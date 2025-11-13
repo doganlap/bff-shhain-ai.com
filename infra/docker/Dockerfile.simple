@@ -1,0 +1,47 @@
+# Stage 1: Build the frontend
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app/frontend
+COPY apps/web/package.json ./
+RUN npm install
+COPY apps/web/ ./
+RUN npm run build
+
+# Stage 2: Build the backend
+FROM node:20-alpine AS backend-builder
+WORKDIR /app/backend
+COPY apps/services/grc-api/package.json ./
+RUN npm install --production
+COPY apps/services/grc-api/ ./
+
+# Stage 3: Final image
+FROM node:20-alpine
+WORKDIR /app
+
+# Copy backend code and dependencies
+COPY --from=backend-builder /app/backend ./backend
+
+# Copy frontend build from builder stage
+COPY --from=frontend-builder /app/frontend/dist ./frontend/dist
+
+# Install serve for serving the frontend
+RUN npm install -g serve
+
+# Copy database schema
+COPY ./infra/db/schema/ ./database-schema/
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S grc -u 1001 -G nodejs
+
+# Change ownership
+RUN chown -R grc:nodejs /app
+
+USER grc
+
+EXPOSE 5001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:5001 || exit 1
+
+CMD ["serve", "-s", "frontend/dist", "-l", "5001"]

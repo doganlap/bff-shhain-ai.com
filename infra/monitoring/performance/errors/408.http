@@ -1,0 +1,4 @@
+HTTP/1.0 408 Request Timeout
+Content-Type: text/html
+
+<html><body><h2>408 Request Timeout</h2></body></html>

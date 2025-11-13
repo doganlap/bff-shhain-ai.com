@@ -1,0 +1,61 @@
+{
+  "timestamp": "2025-11-12T10:52:53.163Z",
+  "summary": {
+    "passed": 1,
+    "failed": 8,
+    "successRate": 11
+  },
+  "steps": [
+    {
+      "stepName": "API Health Check",
+      "success": true,
+      "details": "API is running and healthy"
+    },
+    {
+      "stepName": "Tenant Authentication",
+      "success": false,
+      "details": "Login failed: [object Object]"
+    },
+    {
+      "stepName": "Auto Assessment Preview",
+      "success": false,
+      "details": "Preview failed: [object Object]"
+    },
+    {
+      "stepName": "Get Organization",
+      "success": false,
+      "details": "No organizations found"
+    },
+    {
+      "stepName": "Auto Assessment Generation",
+      "success": false,
+      "details": "Generation failed: [object Object]"
+    },
+    {
+      "stepName": "Response Submission",
+      "success": false,
+      "details": "Submission failed: [object Object]"
+    },
+    {
+      "stepName": "Assessment Completion",
+      "success": false,
+      "details": "Completion failed: [object Object]"
+    },
+    {
+      "stepName": "Assessment Retrieval",
+      "success": false,
+      "details": "Retrieval failed: [object Object]"
+    },
+    {
+      "stepName": "Assessment List",
+      "success": false,
+      "details": "List retrieval failed: [object Object]"
+    }
+  ],
+  "testData": {
+    "tenantId": null,
+    "organizationId": null,
+    "assessmentId": null,
+    "responseId": null
+  }
+}

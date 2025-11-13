@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../Dogan-GRC-Ai"
+		},
+		{
+			"path": "../../www.shahin.com"
+		}
+	],
+	"settings": {
+		"yaml.schemaStore.enable": false,
+		"powershell.cwd": "Assessmant-GRC"
+	}
+}

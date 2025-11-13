@@ -1,0 +1,23 @@
+config:
+  target: http://localhost:3000
+  phases:
+    - duration: 30
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 60
+      arrivalRate: 15
+      name: "Sustained load"
+    - duration: 30
+      arrivalRate: 30
+      name: "Peak load"
+  defaults:
+    headers:
+      Content-Type: application/json
+
+scenarios:
+  - name: "API Health Check"
+    weight: 100
+    flow:
+      - get:
+          url: "/api/health"
+      - think: 1

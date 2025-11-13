@@ -1,0 +1,173 @@
+Category,Component,Purpose,Status,Modules,Dependencies
+App Shell & Navigation,AppShell,"App frame with topbar, sidebar, content area",Ready,All,React/Tailwind
+App Shell & Navigation,TopBar,"Global header with search, user menu, quick actions",Planned,All,React/Tailwind
+App Shell & Navigation,SidebarNav,Collapsible navigation with section groups and badges,Planned,All,React/Tailwind
+App Shell & Navigation,Breadcrumbs,Hierarchical navigation trail,Planned,All,React
+App Shell & Navigation,CommandPalette,Omnibox (⌘K) to run actions and navigate,Planned,All,cmdk/Headless UI
+App Shell & Navigation,GlobalSearch,Cross‑module search with filters,Planned,All,Algolia/Elastic (optional)
+App Shell & Navigation,NotificationsBell,Unread alerts dropdown and inbox link,Planned,All,React
+App Shell & Navigation,UserMenu,"Profile, settings, sign‑out, tenant switch",Planned,All,React
+App Shell & Navigation,TenantSwitcher,Switch between tenants/workspaces,Planned,All,React
+App Shell & Navigation,EnvironmentBadge,Shows env (Dev/QA/Prod) & region,Planned,All,React
+Layout & Containers,PageHeader,"Title, subtitle, actions, breadcrumbs",Planned,All,React/Tailwind
+Layout & Containers,SectionCard,"Card with header/footer, shadow tokens",Ready,All,React/Tailwind
+Layout & Containers,SplitPane,Resizable split view,Planned,All,react-split-pane
+Layout & Containers,SidePanel,Right drawer for copilot/collab/inspectors,Ready,All,React/Tailwind
+Layout & Containers,ModalDialog,Accessible dialog with focus trap,Planned,All,Radix UI/shadcn
+Layout & Containers,Tabs,Content tabs with URL sync,Planned,All,Radix UI/shadcn
+Layout & Containers,Accordion,Disclosure lists for settings/help,Planned,All,Radix UI/shadcn
+Layout & Containers,Stepper,Multi‑step progress for wizards,Planned,All,React
+Layout & Containers,EmptyState,Helpful empty/zero states with CTAs,Planned,All,React
+Layout & Containers,SkeletonLoader,Shimmers for loading lists/charts,Planned,All,React
+Layout & Containers,ErrorBoundary,Catches UI errors and offers retry,Planned,All,React
+Forms & Data Entry,FormBuilder,Schema‑driven forms with validation,Planned,All,react-hook-form/zod
+Forms & Data Entry,Input,Text input with label/help/error,Ready,All,React
+Forms & Data Entry,TextArea,Multi‑line input,Planned,All,React
+Forms & Data Entry,Number,Localized number input,Planned,All,React
+Forms & Data Entry,CurrencySAR,Currency input for SAR,Planned,Finance,React
+Forms & Data Entry,Select,Single select,Planned,All,React
+Forms & Data Entry,MultiSelect,Taggable multi select,Planned,All,React
+Forms & Data Entry,DatePicker,Gregorian date picker,Planned,All,react-day-picker
+Forms & Data Entry,HijriDatePicker,Hijri calendar picker,Planned,All,custom
+Forms & Data Entry,FileUpload,"Drag & drop, chunked uploads, progress",Planned,All,uppy/tus
+Forms & Data Entry,RichText,Markdown/WYSIWYG,Planned,All,TipTap/Quill
+Forms & Data Entry,AssigneePicker,People picker with avatars,Planned,CRM/Projects/Support,React
+Forms & Data Entry,SignaturePad,Handwritten/e‑sign capture,Planned,Contracts/Approvals,Signature pad
+Forms & Data Entry,JSONEditor,JSON code editor (with schema),Planned,Admin/Dev,Monaco
+Forms & Data Entry,PhoneInputKSA,Phone input with KSA validation,Planned,All,libphonenumber-js
+Forms & Data Entry,AddressKSA,Address fields mapped to KSA regions,Planned,All,React
+Data Display,DataTable,"Virtualized table, sorting, filters, server pagination",Ready,All,React/Table libs
+Data Display,PivotTable,Excel‑like pivot with group/agg,Planned,Analytics/Finance,Pivot library
+Data Display,KanbanBoard,Drag‑drop lanes for stages,Planned,CRM/Projects/Support,React DnD
+Data Display,TreeTable,"Hierarchical rows (e.g., BOM/projects)",Planned,Ops/Projects,React
+Data Display,MasterDetail,Parent row with expandable details,Planned,All,React
+Data Display,Timeline,Events over time for tickets/projects,Planned,Projects/Support,React
+Data Display,ActivityFeed,Chronological updates with actors and verbs,Planned,All,React
+Data Display,Avatar,User/tenant images,Ready,All,React
+Data Display,Badge,Status/priority labels,Ready,All,React
+Data Display,ProgressBar,Progress with thresholds,Planned,All,React
+Data Display,Tooltip,Accessible tooltips,Planned,All,Radix UI
+Filtering / Querying,QueryBuilder,No‑code conditions to SQL/Prisma,Planned,All,Rule builder
+Filtering / Querying,SmartFilterBar,Chips + popovers + saved filters,Planned,All,React
+Filtering / Querying,SavedViews,Persisted table/chart presets per user,Planned,All,React
+Filtering / Querying,ColumnConfigurator,Show/hide/reorder columns,Planned,All,React
+Filtering / Querying,ExportMenu,CSV/XLSX/PNG export for tables/charts,Planned,All,SheetJS
+Filtering / Querying,InlineBulkEdit,Bulk update selected rows,Planned,All,React
+Filtering / Querying,AuditLogViewer,Filterable audit events with diffs,Planned,All,React
+Filtering / Querying,DiffViewer,Side‑by‑side or inline diff,Planned,Contracts/Docs,Monaco/CodeDiff
+Analytics & Viz,KPIStatCard,Big number with delta/sparkline,Ready,All,Recharts
+Analytics & Viz,MiniTrend,Tiny sparkline for lists,Planned,All,Recharts
+Analytics & Viz,LineBarAreaCharts,Common chart primitives,Ready,All,Recharts
+Analytics & Viz,PieDonut,Share of total,Planned,All,Recharts
+Analytics & Viz,Heatmap,SLA heatmap / utilization,Planned,Ops/Support,Recharts/Canvas
+Analytics & Viz,Histogram,Distribution view,Planned,Analytics,Recharts
+Analytics & Viz,BoxPlot,Outlier detection,Planned,Analytics,Recharts
+Analytics & Viz,BulletChart,Targets vs actuals,Planned,Finance/OKRs,Recharts
+Analytics & Viz,FunnelChart,Sales/tender funnel,Planned,CRM/Tenders,Recharts
+Analytics & Viz,Gauge,SLA / utilization gauges,Planned,Ops/Support,Recharts
+Analytics & Viz,MapKSA,Choropleth by region/city,Planned,Analytics,Leaflet/Mapbox
+Analytics & Viz,Sankey,Flow of value or tickets,Planned,Analytics,Recharts
+Workflow & Collaboration,ApprovalFlowBuilder,Design approval steps & rules,Planned,All,Custom/Radix
+Workflow & Collaboration,PlaybooksEditor,Reusable sequences for tasks,Planned,Support/Sales,React
+Workflow & Collaboration,AutomationBuilder,If‑This‑Then‑That with triggers/actions,Planned,All,n8n-style
+Workflow & Collaboration,Checklist,Checkable task lists,Planned,All,React
+Workflow & Collaboration,CommentsThreads,Threaded comments with mentions,Planned,All,React
+Workflow & Collaboration,Reactions,Emoji reactions for items,Planned,All,React
+Workflow & Collaboration,TaskList,Personal and team tasks,Planned,All,React
+Workflow & Collaboration,PresenceAvatars,Live presence indicators,Planned,All,WebSocket
+Workflow & Collaboration,VersionHistory,Item revision history with restore,Planned,Docs/Contracts,React
+Communication,ChatWidget,Channel/DM chat with files & mentions,Planned,All,WebSocket
+Communication,InboxView,Unified inbox (email/tickets),Planned,Support/Sales,React
+Communication,EmailComposer,Template‑based email compose,Planned,Sales/Support,MJML/React email
+Communication,WhatsAppThreadViewer,WhatsApp thread (read) + reply via API,Planned,Support/Sales,WA Business API
+Communication,VoiceNoteRecorder,Record/playback voice notes,Planned,All,MediaRecorder
+Communication,MeetingScheduler,Propose times & calendar booking,Planned,All,Calendar APIs
+Communication,NotificationsCenter,Fullpage view of notifications with filters,Planned,All,React
+Communication,AnnouncementsBanner,Top banner for releases/outages,Planned,All,React
+Scheduling & Calendars,Calendar,Month/Week/Day views,Planned,All,FullCalendar
+Scheduling & Calendars,ResourceScheduler,Allocate resources to time slots,Planned,Ops/Projects,FullCalendar
+Scheduling & Calendars,TimelineGantt,Project timeline/gantt light,Planned,Projects,Custom/Vis
+Scheduling & Calendars,SLACountdown,SLA timers with thresholds,Planned,Support,React
+Scheduling & Calendars,WorkingHoursKSA,Regional business hours & holidays,Planned,All,Custom
+Files & Evidence,EvidenceBinder,Collection of related evidence/files,Planned,Compliance/Projects,React
+Files & Evidence,DocumentViewer,PDF/Image viewer with thumbnails,Planned,All,pdf.js
+Files & Evidence,OCRPreview,OCR text/table extraction preview,Planned,All,Tesseract/Service
+Files & Evidence,TableExtractEditor,Fix extracted tables before save,Planned,All,React
+Files & Evidence,RedactionTool,Mask PII/PHI in docs/images,Planned,All,Canvas
+Files & Evidence,ESignRequest,Collect e‑signatures,Planned,Contracts,Docusign/Adobe Sign
+Files & Evidence,VersionedAttachmentList,File list with versions/diff,Planned,All,React
+AI Copilot & Knowledge,PromptBar,Inline prompt with context chips,Planned,All,React
+AI Copilot & Knowledge,CopilotPanel,Right drawer with chat & tools,Ready,All,React
+AI Copilot & Knowledge,InlineSuggest,Type‑ahead suggestions in forms,Planned,All,Service
+AI Copilot & Knowledge,ExplainThis,Explain selected chart/table,Planned,Analytics,Service
+AI Copilot & Knowledge,SummarizeSelection,Summarize selection into bullets,Planned,All,Service
+AI Copilot & Knowledge,DraftFromTemplate,Generate document from template,Planned,Proposals/Emails,Service
+AI Copilot & Knowledge,RAGSourcesSidebar,Citations + source preview,Planned,All,Service
+AI Copilot & Knowledge,ConnectorManager,Connect to SharePoint/OneDrive/Tailscale FS,Planned,All,Service
+AI Copilot & Knowledge,PromptTemplatesLibrary,Saved prompts with permissions,Planned,All,Service
+AI Copilot & Knowledge,EvaluationRubric,Thumbs + labels + comments,Planned,All,Service
+AI Copilot & Knowledge,ActionRecipes,Multi‑step agent actions,Planned,All,Service
+Security & Identity,RBACMatrixEditor,Role‑permission grid editor,Planned,All,React
+Security & Identity,PermissionGuard,Wrapper to gate UI actions,Planned,All,React
+Security & Identity,ConsentBannerPDPL,Cookies/PDPL consent,Planned,All,React
+Security & Identity,SessionTimeoutModal,Warn and extend session,Planned,All,React
+Security & Identity,DeviceTrustIndicator,Shows device/compliance state,Planned,All,Service
+Security & Identity,AuditTrailViewer,Entity‑level audit with filters,Planned,All,React
+Security & Identity,MaskedField,Mask/unmask sensitive values,Planned,All,React
+Security & Identity,RealtimeAccessChecker,Warn if permission changed,Planned,All,WebSocket
+Finance & Commercial,PricingCalculator,Interactive price/discount matrix,Planned,Sales,React
+Finance & Commercial,QuoteBuilder,"Quote lines, terms, approval route",Planned,Sales,React
+Finance & Commercial,ProposalComposer,Rich proposal with sections & sign‑off,Planned,Sales,React
+Finance & Commercial,ContractViewer,Clause explorer & diff view,Planned,Contracts,React
+Finance & Commercial,OrderWizard,Step‑by‑step order capture,Planned,Sales/Ops,React
+Finance & Commercial,InvoiceGrid,"Aging, status, bulk actions",Planned,Finance,React
+Finance & Commercial,PaymentStatusBadge,Paid/Partial/Overdue labels,Planned,Finance,React
+Finance & Commercial,RevenueWaterfall,ARR/MRR waterfall viz,Planned,Finance,Recharts
+Finance & Commercial,DSOWidget,Days Sales Outstanding KPI,Planned,Finance,React
+Finance & Commercial,CollectionsQueue,Queue with call scripts & notes,Planned,Finance,React
+Finance & Commercial,TaxVATHelper,SAR VAT calculations & labels,Planned,Finance,Lib
+Finance & Commercial,CurrencyFormatterSAR,Unified SAR formatting,Ready,Finance,Intl API
+Finance & Commercial,LedgerViewer,Journal/GL explorer,Planned,Finance,React
+Finance & Commercial,ReconciliationAssistant,Suggest matches for payments,Planned,Finance,Service
+RFP / Tenders,TenderInbox,RFP feed parser/crawler,Planned,Tenders,Service
+RFP / Tenders,RequirementsParser,Extract requirements into structure,Planned,Tenders,NLP Service
+RFP / Tenders,ComplianceMatrixEditor,Map requirements to controls,Planned,Tenders/Compliance,React
+RFP / Tenders,ScoringBoard,Multi‑reviewer scoring with weights,Planned,Tenders,React
+RFP / Tenders,VendorComparison,Side‑by‑side comparison table,Planned,Tenders,React
+RFP / Tenders,ClarificationQA,Threaded Q&A per requirement,Planned,Tenders,React
+RFP / Tenders,SubmissionChecklist,Deadline‑driven checklist,Planned,Tenders,React
+RFP / Tenders,DeadlineCountdown,Countdown with reminders,Planned,Tenders,React
+Support & Success,TicketComposer,Rich ticket create with templates,Planned,Support,React
+Support & Success,SLATimer,Live SLA timers and breach flags,Planned,Support,React
+Support & Success,MacroPicker,Insert macros/playbooks,Planned,Support,React
+Support & Success,KnowledgeArticle,View/attach KB articles,Planned,Support,React
+Support & Success,CSATNPS,Survey builder & responses,Planned,Success,React
+Support & Success,ChurnRiskBadge,Predicted risk indicator,Planned,Success,Service
+Support & Success,OnboardingChecklist,Customer onboarding tasks,Planned,Success,React
+Support & Success,RenewalTimeline,Contract and upsell timeline,Planned,Success,React
+Ops / Projects,ProjectKanban,Project tasks kanban,Planned,Projects,React DnD
+Ops / Projects,MilestoneTracker,Milestones with owners/dates,Planned,Projects,React
+Ops / Projects,RiskHeatmap,Probability vs impact heatmap,Planned,Projects/Compliance,Recharts/Canvas
+Ops / Projects,ResourceHeatmap,Utilization by person/skill,Planned,Ops,Recharts/Canvas
+Ops / Projects,CapacityPlanner,Plan capacity vs demand,Planned,Ops,React
+Ops / Projects,DependencyGraph,Relationships between tasks,Planned,Projects,D3/Graph lib
+Ops / Projects,ChangeRequestForm,CR form + approvals,Planned,Projects,React
+Ops / Projects,RunbookViewer,Step‑by‑step SOPs with status,Planned,Ops/Support,React
+Observability & Admin,HealthStatus,Service health cards,Planned,Admin,React
+Observability & Admin,JobQueueMonitor,Background jobs with retries,Planned,Admin,React
+Observability & Admin,DLQViewer,Dead‑letter queue viewer,Planned,Admin,React
+Observability & Admin,LogsTail,Live logs with filters,Planned,Admin,React
+Observability & Admin,FeatureFlags,Toggle features per tenant,Planned,Admin,React
+Observability & Admin,ConfigEditor,YAML/JSON editor with validation,Planned,Admin,Monaco
+Observability & Admin,TenantSettings,Settings screens per tenant,Planned,Admin,React
+Observability & Admin,EmailTemplateEditor,MJML/HTML templates with preview,Planned,Admin,React
+Observability & Admin,WebhookTester,Send test payloads & see responses,Planned,Admin,React
+i18n & Theming,LocaleSwitcher,AR/EN switcher,Ready,All,React
+i18n & Theming,NumeralFormatter,AR/Western digits toggle,Planned,All,Intl API
+i18n & Theming,HijriToggle,Toggle Hijri/Gregorian,Planned,All,Custom
+i18n & Theming,TimezonePicker,Pick/display timezone,Planned,All,React
+i18n & Theming,TenantThemeSwitcher,Swap accent/themes per tenant,Ready,All,React
+i18n & Theming,BrandingUploader,Upload logo/favicon,Planned,All,React
+i18n & Theming,DataResidencyBadge,Shows data region/compliance,Planned,All,React
+i18n & Theming,UsageMeter,Quota and usage bars,Planned,All,React
+i18n & Theming,BillingPlanSelector,Plan/limits chooser,Planned,All,React

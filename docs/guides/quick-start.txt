@@ -1,0 +1,105 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║           GRC TEMPLATE - 5-MINUTE QUICK START                             ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+
+STEP 1: DATABASE SETUP (2 minutes)
+═══════════════════════════════════════════════════════════════════════════
+
+createdb my_grc_app
+cd GRC-TEMPLATE/database-schema
+psql -U postgres -d my_grc_app -f base_schema.sql
+psql -U postgres -d my_grc_app -f organizations_comprehensive.sql
+psql -U postgres -d my_grc_app -f sector_intelligence_fields.sql
+
+✅ Database ready with 206+ tables!
+
+
+STEP 2: BACKEND SETUP (2 minutes)
+═══════════════════════════════════════════════════════════════════════════
+
+mkdir my-grc-backend && cd my-grc-backend
+npm init -y
+npm install express pg cors dotenv uuid morgan nodemon
+
+# Copy files
+cp -r ../GRC-TEMPLATE/backend-api/* ./
+
+# Create .env
+echo "PORT=5000
+DB_NAME=my_grc_app
+DB_USER=postgres
+DB_PASSWORD=password" > .env
+
+# Start server
+npm start
+
+✅ Backend running at http://localhost:5000!
+
+
+STEP 3: FRONTEND SETUP (1 minute)
+═══════════════════════════════════════════════════════════════════════════
+
+npx create-react-app my-grc-frontend
+cd my-grc-frontend
+npm install react-router-dom lucide-react
+
+# Copy files
+cp -r ../GRC-TEMPLATE/frontend-components/* ./src/components/
+cp ../GRC-TEMPLATE/services/apiService.js ./src/services/
+
+# Create .env
+echo "REACT_APP_API_URL=http://localhost:5000/api" > .env
+
+# Start frontend
+npm start
+
+✅ Frontend running at http://localhost:3000!
+
+
+DONE! 🎉
+═══════════════════════════════════════════════════════════════════════════
+
+You now have a complete GRC platform with:
+  ✅ 206+ database tables
+  ✅ 50+ API endpoints
+  ✅ 15+ UI components
+  ✅ Sector-based intelligence
+  ✅ Auto-filtering controls
+  ✅ Professional UI
+
+
+TEST IT:
+────────
+1. Open: http://localhost:3000/organizations
+2. Click: [Add Organization]
+3. See: 3-step wizard with auto-configuration!
+
+
+WHAT YOU GET:
+─────────────
+✅ Sector-based automatic control filtering
+✅ Size-based control scaling
+✅ Multi-step wizards
+✅ Universal table viewer
+✅ Complete CRUD operations
+✅ Professional UI
+✅ Production-ready code
+
+
+NEXT STEPS:
+───────────
+1. Customize branding (logo, colors)
+2. Add your specific sectors
+3. Import your controls
+4. Deploy to production
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+📁 Template Location: D:\ASSESSMENT-MODULE\GRC-TEMPLATE
+📚 Documentation: GRC-TEMPLATE/documentation/
+🚀 Status: Production Ready!
+
+═══════════════════════════════════════════════════════════════════════════
+

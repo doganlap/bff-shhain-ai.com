@@ -1,0 +1,266 @@
+MICROSERVICES CONSOLIDATION - QUICK REFERENCE
+==============================================
+
+PHASE 1: DOCUMENT SERVICE - READY TO DEPRECATE
+================================================
+Status: ALREADY CONSOLIDATED INTO GRC-API
+Risk: LOW
+Action: Verify routes exist, update frontend, set deprecation date
+
+Routes (10 total):
+  POST   /api/documents/upload
+  GET    /api/documents
+  GET    /api/documents/:id
+  POST   /api/documents/:id/reprocess
+  DELETE /api/documents/:id
+  GET    /api/documents/stats/processing
+  GET    /api/documents/secure/:token
+  POST   /api/documents/:id/generate-access-url
+  GET    /api/documents/security/dashboard
+  POST   /api/documents/search
+
+Middleware: authenticateToken, requireTenantAccess, requirePermission
+Services: documentProcessor, avScanner, secureStorage
+Dependencies: multer, pdf-parse, mammoth, sharp
+Database: documents, document_chunks, security_audit_log
+
+Status in GRC-API: IDENTICAL implementation exists
+Location: grc-api/routes/documents.js
+Recommendation: DEPRECATE standalone service immediately
+
+
+PHASE 2: PARTNER SERVICE - REQUIRES INTEGRATION
+================================================
+Status: PARTIAL OVERLAP - missing collaboration features
+Risk: MEDIUM
+Timeline: 1-2 weeks
+Action: Merge collaboration and resource sharing features
+
+Routes (13 total):
+  Partners (6):
+    GET    /api/partners
+    GET    /api/partners/:id
+    POST   /api/partners
+    POST   /api/partners/invite
+    PUT    /api/partners/:id
+    DELETE /api/partners/:id
+
+  Collaborations (5):
+    GET    /api/collaborations
+    GET    /api/collaborations/:id
+    POST   /api/collaborations
+    PUT    /api/collaborations/:id
+    DELETE /api/collaborations/:id
+
+  Resources (2):
+    GET    /api/partners/:partnerId/resources
+    POST   /api/partners/:partnerId/share-resource
+
+Middleware: validatePartnerAccess, requirePartnerAccess
+Services: partnerService, collaborationService
+Dependencies: axios
+Database: partners, partner_collaborations
+
+Status in GRC-API: PARTIAL (partners.js exists, missing collab features)
+Missing in GRC-API: Collaboration management, resource sharing, cross-tenant access
+
+Tasks:
+  [ ] Copy collaborationService to grc-api/services/
+  [ ] Create grc-api/routes/collaborations.js
+  [ ] Merge resources route endpoints
+  [ ] Update partnerAccess middleware in grc-api
+  [ ] Test collaboration workflows
+  [ ] Test cross-tenant access
+
+
+PHASE 3: NOTIFICATION SERVICE - NEEDS INTEGRATION
+==================================================
+Status: DIFFERENT ARCHITECTURE - GRC-API missing email implementation
+Risk: HIGH
+Timeline: 2-3 weeks
+Action: Integrate SMTP + job queue architecture
+
+Routes (4 total):
+  POST /api/notifications/send
+  POST /api/notifications/email
+  GET  /api/notifications
+  GET  /api/notifications/templates
+
+Middleware: X-Service-Token validation
+Services: emailService, templateService, smartNotificationEngine
+Dependencies: nodemailer, twilio, handlebars, ejs, mjml, juice, bull, redis, winston
+Database: notifications
+
+Status in GRC-API: ROUTE EXISTS but different architecture
+GRC-API has: Joi validation, multi-channel support, scheduling, metadata
+Service has: SMTP implementation, job queue (Bull), actual email sending
+Gap: GRC-API doesn't actually send emails
+
+Architecture Decision: Keep database-driven + add job queue for scalability
+
+Tasks:
+  [ ] Copy emailService to grc-api/services/
+  [ ] Copy templateService to grc-api/services/
+  [ ] Create grc-api/config/smtp.js
+  [ ] Install dependencies: bull, redis, nodemailer
+  [ ] Update routes/notifications.js with email integration
+  [ ] Add Bull job queue initialization in server.js
+  [ ] Implement email sending on notification create
+  [ ] Test email delivery and retries
+
+
+CONSOLIDATED ENDPOINT SUMMARY
+=============================
+
+After consolidation, grc-api will have:
+  /api/documents (10 routes)
+  /api/partners (6 routes)
+  /api/collaborations (5 routes)
+  /api/partners/:partnerId/resources (2 routes)
+  /api/notifications (4 routes)
+
+Total: 27 routes consolidated from 3 microservices
+Current grc-api routes: 40+ additional routes
+
+
+CRITICAL ENVIRONMENT VARIABLES
+==============================
+
+DATABASE:
+  DB_HOST=localhost
+  DB_PORT=5432
+  DB_NAME=grc_ecosystem
+  DB_USER=grc_user
+  DB_PASSWORD=***
+
+SMTP (Phase 3):
+  SMTP_HOST=***
+  SMTP_PORT=587
+  SMTP_USER=***
+  SMTP_PASSWORD=***
+  SMTP_FROM=***
+
+JWT:
+  JWT_SECRET=***
+
+SERVICE-TO-SERVICE:
+  SERVICE_TOKEN=***
+
+REDIS (Phase 3, optional):
+  REDIS_HOST=localhost
+  REDIS_PORT=6379
+
+
+KEY FILES TO MIGRATE
+====================
+
+FROM DOCUMENT SERVICE (already in grc-api):
+  ✓ services/documentProcessor.js
+  ✓ services/avScanner.js
+  ✓ services/secureStorage.js
+  ✓ routes/documents.js
+
+FROM PARTNER SERVICE:
+  [ ] services/partnerService.js
+  [ ] services/collaborationService.js
+  [ ] routes/partners.js (update/enhance)
+  [ ] routes/collaborations.js (NEW)
+  [ ] middleware/partnerAccess.js
+
+FROM NOTIFICATION SERVICE:
+  [ ] services/emailService.js
+  [ ] services/templateService.js
+  [ ] services/smartNotificationEngine.js (optional)
+  [ ] config/smtp.js
+  [ ] routes/notifications.js (enhance)
+
+
+DEPLOYMENT CHECKLIST
+====================
+
+Pre-Consolidation:
+  [ ] Backup all service databases
+  [ ] Document all API contracts
+  [ ] Test current microservices thoroughly
+  [ ] Prepare rollback plan
+
+Phase 1 (Document):
+  [ ] Verify grc-api documents routes
+  [ ] Update frontend endpoints
+  [ ] Run integration tests
+  [ ] Monitor traffic for 1 week
+
+Phase 2 (Partner):
+  [ ] Integrate collaboration features
+  [ ] Test partnership workflows
+  [ ] Run integration tests
+  [ ] Monitor traffic for 1 week
+
+Phase 3 (Notification):
+  [ ] Integrate email service
+  [ ] Setup job queue with Bull/Redis
+  [ ] Test email sending
+  [ ] Test retry logic
+  [ ] Run integration tests
+  [ ] Monitor traffic for 1 week
+
+Post-Consolidation:
+  [ ] Decommission microservices
+  [ ] Update documentation
+  [ ] Archive service containers
+  [ ] Reduce infrastructure costs
+
+
+TESTING MATRIX
+==============
+
+Phase 1 - Document Service:
+  [ ] POST /upload - file upload with AV scan
+  [ ] GET / - list with pagination
+  [ ] GET /:id - document details
+  [ ] POST /:id/reprocess - reprocess document
+  [ ] DELETE /:id - delete document
+  [ ] POST /search - full-text search
+  [ ] POST /:id/generate-access-url - signed URL creation
+  [ ] GET /secure/:token - signed URL access
+
+Phase 2 - Partner Service:
+  [ ] GET /api/partners - list partners
+  [ ] POST /api/partners - create partner
+  [ ] PUT /api/partners/:id - update partner
+  [ ] GET /api/collaborations - list collaborations
+  [ ] POST /api/collaborations - create collaboration
+  [ ] POST /api/partners/:id/share-resource - share resource
+
+Phase 3 - Notification Service:
+  [ ] POST /api/notifications/send - send notification
+  [ ] POST /api/notifications/email - send email
+  [ ] GET /api/notifications - list notifications
+  [ ] Email delivery verification
+  [ ] Job queue processing
+  [ ] Retry logic on failure
+
+
+TIMELINE ESTIMATE
+=================
+
+Phase 1: 1-2 days (just verification)
+Phase 2: 7-10 days (coding + testing)
+Phase 3: 10-15 days (architecture + coding + testing)
+Buffer: 3-4 days (unexpected issues)
+
+Total: 3-4 weeks
+
+
+ROLLBACK PLAN
+=============
+
+If issues occur:
+1. Revert grc-api to previous version
+2. Keep microservice containers running
+3. Route requests back to individual services
+4. Identify root cause
+5. Fix and re-deploy
+
+Keep microservices active for 4 weeks post-consolidation
+before full decommission.

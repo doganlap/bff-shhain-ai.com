@@ -1,0 +1,297 @@
+# CI/CD Pipeline Configuration - GRC Platform
+# Production-Grade Deployment Automation
+name: GRC Platform CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOCKER_REGISTRY: ghcr.io
+  IMAGE_TAG: ${{ github.sha }}
+  KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
+
+jobs:
+  # Security and Quality Gates
+  security-scan:
+    name: Security & Quality Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run ESLint Security Analysis
+        run: npm run lint:security
+
+      - name: Run Dependency Vulnerability Scan
+        run: npm audit --audit-level=moderate
+
+      - name: Run SAST Security Scan
+        uses: github/super-linter@v4
+        env:
+          DEFAULT_BRANCH: main
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VALIDATE_TYPESCRIPT_ES: true
+          VALIDATE_JAVASCRIPT_ES: true
+          VALIDATE_DOCKERFILE: true
+
+      - name: Generate Security Report
+        run: |
+          echo "Security Scan Results:" > security-report.txt
+          echo "ESLint: PASSED" >> security-report.txt
+          echo "Dependency Scan: PASSED" >> security-report.txt
+          echo "SAST Scan: PASSED" >> security-report.txt
+
+  # Unit and Integration Testing
+  test-suite:
+    name: Comprehensive Testing
+    runs-on: ubuntu-latest
+    needs: security-scan
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: grc_test
+          POSTGRES_USER: grc_test
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Database Migrations
+        run: npm run db:migrate:test
+        env:
+          DATABASE_URL: postgresql://grc_test:test_password@localhost:5432/grc_test
+
+      - name: Run Unit Tests
+        run: npm run test:unit
+
+      - name: Run Integration Tests
+        run: npm run test:integration
+        env:
+          DATABASE_URL: postgresql://grc_test:test_password@localhost:5432/grc_test
+          REDIS_URL: redis://localhost:6379
+
+      - name: Run API Tests
+        run: npm run test:api
+
+      - name: Generate Test Coverage
+        run: npm run test:coverage
+
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v3
+
+  # Docker Build and Security Scan
+  build-and-scan:
+    name: Build & Security Scan Images
+    runs-on: ubuntu-latest
+    needs: [security-scan, test-suite]
+    strategy:
+      matrix:
+        service: [web, bff, grc-api, auth-service, document-service, partner-service, notification-service]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.DOCKER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker Image
+        uses: docker/build-push-action@v5
+        with:
+          context: apps/${{ matrix.service }}
+          push: false
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ matrix.service }}:${{ env.IMAGE_TAG }}
+            ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ matrix.service }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Run Trivy Security Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ matrix.service }}:${{ env.IMAGE_TAG }}
+          format: 'sarif'
+          output: 'trivy-${{ matrix.service }}.sarif'
+
+      - name: Push Docker Image
+        if: github.ref == 'refs/heads/main'
+        uses: docker/build-push-action@v5
+        with:
+          context: apps/${{ matrix.service }}
+          push: true
+          tags: |
+            ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ matrix.service }}:${{ env.IMAGE_TAG }}
+            ${{ env.DOCKER_REGISTRY }}/${{ github.repository }}/${{ matrix.service }}:latest
+
+  # Performance and Load Testing
+  performance-testing:
+    name: Performance Validation
+    runs-on: ubuntu-latest
+    needs: build-and-scan
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Artillery
+        run: npm install -g artillery@latest
+
+      - name: Deploy to Staging Environment
+        run: |
+          docker-compose -f infra/deployment/docker-compose.staging.yml up -d
+          sleep 60  # Wait for services to be ready
+
+      - name: Run Performance Tests
+        run: |
+          artillery run tests/performance/auth-load-test.yml --output auth-results.json
+          artillery run tests/performance/grc-api-load-test.yml --output api-results.json
+
+      - name: Validate Performance Metrics
+        run: |
+          node scripts/validate-performance.js auth-results.json api-results.json
+
+      - name: Cleanup Staging
+        if: always()
+        run: docker-compose -f infra/deployment/docker-compose.staging.yml down
+
+  # Blue-Green Deployment
+  deploy-production:
+    name: Blue-Green Production Deployment
+    runs-on: ubuntu-latest
+    needs: [build-and-scan, performance-testing]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Kubectl
+        uses: azure/setup-kubectl@v3
+
+      - name: Configure Kubectl
+        run: |
+          echo "${{ secrets.KUBECONFIG_DATA }}" | base64 -d > ~/.kube/config
+          kubectl config current-context
+
+      - name: Deploy Blue Environment
+        run: |
+          # Update image tags in deployment manifests
+          envsubst < infra/k8s/deployment-blue.yaml | kubectl apply -f -
+
+          # Wait for blue deployment to be ready
+          kubectl rollout status deployment/grc-platform-blue --timeout=300s
+
+      - name: Run Health Checks on Blue
+        run: |
+          kubectl port-forward service/grc-platform-blue 8080:80 &
+          sleep 10
+
+          # Run comprehensive health checks
+          ./scripts/health-check.sh http://localhost:8080
+
+      - name: Run Smoke Tests
+        run: |
+          npm run test:smoke -- --base-url=http://localhost:8080
+
+      - name: Switch Traffic to Blue (Green to Blue)
+        run: |
+          # Update service to point to blue deployment
+          kubectl patch service grc-platform -p '{"spec":{"selector":{"version":"blue"}}}'
+
+          # Verify traffic switch
+          kubectl get service grc-platform -o yaml
+
+      - name: Monitor Blue Environment
+        run: |
+          echo "Monitoring blue environment for 5 minutes..."
+          sleep 300
+
+          # Check for any errors or issues
+          kubectl logs -l app=grc-platform,version=blue --tail=100
+
+      - name: Cleanup Old Green Environment
+        run: |
+          # Scale down green deployment
+          kubectl scale deployment grc-platform-green --replicas=0
+
+      - name: Deployment Success Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: "🚀 GRC Platform deployed successfully to production!"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  # Rollback Strategy
+  rollback:
+    name: Emergency Rollback
+    runs-on: ubuntu-latest
+    if: failure()
+    needs: deploy-production
+
+    steps:
+      - name: Rollback to Green Environment
+        run: |
+          # Switch traffic back to green
+          kubectl patch service grc-platform -p '{"spec":{"selector":{"version":"green"}}}'
+
+          # Scale up green deployment if needed
+          kubectl scale deployment grc-platform-green --replicas=3
+
+      - name: Rollback Notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: "⚠️ GRC Platform deployment failed. Rolled back to previous version."
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir /s /b \"d:\\Projects\\GRC-Master\\Assessmant-GRC\")",
+      "Bash(dir:*)",
+      "Bash(git log:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run)",
+      "Bash(Select-Object -First 100)",
+      "Bash(find:*)",
+      "Bash(node -e:*)",
+      "Bash(ls:*)",
+      "Bash(for f in MICROSERVICES_CONSOLIDATION_ANALYSIS.md CONSOLIDATION_SUMMARY.txt ANALYSIS_FILES_CREATED.txt)",
+      "Bash(done)",
+      "Bash(npm install:*)",
+      "Bash(npm run dev:*)",
+      "Bash(cat:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run preview:*)",
+      "Bash(where:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

@@ -1,0 +1,7 @@
+[project]
+name = "example-api-fastapi"
+version = "0.1.0"
+dependencies = ["fastapi","uvicorn[standard]","pydantic-settings"]
+
+[tool.setuptools]
+packages = ["app"]

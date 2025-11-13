@@ -1,0 +1,20 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "ignorePaths": [
+    "node_modules",
+    "dist",
+    "build",
+    ".next"
+  ],
+  "words": [
+    "SAMA",
+    "PDPL",
+    "ZATCA",
+    "COBIT",
+    "InApp",
+    "sama",
+    "zatca",
+    "inapp"
+  ]
+}

@@ -1,0 +1,465 @@
+# ============================================================================
+# License & Renewal Module Configuration
+# MSP Platform: License management and renewal automation
+# ============================================================================
+
+module:
+  name: license_renewal_service
+  version: 1.0.0
+  enabled: true
+
+# ============================================================================
+# RENEWAL CADENCE (Days before license expiry)
+# ============================================================================
+renewal_cadence:
+  enabled: true
+  cron_schedule: "0 9 * * *"  # Run daily at 9 AM
+  timezone: "UTC"
+  
+  # Milestone actions (days before expiry)
+  milestones:
+    - days_before: 120
+      name: "Initial Pipeline"
+      actions:
+        - type: "create_renewal_opportunity"
+          priority: "normal"
+          assign_to: "account_owner"
+          notify: ["sales", "account_manager"]
+        
+    - days_before: 90
+      name: "Pre-Quote"
+      actions:
+        - type: "generate_pre_quote"
+          include_uplift: true
+          default_price_increase_pct: 5.0
+          notify: ["sales", "tenant_admin"]
+        - type: "send_email"
+          template: "renewal_90d_notice"
+          recipients: ["tenant_admin", "billing_contact"]
+    
+    - days_before: 60
+      name: "Proposal"
+      actions:
+        - type: "create_proposal"
+          include_current_terms: true
+          suggest_upgrade: true
+        - type: "schedule_success_checkin"
+          assign_to: "customer_success"
+        - type: "send_email"
+          template: "renewal_60d_proposal"
+    
+    - days_before: 30
+      name: "Final Quote"
+      actions:
+        - type: "generate_final_quote"
+          include_contract_amendment: true
+        - type: "create_proforma_invoice"
+          payment_terms: "net_30"
+        - type: "send_email"
+          template: "renewal_30d_final"
+          include_quote_pdf: true
+    
+    - days_before: 7
+      name: "Urgent Reminder"
+      actions:
+        - type: "send_email"
+          template: "renewal_7d_urgent"
+          escalate: true
+        - type: "create_task"
+          title: "Urgent: License expiring in 7 days"
+          assign_to: "account_owner"
+          priority: "high"
+    
+    - days_before: 0
+      name: "Expiry Day"
+      actions:
+        - type: "check_payment_status"
+        - type: "auto_renew"
+          if: "auto_renew_enabled"
+        - type: "send_email"
+          template: "renewal_expiry_day"
+        - type: "enable_grace_period"
+          grace_days: 7
+    
+    - days_before: -7
+      name: "Grace Period Ended"
+      actions:
+        - type: "suspend_license"
+          if: "not_paid"
+          keep_readonly: true
+        - type: "create_churn_prevention_task"
+          assign_to: "retention_team"
+          priority: "critical"
+        - type: "send_email"
+          template: "license_suspended"
+    
+    - days_before: -14
+      name: "Final Suspension"
+      actions:
+        - type: "suspend_all_features"
+          http_status: 402
+        - type: "create_escalation_case"
+          severity: "critical"
+
+# ============================================================================
+# ENFORCEMENT RULES
+# ============================================================================
+enforcement:
+  enabled: true
+  mode: "strict"  # 'strict', 'lenient', 'grace_only'
+  
+  # Feature gate configuration
+  feature_gates:
+    - feature_code: "FRAMEWORKS"
+      enforcement_type: "hard"
+      unlicensed_behavior: "block_with_message"
+      http_status: 402
+      message: "Framework management requires an active license"
+      suggest_upgrade: true
+    
+    - feature_code: "USERS"
+      enforcement_type: "hard"
+      unlicensed_behavior: "block_new_users"
+      over_limit_behavior: "prevent_creation"
+      message: "User limit reached. Upgrade to add more users."
+    
+    - feature_code: "STORAGE"
+      enforcement_type: "soft"
+      over_limit_behavior: "allow_with_warning"
+      warning_threshold: 0.8  # Warn at 80%
+      hard_limit_threshold: 1.2  # Block at 120%
+    
+    - feature_code: "API_CALLS"
+      enforcement_type: "soft"
+      over_limit_behavior: "throttle"
+      throttle_rate: "10/minute"  # Reduce to 10 req/min when over limit
+    
+    - feature_code: "SALES_CRM"
+      enforcement_type: "hard"
+      unlicensed_behavior: "hide_ui_routes"
+      routes: ["/app/sales", "/app/crm", "/app/leads"]
+    
+    - feature_code: "TENDERING"
+      enforcement_type: "hard"
+      unlicensed_behavior: "redirect_to_upgrade"
+      upgrade_page: "/platform/licenses/upgrade"
+    
+    - feature_code: "PMO"
+      enforcement_type: "hard"
+      unlicensed_behavior: "block_with_message"
+      message: "Project management features require Professional or Enterprise license"
+    
+    - feature_code: "MAINTENANCE"
+      enforcement_type: "soft"
+      unlicensed_behavior: "allow_with_watermark"
+      limit_features: ["advanced_sla", "priority_support"]
+  
+  # Grace period configuration
+  grace_period:
+    enabled: true
+    default_days: 7
+    allow_readonly: true
+    readonly_features: ["ASSESSMENTS", "REPORTS"]
+    blocked_features: ["USERS", "FRAMEWORKS"]
+  
+  # Usage limit warnings
+  usage_warnings:
+    thresholds:
+      - level: "info"
+        percentage: 50
+        notify: ["tenant_admin"]
+      - level: "warning"
+        percentage: 80
+        notify: ["tenant_admin", "account_owner"]
+        create_upsell_opportunity: true
+      - level: "critical"
+        percentage: 100
+        notify: ["tenant_admin", "account_owner", "sales"]
+        block_new: true
+
+# ============================================================================
+# UPSELL & EXPANSION SIGNALS
+# ============================================================================
+upsell_signals:
+  enabled: true
+  auto_create_opportunities: true
+  
+  triggers:
+    - name: "Usage Saturation"
+      condition: "usage_percentage >= 80"
+      usage_types: ["USERS", "STORAGE", "API_CALLS"]
+      opportunity_type: "expansion"
+      assign_to: "account_owner"
+      suggest_tier: "next_tier_up"
+    
+    - name: "Feature Request"
+      condition: "unlicensed_feature_accessed >= 3"
+      window_days: 7
+      opportunity_type: "upgrade"
+      suggest_features: ["from_access_log"]
+    
+    - name: "High Health Score"
+      condition: "customer_health_score >= 80"
+      opportunity_type: "expansion"
+      suggest_addons: true
+    
+    - name: "Multiple Tenants"
+      condition: "tenant_count > 1"
+      opportunity_type: "multi_tenant_license"
+      suggest_tier: "enterprise"
+  
+  # Opportunity creation settings
+  opportunity_config:
+    default_probability: 0.5
+    default_close_date_days: 30
+    include_usage_data: true
+    include_health_score: true
+    auto_assign: true
+
+# ============================================================================
+# BILLING INTEGRATION
+# ============================================================================
+billing:
+  enabled: true
+  provider: "stripe"  # 'stripe', 'chargebee', 'zuora', 'custom'
+  
+  # Invoice generation
+  invoicing:
+    auto_generate: true
+    days_before_renewal: 30
+    payment_terms: "net_30"
+    currency: "USD"
+    tax_calculation: "auto"
+  
+  # Payment collection
+  payment_collection:
+    auto_charge: true
+    retry_failed_payments: true
+    retry_schedule: [3, 7, 14]  # Days after failure
+    max_retries: 3
+  
+  # AR aging
+  ar_aging:
+    enabled: true
+    buckets: [0, 30, 60, 90]
+    auto_suspend_days: 60
+  
+  # Revenue recognition
+  revenue_recognition:
+    method: "straight_line"  # 'straight_line', 'milestone', 'usage_based'
+    booking_on: "payment_received"
+
+# ============================================================================
+# NOTIFICATIONS
+# ============================================================================
+notifications:
+  enabled: true
+  channels: ["email", "in_app", "webhook"]
+  
+  # Email templates
+  email_templates:
+    renewal_120d_notice:
+      subject: "Your license renews in 120 days"
+      template_path: "templates/renewal_120d.html"
+      send_to: ["tenant_admin", "account_owner"]
+    
+    renewal_90d_notice:
+      subject: "Renewal approaching - Review your quote"
+      template_path: "templates/renewal_90d.html"
+      include_quote: true
+    
+    renewal_60d_proposal:
+      subject: "Customized renewal proposal for {{tenant_name}}"
+      template_path: "templates/renewal_60d.html"
+      include_proposal: true
+    
+    renewal_30d_final:
+      subject: "Final reminder: License expires in 30 days"
+      template_path: "templates/renewal_30d.html"
+      include_quote_pdf: true
+      include_payment_link: true
+    
+    renewal_7d_urgent:
+      subject: "URGENT: License expires in 7 days"
+      template_path: "templates/renewal_7d.html"
+      priority: "high"
+    
+    renewal_expiry_day:
+      subject: "Your license expires today"
+      template_path: "templates/renewal_expiry.html"
+    
+    license_suspended:
+      subject: "License suspended - Action required"
+      template_path: "templates/license_suspended.html"
+      priority: "urgent"
+    
+    usage_warning:
+      subject: "Usage limit warning: {{usage_type}}"
+      template_path: "templates/usage_warning.html"
+  
+  # Webhook events
+  webhooks:
+    - event: "license.renewed"
+      url: "{{WEBHOOK_BASE_URL}}/license/renewed"
+    - event: "license.suspended"
+      url: "{{WEBHOOK_BASE_URL}}/license/suspended"
+    - event: "usage.limit_reached"
+      url: "{{WEBHOOK_BASE_URL}}/usage/limit"
+    - event: "renewal.opportunity_created"
+      url: "{{WEBHOOK_BASE_URL}}/renewal/opportunity"
+
+# ============================================================================
+# AUDIT & COMPLIANCE
+# ============================================================================
+audit:
+  enabled: true
+  log_all_license_events: true
+  log_all_entitlement_checks: false  # Too verbose, enable for debugging
+  log_failed_checks_only: true
+  
+  # Retention
+  retention_days: 365
+  archive_after_days: 90
+  
+  # Compliance reports
+  compliance_reports:
+    enabled: true
+    frequency: "monthly"
+    include_usage_data: true
+    include_revenue_data: true
+    recipients: ["finance", "compliance"]
+
+# ============================================================================
+# FEATURE BUCKET DEFINITIONS
+# ============================================================================
+feature_buckets:
+  starter:
+    max_users: 10
+    max_frameworks: 3
+    max_assessments: 20
+    storage_gb: 5
+    api_calls_monthly: 10000
+    features:
+      - FRAMEWORKS
+      - ASSESSMENTS
+      - RISKS
+    excluded_features:
+      - SALES_CRM
+      - TENDERING
+      - PMO
+      - MAINTENANCE
+  
+  professional:
+    max_users: 50
+    max_frameworks: 10
+    max_assessments: 100
+    storage_gb: 50
+    api_calls_monthly: 100000
+    features:
+      - FRAMEWORKS
+      - ASSESSMENTS
+      - RISKS
+      - SALES_CRM
+      - TENDERING
+      - PMO
+    excluded_features:
+      - MAINTENANCE  # Add-on only
+  
+  enterprise:
+    max_users: -1  # Unlimited
+    max_frameworks: -1
+    max_assessments: -1
+    storage_gb: 500
+    api_calls_monthly: 1000000
+    features:
+      - FRAMEWORKS
+      - ASSESSMENTS
+      - RISKS
+      - SALES_CRM
+      - TENDERING
+      - PMO
+      - DELIVERY
+      - MAINTENANCE
+    support_level: "24/7"
+    dedicated_csm: true
+
+# ============================================================================
+# DUNNING & COLLECTION
+# ============================================================================
+dunning:
+  enabled: true
+  strategy: "aggressive"  # 'passive', 'moderate', 'aggressive'
+  
+  # Failed payment recovery
+  failed_payment_recovery:
+    enabled: true
+    max_attempts: 3
+    retry_delays: [3, 7, 14]
+    escalate_after_attempts: 2
+    suspend_after_days: 21
+  
+  # Churn prevention
+  churn_prevention:
+    enabled: true
+    risk_thresholds:
+      low_health_score: 40
+      no_login_days: 30
+      support_tickets_unresolved: 3
+    actions:
+      - type: "assign_retention_specialist"
+      - type: "offer_discount"
+        max_discount_pct: 15
+      - type: "schedule_executive_call"
+
+# ============================================================================
+# KPIs & METRICS
+# ============================================================================
+kpis:
+  track:
+    - name: "MRR"
+      description: "Monthly Recurring Revenue"
+    - name: "ARR"
+      description: "Annual Recurring Revenue"
+    - name: "GRR"
+      description: "Gross Revenue Retention"
+      target: 95
+    - name: "NRR"
+      description: "Net Revenue Retention"
+      target: 110
+    - name: "Churn Rate"
+      description: "Customer churn rate"
+      target: 5
+    - name: "Renewal Rate"
+      description: "License renewal rate"
+      target: 90
+    - name: "Expansion Rate"
+      description: "Revenue expansion rate"
+      target: 20
+    - name: "ARPU"
+      description: "Average Revenue Per User"
+    - name: "CAC Payback"
+      description: "Customer Acquisition Cost Payback Period (months)"
+      target: 12
+  
+  dashboards:
+    - name: "Renewal Pipeline"
+      refresh_interval: 3600
+      metrics: ["upcoming_renewals", "renewal_value", "at_risk"]
+    - name: "Usage Analytics"
+      refresh_interval: 86400
+      metrics: ["avg_usage", "over_limit_tenants", "upsell_opportunities"]
+    - name: "Revenue Health"
+      refresh_interval: 86400
+      metrics: ["MRR", "ARR", "GRR", "NRR", "churn_rate"]
+
+# ============================================================================
+# DEFAULTS
+# ============================================================================
+defaults:
+  grace_period_days: 7
+  default_price_increase_pct: 5.0
+  auto_renew: true
+  trial_days: 14
+  billing_cycle: "monthly"
+  currency: "USD"
+  payment_terms: "net_30"

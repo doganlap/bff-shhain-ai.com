@@ -1,0 +1,115 @@
+<!DOCTYPE html>  
+<html lang="en">  
+  <head>  
+    <!-- Charset must be first for performance -->
+    <meta charset="UTF-8" />  
+    
+    <!-- Security and compatibility headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' http://localhost:* ws://localhost:* wss://localhost:* http://localhost:3001 http://localhost:3006 ws://localhost:3001 ws://localhost:3006;">
+    
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Preload critical resources -->
+    <link rel="modulepreload" href="/src/main.jsx" crossorigin>
+    
+    <title>Shahin-AI KSA | شاهين الذكي السعودية - منصة الحوكمة الذكية</title>
+    
+    <!-- Prevent blank page flash and optimize performance -->
+    <style>
+      /* Compatibility fixes */
+      * {
+        box-sizing: border-box;
+        -webkit-text-size-adjust: 100%; /* iOS Safari */
+        text-size-adjust: 100%; /* Modern browsers */
+      }
+      
+      #root {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        contain: layout style paint;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      
+      .loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        will-change: opacity;
+        -webkit-transition: opacity 0.3s ease-out;
+        transition: opacity 0.3s ease-out;
+      }
+      
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        -webkit-animation: spin 1s linear infinite;
+        animation: spin 1s linear infinite;
+        will-change: transform;
+      }
+      
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      
+      @-webkit-keyframes spin {
+        to {
+          -webkit-transform: rotate(360deg);
+        }
+      }
+      
+      /* Performance optimizations */
+      .sidebar-transition {
+        will-change: width;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+      }
+      
+      .nav-item {
+        will-change: background-color, transform;
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+      }
+    </style>
+  </head>  
+  <body>  
+    <!-- Loading screen to prevent blank page -->
+    <div id="loading-screen" class="loading-screen">
+      <div class="loading-spinner"></div>
+    </div>
+    
+    <div id="root"></div>  
+    
+    <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Remove loading screen once React loads -->
+    <script>
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          const loadingScreen = document.getElementById('loading-screen');
+          if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => loadingScreen.remove(), 300);
+          }
+        }, 1000);
+      });
+    </script>
+  </body>  
+</html> 

@@ -1,0 +1,4 @@
+HTTP/1.0 500 Internal Server Error
+Content-Type: text/html
+
+<html><body><h2>500 Internal Server Error</h2></body></html>

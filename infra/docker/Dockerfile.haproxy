@@ -1,0 +1,12 @@
+FROM haproxy:2.8-alpine
+
+COPY ./performance/haproxy.cfg.new /usr/local/etc/haproxy/haproxy.cfg
+COPY ./performance/errors /etc/haproxy/errors
+
+USER root
+RUN mkdir -p /run/haproxy
+RUN chown haproxy:haproxy /run/haproxy
+RUN mkdir -p /var/lib/haproxy
+RUN chown haproxy:haproxy /var/lib/haproxy
+RUN echo "" >> /usr/local/etc/haproxy/haproxy.cfg
+USER haproxy

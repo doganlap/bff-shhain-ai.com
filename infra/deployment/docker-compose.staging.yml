@@ -1,0 +1,253 @@
+# Staging Environment for Performance Testing
+version: '3.8'
+
+services:
+  # Web Frontend
+  web:
+    build:
+      context: ../../apps/web
+      dockerfile: Dockerfile
+    container_name: grc-web-staging
+    ports:
+      - "5175:5174"  # Different port for staging
+    environment:
+      - NODE_ENV=staging
+      - API_BASE_URL=http://localhost:3006
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5174/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      - bff
+    networks:
+      - grc-staging-network
+
+  # Backend for Frontend (BFF)
+  bff:
+    build:
+      context: ../../apps/bff
+      dockerfile: Dockerfile
+    container_name: grc-bff-staging
+    ports:
+      - "3006:3005"  # Different port for staging
+    environment:
+      - NODE_ENV=staging
+      - PORT=3005
+      - DATABASE_URL=postgresql://grc_user:${DB_PASSWORD}@postgres:5432/grc_staging
+      - JWT_SECRET=${JWT_SECRET}
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - GRC_API_URL=http://grc-api:3000
+      - DOCUMENT_SERVICE_URL=http://document-service:3002
+      - PARTNER_SERVICE_URL=http://partner-service:3003
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3004
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      postgres:
+        condition: service_healthy
+      grc-api:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+    networks:
+      - grc-staging-network
+
+  # GRC API Service
+  grc-api:
+    build:
+      context: ../../apps/services/grc-api
+      dockerfile: Dockerfile
+    container_name: grc-api-staging
+    ports:
+      - "3001:3000"  # Different port for staging
+    environment:
+      - NODE_ENV=staging
+      - PORT=3000
+      - DATABASE_URL=postgresql://grc_user:${DB_PASSWORD}@postgres:5432/grc_staging
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - grc-staging-network
+
+  # Auth Service
+  auth-service:
+    build:
+      context: ../../apps/services/auth-service
+      dockerfile: Dockerfile
+    container_name: grc-auth-staging
+    ports:
+      - "3002:3001"  # Different port for staging
+    environment:
+      - NODE_ENV=staging
+      - PORT=3001
+      - DATABASE_URL=postgresql://grc_user:${DB_PASSWORD}@postgres:5432/grc_staging
+      - JWT_SECRET=${JWT_SECRET}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - grc-staging-network
+
+  # Document Service
+  document-service:
+    build:
+      context: ../../apps/services/document-service
+      dockerfile: Dockerfile
+    container_name: grc-document-staging
+    ports:
+      - "3003:3002"  # Different port for staging
+    environment:
+      - NODE_ENV=staging
+      - PORT=3002
+      - DATABASE_URL=postgresql://grc_user:${DB_PASSWORD}@postgres:5432/grc_staging
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - grc-staging-network
+
+  # Partner Service
+  partner-service:
+    build:
+      context: ../../apps/services/partner-service
+      dockerfile: Dockerfile
+    container_name: grc-partner-staging
+    ports:
+      - "3004:3003"  # Different port for staging
+    environment:
+      - NODE_ENV=staging
+      - PORT=3003
+      - DATABASE_URL=postgresql://grc_user:${DB_PASSWORD}@postgres:5432/grc_staging
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - grc-staging-network
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ../../apps/services/notification-service
+      dockerfile: Dockerfile
+    container_name: grc-notification-staging
+    ports:
+      - "3005:3004"  # Different port for staging
+    environment:
+      - NODE_ENV=staging
+      - PORT=3004
+      - DATABASE_URL=postgresql://grc_user:${DB_PASSWORD}@postgres:5432/grc_staging
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - grc-staging-network
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: grc-postgres-staging
+    ports:
+      - "5434:5432"  # Different port for staging
+    environment:
+      - POSTGRES_DB=grc_staging
+      - POSTGRES_USER=grc_user
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+      - ../../infra/db/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grc_user -d grc_staging"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    networks:
+      - grc-staging-network
+
+  # Redis for Caching (Optional)
+  redis:
+    image: redis:7-alpine
+    container_name: grc-redis-staging
+    ports:
+      - "6380:6379"  # Different port for staging
+    volumes:
+      - redis_staging_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - grc-staging-network
+
+  # Nginx Load Balancer
+  nginx:
+    image: nginx:alpine
+    container_name: grc-nginx-staging
+    ports:
+      - "8081:80"  # Different port for staging
+    volumes:
+      - ../nginx/nginx.staging.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - web
+      - bff
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - grc-staging-network
+
+networks:
+  grc-staging-network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres_staging_data:
+    driver: local
+  redis_staging_data:
+    driver: local

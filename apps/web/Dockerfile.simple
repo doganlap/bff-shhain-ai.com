@@ -1,0 +1,20 @@
+# Simple production container using existing dist folder
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install serve globally
+RUN npm install -g serve
+
+# Copy the already built dist folder
+COPY dist/ ./dist/
+
+# Expose port
+EXPOSE 5001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost:5001/ || exit 1
+
+# Start serve
+CMD ["serve", "-s", "dist", "-l", "5001", "--cors"]

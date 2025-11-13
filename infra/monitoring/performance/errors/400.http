@@ -1,0 +1,4 @@
+HTTP/1.0 400 Bad Request
+Content-Type: text/html
+
+<html><body><h2>400 Bad Request</h2></body></html>

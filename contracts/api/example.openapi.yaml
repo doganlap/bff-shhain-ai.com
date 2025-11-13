@@ -1,0 +1,17 @@
+openapi: 3.0.3
+info:
+  title: Example Service API
+  version: 1.0.0
+paths:
+  /healthz:
+    get:
+      summary: Liveness probe
+      responses:
+        '200':
+          description: OK
+  /readyz:
+    get:
+      summary: Readiness probe
+      responses:
+        '200':
+          description: Ready

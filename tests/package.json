@@ -1,0 +1,58 @@
+{
+  "name": "assessment-grc-security-tests",
+  "version": "1.0.0",
+  "description": "Multi-tenant RBAC security test suite for Assessment-GRC platform",
+  "scripts": {
+    "test": "jest",
+    "test:security": "jest --config jest.security.config.js",
+    "test:security:tenant-isolation": "jest tests/security/tenantIsolation.test.js",
+    "test:security:rbac": "jest tests/security/rbacPermissions.test.js",
+    "test:security:admin-roles": "jest tests/security/adminRoutes.test.js tests/security/adminMiddleware.test.js",
+    "test:security:integration": "jest tests/integration/multiService.test.js",
+    "test:security:all": "npm run test:security:tenant-isolation && npm run test:security:rbac && npm run test:security:admin-roles && npm run test:security:integration",
+    "test:admin-implementation": "node ../scripts/test-admin-roles.js",
+    "test:performance": "jest tests/performance --runInBand",
+    "test:penetration": "node tests/security/penetrationTests.js",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "security:report": "node scripts/generateSecurityReport.js",
+    "security:report:production": "npm run test:security && npm run security:report -- --production",
+    "compliance:validate": "node scripts/complianceValidator.js",
+    "setup:test-db": "node tests/setup/setupTestDatabase.js",
+    "cleanup:test-db": "node tests/setup/cleanupTestDatabase.js"
+  },
+  "devDependencies": {
+    "@jest/globals": "^29.7.0",
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "faker": "^5.5.3"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.1.5",
+    "pg": "^8.11.3",
+    "redis": "^4.6.10"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": ["<rootDir>/setup/jest.setup.js"],
+    "testTimeout": 30000,
+    "collectCoverageFrom": [
+      "apps/*/middleware/**/*.js",
+      "apps/*/routes/**/*.js",
+      "apps/bff/**/*.js",
+      "!**/node_modules/**",
+      "!**/tests/**"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov", "html"],
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "verbose": true
+  }
+}

@@ -1,0 +1,3 @@
+tenant_id,org_name,email_domain,jira_project_key,azdo_area_root,azdo_iteration_root
+TENANT-DEFAULT,Default Org,shahin-ai.com,SHAHIN,Shahin/GRC,Sprint-Current
+TENANT-PRIVACY,Privacy Office,privacy.shahin-ai.com,PDPL,Privacy/GRC,Sprint-Current

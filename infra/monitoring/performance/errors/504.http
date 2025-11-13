@@ -1,0 +1,4 @@
+HTTP/1.0 504 Gateway Timeout
+Content-Type: text/html
+
+<html><body><h2>504 Gateway Timeout</h2></body></html>

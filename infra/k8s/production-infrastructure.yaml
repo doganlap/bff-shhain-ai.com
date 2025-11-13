@@ -1,0 +1,207 @@
+# Production Load Balancer Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: grc-platform
+  labels:
+    app: grc-platform
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-ssl-cert: "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "tcp"
+spec:
+  ports:
+  - name: https
+    port: 443
+    targetPort: 80
+    protocol: TCP
+  - name: http
+    port: 80
+    targetPort: 80
+    protocol: TCP
+  selector:
+    app: grc-platform
+    version: blue  # Initially points to blue, will be switched during deployment
+  type: LoadBalancer
+
+---
+# Ingress for GRC Platform
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: grc-platform-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "50m"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+spec:
+  tls:
+  - hosts:
+    - grc-platform.com
+    - api.grc-platform.com
+    secretName: grc-platform-tls
+  rules:
+  - host: grc-platform.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: grc-platform
+            port:
+              number: 80
+  - host: api.grc-platform.com
+    http:
+      paths:
+      - path: /auth
+        pathType: Prefix
+        backend:
+          service:
+            name: grc-platform
+            port:
+              number: 3001
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: grc-platform
+            port:
+              number: 3000
+      - path: /documents
+        pathType: Prefix
+        backend:
+          service:
+            name: grc-platform
+            port:
+              number: 3002
+      - path: /partners
+        pathType: Prefix
+        backend:
+          service:
+            name: grc-platform
+            port:
+              number: 3003
+      - path: /notifications
+        pathType: Prefix
+        backend:
+          service:
+            name: grc-platform
+            port:
+              number: 3004
+
+---
+# Secrets for GRC Platform
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grc-secrets
+type: Opaque
+data:
+  # Base64 encoded secrets - these should be populated by CI/CD pipeline
+  database-url: <DATABASE_URL_BASE64>
+  jwt-secret: <JWT_SECRET_BASE64>
+  encryption-key: <ENCRYPTION_KEY_BASE64>
+
+---
+# PostgreSQL Database
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-db
+  labels:
+    app: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15-alpine
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: "grc_production"
+        - name: POSTGRES_USER
+          value: "grc_user"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grc-secrets
+              key: database-password
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+        livenessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -h
+            - localhost
+            - -U
+            - grc_user
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          exec:
+            command:
+            - pg_isready
+            - -h
+            - localhost
+            - -U
+            - grc_user
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1"
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+
+---
+# PostgreSQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  labels:
+    app: postgres
+spec:
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+  selector:
+    app: postgres
+  type: ClusterIP
+
+---
+# PostgreSQL Persistent Volume Claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: gp2

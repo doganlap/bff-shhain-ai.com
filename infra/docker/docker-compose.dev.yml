@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: grc-postgres-dev
+    environment:
+      POSTGRES_DB: grc_template
+      POSTGRES_USER: grc_user
+      POSTGRES_PASSWORD: grc_secure_password_2024
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ./database-schema:/docker-entrypoint-initdb.d
+    networks:
+      - grc-network-dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grc_user -d grc_template"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  grc-app-dev:
+    image: grc-app-dev:latest
+    container_name: grc-app-dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=grc_template
+      - DB_USER=grc_user
+      - DB_PASSWORD=grc_secure_password_2024
+      - PORT=5001
+      - NODE_ENV=development
+      - API_BASE_URL=http://localhost:5001
+      - JWT_SECRET=grc_jwt_secret_key_shahin_ai_2024_secure
+      - JWT_EXPIRES_IN=24h
+      - BCRYPT_ROUNDS=12
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    networks:
+      - grc-network-dev
+    restart: unless-stopped
+
+volumes:
+  postgres_data_dev:
+    driver: local
+
+networks:
+  grc-network-dev:
+    driver: bridge

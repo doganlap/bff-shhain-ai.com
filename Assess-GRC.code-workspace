@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"yaml.schemaStore.enable": false,
+		"chat.allowAnonymousAccess": true,
+		"chat.agentSessionsViewLocation": "view",
+		"chat.agent.maxRequests": 100,
+		"chat.checkpoints.showFileChanges": true,
+		"chat.editor.wordWrap": "on",
+		"chat.emptyState.history.enabled": true,
+		"chat.mcp.assisted.nuget.enabled": true,
+		"chat.mcp.discovery.enabled": {
+			"claude-desktop": true,
+			"windsurf": true,
+			"cursor-global": true,
+			"cursor-workspace": true
+		},
+		"chat.mcp.gallery.enabled": true,
+		"chat.renderRelatedFiles": true,
+		"chat.tools.terminal.autoReplyToPrompts": true,
+		"inlineChat.notebookAgent": true
+	}
+}

@@ -1,0 +1,23 @@
+🔧 SIMPLE API SCHEMA FIX
+=========================
+
+✅ Connected to database
+⚡ Applying schema fixes...
+..............
+✅ Schema fixes applied
+⚡ Creating activities table...
+   ✅ activities table ready
+⚡ Adding sample data...
+
+🔍 Final validation...
+📊 organizations: 1 active records
+📊 users: 0 active records
+📊 assessments: 0 active records
+📊 grc_frameworks: 0 active records
+📊 grc_controls: 0 active records
+
+✅ SIMPLE SCHEMA FIX COMPLETED!
+================================
+
+🌟 SCHEMA FIXES COMPLETE!
+Now restart your API service and test endpoints.

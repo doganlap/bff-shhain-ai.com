@@ -1,0 +1,36 @@
+REFERENCE EXTRACTION ANALYSIS
+==================================================
+
+Total files processed: 4
+Total references found: 8936
+Unique references: 735
+
+File breakdown:
+  Comprehensive_Harvard_Bibliography.docx: 4408 references
+  thesis_master_index__2_.xlsx: 120 references
+  Reference_Catalog_2025-11-09.docx: 0 references
+  Comprehensive_Harvard_Bibliography__2_.docx: 4408 references
+
+==================================================
+SAMPLE REFERENCES (first 10):
+==================================================
+1. A, G.L., P, L.M. and Lei, Z. (2020) 'Integrating cost–benefit analysis into the NIST Cybersecurity Framework via the Gordon–Loeb Model', Journal of Cybersecurity. doi: 10.1093/cybsec/tyaa005.
+
+2. A, R.H. et al. (2023) 'Digital technologies in dentistry in Saudi Arabia: Perceptions, practices and challenges', DIGITAL HEALTH. doi: 10.1177/20552076231197095.
+
+3. A., A. and M., E.W. (2022) 'Blockchain-based IoT security in healthcare', IET Conference Proceedings. doi: 10.1049/icp.2022.0396.
+
+4. A., A.S. and S., A.S. (2024) 'A Deep Learning-Based Framework for Strengthening Cybersecurity in Internet of Health Things (IoHT) Environments', Applied Sciences. doi: 10.3390/app14114729.
+
+5. A., C.J. et al. (2025) 'Health equity in the digital age: Exploring health policy and inclusive digital care', Health Policy and Technology. doi: 10.1016/j.hlpt.2025.101039.
+
+6. Abawajy, J. (2018) 'Foundation of healthcare cybersecurity', Information Security: Foundations, Technologies and Applications. doi: 10.1049/pbse001e_ch5.
+
+7. Abdelatti and Marwan (2022) 'Empowering Industrial IoT Systems with GPU-Powered Optimization Algorithms and Cybersecurity Tools', University of Rhode Island. doi: 10.23860/diss-abdelatti-marwan-2022.
+
+8. Abdelatti and Marwan (n.d.) 'Empowering Industrial IoT Systems with GPU-Powered Optimization Algorithms and Cybersecurity Tools', University of Rhode Island. doi: 10.23860/diss-abdelatti-marwan-2022.
+
+9. Abdulaziz, B.S.Q. et al. (2023) 'Kidney Disease and Diabetic Patients', International Journal of Medical Science and Clinical Research Studies. doi: 10.47191/ijmscrs/v3-i11-74.
+
+10. Abdullah, A. and Talal, A. (2021) 'RETRACTED: Developing a Cybersecurity Framework for e-Government Project in the Kingdom of Saudi Arabia', Journal of Cybersecurity and Privacy. doi: 10.3390/jcp1020017.
+

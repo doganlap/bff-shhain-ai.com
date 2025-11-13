@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.3.2 (Python 3.11.9 on win32)" generated="2025-11-13T15:23:26.092550" rpa="false" schemaversion="5">
+<suite id="s1" name="Action" source="D:\Projects\GRC-Master\Assessmant-GRC\Action.robot">
+<test id="s1-t1" name="Verify Workflow Management Page" line="7">
+<kw name="Setup Browser" owner="newfile" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2025-11-13T15:23:26.414315" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<arg>${BASE_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2025-11-13T15:23:26.414315" elapsed="1.711281"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2025-11-13T15:23:28.127193" elapsed="0.040694"/>
+</kw>
+<status status="PASS" start="2025-11-13T15:23:26.413271" elapsed="1.754616"/>
+</kw>
+<kw name="Go To Workflows Page" owner="newfile">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-13T15:23:28.170656" level="INFO">Opening url 'http://localhost:5173/workflows'</msg>
+<arg>${BASE_URL}/workflows</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-13T15:23:28.170656" elapsed="0.122067"/>
+</kw>
+<doc>Navigates to the Workflow Management page.</doc>
+<status status="PASS" start="2025-11-13T15:23:28.169396" elapsed="0.123845"/>
+</kw>
+<kw name="Verify Workflows Page Loads Correctly" owner="newfile">
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<msg time="2025-11-13T15:23:38.672753" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-156.png"&gt;&lt;img src="selenium-screenshot-156.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2025-11-13T15:23:38.673762" level="FAIL">Element 'xpath=//h1[contains(text(),'Workflow Management')]' did not appear in 10 seconds.</msg>
+<arg>xpath=//h1[contains(text(),'Workflow Management')]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="FAIL" start="2025-11-13T15:23:28.294648" elapsed="10.380472">Element 'xpath=//h1[contains(text(),'Workflow Management')]' did not appear in 10 seconds.</status>
+</kw>
+<doc>Verifies that the main content of the Workflow Management page is visible.</doc>
+<status status="FAIL" start="2025-11-13T15:23:28.294089" elapsed="10.381031">Element 'xpath=//h1[contains(text(),'Workflow Management')]' did not appear in 10 seconds.</status>
+</kw>
+<kw name="Teardown Browser" owner="newfile" type="TEARDOWN">
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-13T15:23:38.883673" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-157.png"&gt;&lt;img src="selenium-screenshot-157.png" width="800px"&gt;&lt;/a&gt;</msg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-13T15:23:38.676119" elapsed="0.207554"/>
+</kw>
+<arg>Capture Page Screenshot</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="PASS" start="2025-11-13T15:23:38.676119" elapsed="0.207554"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2025-11-13T15:23:38.883673" elapsed="2.174828"/>
+</kw>
+<status status="PASS" start="2025-11-13T15:23:38.676119" elapsed="2.382968"/>
+</kw>
+<doc>Checks if the Workflow Management page loads correctly.</doc>
+<tag>Smoke</tag>
+<tag>Workflows</tag>
+<status status="FAIL" start="2025-11-13T15:23:26.412270" elapsed="14.646817">Element 'xpath=//h1[contains(text(),'Workflow Management')]' did not appear in 10 seconds.</status>
+</test>
+<test id="s1-t2" name="Verify Assessments Page" line="13">
+<kw name="Setup Browser" owner="newfile" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2025-11-13T15:23:41.061754" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<arg>${BASE_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2025-11-13T15:23:41.061754" elapsed="1.678326"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2025-11-13T15:23:42.740080" elapsed="0.045710"/>
+</kw>
+<status status="PASS" start="2025-11-13T15:23:41.061231" elapsed="1.724559"/>
+</kw>
+<kw name="Go To Assessments Page" owner="newfile">
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-13T15:23:42.790476" level="INFO">Opening url 'http://localhost:5173/assessments'</msg>
+<arg>${BASE_URL}/assessments</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-13T15:23:42.789349" elapsed="0.109747"/>
+</kw>
+<doc>Navigates to the Assessments page.</doc>
+<status status="PASS" start="2025-11-13T15:23:42.787348" elapsed="0.111748"/>
+</kw>
+<kw name="Verify Assessments Page Loads Correctly" owner="newfile">
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<msg time="2025-11-13T15:23:53.409038" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-158.png"&gt;&lt;img src="selenium-screenshot-158.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2025-11-13T15:23:53.409038" level="FAIL">Element 'xpath=//h2[contains(text(),'Advanced Assessment Manager')]' did not appear in 10 seconds.</msg>
+<arg>xpath=//h2[contains(text(),'Advanced Assessment Manager')]</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="FAIL" start="2025-11-13T15:23:42.900097" elapsed="10.511056">Element 'xpath=//h2[contains(text(),'Advanced Assessment Manager')]' did not appear in 10 seconds.</status>
+</kw>
+<doc>Verifies that the Advanced Assessment Manager is visible.</doc>
+<status status="FAIL" start="2025-11-13T15:23:42.899096" elapsed="10.512057">Element 'xpath=//h2[contains(text(),'Advanced Assessment Manager')]' did not appear in 10 seconds.</status>
+</kw>
+<kw name="Teardown Browser" owner="newfile" type="TEARDOWN">
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-13T15:23:53.764712" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="selenium-screenshot-159.png"&gt;&lt;img src="selenium-screenshot-159.png" width="800px"&gt;&lt;/a&gt;</msg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-13T15:23:53.412738" elapsed="0.352984"/>
+</kw>
+<arg>Capture Page Screenshot</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="PASS" start="2025-11-13T15:23:53.412738" elapsed="0.352984"/>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary">
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2025-11-13T15:23:53.765722" elapsed="2.183424"/>
+</kw>
+<status status="PASS" start="2025-11-13T15:23:53.411724" elapsed="2.537978"/>
+</kw>
+<doc>Checks if the Assessments page loads correctly.</doc>
+<tag>Assessments</tag>
+<tag>Smoke</tag>
+<status status="FAIL" start="2025-11-13T15:23:41.060172" elapsed="14.889530">Element 'xpath=//h2[contains(text(),'Advanced Assessment Manager')]' did not appear in 10 seconds.</status>
+</test>
+<test id="s1-t3" name="Verify Frameworks Page" line="19">
+<kw name="Setup Browser" owner="newfile" type="SETUP">
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2025-11-13T15:23:55.950713" level="INFO">Opening browser 'Chrome' to base url 'http://localhost:5173'.</msg>
+<msg time="2025-11-13T15:24:01.689082" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A674D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:05.774218" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A00D5D3D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:09.863018" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A0DCD0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:13.940030" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: HTTPConnectionPool(host='localhost', port=52269): Max retries exceeded with url: /session/898c845bc7e9f168b404b35c9b40e195/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A043BCF90&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</msg>
+<arg>${BASE_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="FAIL" start="2025-11-13T15:23:55.950713" elapsed="17.989924">Execution terminated by signal</status>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="NOT RUN" start="2025-11-13T15:24:13.940637" elapsed="0.000000"/>
+</kw>
+<status status="FAIL" start="2025-11-13T15:23:55.950713" elapsed="17.990937">Execution terminated by signal</status>
+</kw>
+<kw name="Teardown Browser" owner="newfile" type="TEARDOWN">
+<kw name="Run Keyword If Test Failed" owner="BuiltIn">
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-13T15:24:18.025662" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5F0D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:22.099554" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5F790&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:26.189402" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5D2D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:34.367443" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5D850&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:38.458962" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A64490&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:42.543495" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A67E50&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:46.643352" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: HTTPConnectionPool(host='localhost', port=52269): Max retries exceeded with url: /session/898c845bc7e9f168b404b35c9b40e195/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A80750&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</msg>
+<msg time="2025-11-13T15:24:46.644358" level="FAIL">MaxRetryError: HTTPConnectionPool(host='localhost', port=52269): Max retries exceeded with url: /session/898c845bc7e9f168b404b35c9b40e195/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5C2D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</msg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="FAIL" start="2025-11-13T15:24:13.942155" elapsed="32.866854">MaxRetryError: HTTPConnectionPool(host='localhost', port=52269): Max retries exceeded with url: /session/898c845bc7e9f168b404b35c9b40e195/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5C2D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</status>
+</kw>
+<arg>Capture Page Screenshot</arg>
+<doc>Runs the given keyword with the given arguments, if the test failed.</doc>
+<status status="FAIL" start="2025-11-13T15:24:13.942155" elapsed="32.866854">MaxRetryError: HTTPConnectionPool(host='localhost', port=52269): Max retries exceeded with url: /session/898c845bc7e9f168b404b35c9b40e195/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5C2D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</status>
+</kw>
+<kw name="Close Browser" owner="SeleniumLibrary">
+<msg time="2025-11-13T15:24:50.923481" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A80710&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195</msg>
+<msg time="2025-11-13T15:24:55.022358" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A80410&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195</msg>
+<msg time="2025-11-13T15:24:59.089428" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A00510&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195</msg>
+<doc>Closes the current browser.</doc>
+<status status="PASS" start="2025-11-13T15:24:46.810514" elapsed="16.353398"/>
+</kw>
+<status status="FAIL" start="2025-11-13T15:24:13.942155" elapsed="49.221757">MaxRetryError: HTTPConnectionPool(host='localhost', port=52269): Max retries exceeded with url: /session/898c845bc7e9f168b404b35c9b40e195/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5C2D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</status>
+</kw>
+<doc>Checks if the Frameworks page loads correctly.</doc>
+<tag>Frameworks</tag>
+<tag>Smoke</tag>
+<status status="FAIL" start="2025-11-13T15:23:55.950713" elapsed="67.213737">Setup failed:
+Execution terminated by signal
+
+Also teardown failed:
+MaxRetryError: HTTPConnectionPool(host='localhost', port=52269): Max retries exceeded with url: /session/898c845bc7e9f168b404b35c9b40e195/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5C2D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</status>
+</test>
+<test id="s1-t4" name="Verify Risk Management Page" line="25">
+<doc>Checks if the Risk Management page loads correctly.</doc>
+<tag>Risks</tag>
+<tag>robot:exit</tag>
+<tag>Smoke</tag>
+<status status="FAIL" start="2025-11-13T15:25:03.164968" elapsed="0.000544">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-t5" name="Verify Organizations Page" line="31">
+<doc>Checks if the Organizations page loads correctly.</doc>
+<tag>Organizations</tag>
+<tag>robot:exit</tag>
+<tag>Smoke</tag>
+<status status="FAIL" start="2025-11-13T15:25:03.165512" elapsed="0.001520">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-t6" name="Verify Documents Page" line="37">
+<doc>Checks if the Documents page loads correctly.</doc>
+<tag>Documents</tag>
+<tag>robot:exit</tag>
+<tag>Smoke</tag>
+<status status="FAIL" start="2025-11-13T15:25:03.168039" elapsed="0.000000">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-t7" name="Verify Evidence Page" line="43">
+<doc>Checks if the Evidence page loads correctly.</doc>
+<tag>Evidence</tag>
+<tag>robot:exit</tag>
+<tag>Smoke</tag>
+<status status="FAIL" start="2025-11-13T15:25:03.168039" elapsed="0.000000">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-t8" name="Verify Vendors Page" line="49">
+<doc>Checks if the Vendors page loads correctly.</doc>
+<tag>robot:exit</tag>
+<tag>Smoke</tag>
+<tag>Vendors</tag>
+<status status="FAIL" start="2025-11-13T15:25:03.170622" elapsed="0.000000">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-t9" name="Verify AI Scheduler Page" line="55">
+<doc>Checks if the AI Scheduler Console page loads correctly.</doc>
+<tag>AI</tag>
+<tag>robot:exit</tag>
+<tag>Smoke</tag>
+<status status="FAIL" start="2025-11-13T15:25:03.171627" elapsed="0.000000">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-t10" name="Verify RAG Service Page" line="61">
+<doc>Checks if the RAG Service Console page loads correctly.</doc>
+<tag>AI</tag>
+<tag>robot:exit</tag>
+<tag>Smoke</tag>
+<status status="FAIL" start="2025-11-13T15:25:03.172660" elapsed="0.000000">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-t11" name="Verify Regulatory Intelligence Page" line="67">
+<doc>Checks if the Regulatory Intelligence Center page loads correctly.</doc>
+<tag>Regulatory</tag>
+<tag>robot:exit</tag>
+<tag>Smoke</tag>
+<status status="FAIL" start="2025-11-13T15:25:03.173730" elapsed="0.000000">Test execution stopped due to a fatal error.</status>
+</test>
+<status status="FAIL" start="2025-11-13T15:23:26.094075" elapsed="97.081161"/>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="11" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat info="combined" combined="NOT robot:exit" pass="0" fail="3" skip="0">NOT robot:exit</stat>
+<stat pass="0" fail="2" skip="0">AI</stat>
+<stat pass="0" fail="1" skip="0">Assessments</stat>
+<stat pass="0" fail="1" skip="0">Documents</stat>
+<stat pass="0" fail="1" skip="0">Evidence</stat>
+<stat pass="0" fail="1" skip="0">Frameworks</stat>
+<stat pass="0" fail="1" skip="0">Organizations</stat>
+<stat pass="0" fail="1" skip="0">Regulatory</stat>
+<stat pass="0" fail="1" skip="0">Risks</stat>
+<stat pass="0" fail="11" skip="0">Smoke</stat>
+<stat pass="0" fail="1" skip="0">Vendors</stat>
+<stat pass="0" fail="1" skip="0">Workflows</stat>
+</tag>
+<suite>
+<stat name="Action" id="s1" pass="0" fail="11" skip="0">Action</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2025-11-13T15:24:01.689082" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A674D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:05.774218" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A00D5D3D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:09.863018" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A0DCD0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:13.940030" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: HTTPConnectionPool(host='localhost', port=52269): Max retries exceeded with url: /session/898c845bc7e9f168b404b35c9b40e195/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A043BCF90&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</msg>
+<msg time="2025-11-13T15:24:18.025662" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5F0D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:22.099554" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5F790&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:26.189402" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5D2D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:34.367443" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A5D850&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:38.458962" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A64490&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:42.543495" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A67E50&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195/screenshot</msg>
+<msg time="2025-11-13T15:24:46.643352" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: HTTPConnectionPool(host='localhost', port=52269): Max retries exceeded with url: /session/898c845bc7e9f168b404b35c9b40e195/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A80750&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</msg>
+<msg time="2025-11-13T15:24:50.923481" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A80710&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195</msg>
+<msg time="2025-11-13T15:24:55.022358" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A80410&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195</msg>
+<msg time="2025-11-13T15:24:59.089428" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x0000025A04A00510&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/898c845bc7e9f168b404b35c9b40e195</msg>
+</errors>
+</robot>

@@ -1,0 +1,11 @@
+tenant_id,role,AssigneeName,AssigneeEmail
+TENANT-DEFAULT,CISO,Security Lead,security.lead@shahin-ai.com
+TENANT-DEFAULT,DPO,Data Protection Officer,dpo@shahin-ai.com
+TENANT-DEFAULT,Risk Manager,Risk Manager,risk.manager@shahin-ai.com
+TENANT-DEFAULT,IT Operations,IT Operations,it.ops@shahin-ai.com
+TENANT-DEFAULT,SecOps/SOC,SOC Lead,soc@shahin-ai.com
+TENANT-DEFAULT,Network Team,Network Lead,network@shahin-ai.com
+TENANT-DEFAULT,Cloud Team,Cloud Lead,cloud@shahin-ai.com
+TENANT-DEFAULT,HR,HR Lead,hr@shahin-ai.com
+TENANT-DEFAULT,Legal/Compliance,Compliance Lead,legal.compliance@shahin-ai.com
+TENANT-DEFAULT,Procurement/Vendor Mgmt,Procurement Lead,procurement@shahin-ai.com

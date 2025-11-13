@@ -1,0 +1,35 @@
+{
+  "source_csv": "/mnt/data/grc_execution_tasks_pro.csv",
+  "jira": {
+    "project_key_column": "Jira_Project_Key",
+    "issue_type_column": "Jira_Issue_Type",
+    "summary_column": "Summary",
+    "description_column": "Description",
+    "assignee_email_column": "AssigneeEmail",
+    "priority_column": "Priority",
+    "due_date_column": "Due Date",
+    "labels_column": "Labels",
+    "component_column": "Jira_Component",
+    "epic_link_column": "Jira_Epic_Link"
+  },
+  "azure_devops": {
+    "work_item_type_column": "DevOps_WorkItemType",
+    "area_column": "DevOps_Area",
+    "iteration_column": "DevOps_Iteration",
+    "title_column": "Summary",
+    "description_column": "Description",
+    "assigned_to_column": "AssigneeEmail",
+    "tags_column": "DevOps_Tags",
+    "due_date_column": "Due Date"
+  },
+  "acceptance_criteria_columns": [
+    "AcceptanceCriteria_EN",
+    "AcceptanceCriteria_AR"
+  ],
+  "id_columns": [
+    "Control ID",
+    "Section",
+    "Domain",
+    "Frameworks"
+  ]
+}

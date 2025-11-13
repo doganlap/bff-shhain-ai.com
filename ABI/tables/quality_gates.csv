@@ -1,0 +1,6 @@
+gate,tool,threshold
+lint,eslint/ruff,0 errors
+tests,coverage,80%
+contracts,contract-tests,pass
+security,semgrep+trivy,no critical
+migrations,engine,up+down present

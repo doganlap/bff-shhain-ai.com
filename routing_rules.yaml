@@ -1,0 +1,168 @@
+rules:
+  - name: SAMA Identify -> Risk Manager
+    if:
+      sama_function: "^Identify$"
+    then:
+      assign_role: "Risk Manager"
+      add_labels: ["SAMA","Identify"]
+      set:
+        Jira_Component: "Risk"
+        DevOps_Area_suffix: "Risk"
+    continue: false
+
+  # Data Protection (high/critical) -> CISO
+  - name: Data Protection (High/Critical) -> CISO
+    if:
+      grc_domain: "(?i)^Data Protection$"
+      Priority: "(?i)^(Critical|High)$"
+    then:
+      assign_role: "CISO"
+      add_labels: ["DataProtection"]
+      set:
+        Jira_Component: "DataProtection"
+        DevOps_Area_suffix: "DataProtection"
+    continue: false
+
+  - name: Data Protection by Section (High/Critical) -> CISO
+    if:
+      Section: "(?i)Data Protection"
+      Priority: "(?i)^(Critical|High)$"
+    then:
+      assign_role: "CISO"
+      add_labels: ["DataProtection"]
+      set:
+        Jira_Component: "DataProtection"
+        DevOps_Area_suffix: "DataProtection"
+    continue: false
+
+  # Data Protection (medium/low) -> DPO
+  - name: Data Protection (Medium/Low) -> DPO
+    if:
+      grc_domain: "(?i)^Data Protection$"
+      Priority: "(?i)^(Medium|Low)$"
+    then:
+      assign_role: "DPO"
+      add_labels: ["DataProtection"]
+      set:
+        Jira_Component: "DataProtection"
+        DevOps_Area_suffix: "DataProtection"
+    continue: false
+
+  - name: Data Protection by Section (Medium/Low) -> DPO
+    if:
+      Section: "(?i)Data Protection"
+      Priority: "(?i)^(Medium|Low)$"
+    then:
+      assign_role: "DPO"
+      add_labels: ["DataProtection"]
+      set:
+        Jira_Component: "DataProtection"
+        DevOps_Area_suffix: "DataProtection"
+    continue: false
+# Routing rules for smart assignment and metadata enrichment
+# Order matters: first matching rule applies (unless continue=true)
+# Conditions are case-insensitive substring or regex on fields.
+
+rules:
+  - name: PDPL -> DPO
+    if:
+      pdpl_topic: ".*"
+    then:
+      assign_role: "DPO"
+      add_labels: ["PDPL","Privacy"]
+      set:
+        Jira_Component: "Privacy"
+        DevOps_Area_suffix: "Privacy"
+    continue: false
+
+  - name: Access Control -> IT Ops
+    if:
+      grc_domain: "(?i)access control|إدارة الوصول"
+    then:
+      assign_role: "IT Operations"
+      add_labels: ["AccessControl"]
+      set:
+        Jira_Component: "Access"
+        DevOps_Area_suffix: "Access"
+    continue: false
+
+  - name: Network -> Network Team
+    if:
+      section: "(?i)Network Security|vpn|firewall|waf|ids|ips|segmentation|sd-wan"
+    then:
+      assign_role: "Network Team"
+      add_labels: ["Network"]
+      set:
+        Jira_Component: "Network"
+        DevOps_Area_suffix: "Network"
+    continue: false
+
+  - name: Cloud -> Cloud Team
+    if:
+      section: "(?i)Cloud Security|azure|aws|gcp|key vault|kms|tenant|subscription"
+    then:
+      assign_role: "Cloud Team"
+      add_labels: ["Cloud"]
+      set:
+        Jira_Component: "Cloud"
+        DevOps_Area_suffix: "Cloud"
+    continue: false
+
+  - name: Incident -> SecOps
+    if:
+      section: "(?i)Incident|CSIRT|Forensic|Breach|Playbook"
+    then:
+      assign_role: "SecOps/SOC"
+      add_labels: ["IncidentResponse"]
+      set:
+        Jira_Component: "SecOps"
+        DevOps_Area_suffix: "SecOps"
+    continue: false
+
+  - name: Third-Party -> Procurement
+    if:
+      section: "(?i)Third Party|Vendor|Supplier|Outsourc|SLA"
+    then:
+      assign_role: "Procurement/Vendor Mgmt"
+      add_labels: ["ThirdParty"]
+      set:
+        Jira_Component: "ThirdParty"
+        DevOps_Area_suffix: "ThirdParty"
+    continue: false
+
+  - name: Awareness/HR -> HR
+    if:
+      section: "(?i)Awareness|Training|Onboarding|Offboarding|HR"
+    then:
+      assign_role: "HR"
+      add_labels: ["Awareness","HR"]
+      set:
+        Jira_Component: "HR"
+        DevOps_Area_suffix: "HR"
+    continue: false
+
+  - name: Audit/Assurance -> Compliance
+    if:
+      section: "(?i)Audit|Assurance|Testing|Review|Report"
+    then:
+      assign_role: "Legal/Compliance"
+      add_labels: ["Audit","Assurance"]
+      set:
+        Jira_Component: "Compliance"
+        DevOps_Area_suffix: "Compliance"
+    continue: false
+
+  - name: OT/IoT -> Network Team
+    if:
+      section: "(?i)OT|IoT|ICS|SCADA|PLC|IEC 62443"
+    then:
+      assign_role: "Network Team"
+      add_labels: ["OT","IoT"]
+      set:
+        Jira_Component: "OT/IoT"
+        DevOps_Area_suffix: "OT"
+    continue: false
+
+# Fallback: keep existing role from Owner column
+default:
+  assign_from_owner_role: true

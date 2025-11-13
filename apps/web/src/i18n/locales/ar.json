@@ -1,0 +1,201 @@
+{
+  "common": {
+    "actions": {
+      "create": "إنشاء",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "view": "عرض",
+      "approve": "موافقة",
+      "reject": "رفض",
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "submit": "إرسال",
+      "search": "بحث",
+      "filter": "تصفية",
+      "export": "تصدير",
+      "import": "استيراد",
+      "download": "تحميل",
+      "upload": "رفع",
+      "refresh": "تحديث",
+      "back": "رجوع",
+      "next": "التالي",
+      "previous": "السابق",
+      "close": "إغلاق",
+      "select": "اختيار",
+      "selectAll": "اختيار الكل",
+      "deselectAll": "إلغاء اختيار الكل"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "pending": "معلق",
+      "completed": "مكتمل",
+      "approved": "موافق عليه",
+      "rejected": "مرفوض",
+      "draft": "مسودة",
+      "published": "منشور",
+      "archived": "مؤرشف"
+    },
+    "messages": {
+      "loading": "جاري التحميل...",
+      "noData": "لا توجد بيانات متاحة",
+      "error": "حدث خطأ",
+      "success": "تمت العملية بنجاح",
+      "confirmDelete": "هل أنت متأكد من حذف هذا العنصر؟",
+      "confirmBulkDelete": "هل أنت متأكد من حذف {{count}} عنصر؟",
+      "itemsSelected": "تم اختيار {{count}} عنصر",
+      "accessDenied": "تم رفض الوصول. ليس لديك صلاحية لتنفيذ هذا الإجراء.",
+      "sessionExpired": "انتهت صلاحية جلستك. يرجى تسجيل الدخول مرة أخرى."
+    },
+    "validation": {
+      "required": "هذا الحقل مطلوب",
+      "email": "يرجى إدخال عنوان بريد إلكتروني صحيح",
+      "minLength": "الحد الأدنى للطول هو {{min}} أحرف",
+      "maxLength": "الحد الأقصى للطول هو {{max}} أحرف",
+      "numeric": "يرجى إدخال رقم صحيح",
+      "phoneNumber": "يرجى إدخال رقم هاتف صحيح"
+    }
+  },
+  "navigation": {
+    "dashboard": "لوحة التحكم",
+    "assessments": "التقييمات",
+    "compliance": "الامتثال",
+    "risks": "إدارة المخاطر",
+    "frameworks": "الأطر",
+    "controls": "الضوابط",
+    "organizations": "المؤسسات",
+    "users": "المستخدمون",
+    "reports": "التقارير",
+    "workflows": "سير العمل",
+    "settings": "الإعدادات",
+    "auditLogs": "سجلات التدقيق",
+    "licenseManagement": "إدارة التراخيص",
+    "renewalsPipeline": "مسار التجديدات",
+    "usageAnalytics": "تحليلات الاستخدام"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "welcome": "مرحباً بك في منصة شاهين الذكي للحوكمة",
+    "overview": "نظرة عامة",
+    "recentActivity": "النشاط الأخير",
+    "quickActions": "إجراءات سريعة",
+    "statistics": {
+      "totalAssessments": "إجمالي التقييمات",
+      "activeRisks": "المخاطر النشطة",
+      "complianceScore": "نقاط الامتثال",
+      "pendingApprovals": "الموافقات المعلقة"
+    }
+  },
+  "users": {
+    "title": "إدارة المستخدمين",
+    "subtitle": "إدارة المستخدمين والأدوار والصلاحيات",
+    "addUser": "إضافة مستخدم جديد",
+    "editUser": "تعديل المستخدم",
+    "deleteUser": "حذف المستخدم",
+    "userDetails": "تفاصيل المستخدم",
+    "fields": {
+      "firstName": "الاسم الأول",
+      "lastName": "اسم العائلة",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "role": "الدور",
+      "organization": "المؤسسة",
+      "status": "الحالة",
+      "lastLogin": "آخر تسجيل دخول",
+      "permissions": "الصلاحيات"
+    },
+    "roles": {
+      "superAdmin": "مدير عام",
+      "tenantAdmin": "مدير المؤسسة",
+      "manager": "مدير",
+      "analyst": "محلل",
+      "auditor": "مدقق",
+      "viewer": "مشاهد"
+    },
+    "bulkActions": {
+      "title": "العمليات المجمعة",
+      "activate": "تفعيل المحدد",
+      "deactivate": "إلغاء تفعيل المحدد",
+      "delete": "حذف المحدد",
+      "export": "تصدير المحدد",
+      "assignRole": "تعيين دور"
+    }
+  },
+  "assessments": {
+    "title": "التقييمات",
+    "subtitle": "إدارة تقييمات الامتثال والتقييمات",
+    "createAssessment": "إنشاء تقييم",
+    "editAssessment": "تعديل التقييم",
+    "viewAssessment": "عرض التقييم",
+    "deleteAssessment": "حذف التقييم",
+    "fields": {
+      "name": "اسم التقييم",
+      "description": "الوصف",
+      "framework": "الإطار",
+      "status": "الحالة",
+      "assignee": "المسؤول",
+      "dueDate": "تاريخ الاستحقاق",
+      "progress": "التقدم",
+      "score": "النقاط"
+    },
+    "workflow": {
+      "submit": "إرسال للمراجعة",
+      "approve": "موافقة على التقييم",
+      "reject": "رفض التقييم",
+      "requestChanges": "طلب تعديلات"
+    }
+  },
+  "workflows": {
+    "title": "إدارة سير العمل",
+    "subtitle": "إدارة وتتبع سير العمل والموافقات التلقائية",
+    "createWorkflow": "إنشاء سير عمل جديد",
+    "editWorkflow": "تعديل سير العمل",
+    "viewWorkflow": "عرض سير العمل",
+    "deleteWorkflow": "حذف سير العمل",
+    "fields": {
+      "name": "اسم سير العمل",
+      "description": "الوصف",
+      "type": "النوع",
+      "status": "الحالة",
+      "assignee": "المسؤول",
+      "dueDate": "تاريخ الاستحقاق",
+      "progress": "التقدم",
+      "steps": "الخطوات",
+      "approvals": "الموافقات"
+    },
+    "actions": {
+      "start": "بدء سير العمل",
+      "pause": "إيقاف مؤقت",
+      "resume": "استئناف",
+      "complete": "إكمال سير العمل",
+      "delegate": "تفويض",
+      "reassign": "إعادة تعيين"
+    },
+    "approvalChain": "سلسلة الموافقة",
+    "myApprovals": "موافقاتي المعلقة"
+  },
+  "bulkOperations": {
+    "title": "العمليات المجمعة",
+    "selectItems": "اختر العناصر لتنفيذ العمليات المجمعة",
+    "selectedCount": "تم اختيار {{count}} عنصر",
+    "actions": {
+      "bulkEdit": "تعديل مجمع",
+      "bulkDelete": "حذف مجمع",
+      "bulkApprove": "موافقة مجمعة",
+      "bulkReject": "رفض مجمع",
+      "bulkExport": "تصدير مجمع",
+      "bulkAssign": "تعيين مجمع"
+    },
+    "confirmations": {
+      "bulkDelete": "هل أنت متأكد من حذف {{count}} عنصر محدد؟ لا يمكن التراجع عن هذا الإجراء.",
+      "bulkApprove": "هل أنت متأكد من الموافقة على {{count}} عنصر محدد؟",
+      "bulkReject": "هل أنت متأكد من رفض {{count}} عنصر محدد؟"
+    }
+  },
+  "permissions": {
+    "accessDenied": "تم رفض الوصول",
+    "insufficientPermissions": "ليس لديك صلاحيات كافية لتنفيذ هذا الإجراء",
+    "contactAdmin": "يرجى الاتصال بالمدير للحصول على الوصول",
+    "requiredPermission": "الصلاحية المطلوبة: {{permission}}"
+  }
+}

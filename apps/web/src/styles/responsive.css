@@ -1,0 +1,223 @@
+/**
+ * Responsive Auto-Sizing Utilities
+ * Custom CSS classes for consistent auto-sizing behavior
+ */
+
+/* Auto-sizing containers */
+.auto-container {
+  width: auto;
+  height: auto;
+  min-width: -webkit-fit-content;
+  min-width: -moz-fit-content;
+  min-width: fit-content;
+  max-width: 100%;
+}
+
+/* Responsive width utilities */
+.w-auto-responsive {
+  width: auto;
+  min-width: -webkit-fit-content;
+  min-width: -moz-fit-content;
+  min-width: fit-content;
+  max-width: 100%;
+}
+
+.w-auto-sm {
+  width: auto;
+  min-width: 12rem; /* 192px */
+  max-width: 24rem; /* 384px */
+}
+
+.w-auto-md {
+  width: auto;
+  min-width: 16rem; /* 256px */
+  max-width: 32rem; /* 512px */
+}
+
+.w-auto-lg {
+  width: auto;
+  min-width: 20rem; /* 320px */
+  max-width: 48rem; /* 768px */
+}
+
+/* Responsive height utilities */
+.h-auto-responsive {
+  height: auto;
+  min-height: fit-content;
+  max-height: 90vh;
+}
+
+.h-auto-sm {
+  height: auto;
+  min-height: 8rem; /* 128px */
+  max-height: 20rem; /* 320px */
+}
+
+.h-auto-md {
+  height: auto;
+  min-height: 12rem; /* 192px */
+  max-height: 32rem; /* 512px */
+}
+
+.h-auto-lg {
+  height: auto;
+  min-height: 16rem; /* 256px */
+  max-height: 48rem; /* 768px */
+}
+
+/* Flexible containers */
+.flex-auto-container {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Grid auto-sizing */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.grid-auto-fill {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* Responsive text sizing */
+.text-auto-responsive {
+  font-size: clamp(0.875rem, 2.5vw, 1.125rem);
+  line-height: 1.5;
+}
+
+.text-auto-sm {
+  font-size: clamp(0.75rem, 2vw, 0.875rem);
+  line-height: 1.4;
+}
+
+.text-auto-lg {
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  line-height: 1.6;
+}
+
+/* Responsive spacing */
+.spacing-auto-responsive {
+  padding: clamp(0.5rem, 2vw, 1.5rem);
+  margin: clamp(0.25rem, 1vw, 1rem);
+}
+
+/* Sidebar responsive utilities */
+.sidebar-auto {
+  width: clamp(4rem, 15vw, 18rem);
+  transition: width 0.3s ease;
+}
+
+.sidebar-collapsed {
+  width: 5rem;
+}
+
+.sidebar-expanded {
+  width: clamp(16rem, 20vw, 20rem);
+}
+
+/* Modal responsive utilities */
+.modal-auto {
+  width: clamp(20rem, 90vw, 48rem);
+  max-height: 90vh;
+  margin: auto;
+}
+
+.modal-auto-sm {
+  width: clamp(16rem, 80vw, 28rem);
+  max-height: 80vh;
+}
+
+.modal-auto-lg {
+  width: clamp(24rem, 95vw, 64rem);
+  max-height: 95vh;
+}
+
+/* Dropdown responsive utilities */
+.dropdown-auto {
+  min-width: -webkit-fit-content;
+  min-width: -moz-fit-content;
+  min-width: fit-content;
+  max-width: clamp(12rem, 40vw, 24rem);
+  max-height: clamp(12rem, 50vh, 20rem);
+}
+
+/* Tooltip responsive utilities */
+.tooltip-auto {
+  max-width: clamp(8rem, 30vw, 16rem);
+  width: max-content;
+}
+
+/* Card responsive utilities */
+.card-auto {
+  width: 100%;
+  max-width: clamp(16rem, 90vw, 24rem);
+  min-height: fit-content;
+}
+
+/* Form responsive utilities */
+.form-auto {
+  width: 100%;
+  max-width: clamp(20rem, 90vw, 32rem);
+}
+
+.input-auto {
+  width: 100%;
+  min-width: 8rem;
+  max-width: 100%;
+}
+
+/* Media queries for fine-tuning */
+@media (max-width: 640px) {
+  .auto-container {
+    padding: 0.5rem;
+  }
+  
+  .sidebar-auto {
+    width: 100%;
+    max-width: 16rem;
+  }
+  
+  .modal-auto {
+    width: 95vw;
+    margin: 1rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .sidebar-auto {
+    width: clamp(12rem, 18vw, 16rem);
+  }
+  
+  .modal-auto {
+    width: clamp(24rem, 85vw, 40rem);
+  }
+}
+
+@media (min-width: 1025px) {
+  .sidebar-auto {
+    width: clamp(16rem, 15vw, 20rem);
+  }
+  
+  .modal-auto {
+    width: clamp(28rem, 70vw, 48rem);
+  }
+}
+
+/* Print styles */
+@media print {
+  .auto-container,
+  .modal-auto,
+  .dropdown-auto {
+    width: auto !important;
+    height: auto !important;
+    max-width: none !important;
+    max-height: none !important;
+  }
+}

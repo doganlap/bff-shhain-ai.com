@@ -1,0 +1,43 @@
+# Production build for GRC Frontend
+FROM node:20-alpine AS builder
+
+# Add build argument for cache busting
+ARG BUILD_DATE
+ARG BUILD_VERSION
+ENV BUILD_DATE=${BUILD_DATE}
+ENV BUILD_VERSION=${BUILD_VERSION}
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Clear npm cache and install dependencies fresh
+RUN npm cache clean --force && npm ci --no-optional
+
+# Copy source code
+COPY . .
+
+# Build the application with production optimizations
+RUN npm run build
+
+# Production stage with serve
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Install serve globally
+RUN npm install -g serve
+
+# Copy built files from builder
+COPY --from=builder /app/dist ./dist
+
+# Expose port
+EXPOSE 5001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --quiet --tries=1 --spider http://localhost:5001/ || exit 1
+
+# Start serve
+CMD ["serve", "-s", "dist", "-l", "5001", "--cors"]

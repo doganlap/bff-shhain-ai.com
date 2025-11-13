@@ -1,0 +1,66 @@
+<!DOCTYPE html>  
+<html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>GRC Control Administration System</title>  
+    <style>  
+        body { font-family: Arial; margin: 40px; background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%); color: white; }  
+        .container { background: rgba(255,255,255,0.1); padding: 30px; border-radius: 15px; backdrop-filter: blur(10px); }  
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }  
+        .success { background: rgba(0,255,0,0.2); border: 1px solid #0f0; }  
+        .error { background: rgba(255,0,0,0.2); border: 1px solid #f00; }  
+        .loading { background: rgba(255,255,0,0.2); border: 1px solid #ff0; }  
+        button { background: rgba(255,255,255,0.2); border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; color: white; cursor: pointer; }  
+        button:hover { background: rgba(255,255,255,0.3); }  
+    </style>  
+</head>  
+<body>  
+    <div class="container">  
+        <h1>??? GRC Control Administration System</h1>  
+        <p>Governance, Risk & Compliance Management Platform</p>  
+        <div class="status loading" id="status">?? Testing connection...</div>  
+        <div id="details"></div>  
+        <button onclick="testConnection()">?? Test Connection</button>  
+        <button onclick="testAPI()">?? Test API</button>  
+    </div>  
+    <script>  
+        function updateStatus(message, type) {  
+            const status = document.getElementById('status');  
+            status.textContent = message;  
+            status.className = 'status ' + type;  
+        }  
+        function updateDetails(details) {  
+            document.getElementById('details').innerHTML = details;  
+        }  
+        async function testConnection() {  
+            try {  
+                updateStatus('?? Testing backend connection...', 'loading');  
+                const response = await fetch('http://localhost:3001/health', {  
+                    method: 'GET',  
+                    headers: { 'Content-Type': 'application/json' }  
+                });  
+                const data = await response.json();  
+                updateStatus('? Backend connected successfully!', 'success');  
+                updateDetails(`<p><strong>Response:</strong> ${JSON.stringify(data, null, 2)}</p>`);  
+            } catch (error) {  
+                updateStatus('? Connection failed: ' + error.message, 'error');  
+                updateDetails(`<p><strong>Error Details:</strong><br>${error}<br><br><strong>Troubleshooting:</strong><br>1. Check if backend server is running<br>2. Verify port 3001 is not blocked<br>3. Check Windows Firewall settings</p>`);  
+            }  
+        }  
+        async function testAPI() {  
+            try {  
+                updateStatus('?? Testing API endpoint...', 'loading');  
+                const response = await fetch('http://localhost:3001/api/test');  
+                const data = await response.json();  
+                updateStatus('? API test successful!', 'success');  
+                updateDetails(`<p><strong>API Response:</strong> ${JSON.stringify(data, null, 2)}</p>`);  
+            } catch (error) {  
+                updateStatus('? API test failed: ' + error.message, 'error');  
+            }  
+        }  
+        // Auto-test on load  
+        setTimeout(testConnection, 1000);  
+    </script>  
+</body>  
+</html> 

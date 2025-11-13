@@ -1,0 +1,314 @@
+# Green Deployment for GRC Platform
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grc-platform-green
+  labels:
+    app: grc-platform
+    version: green
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: grc-platform
+      version: green
+  template:
+    metadata:
+      labels:
+        app: grc-platform
+        version: green
+    spec:
+      containers:
+      # Web Frontend
+      - name: web
+        image: ${DOCKER_REGISTRY}/${GITHUB_REPOSITORY}/web:${IMAGE_TAG}
+        ports:
+        - containerPort: 5174
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: API_BASE_URL
+          value: "https://api.grc-platform.com"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5174
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5174
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+      # BFF (Backend for Frontend)
+      - name: bff
+        image: ${DOCKER_REGISTRY}/${GITHUB_REPOSITORY}/bff:${IMAGE_TAG}
+        ports:
+        - containerPort: 3005
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3005"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: grc-secrets
+              key: database-url
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: grc-secrets
+              key: jwt-secret
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3005
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3005
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+
+      # GRC API Service
+      - name: grc-api
+        image: ${DOCKER_REGISTRY}/${GITHUB_REPOSITORY}/grc-api:${IMAGE_TAG}
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3000"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: grc-secrets
+              key: database-url
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "1Gi"
+            cpu: "1"
+
+      # Auth Service
+      - name: auth-service
+        image: ${DOCKER_REGISTRY}/${GITHUB_REPOSITORY}/auth-service:${IMAGE_TAG}
+        ports:
+        - containerPort: 3001
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3001"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: grc-secrets
+              key: database-url
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: grc-secrets
+              key: jwt-secret
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+      # Document Service
+      - name: document-service
+        image: ${DOCKER_REGISTRY}/${GITHUB_REPOSITORY}/document-service:${IMAGE_TAG}
+        ports:
+        - containerPort: 3002
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3002"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: grc-secrets
+              key: database-url
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3002
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+      # Partner Service
+      - name: partner-service
+        image: ${DOCKER_REGISTRY}/${GITHUB_REPOSITORY}/partner-service:${IMAGE_TAG}
+        ports:
+        - containerPort: 3003
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3003"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: grc-secrets
+              key: database-url
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3003
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3003
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+      # Notification Service
+      - name: notification-service
+        image: ${DOCKER_REGISTRY}/${GITHUB_REPOSITORY}/notification-service:${IMAGE_TAG}
+        ports:
+        - containerPort: 3004
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: PORT
+          value: "3004"
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: grc-secrets
+              key: database-url
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3004
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health/ready
+            port: 3004
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+---
+# Service for Green Deployment
+apiVersion: v1
+kind: Service
+metadata:
+  name: grc-platform-green
+  labels:
+    app: grc-platform
+    version: green
+spec:
+  ports:
+  - name: web
+    port: 80
+    targetPort: 5174
+    protocol: TCP
+  - name: bff
+    port: 3005
+    targetPort: 3005
+    protocol: TCP
+  - name: grc-api
+    port: 3000
+    targetPort: 3000
+    protocol: TCP
+  - name: auth
+    port: 3001
+    targetPort: 3001
+    protocol: TCP
+  - name: document
+    port: 3002
+    targetPort: 3002
+    protocol: TCP
+  - name: partner
+    port: 3003
+    targetPort: 3003
+    protocol: TCP
+  - name: notification
+    port: 3004
+    targetPort: 3004
+    protocol: TCP
+  selector:
+    app: grc-platform
+    version: green
+  type: ClusterIP

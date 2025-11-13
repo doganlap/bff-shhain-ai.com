@@ -1,0 +1,194 @@
+/* RTL (Right-to-Left) Support for Arabic Language */
+
+/* Global RTL Direction */
+[dir="rtl"] {
+  text-align: right;
+}
+
+[dir="rtl"] .text-left {
+  text-align: right !important;
+}
+
+[dir="rtl"] .text-right {
+  text-align: left !important;
+}
+
+/* Flexbox RTL Support */
+[dir="rtl"] .flex-row-reverse {
+  flex-direction: row !important;
+}
+
+/* Margins and Padding RTL Support */
+[dir="rtl"] .ml-auto {
+  margin-right: auto !important;
+  margin-left: initial !important;
+}
+
+[dir="rtl"] .mr-auto {
+  margin-left: auto !important;
+  margin-right: initial !important;
+}
+
+/* Border Radius RTL Support */
+[dir="rtl"] .rounded-l-lg {
+  border-top-right-radius: 0.5rem !important;
+  border-bottom-right-radius: 0.5rem !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+[dir="rtl"] .rounded-r-lg {
+  border-top-left-radius: 0.5rem !important;
+  border-bottom-left-radius: 0.5rem !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Arabic Typography */
+.arabic-text {
+  font-family: 'Noto Sans Arabic', 'Cairo', 'Amiri', system-ui, sans-serif;
+  font-feature-settings: "liga" on, "calt" on;
+  text-rendering: optimizeLegibility;
+  direction: rtl;
+  unicode-bidi: embed;
+}
+
+.arabic-heading {
+  font-family: 'Cairo', 'Noto Sans Arabic', system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/* Arabic Numbers */
+.arabic-numbers {
+  font-feature-settings: "lnum" on;
+  font-variant-numeric: lining-nums;
+}
+
+/* Scrollbar RTL Support */
+[dir="rtl"] .scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+[dir="rtl"] .scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Input RTL Support */
+[dir="rtl"] input[type="text"],
+[dir="rtl"] input[type="email"],
+[dir="rtl"] input[type="password"],
+[dir="rtl"] textarea,
+[dir="rtl"] select {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Placeholder RTL */
+[dir="rtl"] input::placeholder,
+[dir="rtl"] textarea::placeholder {
+  text-align: right;
+  direction: rtl;
+}
+
+/* Button Group RTL */
+[dir="rtl"] .btn-group > button:first-child {
+  border-top-right-radius: 0.375rem !important;
+  border-bottom-right-radius: 0.375rem !important;
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+[dir="rtl"] .btn-group > button:last-child {
+  border-top-left-radius: 0.375rem !important;
+  border-bottom-left-radius: 0.375rem !important;
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+/* Dropdown RTL */
+[dir="rtl"] .dropdown-menu {
+  right: 0;
+  left: auto;
+  text-align: right;
+}
+
+/* Toast Notifications RTL */
+[dir="rtl"] .toast {
+  right: 1rem;
+  left: auto;
+}
+
+/* Mobile Responsive RTL */
+@media (max-width: 768px) {
+  [dir="rtl"] {
+    font-size: 14px;
+  }
+
+  [dir="rtl"] .mobile-menu {
+    right: 0;
+    left: auto;
+  }
+
+  [dir="rtl"] .mobile-search {
+    text-align: right;
+    direction: rtl;
+  }
+}
+
+/* Dark Mode RTL Support */
+.dark [dir="rtl"] {
+  color-scheme: dark;
+}
+
+/* Animation RTL Support */
+[dir="rtl"] .slide-in-right {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+[dir="rtl"] .slide-in-left {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Print RTL Support */
+@media print {
+  [dir="rtl"] {
+    direction: rtl;
+    text-align: right;
+  }
+}
+
+/* High Contrast Mode RTL */
+@media (prefers-contrast: high) {
+  [dir="rtl"] {
+    font-weight: 600;
+  }
+}
+
+/* Reduced Motion RTL */
+@media (prefers-reduced-motion: reduce) {
+  [dir="rtl"] * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

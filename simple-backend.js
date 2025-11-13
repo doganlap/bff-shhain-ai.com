@@ -1,0 +1,1 @@
+const express = require('express'); const app = express(); const port = 3001; app.get('/health', (req, res) = 'ok', timestamp: new Date()})); app.get('/', (req, res) = 'GRC Backend API', version: '1.0.0'})); app.listen(port, () = server running on http://localhost:${port}`));  
