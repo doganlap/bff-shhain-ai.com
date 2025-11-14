@@ -1,7 +1,7 @@
 // Sandbox/Playground Service - Create temporary demo sessions
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://grc-backend-prod.delightfulwave-81a84bdf.eastus.azurecontainerapps.io/api'
-const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'https://grc-frontend-prod.delightfulwave-81a84bdf.eastus.azurecontainerapps.io'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173'
 
 /**
  * Create a temporary sandbox session for visitor
@@ -45,13 +45,13 @@ export const createSandboxSession = async (visitorInfo = {}) => {
     }
 
     const data = await response.json()
-    
+
     // Store session info locally for tracking
     storeSandboxSession(data)
-    
+
     // Track sandbox creation
     trackSandboxEvent('sandbox_created', data.sessionId)
-    
+
     return {
       success: true,
       sessionId: data.sessionId,
@@ -64,10 +64,10 @@ export const createSandboxSession = async (visitorInfo = {}) => {
     }
   } catch (error) {
     console.error('Sandbox session creation error:', error)
-    
+
     // Track error
     trackSandboxEvent('sandbox_error', error.message)
-    
+
     throw new Error('Failed to create sandbox session. Please try again or contact support.')
   }
 }
@@ -80,10 +80,10 @@ export const createSandboxSession = async (visitorInfo = {}) => {
 export const quickAccessSandbox = async () => {
   try {
     const session = await createSandboxSession()
-    
+
     // Open in new tab
     window.open(session.sandboxUrl, '_blank', 'noopener,noreferrer')
-    
+
     return session
   } catch (error) {
     console.error('Quick access sandbox error:', error)
@@ -118,13 +118,13 @@ export const requestGuidedDemo = async (bookingData) => {
     }
 
     const data = await response.json()
-    
+
     // Store session
     storeSandboxSession(data.sandboxSession)
-    
+
     // Track guided demo request
     trackSandboxEvent('guided_demo_requested', data.bookingId)
-    
+
     return {
       success: true,
       bookingId: data.bookingId,
@@ -169,10 +169,10 @@ export const sendSandboxFeedback = async (sessionId, feedback) => {
     }
 
     const data = await response.json()
-    
+
     // Track feedback submission
     trackSandboxEvent('feedback_submitted', sessionId, feedback.rating)
-    
+
     return {
       success: true,
       message: data.message
@@ -214,10 +214,10 @@ export const sendContactMessage = async (contactData) => {
     }
 
     const data = await response.json()
-    
+
     // Track contact submission
     trackSandboxEvent('contact_submitted', contactData.type)
-    
+
     return {
       success: true,
       message: data.message,
@@ -278,7 +278,7 @@ export const getRecentSandboxSessions = () => {
 export const reopenSandboxSession = (sessionId) => {
   const sessions = getRecentSandboxSessions()
   const session = sessions.find(s => s.sessionId === sessionId)
-  
+
   if (session) {
     window.open(
       `${FRONTEND_URL}/sandbox?token=${session.accessToken}`,
@@ -305,7 +305,7 @@ const trackSandboxEvent = (eventName, value, extraData = null) => {
       timestamp: new Date().toISOString()
     })
   }
-  
+
   // Azure Application Insights
   if (window.appInsights) {
     window.appInsights.trackEvent({
@@ -317,9 +317,9 @@ const trackSandboxEvent = (eventName, value, extraData = null) => {
       }
     })
   }
-  
+
   // Console log for development
-  if (import.meta.env?.MODE === 'development') {
+  if (process.env.NODE_ENV === 'development') {
     console.log(`[Sandbox Event] ${eventName}:`, value, extraData)
   }
 }

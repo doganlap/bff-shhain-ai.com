@@ -1,0 +1,177 @@
+{
+  "environment": {
+    "DB_HOST": "localhost",
+    "DB_PORT": "5432",
+    "DB_USER": "postgres",
+    "COMPLIANCE_DB": "shahin_ksa_compliance",
+    "FINANCE_DB": "grc_master",
+    "AUTH_DB": "shahin_access_control",
+    "API_BASE_URL": "http://localhost:3006",
+    "NODE_ENV": "development"
+  },
+  "database": {
+    "compliance": {
+      "status": "connected",
+      "database": "shahin_ksa_compliance",
+      "tables": [
+        "activity_logs",
+        "analytics_events",
+        "assessment_comments",
+        "assessment_controls",
+        "assessment_history",
+        "assessment_responses",
+        "assessments",
+        "contact_messages",
+        "framework_controls",
+        "frameworks",
+        "landing_content",
+        "landing_requests",
+        "migrations",
+        "notifications",
+        "organizations",
+        "project_milestones",
+        "projects",
+        "sandbox_feedback",
+        "sandbox_sessions",
+        "system_settings",
+        "task_comments",
+        "tasks",
+        "team_members",
+        "teams",
+        "user_organizations",
+        "users"
+      ],
+      "tableCount": 26
+    },
+    "finance": {
+      "status": "connected",
+      "database": "grc_master",
+      "tables": [
+        "assessment_evidence",
+        "assessment_responses",
+        "assessment_sections",
+        "assessment_templates",
+        "assessments",
+        "database_connections",
+        "dunning_execution_log",
+        "dunning_schedules",
+        "grc_controls",
+        "grc_frameworks",
+        "invoices",
+        "license_events",
+        "license_feature_map",
+        "license_features",
+        "licenses",
+        "organizations",
+        "regulator_compliance",
+        "renewal_opportunities",
+        "roles",
+        "sector_controls",
+        "subscription_features",
+        "subscription_plans",
+        "subscription_usage",
+        "subscriptions",
+        "tenant_license_usage",
+        "tenant_licenses",
+        "tenants",
+        "user_roles",
+        "users",
+        "v_finance_performance",
+        "v_renewals_120d"
+      ],
+      "tableCount": 31
+    },
+    "auth": {
+      "status": "connected",
+      "database": "shahin_access_control",
+      "tables": [
+        "api_tokens",
+        "audit_logs",
+        "cross_db_references",
+        "permissions",
+        "role_permissions",
+        "roles",
+        "user_database_access",
+        "user_roles",
+        "user_sessions",
+        "users",
+        "v_auth_performance"
+      ],
+      "tableCount": 11
+    }
+  },
+  "files": {
+    "tests/test_auto_assessment_generator.js": {
+      "exists": true,
+      "size": 16311,
+      "readable": true
+    },
+    "tests/test_workflow_engine.js": {
+      "exists": true,
+      "size": 24085,
+      "readable": true
+    },
+    "tests/run_all_tests.js": {
+      "exists": true,
+      "size": 2314,
+      "readable": true
+    },
+    "tests/quick_start.js": {
+      "exists": true,
+      "size": 6121,
+      "readable": true
+    },
+    "tests/test_db_connection.js": {
+      "exists": true,
+      "size": 3376,
+      "readable": true
+    },
+    "tests/test_guide.js": {
+      "exists": true,
+      "size": 12675,
+      "readable": true
+    },
+    "node_modules/pg": {
+      "installed": true
+    },
+    "node_modules/axios": {
+      "installed": true
+    },
+    "node_modules/lodash": {
+      "installed": true
+    },
+    "node_modules/uuid": {
+      "installed": true
+    },
+    "node_modules/joi": {
+      "installed": false
+    }
+  },
+  "services": {
+    "BFF Service": {
+      "status": "not_reachable"
+    },
+    "GRC API": {
+      "status": "not_reachable"
+    }
+  },
+  "problems": [
+    "DB_PASSWORD is not set (REQUIRED)",
+    "DATABASE_URL is not set (REQUIRED)",
+    "joi not installed"
+  ],
+  "warnings": [
+    "  Missing tables: tenants, workflows, assessment_workflow, grc_frameworks, grc_controls",
+    "  Missing tables: workflows, assessment_workflow",
+    "  Missing tables: tenants, organizations, assessments, workflows, assessment_workflow, grc_frameworks, grc_controls",
+    "BFF Service not reachable at http://localhost:3006/health (optional)",
+    "GRC API not reachable at http://localhost:3000/health (optional)"
+  ],
+  "recommendations": [
+    "Set required environment variables:\n  Windows PowerShell:\n    $env:DB_PASSWORD=\"your_password\"\n  Linux/Mac:\n    export DB_PASSWORD=your_password",
+    "Install missing dependencies:\n  npm install",
+    "Run migrations for Compliance DB:\n  psql -U postgres -d shahin_ksa_compliance -f database/schema.sql",
+    "Run migrations for Finance DB:\n  psql -U postgres -d grc_master -f database/schema.sql",
+    "Run migrations for Auth DB:\n  psql -U postgres -d shahin_access_control -f database/schema.sql"
+  ]
+}

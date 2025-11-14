@@ -9,26 +9,43 @@
 // Initialize i18n system
 console.log('🌍 Initializing i18n system for Shahin-AI KSA');
 
-// Set default language based on browser or localStorage
+// Get default language in a way that is safe for Node/Vitest (no window/document)
 const getDefaultLanguage = () => {
-  // Check localStorage first
-  const savedLanguage = localStorage.getItem('grc-language');
-  if (savedLanguage && ['ar', 'en'].includes(savedLanguage)) {
-    return savedLanguage;
+  // In non-browser environments (SSR, tests), fall back to Arabic
+  if (typeof window === 'undefined') {
+    return 'ar';
+  }
+
+  try {
+    // Check localStorage first
+    const savedLanguage = window.localStorage.getItem('grc-language');
+    if (savedLanguage && ['ar', 'en'].includes(savedLanguage)) {
+      return savedLanguage;
+    }
+  } catch (err) {
+    console.warn('i18n: unable to access localStorage, falling back to browser language');
   }
   
-  // Check browser language
-  const browserLanguage = navigator.language || navigator.userLanguage;
-  if (browserLanguage.startsWith('ar')) {
-    return 'ar';
+  try {
+    // Check browser language
+    const browserLanguage = window.navigator.language || window.navigator.userLanguage;
+    if (browserLanguage && browserLanguage.startsWith('ar')) {
+      return 'ar';
+    }
+  } catch (err) {
+    console.warn('i18n: unable to read navigator language, falling back to default');
   }
   
   // Default to Arabic for KSA market
   return 'ar';
 };
 
-// Set document attributes on initialization
+// Set document attributes on initialization (browser only)
 const initializeDocumentAttributes = () => {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
   const language = getDefaultLanguage();
   const direction = language === 'ar' ? 'rtl' : 'ltr';
   
@@ -42,7 +59,7 @@ const initializeDocumentAttributes = () => {
   console.log(`📝 Document initialized with language: ${language}, direction: ${direction}`);
 };
 
-// Initialize on load
+// Initialize on load (browser only)
 initializeDocumentAttributes();
 
 // Export configuration

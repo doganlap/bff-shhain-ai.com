@@ -26,17 +26,18 @@ export default defineConfig({
   server: {  
     port: 5173,  
     host: '0.0.0.0',
+    proxy: {
+      "/api": {
+        target: "http://localhost:8001",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
     cors: {
       origin: ['http://localhost:3001', 'http://localhost:5173', 'http://localhost:5174'],
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Tenant-Id']
     },
-    headers: {
-      'X-Content-Type-Options': 'nosniff',
-      'X-Frame-Options': 'DENY',
-      'Referrer-Policy': 'strict-origin-when-cross-origin',
-      'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
-    }
   },  
   preview: {  
     port: 4173,  

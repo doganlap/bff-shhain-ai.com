@@ -1,10 +1,16 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: {
+    relative: true,
+    files: [
+      "./index.html",
+      "./src/**/*.{js,jsx,ts,tsx}",
+      // Explicitly exclude node_modules
+      "!./node_modules/**",
+      "!./www.shahin.com/node_modules/**",
+    ],
+  },
   theme: {
     extend: {
       // ============================================

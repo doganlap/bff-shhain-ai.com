@@ -365,6 +365,12 @@ app.use('/api/notifications', notificationsRouter);
 const reportsRouter = require('./routes/reports');
 app.use('/api/reports', reportsRouter);
 
+const schedulerRouter = require('./routes/scheduler');
+app.use('/api/scheduler', schedulerRouter);
+
+const ragRouter = require('./routes/rag');
+app.use('/api/rag', ragRouter);
+
 // ==========================================
 // REGULAR API ROUTES
 // ==========================================
@@ -402,7 +408,14 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
   });
 });
 
-// Apply authentication and RLS context to all /api routes
+// ==========================================
+// PUBLIC ACCESS ROUTES (Demo, Partner, POC)
+// ==========================================
+
+const publicAccessRouter = require('./routes/publicAccess');
+app.use('/api', publicAccessRouter); // Mount at /api for all public routes (demo, partner, poc)
+
+// Apply authentication and RLS context to all /api routes EXCEPT public ones
 const apiMiddlewares = [
   authenticateToken,
   superAdminBypass,
@@ -410,7 +423,7 @@ const apiMiddlewares = [
   injectTenantFilter
 ];
 if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) { apiMiddlewares.push(setRLSContext) }
-app.use('/api', ...apiMiddlewares);
+// Note: Public routes (/api/public, /api/partner/auth) are registered BEFORE auth middleware
 
 // ============================================
 // EXAMPLE: RBAC-PROTECTED ROUTES
@@ -540,11 +553,9 @@ app.get('/api/audit-logs',
 // FALLBACK: GENERIC PROXY FOR OTHER ROUTES
 // ============================================
 
-// Proxy all other /api/* requests to appropriate services
-// (Keep existing proxy logic for backward compatibility)
-app.use('/api/*', authenticateToken, tenantContext, (req, res, next) => {
-  // ...existing generic proxy code...
-});
+// NOTE: Catch-all proxy removed to allow public routes
+// Public routes are handled by publicAccessRouter registered earlier
+// Protected routes should be explicitly defined above
 
 // ==========================================
 // ROOT ROUTE

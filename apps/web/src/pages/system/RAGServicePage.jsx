@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Search, FileText, Brain, Upload, Download, MessageSquare, Sparkles, Database, Filter, Settings } from 'lucide-react';
+import { Search, FileText, Brain, Upload, Download, MessageSquare, Sparkles, Database, Filter, Settings, Trash2 } from 'lucide-react';
 import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
 import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner, AnimatedProgress } from '../../components/Animation/InteractiveAnimationToolkit';
 import { PermissionBasedCard, PermissionBasedButton } from '../../components/common/PermissionBasedCard';
 import { useRBAC } from '../../hooks/useRBAC';
-// import { QuickActionsToolbar } from '../../components/dashboard/QuickActionsToolbar';
-// import { RoleDashboardCards } from '../../components/dashboard/RoleDashboardCards';
-// import { AdvancedAnalyticsPanel } from '../../components/dashboard/AdvancedAnalyticsPanel';
-// import { RealTimeMonitor } from '../../components/dashboard/RealTimeMonitor';
+import apiService from '../../services/apiEndpoints';
 
 const RAGServicePage = () => {
   const { user, hasPermission } = useRBAC();
@@ -23,98 +20,64 @@ const RAGServicePage = () => {
     avgResponseTime: 0,
     queryAccuracy: 0
   });
+  const [error, setError] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
-  // Sample documents for demonstration
-  const sampleDocuments = [
-    {
-      id: 1,
-      name: 'SAMA Cybersecurity Framework.pdf',
-      type: 'PDF',
-      size: '2.4 MB',
-      uploaded: '2024-01-15',
-      status: 'processed',
-      chunks: 156,
-      embeddings: 156
-    },
-    {
-      id: 2,
-      name: 'ISO 27001 Implementation Guide.docx',
-      type: 'DOCX',
-      size: '1.8 MB',
-      uploaded: '2024-01-14',
-      status: 'processed',
-      chunks: 98,
-      embeddings: 98
-    },
-    {
-      id: 3,
-      name: 'NCA Compliance Checklist.xlsx',
-      type: 'XLSX',
-      size: '0.5 MB',
-      uploaded: '2024-01-13',
-      status: 'processing',
-      chunks: 0,
-      embeddings: 0
-    },
-    {
-      id: 4,
-      name: 'PCI DSS Requirements.pdf',
-      type: 'PDF',
-      size: '3.2 MB',
-      uploaded: '2024-01-12',
-      status: 'processed',
-      chunks: 203,
-      embeddings: 203
-    }
-  ];
-
-  // Sample search results
-  const sampleResults = [
-    {
-      id: 1,
-      document: 'SAMA Cybersecurity Framework.pdf',
-      relevance: 0.92,
-      chunk: 'Organizations must implement multi-factor authentication for all privileged accounts accessing critical systems. This requirement applies to both internal users and third-party service providers.',
-      page: 45,
-      section: 'Access Control Requirements',
-      context: 'Authentication and Authorization'
-    },
-    {
-      id: 2,
-      document: 'ISO 27001 Implementation Guide.docx',
-      relevance: 0.87,
-      chunk: 'Access control procedures should be documented and regularly reviewed. Organizations must maintain an inventory of all user accounts and their associated privileges.',
-      page: 23,
-      section: 'A.9.1 Access Control Management',
-      context: 'User Access Management'
-    },
-    {
-      id: 3,
-      document: 'PCI DSS Requirements.pdf',
-      relevance: 0.83,
-      chunk: 'Strong authentication mechanisms must be implemented for all system components. Default passwords and authentication parameters must be changed before systems are put into production.',
-      page: 67,
-      section: 'Requirement 8: Authentication',
-      context: 'Identity and Access Management'
-    }
-  ];
+  // Load real data instead of using mock data
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') || 'en';
     setLanguage(savedLanguage);
-    setDocuments(sampleDocuments);
+    loadRAGData();
   }, []);
+
+  const loadRAGData = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const [documentsRes, statsRes] = await Promise.all([
+        apiService.rag.getDocuments({ limit: 50 }),
+        apiService.rag.getStats()
+      ]);
+      
+      const documentsData = documentsRes.data || [];
+      const stats = statsRes.data || {};
+      
+      setDocuments(documentsData);
+      setRagMetrics({
+        totalDocuments: stats.totalDocuments || 0,
+        indexedDocuments: stats.totalChunks || 0,
+        avgResponseTime: stats.avgRelevanceScore || 0,
+        queryAccuracy: stats.processingRate || 0
+      });
+    } catch (error) {
+      console.error('Failed to load RAG data:', error);
+      setError('Failed to load RAG data');
+      // Set empty data instead of mock data
+      setDocuments([]);
+      setRagMetrics({
+        totalDocuments: 0,
+        indexedDocuments: 0,
+        avgResponseTime: 0,
+        queryAccuracy: 0
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleQuery = async () => {
     if (!query.trim()) return;
 
     setLoading(true);
+    setError(null);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setSearchResults(sampleResults);
+      const response = await apiService.rag.query(query, 5, 0.7);
+      setSearchResults(response.data?.results || []);
     } catch (error) {
       console.error('RAG query failed:', error);
+      setError('Failed to process query');
+      setSearchResults([]);
     } finally {
       setLoading(false);
     }
@@ -126,6 +89,66 @@ const RAGServicePage = () => {
       case 'processing': return 'bg-yellow-100 text-yellow-800';
       case 'failed': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const handleFileUpload = async (event) => {
+    const files = event.target.files;
+    if (!files.length) return;
+
+    setUploading(true);
+    setError(null);
+    
+    try {
+      for (const file of files) {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          const content = e.target.result;
+          await apiService.rag.createDocument({
+            name: file.name,
+            content: content,
+            type: file.type,
+            metadata: {
+              size: file.size,
+              lastModified: file.lastModified,
+              type: file.type
+            }
+          });
+        };
+        reader.readAsText(file);
+      }
+      
+      // Reload data after upload
+      await loadRAGData();
+    } catch (error) {
+      console.error('File upload failed:', error);
+      setError('Failed to upload files');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDeleteDocument = async (documentId) => {
+    if (!window.confirm('Are you sure you want to delete this document?')) return;
+    
+    try {
+      await apiService.rag.deleteDocument(documentId);
+      await loadRAGData();
+    } catch (error) {
+      console.error('Failed to delete document:', error);
+      setError('Failed to delete document');
+    }
+  };
+
+  const handleReindex = async () => {
+    if (!window.confirm('Are you sure you want to reindex all documents? This may take some time.')) return;
+    
+    try {
+      await apiService.rag.reindex();
+      alert('Reindexing started successfully');
+    } catch (error) {
+      console.error('Reindexing failed:', error);
+      setError('Failed to start reindexing');
     }
   };
 
@@ -170,6 +193,35 @@ const RAGServicePage = () => {
         </div>
       </div>
 
+      {/* Error Display */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-red-800">Error</h3>
+              <div className="mt-2 text-sm text-red-700">
+                <p>{error}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {loading && (
+        <div className="flex justify-center items-center py-8">
+          <CulturalLoadingSpinner culturalStyle="modern" size="medium" />
+          <span className="ml-3 text-gray-600">
+            {language === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+          </span>
+        </div>
+      )}
+
       {/* Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <AnimatedCard hover3D={false} culturalPattern={true}>
@@ -195,7 +247,7 @@ const RAGServicePage = () => {
                 <Database className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
-                <p className="text-2xl font-bold text-gray-900">657</p>
+                <p className="text-2xl font-bold text-gray-900">{ragMetrics.totalDocuments || 0}</p>
                 <p className="text-sm text-gray-600">
                   {language === 'ar' ? 'القطع النصية' : 'Text Chunks'}
                 </p>
@@ -211,7 +263,7 @@ const RAGServicePage = () => {
                 <Brain className="h-6 w-6 text-purple-600" />
               </div>
               <div className="ml-4">
-                <p className="text-2xl font-bold text-gray-900">657</p>
+                <p className="text-2xl font-bold text-gray-900">{ragMetrics.indexedDocuments || 0}</p>
                 <p className="text-sm text-gray-600">
                   {language === 'ar' ? 'التضمينات المتجهة' : 'Vector Embeddings'}
                 </p>
@@ -227,7 +279,7 @@ const RAGServicePage = () => {
                 <Sparkles className="h-6 w-6 text-yellow-600" />
               </div>
               <div className="ml-4">
-                <p className="text-2xl font-bold text-gray-900">1,234</p>
+                <p className="text-2xl font-bold text-gray-900">{ragMetrics.queryAccuracy || 0}</p>
                 <p className="text-sm text-gray-600">
                   {language === 'ar' ? 'الاستعلامات المنجزة' : 'Queries Processed'}
                 </p>
@@ -403,10 +455,28 @@ const RAGServicePage = () => {
                   <p className="text-sm text-gray-600 mb-4">
                     {language === 'ar' ? 'يدعم PDF, DOCX, TXT, والمزيد' : 'Supports PDF, DOCX, TXT, and more'}
                   </p>
-                  <AnimatedButton variant="primary">
-                    <Upload className="w-4 h-4 mr-2" />
-                    {language === 'ar' ? 'اختر الملفات' : 'Choose Files'}
-                  </AnimatedButton>
+                  <input
+                    type="file"
+                    multiple
+                    accept=".txt,.pdf,.doc,.docx,.md"
+                    onChange={handleFileUpload}
+                    className="hidden"
+                    id="rag-file-upload"
+                    disabled={uploading}
+                  />
+                  <label htmlFor="rag-file-upload">
+                    <AnimatedButton 
+                      variant="primary" 
+                      component="span"
+                      disabled={uploading}
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {uploading ? 
+                        (language === 'ar' ? 'جاري الرفع...' : 'Uploading...') :
+                        (language === 'ar' ? 'اختر الملفات' : 'Choose Files')
+                      }
+                    </AnimatedButton>
+                  </label>
                 </div>
               </div>
             </AnimatedCard>
@@ -421,36 +491,49 @@ const RAGServicePage = () => {
                 </h3>
 
                 <div className="space-y-3">
-                  {documents.map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
-                      <div className="flex items-center space-x-4">
-                        <FileText className="w-8 h-8 text-gray-400" />
-                        <div>
-                          <p className="font-medium text-gray-900">{doc.name}</p>
-                          <p className="text-sm text-gray-600">
-                            {doc.size} • {language === 'ar' ? 'رُفع في' : 'Uploaded'} {doc.uploaded}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center space-x-4">
-                        <div className="text-right">
-                          <p className="text-sm font-medium text-gray-900">
-                            {doc.chunks} {language === 'ar' ? 'قطعة' : 'chunks'}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {doc.embeddings} {language === 'ar' ? 'تضمين' : 'embeddings'}
-                          </p>
-                        </div>
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(doc.status)}`}>
-                          {doc.status}
-                        </span>
-                        <button className="text-gray-400 hover:text-gray-600">
-                          <Download className="w-4 h-4" />
-                        </button>
-                      </div>
+                  {documents.length === 0 ? (
+                    <div className="text-center py-8 text-gray-500">
+                      <FileText className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                      <p>{language === 'ar' ? 'لا توجد مستندات' : 'No documents found'}</p>
                     </div>
-                  ))}
+                  ) : (
+                    documents.map((doc) => (
+                      <div key={doc.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center space-x-4">
+                          <FileText className="w-8 h-8 text-gray-400" />
+                          <div>
+                            <p className="font-medium text-gray-900">{doc.name}</p>
+                            <p className="text-sm text-gray-600">
+                              {language === 'ar' ? 'رُفع في' : 'Uploaded'} {new Date(doc.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-4">
+                          <div className="text-right">
+                            <p className="text-sm font-medium text-gray-900">
+                              {doc.chunks?.length || 0} {language === 'ar' ? 'قطعة' : 'chunks'}
+                            </p>
+                            <p className="text-sm text-gray-600">
+                              {doc.type || 'text'}
+                            </p>
+                          </div>
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(doc.status)}`}>
+                            {doc.status}
+                          </span>
+                          {hasPermission('rag:delete') && (
+                            <button 
+                              onClick={() => handleDeleteDocument(doc.id)}
+                              className="text-red-400 hover:text-red-600"
+                              title={language === 'ar' ? 'حذف' : 'Delete'}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             </AnimatedCard>
@@ -473,16 +556,16 @@ const RAGServicePage = () => {
                     <h4 className="text-sm font-medium text-gray-700 mb-2">
                       {language === 'ar' ? 'الاستعلامات هذا الشهر' : 'Queries This Month'}
                     </h4>
-                    <AnimatedProgress value={75} max={100} className="h-3 mb-2" />
-                    <p className="text-sm text-gray-600">1,234 / 1,500 queries used</p>
+                    <AnimatedProgress value={ragMetrics.avgResponseTime || 0} max={100} className="h-3 mb-2" />
+                    <p className="text-sm text-gray-600">{ragMetrics.avgResponseTime || 0} / 1,500 queries used</p>
                   </div>
 
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-2">
                       {language === 'ar' ? 'دقة النتائج' : 'Result Accuracy'}
                     </h4>
-                    <AnimatedProgress value={92} max={100} className="h-3 mb-2" />
-                    <p className="text-sm text-gray-600">92% average relevance score</p>
+                    <AnimatedProgress value={ragMetrics.queryAccuracy || 0} max={100} className="h-3 mb-2" />
+                    <p className="text-sm text-gray-600">{ragMetrics.queryAccuracy || 0}% average relevance score</p>
                   </div>
                 </div>
               </div>
@@ -539,6 +622,14 @@ const RAGServicePage = () => {
                       className="w-full"
                     />
                   </div>
+
+                  {hasPermission('rag:manage') && (
+                    <div>
+                      <AnimatedButton variant="primary" onClick={handleReindex}>
+                        {language === 'ar' ? 'إعادة الفهرسة' : 'Reindex Documents'}
+                      </AnimatedButton>
+                    </div>
+                  )}
                 </div>
               </div>
             </AnimatedCard>

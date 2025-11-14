@@ -1,13 +1,32 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../db/prisma');
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {
   console.error(message, error);
   res.status(500).json({ error: message || 'Internal Server Error' });
 };
+
+// GET /api/vendors/stats - Get vendor statistics
+router.get('/stats', async (req, res) => {
+  try {
+    const totalVendors = await prisma.vendor.count();
+    const activeVendors = await prisma.vendor.count({
+      where: { isActive: true }
+    });
+    
+    const stats = {
+      totalVendors,
+      activeVendors,
+      inactiveVendors: totalVendors - activeVendors,
+    };
+
+    res.json(stats);
+  } catch (error) {
+    handleError(res, error, 'Error fetching vendor statistics');
+  }
+});
 
 // GET /api/vendors - Get all vendors
 router.get('/', async (req, res) => {
@@ -75,6 +94,96 @@ router.post('/:id/assess', async (req, res) => {
     res.status(201).json(assessment);
   } catch (error) {
     handleError(res, error, 'Error creating vendor assessment');
+  }
+});
+
+// PUT /api/vendors/:id - Update an existing vendor
+router.put('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updatedVendor = await prisma.vendor.update({
+      where: { id: parseInt(id, 10) },
+      data: req.body,
+    });
+    res.json(updatedVendor);
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Vendor not found' });
+    }
+    handleError(res, error, 'Error updating vendor');
+  }
+});
+
+// DELETE /api/vendors/:id - Delete a vendor
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await prisma.vendor.delete({
+      where: { id: parseInt(id, 10) },
+    });
+    res.json({ message: 'Vendor deleted successfully' });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Vendor not found' });
+    }
+    handleError(res, error, 'Error deleting vendor');
+  }
+});
+
+// POST /api/vendors/:id/risks - Add a risk to a vendor
+router.post('/:id/risks', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const risk = await prisma.risk.create({
+      data: {
+        vendorId: parseInt(id, 10),
+        ...req.body,
+      },
+    });
+    res.status(201).json(risk);
+  } catch (error) {
+    handleError(res, error, 'Error creating vendor risk');
+  }
+});
+
+// GET /api/vendors/stats - Get vendor statistics
+router.get('/stats', async (req, res) => {
+  try {
+    const totalVendors = await prisma.vendor.count();
+    const activeVendors = await prisma.vendor.count({
+      where: { isActive: true }
+    });
+    const highRiskVendors = await prisma.vendor.count({
+      where: { riskLevel: 'high' }
+    });
+    
+    const vendorsByCategory = await prisma.vendor.groupBy({
+      by: ['category'],
+      _count: { id: true }
+    });
+    
+    const vendorsByRiskLevel = await prisma.vendor.groupBy({
+      by: ['riskLevel'],
+      _count: { id: true }
+    });
+
+    const stats = {
+      totalVendors,
+      activeVendors,
+      highRiskVendors,
+      vendorsByCategory: vendorsByCategory.reduce((acc, item) => {
+        acc[item.category] = item._count.id;
+        return acc;
+      }, {}),
+      vendorsByRiskLevel: vendorsByRiskLevel.reduce((acc, item) => {
+        acc[item.riskLevel] = item._count.id;
+        return acc;
+      }, {})
+    };
+
+    res.json(stats);
+  } catch (error) {
+    handleError(res, error, 'Error fetching vendor statistics');
   }
 });
 

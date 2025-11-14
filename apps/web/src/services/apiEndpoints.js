@@ -12,36 +12,64 @@
 import axios from 'axios';
 
 // API Base URL from environment
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002'; // Use backend server port
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3005'; // Use backend server port
 
 // Create axios instance with default config
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+let api;
+try {
+  api = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+} catch (error) {
+  // In test environment, create a minimal mock
+  api = {
+    interceptors: {
+      request: { use: () => {} },
+      response: { use: () => {} }
+    },
+    get: () => Promise.resolve({ data: {} }),
+    post: () => Promise.resolve({ data: {} }),
+    put: () => Promise.resolve({ data: {} }),
+    delete: () => Promise.resolve({ data: {} }),
+    patch: () => Promise.resolve({ data: {} }),
+  };
+}
 
 // Request interceptor for auth token
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('auth_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  
-  // Add tenant_id if available
-  const tenantId = localStorage.getItem('tenant_id');
-  if (tenantId) {
-    config.params = config.params || {};
-    config.params.tenant_id = tenantId;
-  }
-  
-  return config;
-});
+if (api && api.interceptors && api.interceptors.request) {
+  api.interceptors.request.use((config) => {
+    // Handle test environment where localStorage might not be available immediately
+    try {
+      const token = typeof localStorage !== 'undefined' ? localStorage.getItem('auth_token') : null;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (error) {
+      // In test environment, localStorage might not be available
+      console.warn('localStorage not available for auth token:', error.message);
+    }
+    
+    // Add tenant_id if available
+    try {
+      const tenantId = typeof localStorage !== 'undefined' ? localStorage.getItem('tenant_id') : null;
+      if (tenantId) {
+        config.params = config.params || {};
+        config.params.tenant_id = tenantId;
+      }
+    } catch (error) {
+      console.warn('localStorage not available for tenant_id:', error.message);
+    }
+    return config;
+  });
+}
 
 // Response interceptor for error handling
-api.interceptors.response.use(
-  (response) => response,
+if (api && api.interceptors && api.interceptors.response) {
+  api.interceptors.response.use(
+    (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       // Handle unauthorized - redirect to login
@@ -50,7 +78,8 @@ api.interceptors.response.use(
     }
     return Promise.reject(error);
   }
-);
+  );
+}
 
 /**
  * Page 1: Dashboard APIs
@@ -188,8 +217,8 @@ export const controlsAPI = {
  * Page 6: Organizations APIs
  */
 export const organizationsAPI = {
-  // PUT /api/organizations/:id
-  update: (id, data) => api.put(`/organizations/${id}`, data),
+  // POST /api/organizations
+  create: (data) => api.post('/organizations', data),
   
   // GET /api/organizations
   getAll: (params = {}) => api.get('/organizations', { params }),
@@ -197,8 +226,17 @@ export const organizationsAPI = {
   // GET /api/organizations/:id
   getById: (id) => api.get(`/organizations/${id}`),
   
+  // PUT /api/organizations/:id
+  update: (id, data) => api.put(`/organizations/${id}`, data),
+  
+  // DELETE /api/organizations/:id
+  delete: (id) => api.delete(`/organizations/${id}`),
+  
   // GET /api/organizations/:id/units
   getUnits: (id) => api.get(`/organizations/${id}/units`),
+  
+  // POST /api/organizations/:id/units
+  createUnit: (id, data) => api.post(`/organizations/${id}/units`, data),
 };
 
 /**
@@ -222,6 +260,32 @@ export const regulatorsAPI = {
   
   // DELETE /api/regulators/:id
   delete: (id) => api.delete(`/regulators/${id}`),
+  
+  // GET /api/regulators/stats
+  getStats: () => api.get('/regulators/stats'),
+  
+  // GET /api/regulators/changes
+  getChanges: (regulator, params = {}) => api.get('/regulators/changes', { params: { ...params, regulator } }),
+  
+  // GET /api/regulators/:regulatorId/changes
+  getRegulatorChanges: (regulatorId, params = {}) => api.get(`/regulators/${regulatorId}/changes`, { params }),
+  
+  // Regulatory Intelligence APIs
+  
+  // GET /api/regulators/regulatory-intelligence/feed
+  getRegulatoryFeed: (params = {}) => api.get('/regulators/regulatory-intelligence/feed', { params }),
+  
+  // GET /api/regulators/regulatory-intelligence/stats
+  getRegulatoryStats: () => api.get('/regulators/regulatory-intelligence/stats'),
+  
+  // GET /api/regulators/regulatory-intelligence/calendar
+  getRegulatoryCalendar: (params = {}) => api.get('/regulators/regulatory-intelligence/calendar', { params }),
+  
+  // GET /api/regulators/regulatory-intelligence/impact/:changeId
+  getRegulatoryImpact: (changeId) => api.get(`/regulators/regulatory-intelligence/impact/${changeId}`),
+  
+  // POST /api/regulators/regulatory-intelligence/subscribe
+  subscribeToRegulatoryUpdates: (data) => api.post('/regulators/regulatory-intelligence/subscribe', data),
 };
 
 /**
@@ -257,6 +321,9 @@ export const risksAPI = {
   
   // GET /api/risks/realtime
   getRealTimeMetrics: () => api.get('/risks/realtime'),
+  
+  // GET /api/risks/trends
+  getTrends: (params = {}) => api.get('/risks/trends', { params }),
   
   // GET /api/risks/export
   export: (params = {}) => api.get('/risks/export', { params }),
@@ -362,6 +429,12 @@ export const workflowsAPI = {
   // GET /api/workflows/:id
   getById: (id) => api.get(`/workflows/${id}`),
   
+  // PUT /api/workflows/:id
+  update: (id, data) => api.put(`/workflows/${id}`, data),
+  
+  // DELETE /api/workflows/:id
+  delete: (id) => api.delete(`/workflows/${id}`),
+  
   // POST /api/workflows/:id/instances
   createInstance: (id, data) => api.post(`/workflows/${id}/instances`, data),
   
@@ -370,6 +443,15 @@ export const workflowsAPI = {
   
   // PUT /api/workflows/instances/:id
   updateInstance: (id, data) => api.put(`/workflows/instances/${id}`, data),
+  
+  // DELETE /api/workflows/instances/:id
+  deleteInstance: (id) => api.delete(`/workflows/instances/${id}`),
+  
+  // GET /api/workflows/templates
+  getTemplates: () => api.get('/workflows/templates'),
+  
+  // GET /api/workflows/stats
+  getStats: () => api.get('/workflows/stats'),
 };
 
 /**
@@ -385,11 +467,23 @@ export const vendorsAPI = {
   // GET /api/vendors/:id
   getById: (id) => api.get(`/vendors/${id}`),
   
+  // PUT /api/vendors/:id
+  update: (id, data) => api.put(`/vendors/${id}`, data),
+  
+  // DELETE /api/vendors/:id
+  delete: (id) => api.delete(`/vendors/${id}`),
+  
   // POST /api/vendors/:id/assess
   assess: (id, data) => api.post(`/vendors/${id}/assess`, data),
   
+  // POST /api/vendors/:id/risks
+  addRisk: (id, data) => api.post(`/vendors/${id}/risks`, data),
+  
   // GET /api/vendors/:id/risks
   getRisks: (id) => api.get(`/vendors/${id}/risks`),
+  
+  // GET /api/vendors/stats
+  getStats: () => api.get('/vendors/stats'),
 };
 
 /**
@@ -470,12 +564,53 @@ export const schedulerAPI = {
   
   // GET /api/scheduler/runs
   getRuns: (params = {}) => api.get('/scheduler/runs', { params }),
+
+  // GET /api/scheduler/stats
+  getStats: () => api.get('/scheduler/stats'),
+
+  // Canonical CRUD for useCRUD hook
+  getAll: (params = {}) => api.get('/scheduler/jobs', { params }),
+  getById: (id) => api.get(`/scheduler/jobs/${id}`),
+  create: (data) => api.post('/scheduler/jobs', data),
+  update: (id, data) => api.put(`/scheduler/jobs/${id}`, data),
+  delete: (id) => api.delete(`/scheduler/jobs/${id}`),
 };
 
 /**
  * Page 16: RAG Service APIs
  */
 export const ragAPI = {
+  // Documents CRUD operations
+  // POST /api/rag/documents - Upload and process document
+  createDocument: (data) => api.post('/rag/documents', data),
+  
+  // GET /api/rag/documents
+  getDocuments: (params = {}) => api.get('/rag/documents', { params }),
+  
+  // GET /api/rag/documents/:id
+  getDocument: (id) => api.get(`/rag/documents/${id}`),
+  
+  // PUT /api/rag/documents/:id
+  updateDocument: (id, data) => api.put(`/rag/documents/${id}`, data),
+  
+  // DELETE /api/rag/documents/:id
+  deleteDocument: (id) => api.delete(`/rag/documents/${id}`),
+  
+  // Query operations
+  // POST /api/rag/query - Query RAG system
+  query: (query, limit = 5, minRelevance = 0.7) => api.post('/rag/query', { query, limit, minRelevance }),
+  
+  // GET /api/rag/queries - Get query history
+  getQueries: (params = {}) => api.get('/rag/queries', { params }),
+  
+  // Statistics
+  // GET /api/rag/stats
+  getStats: () => api.get('/rag/stats'),
+  
+  // POST /api/rag/reindex - Reindex all documents
+  reindex: () => api.post('/rag/reindex'),
+  
+  // Legacy endpoints (for backward compatibility)
   // POST /api/rag/ask
   ask: (question, context = {}) => api.post('/rag/ask', { question, ...context }),
   

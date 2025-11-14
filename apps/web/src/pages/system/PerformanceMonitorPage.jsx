@@ -44,14 +44,39 @@ const PerformanceMonitorPage = () => {
         setPerformanceData(response.data.data);
         setLastRefresh(new Date());
       } else {
-        // Fallback to mock data if API fails
-        setPerformanceData(generateMockPerformanceData());
+        console.warn('Performance metrics API returned empty or invalid response');
+        // Use empty state instead of mock fallback
+        setPerformanceData({
+          responseTime: 0,
+          throughput: 0,
+          cpuUsage: 0,
+          memoryUsage: 0,
+          diskUsage: 0,
+          networkLatency: 0,
+          activeConnections: 0,
+          errorRate: 0,
+          uptime: 0,
+          apiCalls: 0,
+          lastUpdate: new Date().toISOString()
+        });
       }
     } catch (error) {
       console.error('Error loading performance data:', error);
       toast.error(language === 'ar' ? 'فشل تحميل مقاييس الأداء' : 'Failed to load performance metrics');
-      // Fallback to mock data
-      setPerformanceData(generateMockPerformanceData());
+      // Use empty state instead of mock fallback
+      setPerformanceData({
+        responseTime: 0,
+        throughput: 0,
+        cpuUsage: 0,
+        memoryUsage: 0,
+        diskUsage: 0,
+        networkLatency: 0,
+        activeConnections: 0,
+        errorRate: 0,
+        uptime: 0,
+        apiCalls: 0,
+        lastUpdate: new Date().toISOString()
+      });
     } finally {
       setLoading(false);
     }
@@ -84,22 +109,6 @@ const PerformanceMonitorPage = () => {
     } catch (error) {
       console.error('Error loading historical data:', error);
     }
-  };
-
-  const generateMockPerformanceData = () => {
-    return {
-      responseTime: Math.random() * 5 + 1,
-      throughput: Math.floor(Math.random() * 2000) + 1000,
-      cpuUsage: Math.random() * 80 + 10,
-      memoryUsage: Math.random() * 70 + 20,
-      diskUsage: Math.random() * 60 + 10,
-      networkLatency: Math.random() * 20 + 5,
-      activeConnections: Math.floor(Math.random() * 100) + 20,
-      errorRate: Math.random() * 2,
-      uptime: 99.5 + Math.random() * 0.5,
-      apiCalls: Math.floor(Math.random() * 50000) + 10000,
-      lastUpdate: new Date().toISOString()
-    };
   };
 
   const handleExportData = async () => {

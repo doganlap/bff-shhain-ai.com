@@ -38,6 +38,7 @@ const RiskManagementPage = () => {
     mitigationProgress: 0
   });
   const [heatmapData, setHeatmapData] = useState([]);
+  const [trendData, setTrendData] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -104,6 +105,7 @@ const RiskManagementPage = () => {
     loadRisks();
     loadRiskMetrics();
     loadRealTimeData();
+    loadTrendData();
     const savedLanguage = localStorage.getItem('language') || 'en';
     setLanguage(savedLanguage);
     
@@ -240,16 +242,23 @@ const RiskManagementPage = () => {
       setHeatmapData(heatmapData);
     } catch (error) {
       console.error('Failed to load heatmap data:', error);
-      // Generate fallback heatmap data from current risks
-      const fallbackHeatmap = risks.map(risk => ({
-        id: risk.id,
-        title: risk.title,
-        probability: risk.probability || 'medium',
-        impact: risk.impact || 'medium',
-        severity: risk.severity || 'medium',
-        riskScore: risk.riskScore || 5.0
-      }));
-      setHeatmapData(fallbackHeatmap);
+      // Use empty array instead of calculated fallback
+      setHeatmapData([]);
+    }
+  };
+
+  const loadTrendData = async () => {
+    try {
+      const response = await apiService.risks.getTrends();
+      if (response?.data?.success && response.data.data) {
+        setTrendData(response.data.data);
+      } else {
+        console.warn('Risk trends API returned empty or invalid response');
+        setTrendData([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch trend data:', error);
+      setTrendData([]);
     }
   };
 
@@ -259,36 +268,27 @@ const RiskManagementPage = () => {
       if (response?.data?.success && response.data.data) {
         setRiskMetrics(response.data.data);
       } else {
-        // Fallback to calculated metrics
-        const high = risks.filter(r => r.severity === 'high').length;
-        const medium = risks.filter(r => r.severity === 'medium').length;
-        const low = risks.filter(r => r.severity === 'low').length;
-        const avgScore = risks.length > 0 ? (risks.reduce((sum, r) => sum + (r.riskScore || 0), 0) / risks.length).toFixed(1) : '0.0';
-        
+        console.warn('Risk metrics API returned empty or invalid response');
+        // Use empty state instead of calculated fallback
         setRiskMetrics({
-          highRisks: high,
-          mediumRisks: medium,
-          lowRisks: low,
-          averageScore: avgScore,
-          totalRisks: risks.length,
-          activeRisks: risks.filter(r => r.status === 'active').length
+          highRisks: 0,
+          mediumRisks: 0,
+          lowRisks: 0,
+          averageScore: '0.0',
+          totalRisks: 0,
+          activeRisks: 0
         });
       }
     } catch (error) {
       console.error('Failed to fetch risk metrics:', error);
-      // Fallback to calculated metrics
-      const high = risks.filter(r => r.severity === 'high').length;
-      const medium = risks.filter(r => r.severity === 'medium').length;
-      const low = risks.filter(r => r.severity === 'low').length;
-      const avgScore = risks.length > 0 ? (risks.reduce((sum, r) => sum + (r.riskScore || 0), 0) / risks.length).toFixed(1) : '0.0';
-      
+      // Use empty state instead of calculated fallback
       setRiskMetrics({
-        highRisks: high,
-        mediumRisks: medium,
-        lowRisks: low,
-        averageScore: avgScore,
-        totalRisks: risks.length,
-        activeRisks: risks.filter(r => r.status === 'active').length
+        highRisks: 0,
+        mediumRisks: 0,
+        lowRisks: 0,
+        averageScore: '0.0',
+        totalRisks: 0,
+        activeRisks: 0
       });
     }
   };
@@ -299,20 +299,21 @@ const RiskManagementPage = () => {
       if (response?.data?.success && response.data.data) {
         setRealTimeData(response.data.data);
       } else {
-        // Fallback to mock real-time data
+        console.warn('Real-time metrics API returned empty or invalid response');
+        // Use empty state instead of mock fallback
         setRealTimeData({
-          riskAlerts: Math.floor(Math.random() * 10),
-          pendingAssessments: Math.floor(Math.random() * 20) + 5,
-          mitigationProgress: Math.floor(Math.random() * 40) + 60
+          riskAlerts: 0,
+          pendingAssessments: 0,
+          mitigationProgress: 0
         });
       }
     } catch (error) {
       console.error('Failed to fetch real-time data:', error);
-      // Fallback to mock real-time data
+      // Use empty state instead of mock fallback
       setRealTimeData({
-        riskAlerts: Math.floor(Math.random() * 10),
-        pendingAssessments: Math.floor(Math.random() * 20) + 5,
-        mitigationProgress: Math.floor(Math.random() * 40) + 60
+        riskAlerts: 0,
+        pendingAssessments: 0,
+        mitigationProgress: 0
       });
     }
   };
@@ -505,13 +506,8 @@ const RiskManagementPage = () => {
               {
                 title: 'Risk Trend Over Time',
                 type: 'line',
-                data: [
-                  { name: 'Jan', value: 45 },
-                  { name: 'Feb', value: 52 },
-                  { name: 'Mar', value: 48 },
-                  { name: 'Apr', value: 61 },
-                  { name: 'May', value: 55 },
-                  { name: 'Jun', value: 67 }
+                data: trendData.length > 0 ? trendData : [
+                  { name: 'No Data', value: 0 }
                 ]
               }
             ]}

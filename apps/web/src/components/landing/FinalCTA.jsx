@@ -98,9 +98,6 @@ const FinalCTA = () => {
             transition={{ delay: 0.5 }}
             className="text-center mt-12"
           >
-            <p className="font-english text-sm text-white/70 mb-4">
-              Trusted by 500+ organizations worldwide
-            </p>
             <div className="flex flex-wrap justify-center gap-4 opacity-50">
               <div className="px-4 py-2 bg-white/10 rounded-lg text-white text-xs font-bold">ISO 27001 Certified</div>
               <div className="px-4 py-2 bg-white/10 rounded-lg text-white text-xs font-bold">Saudi Made</div>
@@ -109,30 +106,6 @@ const FinalCTA = () => {
             </div>
           </motion.div>
 
-          {/* No Risk Guarantee */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.6 }}
-            className="mt-12 bg-white/10 backdrop-blur-sm rounded-2xl p-8 border-2 border-white/20 text-center"
-          >
-            <div className="flex flex-col items-center gap-4">
-              <div className="text-5xl mb-2">💯</div>
-              <h4 className="font-arabic font-bold text-2xl text-white mb-2">
-                ضمان استرجاع الأموال لمدة 30 يوم
-              </h4>
-              <p className="font-english text-lg text-white/90 mb-4">
-                30-Day Money-Back Guarantee
-              </p>
-              <p className="font-arabic text-white/80 max-w-2xl">
-                جرب شاهين بدون مخاطر. إذا لم تكن راضياً تماماً خلال أول 30 يوماً، سنعيد لك كامل المبلغ
-              </p>
-              <p className="font-english text-white/70 max-w-2xl text-sm mt-2">
-                Try Shahin risk-free. If you're not completely satisfied in the first 30 days, we'll refund you in full
-              </p>
-            </div>
-          </motion.div>
         </div>
       </div>
 

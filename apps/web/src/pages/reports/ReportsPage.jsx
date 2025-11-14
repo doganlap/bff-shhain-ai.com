@@ -1,400 +1,458 @@
-import React, { useState, useEffect } from 'react';
-import { BarChart3, Download, Eye, Calendar, Filter, TrendingUp, PieChart, FileText, Users, Shield, AlertTriangle } from 'lucide-react';
-import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
-import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner, AnimatedProgress } from '../../components/Animation/InteractiveAnimationToolkit';
-import { FeatureGate, useSubscription } from '../../components/Subscription/SubscriptionManager';
+import React, { useState, useEffect, useCallback } from 'react';
+import EnterprisePageLayout from '../../components/layout/EnterprisePageLayout';
 import apiService from '../../services/apiEndpoints';
-import { useI18n } from '../../hooks/useI18n';
+import { toast } from 'sonner';
+import {
+  BarChart3, Download, Eye, Calendar, Shield, AlertTriangle,
+  TrendingUp, FileText, RefreshCw, Grid, List, Search, Plus
+} from 'lucide-react';
+import { format } from 'date-fns';
 
 const ReportsPage = () => {
-  const { hasFeature, currentPlan } = useSubscription();
-  const { t, language, changeLanguage, isRTL } = useI18n();
+  // State
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const [filterBy, setFilterBy] = useState('all');
+  const [viewMode, setViewMode] = useState('grid');
+  const [sortField, setSortField] = useState('generatedDate');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [stats, setStats] = useState({});
 
-
-  // Generate new report
-  const handleGenerateReport = async (reportType, params) => {
+  // Fetch data
+  const fetchReports = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await apiServices.reports.generate(reportType, params);
-      if (response?.data?.success) {
-        // Refresh reports list
-        fetchReports();
-      }
-    } catch (error) {
-      console.error('Error generating report:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-  useEffect(() => {
-    loadReports();
-  }, [language]);
-
-  const loadReports = async () => {
-    try {
-      setLoading(true);
-      const response = await apiService.reports.getRuns();
+      const response = await apiService.reports.getRuns({
+        search: searchTerm,
+        type: filterBy !== 'all' ? filterBy : undefined
+      });
       setReports(response.data?.data || response.data || []);
     } catch (error) {
-      console.error('Failed to fetch reports:', error);
+      console.error('Error fetching reports:', error);
+      toast.error('Failed to load reports');
       setReports([]);
     } finally {
       setLoading(false);
     }
+  }, [searchTerm, filterBy]);
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const response = await apiService.reports.getStats();
+      setStats(response.data || {});
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchReports();
+    fetchStats();
+  }, [fetchReports, fetchStats]);
+
+  // Calculate statistics
+  const statsCards = [
+    {
+      title: 'Total Reports',
+      value: stats.total || reports.length,
+      icon: BarChart3,
+      color: 'blue',
+      trend: `${reports.length} generated`
+    },
+    {
+      title: 'Compliance Reports',
+      value: stats.compliance || reports.filter(r => r.type === 'compliance').length,
+      icon: Shield,
+      color: 'green',
+      trend: 'Regulatory'
+    },
+    {
+      title: 'Risk Reports',
+      value: stats.risk || reports.filter(r => r.type === 'risk').length,
+      icon: AlertTriangle,
+      color: 'red',
+      trend: 'Assessment'
+    },
+    {
+      title: 'Executive Reports',
+      value: stats.executive || reports.filter(r => r.type === 'executive').length,
+      icon: TrendingUp,
+      color: 'purple',
+      trend: 'Summary'
+    }
+  ];
+
+  // Filter and sort
+  const filteredReports = reports.filter(report => {
+    const matchesSearch =
+      report.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.organization?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      report.framework?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesFilter = filterBy === 'all' || report.type === filterBy;
+    return matchesSearch && matchesFilter;
+  });
+
+  const sortedReports = [...filteredReports].sort((a, b) => {
+    const aValue = a[sortField] || '';
+    const bValue = b[sortField] || '';
+    if (sortDirection === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    }
+    return aValue < bValue ? 1 : -1;
+  });
+
+  // Handlers
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const handleDownload = async (reportId) => {
+    try {
+      await apiService.reports.download(reportId);
+      toast.success('Report downloaded successfully');
+    } catch (error) {
+      console.error('Error downloading report:', error);
+      toast.error('Failed to download report');
+    }
+  };
+
+  const handleGenerateReport = () => {
+    toast.info('Report generation feature coming soon');
   };
 
   const getTypeColor = (type) => {
     switch (type) {
-      case 'compliance': return 'bg-blue-100 text-blue-800';
-      case 'risk': return 'bg-red-100 text-red-800';
-      case 'executive': return 'bg-purple-100 text-purple-800';
-      case 'audit': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'compliance': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'risk': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'executive': return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200';
+      case 'audit': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
   };
 
   const getTypeIcon = (type) => {
     switch (type) {
-      case 'compliance': return <Shield className="h-4 w-4" />;
-      case 'risk': return <AlertTriangle className="h-4 w-4" />;
-      case 'executive': return <TrendingUp className="h-4 w-4" />;
-      case 'audit': return <FileText className="h-4 w-4" />;
-      default: return <BarChart3 className="h-4 w-4" />;
+      case 'compliance': return Shield;
+      case 'risk': return AlertTriangle;
+      case 'executive': return TrendingUp;
+      case 'audit': return FileText;
+      default: return BarChart3;
     }
-  };
-
-  const getTypeText = (type) => {
-    const typeMap = {
-      compliance: { en: 'Compliance', ar: 'امتثال' },
-      risk: { en: 'Risk', ar: 'مخاطر' },
-      executive: { en: 'Executive', ar: 'تنفيذي' },
-      audit: { en: 'Audit', ar: 'تدقيق' }
-    };
-    return typeMap[type]?.[language] || type;
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800';
-      case 'generating': return 'bg-yellow-100 text-yellow-800';
-      case 'failed': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'completed': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'generating': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'failed': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
   };
 
-  const getStatusText = (status) => {
-    const statusMap = {
-      completed: { en: 'Completed', ar: 'مكتمل' },
-      generating: { en: 'Generating', ar: 'قيد الإنشاء' },
-      failed: { en: 'Failed', ar: 'فشل' }
-    };
-    return statusMap[status]?.[language] || status;
-  };
-
-  const filteredReports = reports.filter(report => {
-    if (filterBy === 'all') return true;
-    return report.type === filterBy;
-  });
-
-  if (loading) {
+  // Loading state
+  if (loading && reports.length === 0) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <CulturalLoadingSpinner culturalStyle="modern" />
-      </div>
+      <EnterprisePageLayout title="Reports" subtitle="Generate and manage compliance reports">
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </EnterprisePageLayout>
     );
   }
 
   return (
-    <div className="space-y-6" style={{ fontFamily: language === 'ar' ? 'Amiri, Noto Sans Arabic, sans-serif' : 'Inter, sans-serif' }}>
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-        <div>
-          <ArabicTextEngine
-            animated={true}
-            personalityType="professional"
-            style={{ fontSize: '28px', fontWeight: 'bold', color: '#1a202c', marginBottom: '8px' }}
+    <EnterprisePageLayout
+      title="Reports"
+      subtitle="Generate and manage compliance, risk, and audit reports"
+      actions={
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
+            className="px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
-            {language === 'ar' ? 'التقارير' : 'Reports'}
-          </ArabicTextEngine>
-          <ArabicTextEngine
-            personalityType="casual"
-            style={{ fontSize: '16px', color: '#4a5568' }}
+            {viewMode === 'grid' ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
+          </button>
+          <button
+            onClick={fetchReports}
+            className="px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
-            {language === 'ar' ? 'إنشاء وإدارة تقارير الامتثال والمخاطر' : 'Generate and manage compliance and risk reports'}
-          </ArabicTextEngine>
+            <RefreshCw className="h-4 w-4" />
+          </button>
+          <button
+            onClick={handleGenerateReport}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            Generate Report
+          </button>
+        </div>
+      }
+    >
+      <div className="space-y-6">
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {statsCards.map((stat, index) => (
+            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{stat.title}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white mt-2">{stat.value}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{stat.trend}</p>
+                </div>
+                <div className={`p-3 rounded-lg bg-${stat.color}-100 dark:bg-${stat.color}-900`}>
+                  <stat.icon className={`h-6 w-6 text-${stat.color}-600 dark:text-${stat.color}-400`} />
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        <div className="flex items-center space-x-4">
-          {/* Filter */}
-          <select
-            value={filterBy}
-            onChange={(e) => setFilterBy(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="all">{language === 'ar' ? 'جميع التقارير' : 'All Reports'}</option>
-            <option value="compliance">{language === 'ar' ? 'تقارير الامتثال' : 'Compliance Reports'}</option>
-            <option value="risk">{language === 'ar' ? 'تقارير المخاطر' : 'Risk Reports'}</option>
-            <option value="executive">{language === 'ar' ? 'التقارير التنفيذية' : 'Executive Reports'}</option>
-            <option value="audit">{language === 'ar' ? 'تقارير التدقيق' : 'Audit Reports'}</option>
-          </select>
-
-          {/* Generate Report */}
-          <FeatureGate feature="basicReports">
-            <AnimatedButton
-              variant="primary"
-              culturalStyle="modern"
-              style={{ backgroundColor: '#667eea' }}
+        {/* Filters */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search reports..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+            <select
+              value={filterBy}
+              onChange={(e) => setFilterBy(e.target.value)}
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500"
             >
-              <BarChart3 className="h-4 w-4 mr-2" />
-              <ArabicTextEngine personalityType="casual">
-                {language === 'ar' ? 'إنشاء تقرير جديد' : 'Generate Report'}
-              </ArabicTextEngine>
-            </AnimatedButton>
-          </FeatureGate>
+              <option value="all">All Reports</option>
+              <option value="compliance">Compliance Reports</option>
+              <option value="risk">Risk Reports</option>
+              <option value="executive">Executive Reports</option>
+              <option value="audit">Audit Reports</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      {/* Report Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <AnimatedCard hover3D={true} culturalPattern={false}>
-          <div className="p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600 mb-2">{reports.length}</div>
-            <ArabicTextEngine personalityType="casual" style={{ fontSize: '14px', color: '#6b7280' }}>
-              {language === 'ar' ? 'إجمالي التقارير' : 'Total Reports'}
-            </ArabicTextEngine>
-          </div>
-        </AnimatedCard>
-
-        <AnimatedCard hover3D={true} culturalPattern={false}>
-          <div className="p-4 text-center">
-            <div className="text-2xl font-bold text-green-600 mb-2">
-              {reports.filter(r => r.type === 'compliance').length}
-            </div>
-            <ArabicTextEngine personalityType="casual" style={{ fontSize: '14px', color: '#6b7280' }}>
-              {language === 'ar' ? 'تقارير الامتثال' : 'Compliance'}
-            </ArabicTextEngine>
-          </div>
-        </AnimatedCard>
-
-        <AnimatedCard hover3D={true} culturalPattern={false}>
-          <div className="p-4 text-center">
-            <div className="text-2xl font-bold text-red-600 mb-2">
-              {reports.filter(r => r.type === 'risk').length}
-            </div>
-            <ArabicTextEngine personalityType="casual" style={{ fontSize: '14px', color: '#6b7280' }}>
-              {language === 'ar' ? 'تقارير المخاطر' : 'Risk Reports'}
-            </ArabicTextEngine>
-          </div>
-        </AnimatedCard>
-
-        <AnimatedCard hover3D={true} culturalPattern={false}>
-          <div className="p-4 text-center">
-            <div className="text-2xl font-bold text-purple-600 mb-2">
-              {reports.filter(r => r.type === 'executive').length}
-            </div>
-            <ArabicTextEngine personalityType="casual" style={{ fontSize: '14px', color: '#6b7280' }}>
-              {language === 'ar' ? 'التقارير التنفيذية' : 'Executive'}
-            </ArabicTextEngine>
-          </div>
-        </AnimatedCard>
-      </div>
-
-      {/* Reports List */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredReports.map((report) => (
-          <AnimatedCard key={report.id} hover3D={true} culturalPattern={true}>
-            <div className="p-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    {getTypeIcon(report.type)}
-                    <ArabicTextEngine
-                      personalityType="professional"
-                      style={{ fontSize: '16px', fontWeight: '600', color: '#1a202c' }}
-                    >
-                      {language === 'ar' ? report.titleAr : report.title}
-                    </ArabicTextEngine>
+        {/* Grid or Table View */}
+        {viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {sortedReports.map((report) => {
+              const TypeIcon = getTypeIcon(report.type);
+              return (
+                <div key={report.id} className="bg-white dark:bg-gray-800 rounded-lg p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3 flex-1">
+                      <TypeIcon className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {report.title || 'Untitled Report'}
+                      </h3>
+                    </div>
                   </div>
 
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1 ${getTypeColor(report.type)}`}>
-                      {getTypeIcon(report.type)}
-                      {getTypeText(report.type)}
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getTypeColor(report.type)}`}>
+                      {report.type || 'Unknown'}
                     </span>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(report.status)}`}>
-                      {getStatusText(report.status)}
+                      {report.status || 'unknown'}
                     </span>
                   </div>
 
-                  <div className="space-y-2 text-sm text-gray-600 mb-4">
+                  <div className="space-y-2 text-sm text-gray-700 dark:text-gray-300 mb-4">
                     <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      <ArabicTextEngine personalityType="casual">
-                        {language === 'ar' ? report.organizationAr : report.organization}
-                      </ArabicTextEngine>
+                      <Shield className="h-4 w-4 text-gray-400" />
+                      {report.framework || 'N/A'}
                     </div>
                     <div className="flex items-center gap-2">
-                      <Shield className="h-4 w-4" />
-                      <ArabicTextEngine personalityType="casual">
-                        {language === 'ar' ? report.frameworkAr : report.framework}
-                      </ArabicTextEngine>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      <span>{language === 'ar' ? 'تاريخ الإنشاء:' : 'Generated:'} {new Date(report.generatedDate).toLocaleDateString()}</span>
+                      <Calendar className="h-4 w-4 text-gray-400" />
+                      {report.generatedDate ? format(new Date(report.generatedDate), 'MMM dd, yyyy') : 'N/A'}
                     </div>
                   </div>
 
                   {/* Compliance Score */}
-                  <div className="mb-4">
-                    <div className="flex justify-between items-center mb-2">
-                      <ArabicTextEngine personalityType="casual" style={{ fontSize: '14px', color: '#6b7280' }}>
-                        {language === 'ar' ? 'نقاط الامتثال' : 'Compliance Score'}
-                      </ArabicTextEngine>
-                      <span className="text-sm font-medium text-gray-900">{report.complianceScore}%</span>
+                  {report.complianceScore !== undefined && (
+                    <div className="mb-4">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Compliance Score</span>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white">{report.complianceScore}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div
+                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${report.complianceScore}%` }}
+                        ></div>
+                      </div>
                     </div>
-                    <AnimatedProgress
-                      value={report.complianceScore}
-                      culturalStyle="modern"
-                      style={{ height: '6px' }}
-                    />
-                  </div>
+                  )}
 
                   {/* Findings Summary */}
-                  <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="text-center p-2 bg-red-50 rounded">
-                      <div className="text-lg font-bold text-red-600">{report.criticalFindings}</div>
-                      <ArabicTextEngine personalityType="casual" style={{ fontSize: '10px', color: '#dc2626' }}>
-                        {language === 'ar' ? 'حرجة' : 'Critical'}
-                      </ArabicTextEngine>
+                  {(report.criticalFindings !== undefined || report.mediumFindings !== undefined || report.lowFindings !== undefined) && (
+                    <div className="grid grid-cols-3 gap-2 mb-4">
+                      <div className="text-center p-2 bg-red-50 dark:bg-red-900/20 rounded">
+                        <div className="text-lg font-bold text-red-600 dark:text-red-400">{report.criticalFindings || 0}</div>
+                        <div className="text-xs text-red-600 dark:text-red-400">Critical</div>
+                      </div>
+                      <div className="text-center p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded">
+                        <div className="text-lg font-bold text-yellow-600 dark:text-yellow-400">{report.mediumFindings || 0}</div>
+                        <div className="text-xs text-yellow-600 dark:text-yellow-400">Medium</div>
+                      </div>
+                      <div className="text-center p-2 bg-green-50 dark:bg-green-900/20 rounded">
+                        <div className="text-lg font-bold text-green-600 dark:text-green-400">{report.lowFindings || 0}</div>
+                        <div className="text-xs text-green-600 dark:text-green-400">Low</div>
+                      </div>
                     </div>
-                    <div className="text-center p-2 bg-yellow-50 rounded">
-                      <div className="text-lg font-bold text-yellow-600">{report.mediumFindings}</div>
-                      <ArabicTextEngine personalityType="casual" style={{ fontSize: '10px', color: '#d97706' }}>
-                        {language === 'ar' ? 'متوسطة' : 'Medium'}
-                      </ArabicTextEngine>
-                    </div>
-                    <div className="text-center p-2 bg-green-50 rounded">
-                      <div className="text-lg font-bold text-green-600">{report.lowFindings}</div>
-                      <ArabicTextEngine personalityType="casual" style={{ fontSize: '10px', color: '#059669' }}>
-                        {language === 'ar' ? 'منخفضة' : 'Low'}
-                      </ArabicTextEngine>
-                    </div>
-                  </div>
+                  )}
 
                   {/* File Info */}
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                    <span>{report.format}</span>
-                    <span>{report.size}</span>
+                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4">
+                    <span>{report.format || 'PDF'}</span>
+                    <span>{report.size || 'N/A'}</span>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
+                    <button className="flex-1 px-3 py-2 text-sm bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors">
+                      <Eye className="h-3 w-3 inline mr-1" />
+                      Preview
+                    </button>
+                    {report.status === 'completed' && (
+                      <button
+                        onClick={() => handleDownload(report.id)}
+                        className="flex-1 px-3 py-2 text-sm bg-green-50 dark:bg-green-900 text-green-600 dark:text-green-400 rounded-lg hover:bg-green-100 dark:hover:bg-green-800 transition-colors"
+                      >
+                        <Download className="h-3 w-3 inline mr-1" />
+                        Download
+                      </button>
+                    )}
+                    {report.status === 'generating' && (
+                      <div className="flex-1 flex items-center justify-center px-3 py-2 text-sm text-yellow-600 dark:text-yellow-400">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 mr-2"></div>
+                        Generating...
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex justify-end space-x-2">
-                <AnimatedButton
-                  variant="outline"
-                  size="small"
-                  culturalStyle="modern"
-                >
-                  <Eye className="h-4 w-4 mr-1" />
-                  <ArabicTextEngine personalityType="casual" style={{ fontSize: '14px' }}>
-                    {language === 'ar' ? 'معاينة' : 'Preview'}
-                  </ArabicTextEngine>
-                </AnimatedButton>
-
-                {report.status === 'completed' && (
-                  <FeatureGate feature="basicReports">
-                    <AnimatedButton
-                      variant="primary"
-                      size="small"
-                      culturalStyle="modern"
-                      style={{ backgroundColor: '#48bb78' }}
+              );
+            })}
+          </div>
+        ) : (
+          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-900">
+                  <tr>
+                    <th
+                      onClick={() => handleSort('title')}
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
                     >
-                      <Download className="h-4 w-4 mr-1" />
-                      <ArabicTextEngine personalityType="casual" style={{ fontSize: '14px' }}>
-                        {language === 'ar' ? 'تحميل' : 'Download'}
-                      </ArabicTextEngine>
-                    </AnimatedButton>
-                  </FeatureGate>
-                )}
-
-                {report.status === 'generating' && (
-                  <div className="flex items-center px-3 py-1.5 text-sm text-yellow-600">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600 mr-2"></div>
-                    <ArabicTextEngine personalityType="casual" style={{ fontSize: '14px' }}>
-                      {language === 'ar' ? 'قيد الإنشاء...' : 'Generating...'}
-                    </ArabicTextEngine>
-                  </div>
-                )}
-              </div>
+                      Title {sortField === 'title' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th
+                      onClick={() => handleSort('type')}
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                    >
+                      Type {sortField === 'type' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Framework
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Score
+                    </th>
+                    <th
+                      onClick={() => handleSort('generatedDate')}
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
+                    >
+                      Generated {sortField === 'generatedDate' && (sortDirection === 'asc' ? '↑' : '↓')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  {sortedReports.map((report) => (
+                    <tr key={report.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {report.title || 'Untitled'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs rounded-full ${getTypeColor(report.type)}`}>
+                          {report.type || 'Unknown'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-700 dark:text-gray-300">{report.framework || 'N/A'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {report.complianceScore !== undefined ? `${report.complianceScore}%` : 'N/A'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-700 dark:text-gray-300">
+                          {report.generatedDate ? format(new Date(report.generatedDate), 'MMM dd, yyyy') : 'N/A'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(report.status)}`}>
+                          {report.status || 'unknown'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300 mr-3">
+                          <Eye className="h-4 w-4 inline" />
+                        </button>
+                        {report.status === 'completed' && (
+                          <button
+                            onClick={() => handleDownload(report.id)}
+                            className="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300"
+                          >
+                            <Download className="h-4 w-4 inline" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          </AnimatedCard>
-        ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {sortedReports.length === 0 && (
+          <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+            <BarChart3 className="mx-auto h-12 w-12 text-gray-400" />
+            <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">No reports found</h3>
+            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+              {searchTerm ? 'Try a different search term' : 'Get started by generating a new report'}
+            </p>
+            <div className="mt-6">
+              <button
+                onClick={handleGenerateReport}
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Generate Report
+              </button>
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Empty State */}
-      {filteredReports.length === 0 && (
-        <AnimatedCard hover3D={false} culturalPattern={true}>
-          <div className="p-12 text-center">
-            <BarChart3 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <ArabicTextEngine
-              personalityType="friendly"
-              style={{ fontSize: '18px', fontWeight: '600', color: '#4a5568', marginBottom: '8px' }}
-            >
-              {language === 'ar' ? 'لا توجد تقارير' : 'No reports found'}
-            </ArabicTextEngine>
-            <ArabicTextEngine
-              personalityType="casual"
-              style={{ fontSize: '14px', color: '#6b7280' }}
-            >
-              {language === 'ar' ? 'ابدأ بإنشاء تقرير جديد' : 'Start by generating a new report'}
-            </ArabicTextEngine>
-          </div>
-        </AnimatedCard>
-      )}
-
-      {/* Premium Features Teaser */}
-      {currentPlan === 'free' && (
-        <AnimatedCard hover3D={false} culturalPattern={true}>
-          <div className="p-6 bg-gradient-to-r from-blue-50 to-purple-50">
-            <div className="flex items-center justify-between">
-              <div>
-                <ArabicTextEngine
-                  personalityType="professional"
-                  style={{ fontSize: '18px', fontWeight: 'bold', color: '#1a202c', marginBottom: '8px' }}
-                >
-                  {language === 'ar' ? 'ميزات التقارير المتقدمة' : 'Advanced Reporting Features'}
-                </ArabicTextEngine>
-                <ArabicTextEngine
-                  personalityType="casual"
-                  style={{ fontSize: '14px', color: '#4a5568', marginBottom: '12px' }}
-                >
-                  {language === 'ar' ?
-                    'احصل على تقارير مخصصة، تحليلات متقدمة، وتصدير متعدد الصيغ' :
-                    'Get custom reports, advanced analytics, and multi-format exports'}
-                </ArabicTextEngine>
-                <AnimatedButton
-                  variant="primary"
-                  size="small"
-                  culturalStyle="modern"
-                  style={{ backgroundColor: '#667eea' }}
-                  onClick={() => window.location.href = '/app/subscription'}
-                >
-                  {language === 'ar' ? 'ترقية الآن' : 'Upgrade Now'}
-                </AnimatedButton>
-              </div>
-              <div className="text-4xl">📊</div>
-            </div>
-          </div>
-        </AnimatedCard>
-      )}
-    </div>
+    </EnterprisePageLayout>
   );
 };
 

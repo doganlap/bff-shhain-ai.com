@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const prisma = require('../db/prisma');
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {
@@ -62,6 +61,77 @@ router.get('/:id/units', async (req, res) => {
     res.json(units);
   } catch (error) {
     handleError(res, error, 'Error fetching business units');
+  }
+});
+
+// POST /api/organizations - Create a new organization
+router.post('/', async (req, res) => {
+  try {
+    const { name, description, type, industry, size, website, contactEmail, isActive = true } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ error: 'Organization name is required' });
+    }
+
+    const organization = await prisma.organization.create({
+      data: {
+        name,
+        description,
+        type,
+        industry,
+        size,
+        website,
+        contactEmail,
+        isActive,
+      },
+    });
+
+    res.status(201).json(organization);
+  } catch (error) {
+    handleError(res, error, 'Error creating organization');
+  }
+});
+
+// DELETE /api/organizations/:id - Delete an organization
+router.delete('/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await prisma.organization.delete({
+      where: { id: parseInt(id, 10) },
+    });
+    res.json({ message: 'Organization deleted successfully' });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Organization not found' });
+    }
+    handleError(res, error, 'Error deleting organization');
+  }
+});
+
+// POST /api/organizations/:id/units - Create a business unit for an organization
+router.post('/:id/units', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const { name, description, type, managerId, isActive = true } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ error: 'Business unit name is required' });
+    }
+
+    const unit = await prisma.businessUnit.create({
+      data: {
+        name,
+        description,
+        type,
+        managerId,
+        organizationId: parseInt(id, 10),
+        isActive,
+      },
+    });
+
+    res.status(201).json(unit);
+  } catch (error) {
+    handleError(res, error, 'Error creating business unit');
   }
 });
 

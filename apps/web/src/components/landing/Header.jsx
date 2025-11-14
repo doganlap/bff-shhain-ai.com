@@ -5,7 +5,7 @@ import DemoBooking from './DemoBooking'
 import LoginModal from './LoginModal'
 import UnifiedLogo from './UnifiedLogo'
 import ThemeToggle from './ThemeToggle'
-import { useScrollSpy, useScrollProgress, useHeaderVisibility } from '../hooks/useScrollSpy'
+import { useScrollSpy, useScrollProgress, useHeaderVisibility } from '../../hooks/useScrollSpy'
 
 const Header = ({ onLoginClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)

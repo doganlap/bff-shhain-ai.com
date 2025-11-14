@@ -1,10 +1,10 @@
 /**
  * Enhanced GRC Modules Export - ORGANIZED STRUCTURE
  * Centralized export for all comprehensive GRC modules and pages
- * 
+ *
  * 📁 FOLDER STRUCTURE:
  * ├── 📊 dashboard/     - All dashboard variants
- * ├── 🛡️ grc-modules/   - Core GRC functionality  
+ * ├── 🛡️ grc-modules/   - Core GRC functionality
  * ├── 🏢 organizations/ - Organization management
  * ├── ⚙️ system/        - System & admin pages
  * ├── 🏗️ platform/      - MSP & platform management
@@ -21,8 +21,8 @@
 // Enhanced Dashboard with KPIs, Heatmaps, Trends
 export { default as EnhancedDashboard } from './dashboard/EnhancedDashboard.jsx';
 
-// Legacy Dashboard (Backward Compatibility)
-export { default as Dashboard } from './dashboard/Dashboard.jsx';
+// Legacy Dashboard (Backward Compatibility) - Using EnhancedDashboard as fallback
+export { default as Dashboard } from './dashboard/EnhancedDashboard.jsx';
 
 // Advanced Dashboard Variants
 export { default as ModernAdvancedDashboard } from './dashboard/ModernAdvancedDashboard.jsx';
@@ -36,6 +36,8 @@ export { default as UsageDashboardPage } from './dashboard/UsageDashboardPage.js
 
 // Enhanced Assessments with RAG, Questions Generation, Collaboration
 export { default as AssessmentDetailsCollaborative } from './grc-modules/AssessmentDetailsCollaborative.jsx';
+export { default as AssessmentsModuleEnhanced } from './grc-modules/AssessmentDetailsCollaborative.jsx'; // Alias
+export { default as Assessments } from './grc-modules/AssessmentDetailsCollaborative.jsx'; // Alias
 
 // Enhanced Compliance Tracking with Gap Analysis, Scoring
 export { default as ComplianceTrackingModuleEnhanced } from './grc-modules/ComplianceTrackingModuleEnhanced.jsx';
@@ -47,17 +49,20 @@ export { default as RiskManagementPage } from './grc-modules/RiskManagementPage.
 export { default as Risks } from './grc-modules/Risks.jsx';
 
 // Enhanced Frameworks Management with Import/Export, Coverage
-// (Now using AdvancedFrameworkManager from components)
+export { default as FrameworksModuleEnhanced } from './grc-modules/FrameworksManagementPage.jsx';
+export { default as FrameworksPage } from './grc-modules/FrameworksManagementPage.jsx'; // Alias
 
 // Enhanced Controls Management with Evidence, Testing
 export { default as ControlsModuleEnhanced } from './grc-modules/ControlsModuleEnhanced.jsx';
+export { default as ControlsPage } from './grc-modules/ControlsModuleEnhanced.jsx'; // Alias
+export { default as Controls } from './grc-modules/ControlsModuleEnhanced.jsx'; // Alias
 export { default as Evidence } from './grc-modules/Evidence.jsx';
 
 // ============================================================================
 // 🏢 ORGANIZATION MANAGEMENT
 // ============================================================================
 
-export { default as OrganizationsPage } from './organizations/OrganizationsPage.jsx';
+export { default as OrganizationsPage } from './organizations/Organizations.jsx';
 export { default as Organizations } from './organizations/Organizations.jsx';
 export { default as OrganizationDetails } from './organizations/OrganizationDetails.jsx';
 export { default as OrganizationForm } from './organizations/OrganizationForm.jsx';
@@ -127,14 +132,40 @@ export { default as ReportsPage } from './reports/ReportsPage.jsx';
 // ============================================================================
 
 export { default as SimpleLoginPage } from './auth/SimpleLoginPage.jsx';
+export { default as LoginPage } from './auth/SimpleLoginPage.jsx'; // Alias for compatibility
+export { default as GlassmorphismLoginPage } from './auth/SimpleLoginPage.jsx'; // Alias for compatibility
+export { default as RegistrationPage } from './auth/StoryDrivenRegistration.jsx'; // Alias for compatibility
 export { default as StoryDrivenRegistration } from './auth/StoryDrivenRegistration.jsx';
 
 // ============================================================================
-// 🌐 PUBLIC & DEMO PAGES
+// 🌐 PUBLIC PAGES
 // ============================================================================
 
 export { default as LandingPage } from './public/LandingPage.jsx';
 export { default as NotFoundPage } from './public/NotFoundPage.jsx';
 export { default as ComponentsDemo } from './public/ComponentsDemo.jsx';
 export { default as ModernComponentsDemo } from './public/ModernComponentsDemo.jsx';
-export { default as DemoPage } from './public/Demo.jsx';
+
+// ============================================================================
+// 🎯 DEMO ACCESS PATH
+// ============================================================================
+
+export { default as DemoLanding } from './demo/DemoLanding.jsx';
+export { default as DemoRegister } from './demo/DemoRegister.jsx';
+export { default as DemoAppLayout } from './demo/DemoAppLayout.jsx';
+
+// ============================================================================
+// 🤝 PARTNER ACCESS PATH
+// ============================================================================
+
+export { default as PartnerLanding } from './partner/PartnerLanding.jsx';
+export { default as PartnerLogin } from './partner/PartnerLogin.jsx';
+export { default as PartnerAppLayout } from './partner/PartnerAppLayout.jsx';
+
+// ============================================================================
+// 🏢 POC ACCESS PATH
+// ============================================================================
+
+export { default as PocLanding } from './poc/PocLanding.jsx';
+export { default as PocRequest } from './poc/PocRequest.jsx';
+export { default as PocAppLayout } from './poc/PocAppLayout.jsx';

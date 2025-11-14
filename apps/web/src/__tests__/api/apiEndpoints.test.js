@@ -13,10 +13,9 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import axios from 'axios';
 import apiService from '../../services/apiEndpoints';
 
-// Mock axios
-vi.mock('axios');
-
 describe('API Endpoints - Dashboard Module', () => {
+  const mockedAxios = axios;
+  
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.setItem('auth_token', 'mock-token');

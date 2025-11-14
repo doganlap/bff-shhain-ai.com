@@ -1,0 +1,9 @@
+{
+  "fullName": "Sara Enterprise Manager",
+  "email": "sara.manager@bigcorp.com",
+  "companyName": "Big Corporation Ltd",
+  "sector": "financial-services",
+  "useCases": ["enterprise-grc", "compliance-automation", "risk-assessment"],
+  "environmentPreference": "azure-cloud",
+  "notes": "We need comprehensive GRC solution for our organization"
+}

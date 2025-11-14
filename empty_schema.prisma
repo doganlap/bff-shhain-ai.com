@@ -1,0 +1,15 @@
+// Completely Empty Schema for Prisma Studio Demo
+// No models, no tables, no data - just Prisma Studio interface
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = "postgresql://postgres:postgres@localhost:5432/shahin_empty_demo"
+}
+
+// This schema contains NO MODELS
+// Prisma Studio will show empty interface with no tables
+// Perfect for demonstrating Prisma Studio UI without any data

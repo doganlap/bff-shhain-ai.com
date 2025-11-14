@@ -1,23 +1,24 @@
 {
   "version": 2,
-  "name": "grc-platform",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "framework": "vite",
+  "regions": ["iad1"],
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/assets/(.*)",
-      "dest": "/assets/$1"
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
@@ -31,6 +32,27 @@
       ]
     },
     {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://www.shahin-ai.com,https://shahin-ai.com,https://grc.shahin-ai.com"
+        },
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, X-Requested-With"
+        }
+      ]
+    },
+    {
       "source": "/(.*)",
       "headers": [
         {
@@ -39,13 +61,42 @@
         },
         {
           "key": "X-Frame-Options",
-          "value": "DENY"
+          "value": "SAMEORIGIN"
         },
         {
           "key": "X-XSS-Protection",
           "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://grc-backend.shahin-ai.com wss://grc-backend.shahin-ai.com https://www.shahin-ai.com https://shahin-ai.com;"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
         }
       ]
+    }
+  ],
+  "env": {
+    "VITE_API_URL": "https://grc-backend.shahin-ai.com/api",
+    "VITE_API_BASE_URL": "https://grc-backend.shahin-ai.com/api",
+    "VITE_WS_URL": "wss://grc-backend.shahin-ai.com",
+    "VITE_NODE_ENV": "production"
+  },
+  "github": {
+    "deploymentEnabled": true,
+    "autoAlias": true
+  },
+  "alias": ["grc.shahin-ai.com", "www.grc.shahin-ai.com"],
+  "crons": [
+    {
+      "path": "/api/health",
+      "schedule": "*/5 * * * *"
     }
   ]
 }

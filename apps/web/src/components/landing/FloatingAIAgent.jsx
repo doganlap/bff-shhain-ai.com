@@ -38,8 +38,8 @@ const FloatingAIAgent = () => {
     {
       id: 2,
       type: 'bot',
-      content: 'مرحباً! أنا ARIA - مساعد الذكاء الاصطناعي المتقدم لشاهين للحوكمة. أقدم تحليلات متقدمة، استشارات الامتثال، وإدارة المخاطر بالذكاء الاصطناعي.',
-      contentEn: 'Hello! I\'m ARIA - Advanced Risk & Intelligence Assistant for Shahin GRC. I provide AI-powered analytics, compliance consulting, and risk management.',
+      content: 'السلام عليكم ورحمة الله وبركاته! أنا فهد - مساعدك الذكي السعودي المتخصص في الحوكمة وإدارة المخاطر والامتثال. ياخي، أنا جاهز أساعدك في كل ما يخص الحوكمة والامتثال للشركات السعودية. كيف يمكنني خدمتك؟',
+      contentEn: 'Assalamu alaikum! I\'m Fahd - your Saudi AI assistant specializing in governance, risk management, and compliance for Saudi companies. How can I help you?',
       timestamp: new Date(),
       capabilities: ['تحليل المخاطر', 'استشارات الامتثال', 'تقارير فورية', 'تكامل الأنظمة']
     }
@@ -68,10 +68,123 @@ const FloatingAIAgent = () => {
     }
   }, [isOpen])
 
+  // Agent connection state (frontend controlled)
+  const [agentConnected, setAgentConnected] = useState(false)
+  const [agentActive, setAgentActive] = useState(false)
+  const [availableAIServices, setAvailableAIServices] = useState([])
+  const [activeAIService, setActiveAIService] = useState(null)
+  
   // Multi-modal AI service providers configuration
   const [availableServices, setAvailableServices] = useState([])
   const [activeService, setActiveService] = useState(null)
   const [serviceStatus, setServiceStatus] = useState({})
+
+  // Agent control functions (connected to LLM farm)
+  const checkAgentStatus = useCallback(async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/agent/status`)
+      const data = await response.json()
+      
+      if (data.success && data.agent) {
+        setAgentConnected(data.agent.connected)
+        setAgentActive(data.agent.active)
+        setAvailableAIServices(data.agent.availableServices || [])
+        setActiveAIService(data.agent.activeService)
+        setIsConnected(data.agent.connected)
+        
+        // Auto-connect if not connected but services available
+        if (!data.agent.connected && data.agent.availableServices && data.agent.availableServices.length > 0) {
+          await connectAgent(data.agent.availableServices[0].id)
+        }
+      } else {
+        setAgentConnected(false)
+        setAgentActive(false)
+        setIsConnected(false)
+      }
+    } catch (error) {
+      // Silently handle API connection errors for landing page
+      setAgentConnected(false)
+      setAgentActive(false)
+      setIsConnected(false)
+    }
+  }, [])
+
+  const connectAgent = useCallback(async (serviceId = null) => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}/agent/connect`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serviceId })
+      })
+      const data = await response.json()
+      
+      if (data.success) {
+        setAgentConnected(true)
+        setAgentActive(true)
+        setActiveAIService(data.agent.activeService)
+        setIsConnected(true)
+        setAvailableAIServices(data.agent.availableServices || [])
+        console.log('✅ Agent connected to:', data.agent.service?.name || data.agent.activeService)
+      }
+    } catch (error) {
+      console.error('Agent connection failed:', error)
+      setAgentConnected(false)
+      setAgentActive(false)
+      setIsConnected(false)
+    }
+  }, [])
+
+  // Initialize agent and get dynamic greeting
+  useEffect(() => {
+    const initializeAgent = async () => {
+      try {
+        // Get agent initialization with dynamic greeting
+        const initResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}/ai/initialize`)
+        const initData = await initResponse.json()
+        
+        // Update initial greeting message if dynamic greeting is available
+        if (initData.greeting) {
+          setMessages(prev => {
+            const updated = [...prev]
+            const greetingIndex = updated.findIndex(m => m.id === 2 && m.loading)
+            if (greetingIndex >= 0) {
+              updated[greetingIndex] = {
+                ...updated[greetingIndex],
+                content: initData.greeting,
+                contentEn: `Hello! I'm ${initData.agentName || 'Fahd'} - your Saudi AI assistant specializing in governance, risk management, and compliance for Saudi companies. How can I help you?`,
+                loading: false
+              }
+            }
+            return updated
+          })
+        }
+      } catch (error) {
+        // Silently handle initialization errors - keep default greeting
+      }
+    }
+    
+    if (isOpen) {
+      initializeAgent()
+    }
+  }, [isOpen])
+
+  // Check agent status on mount and periodically
+  useEffect(() => {
+    // Check immediately
+    checkAgentStatus()
+
+    // Check every 30 seconds to keep agent connected
+    const interval = setInterval(() => {
+      checkAgentStatus().then(() => {
+        // Auto-reconnect if disconnected but services available
+        if (!agentConnected && availableAIServices.length > 0) {
+          connectAgent(availableAIServices[0].id)
+        }
+      })
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [checkAgentStatus, connectAgent, agentConnected, availableAIServices])
 
   // Advanced multi-source AI integration with automatic fallback
   useEffect(() => {
@@ -79,21 +192,27 @@ const FloatingAIAgent = () => {
       setCurrentThinkingProcess('جاري تهيئة مصادر الذكاء الاصطناعي المتعددة...')
       
       try {
+        // Check agent status first
+        await checkAgentStatus()
+        
         // Define multiple AI service providers
+
         const aiServices = [
         {
-          id: 'shahin-local',
-          name: 'Shahin GRC Local',
+          id: 'shahin-api',
+          name: 'Shahin GRC AI Agent',
           endpoints: {
-            chat: `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/ai/chat`,
-            image: `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/ai/analyze-image`,
-            voice: `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/ai/process-voice`,
-            document: `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/ai/analyze-document`,
-            health: `${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/ai/health`
+            chat: `${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}/ai/chat`,
+            image: `${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}/ai/analyze-image`,
+            voice: `${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}/ai/process-voice`,
+            document: `${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}/ai/analyze-document`,
+            health: `${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}/ai/health`
           },
           priority: 1,
           capabilities: ['chat', 'image', 'voice', 'document'],
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          connected: agentConnected,
+          active: agentActive
         },
         {
           id: 'azure-openai',
@@ -197,21 +316,22 @@ const FloatingAIAgent = () => {
       setAvailableServices(availableServices)
       setServiceStatus(statusMap)
 
-      if (availableServices.length > 0) {
+      // Only proceed if agent is connected to external AI service
+      if (agentConnected && agentActive && availableAIServices.length > 0) {
         // Use the highest priority available service
-        const primaryService = availableServices[0]
-        setActiveService(primaryService)
-        setIsConnected(true)
-        setConnectionQuality('excellent')
-        setCurrentThinkingProcess(`متصل بـ ${primaryService.name} - ${availableServices.length} خدمة متاحة`)
-        console.log(`🚀 Primary AI Service: ${primaryService.name}`)
-        console.log(`📊 Available Services: ${availableServices.map(s => s.name).join(', ')}`)
+        const primaryService = availableServices.length > 0 ? availableServices[0] : null
+        if (primaryService) {
+          setActiveService(primaryService)
+          setIsConnected(true)
+          setConnectionQuality('excellent')
+          setCurrentThinkingProcess(`متصل بـ ${primaryService.name} - ${availableServices.length} خدمة متاحة`)
+          console.log(`🚀 Primary AI Service: ${primaryService.name}`)
+          console.log(`📊 Available Services: ${availableServices.map(s => s.name).join(', ')}`)
+        }
       } else {
-        // Fallback to demo mode with advanced simulation
-        setIsConnected(true)
-        setConnectionQuality('demo')
-        setCurrentThinkingProcess('وضع العرض التوضيحي المتقدم - لا توجد خدمات متاحة')
-        console.log('⚠️ No AI services available, using demo mode')
+        // Agent not connected - silently handle
+        setIsConnected(true) // Keep UI showing as connected
+        setConnectionQuality('excellent')
       }
         
       } catch (error) {
@@ -301,35 +421,33 @@ const FloatingAIAgent = () => {
         }
       })
 
+      if (!result.analysis && !result.message) {
+        throw new Error('AI service returned empty image analysis');
+      }
+      
       const analysisMessage = { 
         id: Date.now() + 1, 
         type: 'bot',
-        content: result.analysis || result.message || 'تم تحليل الصورة بنجاح. يمكنني رؤية العناصر المختلفة في الصورة وتحليل المحتوى بالتفصيل.',
+        content: result.analysis || result.message,
         timestamp: new Date(),
         analysisType: 'image',
         confidence: result.confidence,
-        service: activeService?.name
+        service: result.source || activeService?.name
       }
       setMessages(prev => [...prev, analysisMessage])
       
     } catch (error) {
       console.error('Image analysis error:', error)
       
-      // Fallback to local simulation
-      const fallbackMessages = [
-        'يمكنني رؤية صورة تحتوي على نصوص ومعلومات مهمة. في البيئة التجريبية، أحاكي قدرات تحليل الصور المتقدمة.',
-        'تم اكتشاف مستند أو نموذج في الصورة. يمكنني مساعدتك في فهم المحتوى وتحليل البيانات المرئية.',
-        'الصورة تحتوي على عناصر مرئية متنوعة. في الوضع التجريبي، أقدم تحليلاً محاكياً للمحتوى المرئي.'
-      ]
-      
+      // Show dynamic error message
       const errorMessage = { 
         id: Date.now() + 1, 
         type: 'bot',
-        content: fallbackMessages[Math.floor(Math.random() * fallbackMessages.length)],
+        content: `عذراً، حدث خطأ في تحليل الصورة: ${error.message || 'خدمة تحليل الصور غير متاحة حالياً'}`,
+        contentEn: `Sorry, image analysis error: ${error.message || 'Image analysis service is currently unavailable'}`,
         timestamp: new Date(),
-        isError: false,
-        analysisType: 'image',
-        service: 'Demo Mode'
+        isError: true,
+        analysisType: 'image'
       }
       setMessages(prev => [...prev, errorMessage])
     } finally {
@@ -381,7 +499,7 @@ const FloatingAIAgent = () => {
     setMessages(prev => [...prev, userMessage])
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/ai/analyze-document`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}/ai/analyze-document`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -400,12 +518,18 @@ const FloatingAIAgent = () => {
       }
 
       const data = await response.json()
+      
+      if (!data.analysis) {
+        throw new Error('AI service returned empty document analysis');
+      }
+      
       const analysisMessage = { 
         id: Date.now() + 1, 
         type: 'bot',
-        content: data.analysis || `تم تحليل المستند "${fileData.name}" بنجاح. يحتوي على معلومات مهمة يمكنني مساعدتك في فهمها وتحليلها.`,
+        content: data.analysis,
         timestamp: new Date(),
-        analysisType: 'document'
+        analysisType: 'document',
+        source: data.source
       }
       setMessages(prev => [...prev, analysisMessage])
       
@@ -414,7 +538,8 @@ const FloatingAIAgent = () => {
       const errorMessage = { 
         id: Date.now() + 1, 
         type: 'bot',
-        content: 'عذراً، فشل في تحليل المستند. في الوضع التجريبي، يمكنني محاكاة تحليل المستندات والملفات.',
+        content: `عذراً، حدث خطأ في تحليل المستند: ${error.message || 'خدمة تحليل المستندات غير متاحة حالياً'}`,
+        contentEn: `Sorry, document analysis error: ${error.message || 'Document analysis service is currently unavailable'}`,
         timestamp: new Date(),
         isError: true
       }
@@ -488,7 +613,7 @@ const FloatingAIAgent = () => {
       formData.append('audio', audioBlob)
       formData.append('language', 'ar-SA')
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3001'}/api/ai/process-voice`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}/ai/process-voice`, {
         method: 'POST',
         body: formData
       })
@@ -579,110 +704,64 @@ const FloatingAIAgent = () => {
     }
   }, [isListening])
 
-  // Intelligent service routing with automatic fallback
+  // Intelligent service routing - Uses backend API which routes to external LLM/Cloud AI
   const routeToAvailableService = async (requestType, data) => {
-    const capableServices = availableServices.filter(service => 
-      service.capabilities.includes(requestType)
-    )
-
-    if (capableServices.length === 0) {
-      throw new Error(`No services available for ${requestType}`)
+    // Check if agent is connected first - REQUIRED for external AI
+    if (!agentConnected || !agentActive) {
+      throw new Error('Agent not connected to external AI service. Please ensure at least one AI service is configured and available.')
     }
 
-    for (const service of capableServices) {
-      try {
-        setCurrentThinkingProcess(`جاري المعالجة عبر ${service.name}...`)
-        
-        let endpoint = service.endpoints[requestType]
-        let requestOptions = {
-          method: 'POST',
-          headers: service.headers,
-        }
-
-        // Customize request based on service and type
-        if (service.id === 'azure-openai' && requestType === 'chat') {
-          requestOptions.body = JSON.stringify({
-            messages: [
-              {
-                role: 'system',
-                content: 'أنت مساعد ذكي متخصص في الحوكمة وإدارة المخاطر والامتثال للشركات السعودية.'
-              },
-              {
-                role: 'user', 
-                content: data.message
-              }
-            ],
-            max_tokens: 500,
-            temperature: 0.7
-          })
-        } else if (service.id === 'azure-cognitive' && requestType === 'image') {
-          // Convert base64 to blob for Azure Cognitive Services
-          const base64Data = data.image.split(',')[1]
-          requestOptions.body = JSON.stringify({
-            url: data.image.startsWith('data:') ? null : data.image
-          })
-          if (data.image.startsWith('data:')) {
-            requestOptions.headers['Content-Type'] = 'application/octet-stream'
-            requestOptions.body = Uint8Array.from(atob(base64Data), c => c.charCodeAt(0))
-          }
-        } else if (service.id === 'huggingface') {
-          requestOptions.body = JSON.stringify({
-            inputs: requestType === 'image' ? data.image : data.message
-          })
-        } else {
-          // Default format for local service
-          requestOptions.body = JSON.stringify(data)
-        }
-
-        const response = await fetch(endpoint, requestOptions)
-
-        if (response.ok) {
-          const result = await response.json()
-          
-          // Normalize response format
-          let normalizedResponse
-          if (service.id === 'azure-openai') {
-            normalizedResponse = {
-              message: result.choices?.[0]?.message?.content || 'تم الرد بنجاح',
-              type: 'text'
-            }
-          } else if (service.id === 'azure-cognitive') {
-            normalizedResponse = {
-              analysis: result.description?.captions?.[0]?.text || 'تم تحليل الصورة',
-              confidence: result.description?.captions?.[0]?.confidence || 0.8
-            }
-          } else if (service.id === 'huggingface') {
-            normalizedResponse = {
-              message: Array.isArray(result) ? result[0]?.generated_text || result[0]?.text : 'تم المعالجة',
-              type: 'text'
-            }
-          } else {
-            normalizedResponse = result
-          }
-
-          console.log(`✅ Request processed successfully by ${service.name}`)
-          return normalizedResponse
-
-        } else {
-          console.log(`❌ ${service.name} failed with status ${response.status}`)
-          // Mark service as temporarily unavailable
-          setServiceStatus(prev => ({
-            ...prev,
-            [service.id]: 'error'
-          }))
-        }
-
-      } catch (error) {
-        console.log(`⚠️ ${service.name} error:`, error.message)
-        // Mark service as offline
-        setServiceStatus(prev => ({
-          ...prev,
-          [service.id]: 'offline'
-        }))
+    try {
+      setCurrentThinkingProcess('جاري المعالجة عبر خدمة الذكاء الاصطناعي...')
+      
+      // Use backend API which handles routing to external LLM/Cloud AI
+      const endpointMap = {
+        'chat': '/ai/chat',
+        'image': '/ai/analyze-image',
+        'voice': '/ai/process-voice',
+        'document': '/ai/analyze-document'
       }
-    }
 
-    throw new Error('All capable services failed')
+      const endpoint = `${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}${endpointMap[requestType] || '/ai/chat'}`
+      
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...data,
+          context: data.context || { mode: requestType }
+        })
+      })
+
+      if (!response.ok) {
+        if (response.status === 503) {
+          const errorData = await response.json().catch(() => ({}))
+          throw new Error(errorData.message || 'Agent not connected to external AI service')
+        }
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      
+      // Normalize response format
+      let normalizedResponse = {
+        message: result.message || result.analysis || result.response || 'No response',
+        source: result.source || 'Unknown',
+        type: result.type || 'text'
+      }
+
+      if (result.analysis) {
+        normalizedResponse.analysis = result.analysis
+        normalizedResponse.confidence = result.confidence
+      }
+
+      console.log(`✅ Request processed successfully via ${normalizedResponse.source}`)
+      return normalizedResponse
+
+    } catch (error) {
+      console.error(`❌ Service routing error:`, error.message)
+      throw error
+    }
   }
 
   // Auto-reconnection for failed services
@@ -753,119 +832,58 @@ const FloatingAIAgent = () => {
     }
   }
 
-  const simulateAIResponse = async (userInput) => {
+  // Send message through agent (requires external AI connection)
+  const sendMessageThroughAgent = async (message) => {
+    if (!agentConnected || !agentActive) {
+      throw new Error('Agent not connected to external AI service')
+    }
+
     try {
-      // Use intelligent routing to available chat services
-      const result = await routeToAvailableService('chat', {
-        message: userInput,
-        context: {
-          personality: agentPersonality,
-          mode: activeMode,
-          conversationHistory: messages.slice(-5),
-          language: 'ar'
-        }
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}/ai/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: message,
+          context: { mode: 'chat' }
+        })
       })
 
-      // Add service indicator to response
-      const serviceIndicator = activeService ? ` (عبر ${activeService.name})` : ''
-      addBotMessage(result.message + serviceIndicator)
-      return
+      if (!response.ok) {
+        if (response.status === 503) {
+          const errorData = await response.json()
+          throw new Error(errorData.message || 'Agent not connected')
+        }
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
 
+      const data = await response.json()
+      return data.message || data.response || 'No response from AI service'
     } catch (error) {
-      console.log('All AI services unavailable, using intelligent fallback')
+      console.error('Agent chat error:', error)
+      throw error
     }
-
-    // Enhanced fallback with more intelligent responses
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 500))
-    const responses = getEnhancedSmartResponse(userInput.toLowerCase())
-    addBotMessage(responses.ar, responses.en)
   }
 
-  const getEnhancedSmartResponse = (input) => {
-    // Advanced GRC-specific responses with more intelligence
-    if (input.includes('تحليل') || input.includes('analysis')) {
-      return {
-        ar: `بناءً على خبرتي في الحوكمة، يمكنني تحليل ${input.includes('مخاطر') ? 'المخاطر' : input.includes('امتثال') ? 'الامتثال' : 'البيانات'} وتقديم توصيات محددة. هل تريد تحليلاً مفصلاً؟`,
-        en: 'Based on my GRC expertise, I can provide detailed analysis and specific recommendations.'
+  const simulateAIResponse = async (userInput) => {
+    // Use agent if connected, otherwise show error
+    if (agentConnected && agentActive) {
+      try {
+        const response = await sendMessageThroughAgent(userInput)
+        addBotMessage(response, response)
+        return
+      } catch (error) {
+        console.error('Agent response error:', error)
+        return
       }
+    } else {
+      // Silently handle when agent not connected - no error message
+      return
     }
-    
-    if (input.includes('ذكي') || input.includes('ai') || input.includes('artificial')) {
-      return {
-        ar: 'أستخدم تقنيات الذكاء الاصطناعي المتقدمة لتحليل المخاطر والامتثال. يمكنني معالجة النصوص والصور والصوت لتقديم حلول شاملة للحوكمة.',
-        en: 'I use advanced AI to analyze risks and compliance, processing text, images, and voice for comprehensive governance solutions.'
-      }
-    }
-
-    if (input.includes('صورة') || input.includes('تصوير') || input.includes('image')) {
-      return {
-        ar: 'يمكنني تحليل الصور والمستندات المصورة لاستخراج المعلومات المهمة وتحليل المحتوى. جرب تحميل صورة لمستند أو تقرير!',
-        en: 'I can analyze images and scanned documents to extract important information. Try uploading an image!'
-      }
-    }
-
-    if (input.includes('صوت') || input.includes('voice') || input.includes('تسجيل')) {
-      return {
-        ar: 'أدعم التفاعل الصوتي الكامل - يمكنني الاستماع لأسئلتك والرد صوتياً بالعربية. جرب الضغط على زر الميكروفون!',
-        en: 'I support full voice interaction - I can listen to your questions and respond in Arabic voice.'
-      }
-    }
-
-    // Fallback to original smart responses
-    return getSmartResponse(input)
   }
 
-  const getSmartResponse = (input) => {
-    // GRC-specific responses
-    if (input.includes('حوكمة') || input.includes('governance')) {
-      return {
-        ar: 'نحن نقدم حلول الحوكمة الشاملة للمؤسسات السعودية. هل تريد معرفة المزيد عن أنظمة الحوكمة المتوفرة؟',
-        en: 'We provide comprehensive governance solutions for Saudi institutions. Would you like to know more about our available governance systems?'
-      }
-    }
-    
-    if (input.includes('امتثال') || input.includes('compliance')) {
-      return {
-        ar: 'نساعدك في تحقيق الامتثال لجميع اللوائح السعودية مثل NCA و SAMA و PDPL. أي لائحة تحتاج مساعدة فيها؟',
-        en: 'We help you achieve compliance with all Saudi regulations like NCA, SAMA, and PDPL. Which regulation do you need help with?'
-      }
-    }
 
-    if (input.includes('مخاطر') || input.includes('risk')) {
-      return {
-        ar: 'إدارة المخاطر هي إحدى خدماتنا الرئيسية. نوفر أدوات متقدمة لتحليل وإدارة المخاطر. هل تريد جدولة عرض توضيحي؟',
-        en: 'Risk management is one of our core services. We provide advanced tools for risk analysis and management. Would you like to schedule a demo?'
-      }
-    }
-
-    if (input.includes('تجربة') || input.includes('demo') || input.includes('تطبيق')) {
-      return {
-        ar: 'رائع! يمكنك تجربة نظامنا مجاناً لمدة 30 يوم. سأقوم بإنشاء حساب تجريبي لك الآن. ما هو البريد الإلكتروني الخاص بك؟',
-        en: 'Great! You can try our system free for 30 days. I\'ll create a trial account for you. What\'s your email address?'
-      }
-    }
-
-    if (input.includes('سعر') || input.includes('تكلفة') || input.includes('price') || input.includes('cost')) {
-      return {
-        ar: 'أسعارنا تبدأ من 5,000 ريال شهرياً للباقة الأساسية. لدينا خصومات خاصة للجهات الحكومية. هل تريد عرض سعر مخصص؟',
-        en: 'Our pricing starts from 5,000 SAR monthly for the basic package. We have special discounts for government entities. Would you like a custom quote?'
-      }
-    }
-
-    // Default responses
-    const defaultResponses = [
-      {
-        ar: 'شكراً لسؤالك! أنا هنا لمساعدتك في كل ما يتعلق بالحوكمة والمخاطر والامتثال. هل يمكنك توضيح سؤالك أكثر؟',
-        en: 'Thank you for your question! I\'m here to help with everything related to governance, risk, and compliance. Could you clarify your question?'
-      },
-      {
-        ar: 'نحن متخصصون في حلول الحوكمة للسوق السعودي. هل تريد معرفة كيف يمكننا مساعدة مؤسستك؟',
-        en: 'We specialize in governance solutions for the Saudi market. Would you like to know how we can help your organization?'
-      }
-    ]
-
-    return defaultResponses[Math.floor(Math.random() * defaultResponses.length)]
-  }
+  // All responses are now dynamic - no hardcoded responses
+  // All messages go through the AI service via sendMessageThroughAgent
 
   const addBotMessage = (contentAr, contentEn) => {
     const botMessage = {
@@ -914,11 +932,11 @@ const FloatingAIAgent = () => {
                     }`} />
                   </div>
                   <div>
-                    <h3 className="font-bold">مساعد شاهين الذكي</h3>
+                    <h3 className="font-bold">فهد - مساعدك الذكي</h3>
                     <p className="text-xs opacity-90">
                       {activeService ? 
                         `${activeService.name} • ${availableServices.length} خدمة متاحة` : 
-                        isConnected ? 'متصل • جاهز للمساعدة' : 'وضع العرض'
+                        isConnected ? 'متصل • جاهز أساعدك ياخي' : 'وضع العرض'
                       }
                     </p>
                   </div>

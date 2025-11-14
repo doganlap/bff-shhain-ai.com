@@ -115,22 +115,23 @@ const DatabasePage = () => {
         setRealTimeData(response.data.data);
         setLastRefresh(new Date());
       } else {
-        // Fallback to mock data
+        console.warn('Database real-time metrics API returned empty or invalid response');
+        // Use empty state instead of mock fallback
         setRealTimeData({
-          queriesPerSecond: Math.floor(Math.random() * 1000) + 500,
-          activeConnections: Math.floor(Math.random() * 100) + 20,
-          replicationLag: Math.floor(Math.random() * 10),
-          cacheHitRatio: Math.floor(Math.random() * 20) + 80
+          queriesPerSecond: 0,
+          activeConnections: 0,
+          replicationLag: 0,
+          cacheHitRatio: 0
         });
       }
     } catch (error) {
       console.error('Error loading real-time data:', error);
-      // Fallback to mock data
+      // Use empty state instead of mock fallback
       setRealTimeData({
-        queriesPerSecond: Math.floor(Math.random() * 1000) + 500,
-        activeConnections: Math.floor(Math.random() * 100) + 20,
-        replicationLag: Math.floor(Math.random() * 10),
-        cacheHitRatio: Math.floor(Math.random() * 20) + 80
+        queriesPerSecond: 0,
+        activeConnections: 0,
+        replicationLag: 0,
+        cacheHitRatio: 0
       });
     }
   };
@@ -142,27 +143,28 @@ const DatabasePage = () => {
       if (response?.data?.success && response.data.data) {
         setDbMetrics(response.data.data);
       } else {
-        // Fallback to mock data
+        console.warn('Database stats API returned empty or invalid response');
+        // Use empty state instead of mock fallback
         setDbMetrics({
-          totalTables: Math.floor(Math.random() * 50) + 20,
-          totalRecords: Math.floor(Math.random() * 100000) + 50000,
-          storageUsed: `${(Math.random() * 5 + 1).toFixed(1)} GB`,
-          connections: Math.floor(Math.random() * 100) + 20,
-          uptime: `${Math.floor(Math.random() * 30 + 5)} days`,
-          performance: Math.floor(Math.random() * 30) + 70
+          totalTables: 0,
+          totalRecords: 0,
+          storageUsed: '0 GB',
+          connections: 0,
+          uptime: '0 hours',
+          performance: 0
         });
       }
     } catch (error) {
       console.error('Error loading database stats:', error);
       toast.error(language === 'ar' ? 'فشل تحميل إحصائيات قاعدة البيانات' : 'Failed to load database statistics');
-      // Fallback to mock data
+      // Use empty state instead of mock fallback
       setDbMetrics({
-        totalTables: Math.floor(Math.random() * 50) + 20,
-        totalRecords: Math.floor(Math.random() * 100000) + 50000,
-        storageUsed: `${(Math.random() * 5 + 1).toFixed(1)} GB`,
-        connections: Math.floor(Math.random() * 100) + 20,
-        uptime: `${Math.floor(Math.random() * 30 + 5)} days`,
-        performance: Math.floor(Math.random() * 30) + 70
+        totalTables: 0,
+        totalRecords: 0,
+        storageUsed: '0 GB',
+        connections: 0,
+        uptime: '0 hours',
+        performance: 0
       });
     } finally {
       setLoading(false);
@@ -175,24 +177,15 @@ const DatabasePage = () => {
       if (response?.data?.success && response.data.data) {
         setTables(response.data.data);
       } else {
-        // Fallback to mock data
-        setTables([
-          { name: 'users', nameAr: 'المستخدمين', records: 1247, size: '2.3MB' },
-          { name: 'organizations', nameAr: 'المؤسسات', records: 89, size: '856KB' },
-          { name: 'frameworks', nameAr: 'الأطر التنظيمية', records: 156, size: '1.2MB' },
-          { name: 'controls', nameAr: 'الضوابط', records: 2568, size: '15.7MB' }
-        ]);
+        console.warn('Database tables API returned empty or invalid response');
+        // Use empty array instead of mock fallback
+        setTables([]);
       }
     } catch (error) {
       console.error('Error loading database tables:', error);
       toast.error(language === 'ar' ? 'فشل تحميل جداول قاعدة البيانات' : 'Failed to load database tables');
-      // Fallback to mock data
-      setTables([
-        { name: 'users', nameAr: 'المستخدمين', records: 1247, size: '2.3MB' },
-        { name: 'organizations', nameAr: 'المؤسسات', records: 89, size: '856KB' },
-        { name: 'frameworks', nameAr: 'الأطر التنظيمية', records: 156, size: '1.2MB' },
-        { name: 'controls', nameAr: 'الضوابط', records: 2568, size: '15.7MB' }
-      ]);
+      // Use empty array instead of mock fallback
+      setTables([]);
     }
   };
 

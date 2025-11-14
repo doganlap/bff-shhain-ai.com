@@ -1,0 +1,9 @@
+{
+  "fullName": "Test User",
+  "email": "test@example.com",
+  "companyName": "Test Company",
+  "sector": "Technology",
+  "orgSize": "1-50",
+  "useCases": ["governance", "risk"],
+  "notes": "Testing demo registration"
+}

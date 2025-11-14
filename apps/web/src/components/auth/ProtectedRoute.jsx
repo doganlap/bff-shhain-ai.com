@@ -1,38 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { CulturalLoadingSpinner } from '../Animation/InteractiveAnimationToolkit';
+import { useApp } from '../../context/AppContext';
 
 const ProtectedRoute = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { state } = useApp();
 
   useEffect(() => {
     checkAuthentication();
-  }, []);
+  }, [state.isAuthenticated, state.isDemoMode]);
 
   const checkAuthentication = async () => {
     try {
-      // EMERGENCY BYPASS FOR TESTING ALL 147+ FEATURES
-      // This completely bypasses authentication so you can test everything
-      console.log('🚀 EMERGENCY SUPER ADMIN TESTING MODE - ALL AUTHENTICATION BYPASSED');
-      setIsAuthenticated(true);
-      setLoading(false);
+      // Check if we're in demo mode and user is already authenticated
+      if (state.isDemoMode && state.isAuthenticated && state.user) {
+        console.log('🔓 Demo mode authentication verified');
+        setIsAuthenticated(true);
+        setLoading(false);
+        return;
+      }
 
-      // Store mock super admin user data for testing
-      localStorage.setItem('token', 'super-admin-emergency-testing-token');
-      localStorage.setItem('user', JSON.stringify({
-        id: 'super-admin',
-        name: 'Super Administrator',
-        email: 'superadmin@grc.com',
-        role: 'super_admin',
-        permissions: ['*', 'all', 'read', 'write', 'delete', 'admin', 'manager', 'analyst', 'viewer']
-      }));
-
-      return;
-
-      // ORIGINAL CODE (commented out for testing)
-      /*
-      // Check for token in localStorage
+      // Check for token in localStorage for non-demo mode
       const token = localStorage.getItem('token');
 
       if (!token) {
@@ -40,10 +30,6 @@ const ProtectedRoute = ({ children }) => {
         setLoading(false);
         return;
       }
-
-      // In a real app, you would validate the token with your backend
-      // For demo purposes, we'll just check if token exists
-      // You could also check token expiration, user permissions, etc.
 
       // Simulate API call to validate token
       await new Promise(resolve => setTimeout(resolve, 500));
@@ -58,7 +44,6 @@ const ProtectedRoute = ({ children }) => {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
       }
-      */
     } catch (error) {
       console.error('Authentication check failed:', error);
       setIsAuthenticated(false);

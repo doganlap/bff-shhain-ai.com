@@ -11,7 +11,7 @@ import {
   FolderOpen, Workflow, TrendingUp, Cpu, Globe,
   UserCheck, GitBranch, Monitor, Code, Briefcase, BookOpen, Award,
   Plus, Edit, Trash2, RefreshCw, Filter, Search, Download, Upload,
-  Play, Pause, Stop, Eye, EyeOff, Star, Heart, Share2, Copy
+  Play, Pause, Eye, EyeOff, Star, Heart, Share2, Copy
 } from 'lucide-react';
 
 const Sidebar = () => {

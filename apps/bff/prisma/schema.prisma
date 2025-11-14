@@ -8,6 +8,166 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
+// ============================================================================
+// MULTI-TENANT ARCHITECTURE - Three Access Paths (Demo, Partner, POC)
+// ============================================================================
+
+model tenants {
+  id            String   @id @default(uuid())
+  slug          String   @unique
+  display_name  String
+  
+  // Type: demo | poc | partner | customer
+  type          String
+  // Status: active | suspended | pending | expired
+  status        String   @default("active")
+  
+  country       String?
+  sector        String?
+  metadata      Json     @default("{}")
+  
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  expires_at    DateTime? // For demo/POC expiration
+  
+  // Relations
+  users              users[]
+  demo_requests      demo_requests[]
+  poc_requests       poc_requests[]
+  partner_invitations partner_invitations[]
+  
+  @@index([type])
+  @@index([status])
+}
+
+model users {
+  id              String   @id @default(uuid())
+  tenant_id       String
+  
+  email           String
+  password_hash   String?
+  full_name       String?
+  
+  role            String   @default("user") // demo-admin, partner-admin, poc-admin, etc.
+  is_partner      Boolean  @default(false)
+  is_super_admin  Boolean  @default(false)
+  
+  metadata        Json     @default("{}")
+  
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  last_login_at   DateTime?
+  
+  // Relations
+  tenant          tenants  @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+  
+  demo_requests_created   demo_requests[] @relation("demo_reviewer")
+  poc_requests_owned      poc_requests[] @relation("poc_owner")
+  partner_invitations_sent partner_invitations[] @relation("invitation_sender")
+  partner_invitations_accepted partner_invitations[] @relation("invitation_acceptor")
+  
+  @@unique([tenant_id, email])
+  @@index([email])
+  @@index([tenant_id])
+}
+
+model demo_requests {
+  id            String   @id @default(uuid())
+  
+  email         String
+  full_name     String
+  company_name  String?
+  sector        String?
+  org_size      String?
+  use_cases     String[]
+  notes         String?
+  
+  // Status: pending | approved_auto | approved_manual | rejected
+  status        String   @default("pending")
+  tenant_id     String?
+  user_id       String?
+  
+  created_at    DateTime @default(now())
+  reviewed_at   DateTime?
+  reviewer_id   String?
+  
+  metadata      Json     @default("{}")
+  
+  // Relations
+  tenant        tenants? @relation(fields: [tenant_id], references: [id], onDelete: SetNull)
+  reviewer      users?   @relation("demo_reviewer", fields: [reviewer_id], references: [id], onDelete: SetNull)
+  
+  @@index([email])
+  @@index([status])
+  @@index([created_at])
+}
+
+model poc_requests {
+  id                      String   @id @default(uuid())
+  
+  email                   String
+  full_name               String
+  company_name            String
+  sector                  String?
+  use_cases               String[]
+  environment_preference  String?  // azure-cloud | aws-cloud | on-prem | hybrid
+  preferred_start_date    DateTime?
+  notes                   String?
+  
+  // Status: new | pending_review | approved | rejected | in_progress | completed
+  status                  String   @default("new")
+  tenant_id               String?
+  owner_internal_user_id  String?
+  
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
+  approved_at             DateTime?
+  completed_at            DateTime?
+  
+  metadata                Json     @default("{}")
+  
+  // Relations
+  tenant                  tenants? @relation(fields: [tenant_id], references: [id], onDelete: SetNull)
+  owner                   users?   @relation("poc_owner", fields: [owner_internal_user_id], references: [id], onDelete: SetNull)
+  
+  @@index([status])
+  @@index([company_name])
+  @@index([created_at])
+}
+
+model partner_invitations {
+  id                  String   @id @default(uuid())
+  
+  partner_tenant_id   String
+  
+  email               String
+  invite_token        String   @unique
+  // Status: pending | accepted | revoked | expired
+  status              String   @default("pending")
+  
+  invited_by_user_id  String?
+  accepted_user_id    String?
+  
+  created_at          DateTime @default(now())
+  expires_at          DateTime
+  accepted_at         DateTime?
+  
+  metadata            Json     @default("{}")
+  
+  // Relations
+  partner_tenant      tenants  @relation(fields: [partner_tenant_id], references: [id], onDelete: Cascade)
+  invited_by          users?   @relation("invitation_sender", fields: [invited_by_user_id], references: [id], onDelete: SetNull)
+  accepted_by         users?   @relation("invitation_acceptor", fields: [accepted_user_id], references: [id], onDelete: SetNull)
+  
+  @@index([email])
+  @@index([status])
+  @@index([partner_tenant_id])
+}
+
+// ============================================================================
+// LEGACY MODELS (Keep for backward compatibility)
+// ============================================================================
+
 model User {
   id             String        @id @default(cuid())
   email          String        @unique
@@ -120,4 +280,254 @@ enum Role {
   ADMIN
   AUDITOR
   MANAGER
+}
+
+// ============================================================================
+// GRC COMPLIANCE TABLES (5500+ Controls & Frameworks)
+// ============================================================================
+
+model grc_frameworks {
+  id              String   @id @default(uuid())
+  name            String
+  name_ar         String?
+  description     String?
+  description_ar  String?
+  version         String?
+  effective_date  DateTime?
+  authority       String?
+  authority_ar    String?
+  scope           String?
+  jurisdiction    String?
+  mandatory       Boolean  @default(false)
+  industry_sector String?
+  compliance_level String?
+  total_controls  Int      @default(0)
+  tenant_id       String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  
+  // Relations
+  controls        grc_controls[]
+  
+  @@index([tenant_id])
+  @@index([jurisdiction])
+}
+
+model grc_controls {
+  id                          String   @id @default(uuid())
+  framework_id                String
+  control_id                  String
+  title                       String
+  title_ar                    String?
+  description                 String?
+  description_ar              String?
+  category                    String?
+  subcategory                 String?
+  risk_level                  String?
+  control_type                String?
+  implementation_status       String   @default("not_implemented")
+  maturity_level              Int      @default(0)
+  evidence_required           Boolean  @default(false)
+  testing_frequency           String?
+  implementation_guidance     String?
+  implementation_guidance_ar  String?
+  related_regulations         Json     @default("[]")
+  tenant_id                   String?
+  created_at                  DateTime @default(now())
+  updated_at                  DateTime @updatedAt
+  
+  // Relations
+  framework                   grc_frameworks @relation(fields: [framework_id], references: [id], onDelete: Cascade)
+  
+  @@unique([framework_id, control_id])
+  @@index([framework_id])
+  @@index([tenant_id])
+  @@index([risk_level])
+  @@index([category])
+}
+
+model framework_controls {
+  id            String   @id @default(uuid())
+  framework_id  String
+  control_id    String
+  sequence      Int?
+  mandatory     Boolean  @default(true)
+  tenant_id     String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  
+  @@unique([framework_id, control_id])
+  @@index([framework_id])
+  @@index([tenant_id])
+}
+
+model sector_controls {
+  id              String   @id @default(uuid())
+  sector          String
+  control_id      String
+  applicability   String?
+  risk_multiplier Float    @default(1.0)
+  mandatory       Boolean  @default(false)
+  tenant_id       String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  
+  @@unique([sector, control_id])
+  @@index([sector])
+  @@index([tenant_id])
+}
+
+model control_evidence_requirements {
+  id                  String   @id @default(uuid())
+  control_id          String
+  evidence_type       String
+  evidence_name       String
+  evidence_name_ar    String?
+  description         String?
+  description_ar      String?
+  is_mandatory        Boolean  @default(false)
+  weight_percentage   Float?
+  validation_criteria Json?
+  tenant_id           String?
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+  
+  @@index([control_id])
+  @@index([tenant_id])
+}
+
+model organizations {
+  id                  String   @id @default(uuid())
+  name                String
+  name_ar             String?
+  registration_number String?
+  sector              String?
+  country             String?
+  city                String?
+  address             String?
+  contact_email       String?
+  contact_phone       String?
+  license_type        String?
+  tenant_id           String
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+  
+  @@index([tenant_id])
+  @@index([sector])
+}
+
+model assessments {
+  id              String   @id @default(uuid())
+  title           String
+  title_ar        String?
+  framework_id    String
+  organization_id String
+  assessment_type String?
+  status          String   @default("draft")
+  progress        Float    @default(0)
+  score           Float?
+  start_date      DateTime?
+  due_date        DateTime?
+  completed_date  DateTime?
+  assigned_to     String?
+  tenant_id       String
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  
+  @@index([framework_id])
+  @@index([organization_id])
+  @@index([tenant_id])
+  @@index([status])
+}
+
+model assessment_controls {
+  id                      String   @id @default(uuid())
+  assessment_id           String
+  control_id              String
+  status                  String   @default("not_started")
+  implementation_status   String?
+  compliance_status       String?
+  score                   Float?
+  evidence_submitted      Boolean  @default(false)
+  notes                   String?
+  assigned_to             String?
+  reviewed_by             String?
+  reviewed_at             DateTime?
+  tenant_id               String
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
+  
+  @@unique([assessment_id, control_id])
+  @@index([assessment_id])
+  @@index([control_id])
+  @@index([tenant_id])
+}
+
+model licenses {
+  id              String   @id @default(uuid())
+  tenant_id       String
+  license_key     String   @unique
+  plan_type       String
+  seats           Int      @default(1)
+  status          String   @default("active")
+  issued_date     DateTime @default(now())
+  expiry_date     DateTime
+  features        Json     @default("{}")
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  
+  @@index([tenant_id])
+  @@index([status])
+}
+
+model subscriptions {
+  id                String   @id @default(uuid())
+  tenant_id         String
+  plan_id           String
+  status            String   @default("active")
+  billing_cycle     String
+  amount            Float
+  currency          String   @default("SAR")
+  start_date        DateTime
+  end_date          DateTime?
+  auto_renew        Boolean  @default(true)
+  payment_method    String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  
+  @@index([tenant_id])
+  @@index([status])
+}
+
+model audit_logs {
+  id          String   @id @default(uuid())
+  tenant_id   String
+  user_id     String?
+  action      String
+  resource    String
+  resource_id String?
+  details     Json?
+  ip_address  String?
+  user_agent  String?
+  created_at  DateTime @default(now())
+  
+  @@index([tenant_id])
+  @@index([user_id])
+  @@index([action])
+  @@index([created_at])
+}
+
+model activity_logs {
+  id          String   @id @default(uuid())
+  tenant_id   String
+  user_id     String?
+  activity    String
+  module      String?
+  details     Json?
+  created_at  DateTime @default(now())
+  
+  @@index([tenant_id])
+  @@index([user_id])
+  @@index([module])
+  @@index([created_at])
 }

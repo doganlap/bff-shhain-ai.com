@@ -468,10 +468,8 @@ describe('AdvancedAssessmentManager - Page Integration Tests', () => {
       const createButton = screen.getByRole('button', { name: /create new/i });
       await user.click(createButton);
 
-      await waitFor(() => {
-        const submitButton = screen.getByRole('button', { name: /create/i });
-        await user.click(submitButton);
-      });
+      const submitButton = await screen.findByRole('button', { name: /create/i });
+      await user.click(submitButton);
 
       await waitFor(() => {
         expect(screen.getByText(/failed to create/i)).toBeInTheDocument();

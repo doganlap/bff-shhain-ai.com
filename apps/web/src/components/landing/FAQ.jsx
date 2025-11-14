@@ -204,28 +204,6 @@ const FAQ = () => {
           </div>
         </div>
 
-        {/* Additional Help CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mt-16"
-        >
-          <p className="font-arabic text-xl text-gray-900 mb-4">
-            لم تجد إجابة لسؤالك؟
-          </p>
-          <p className="font-english text-lg text-gray-600 mb-8">
-            Didn't find an answer to your question?
-          </p>
-          <motion.a
-            href="#contact"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="inline-block bg-gradient-to-r from-brand-primary to-brand-secondary text-white px-12 py-4 rounded-xl font-arabic font-bold text-lg shadow-lg hover:shadow-xl transition-all"
-          >
-            اتصل بنا
-          </motion.a>
-        </motion.div>
       </div>
     </section>
   )

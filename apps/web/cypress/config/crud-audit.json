@@ -1,0 +1,41 @@
+{
+  "baseUrl": "http://localhost:3000",
+  "viewportWidth": 1280,
+  "viewportHeight": 720,
+  "video": true,
+  "screenshotOnRunFailure": true,
+  "screenshotsFolder": "cypress/screenshots",
+  "videosFolder": "cypress/videos",
+  "reporter": "mochawesome",
+  "reporterOptions": {
+    "reportDir": "cypress/reports",
+    "overwrite": false,
+    "html": true,
+    "json": true,
+    "charts": true
+  },
+  "env": {
+    "apiUrl": "http://localhost:3001/api",
+    "testUser": {
+      "email": "admin@example.com",
+      "password": "password123"
+    },
+    "readonlyUser": {
+      "email": "readonly@example.com",
+      "password": "password123"
+    },
+    "editorUser": {
+      "email": "editor@example.com",
+      "password": "password123"
+    }
+  },
+  "retries": {
+    "runMode": 2,
+    "openMode": 0
+  },
+  "defaultCommandTimeout": 10000,
+  "requestTimeout": 10000,
+  "responseTimeout": 10000,
+  "pageLoadTimeout": 30000,
+  "taskTimeout": 60000
+}

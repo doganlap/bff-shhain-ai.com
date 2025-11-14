@@ -3,7 +3,7 @@ import {
   Shield, Home, FileText, Target, AlertTriangle, 
   CheckCircle, Users, Building2, BarChart3, Settings,
   Menu, X, Bell, Search, Globe, Sun, Moon, 
-  ChevronDown, ChevronRight, Activity, TrendingUp,
+  ChevronRight, Activity, TrendingUp,
   Award, Briefcase, Database, Lock, Loader2
 } from 'lucide-react';
 import { Calendar, CreditCard, Play } from 'lucide-react';
@@ -15,7 +15,7 @@ import apiService from '../../services/apiEndpoints';
 const AdvancedShell = ({ children, activeSection, onNavigate }) => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { state } = useApp();
-  const { t, language, changeLanguage, isRTL } = useI18n();
+  const { language, changeLanguage } = useI18n();
   const { isDark, toggleTheme } = useTheme();
   
   // Real data states
@@ -34,7 +34,7 @@ const AdvancedShell = ({ children, activeSection, onNavigate }) => {
       setLoading(true);
       
       // Fetch compliance score from API
-      const complianceRes = await apiService.dashboard.getKPIs();
+      const complianceRes = await apiService.dashboard.getStats();
       if (complianceRes?.data?.compliance_score) {
         setComplianceScore(complianceRes.data.compliance_score);
       }

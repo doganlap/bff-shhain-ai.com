@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { 
-  ChevronUp, ChevronDown, Search, Filter, 
+import {
+  ChevronUp, ChevronDown, Search, Filter,
   MoreVertical, Eye, Edit, Trash2
 } from 'lucide-react';
 import { useBulkOperations } from '../../hooks/useBulkOperations';
@@ -30,7 +29,6 @@ const DataTable = ({
   emptyMessage,
   loading = false
 }) => {
-  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [currentPage, setCurrentPage] = useState(1);
@@ -174,7 +172,7 @@ const DataTable = ({
       <AnimatedCard>
         <div className="p-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">{t('common.messages.loading')}</p>
+          <p className="mt-2 text-gray-600">Loading...</p>
         </div>
       </AnimatedCard>
     );
@@ -190,7 +188,7 @@ const DataTable = ({
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
                 type="text"
-                placeholder={t('common.actions.search')}
+                placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -286,7 +284,7 @@ const DataTable = ({
                     colSpan={columns.length + (selectable ? 2 : 1)} 
                     className="px-6 py-12 text-center text-gray-500"
                   >
-                    {emptyMessage || t('common.messages.noData')}
+                    {emptyMessage || 'No data available'}
                   </td>
                 </tr>
               ) : (

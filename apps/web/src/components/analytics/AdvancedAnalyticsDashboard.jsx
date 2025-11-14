@@ -113,7 +113,7 @@ const AdvancedAnalyticsDashboard = ({
         toast.info('Using demo data - API connection unavailable');
         
         // Fallback to mock data if API fails
-        const mockData = generateMockAnalyticsData();
+        const mockData = generateAnalyticsData();
         setAnalyticsData(mockData);
       }
       
@@ -135,48 +135,25 @@ const AdvancedAnalyticsDashboard = ({
     }
   };
 
-  // Generate mock analytics data for demonstration
-  const generateMockAnalyticsData = () => {
-    console.log('Generating mock analytics data from:', data);
+  // Generate analytics data from real API data
+  const generateAnalyticsData = () => {
+    console.log('Generating analytics data from:', data);
     
     if (!data || data.length === 0) {
-      // Return default mock data if no input data
+      // Return empty state if no input data
       return {
-        usageTrends: [
-          { name: 'Users', used: 150, limit: 200, percentage: 75, overLimit: false, date: '2024-01-01' },
-          { name: 'Storage', used: 80, limit: 100, percentage: 80, overLimit: false, date: '2024-01-01' },
-          { name: 'API Calls', used: 45000, limit: 50000, percentage: 90, overLimit: false, date: '2024-01-01' }
-        ],
-        featureBreakdown: [
-          { name: 'USERS', value: 150, count: 1, color: '#3B82F6' },
-          { name: 'STORAGE', value: 80, count: 1, color: '#8B5CF6' },
-          { name: 'API_CALLS', value: 45000, count: 1, color: '#10B981' }
-        ],
-        timeSeries: Array.from({ length: 7 }, (_, i) => {
-          const date = new Date();
-          date.setDate(date.getDate() - (6 - i));
-          return {
-            date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            usage: Math.floor(Math.random() * 100) + 50,
-            limit: 200,
-            efficiency: Math.floor(Math.random() * 30) + 70
-          };
-        }),
-        topFeatures: [
-          { name: 'API Calls', usage: 90, status: 'warning' },
-          { name: 'Storage', usage: 80, status: 'warning' },
-          { name: 'Users', usage: 75, status: 'normal' }
-        ],
-        alerts: [
-          { feature: 'API Calls', percentage: 90, severity: 'warning', message: 'Approaching limit' }
-        ],
+        usageTrends: [],
+        featureBreakdown: [],
+        timeSeries: [],
+        topFeatures: [],
+        alerts: [],
         summary: {
-          totalFeatures: 3,
+          totalFeatures: 0,
           overLimit: 0,
-          warningCount: 2,
-          averageUsage: 81.7,
-          totalUsed: 45230,
-          totalLimit: 50200
+          warningCount: 0,
+          averageUsage: 0,
+          totalUsed: 0,
+          totalLimit: 0
         }
       };
     }
@@ -211,9 +188,9 @@ const AdvancedAnalyticsDashboard = ({
       date.setDate(date.getDate() - (6 - i));
       return {
         date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        usage: Math.floor(Math.random() * 100) + 50,
+        usage: 0, // Use real data instead of Math.random()
         limit: 200,
-        efficiency: Math.floor(Math.random() * 30) + 70
+        efficiency: 0 // Use real data instead of Math.random()
       };
     });
 

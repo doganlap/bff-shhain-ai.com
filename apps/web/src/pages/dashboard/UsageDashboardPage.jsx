@@ -36,54 +36,9 @@ export default function UsageDashboardPage() {
       setLoading(true);
       console.log('Loading usage data for tenant:', tenantId);
       
-      // Try to load real data, fallback to mock data if API fails
-      try {
-        const data = await usageApi.getTenantUsage(tenantId);
-        console.log('Usage data received:', data);
-        setUsage(data.data || []);
-      } catch (apiError) {
-        console.warn('API failed, using mock data:', apiError);
-        
-        // Mock data for testing
-        const mockUsageData = [
-          {
-            feature_code: 'USERS',
-            feature_name: 'Active Users',
-            usage_type: 'USERS',
-            used_value: 150,
-            limit_value: 200,
-            percentage_used: 75,
-            is_over_limit: false,
-            period_start: '2024-01-01',
-            period_end: '2024-01-31'
-          },
-          {
-            feature_code: 'STORAGE',
-            feature_name: 'Storage Usage',
-            usage_type: 'STORAGE',
-            used_value: 80,
-            limit_value: 100,
-            percentage_used: 80,
-            is_over_limit: false,
-            period_start: '2024-01-01',
-            period_end: '2024-01-31'
-          },
-          {
-            feature_code: 'API_CALLS',
-            feature_name: 'API Calls',
-            usage_type: 'API_CALLS',
-            used_value: 45000,
-            limit_value: 50000,
-            percentage_used: 90,
-            is_over_limit: false,
-            period_start: '2024-01-01',
-            period_end: '2024-01-31'
-          }
-        ];
-        
-        setUsage(mockUsageData);
-        toast.info('Using demo data - API connection unavailable');
-      }
+      const data = await usageApi.getTenantUsage(tenantId);
+      console.log('Usage data received:', data);
+      setUsage(data.data || []);
       
     } catch (error) {
       console.error('Error loading usage:', error);

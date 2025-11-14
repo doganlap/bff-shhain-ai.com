@@ -1,7 +1,7 @@
 // Backend Integration Service for Demo/POC Bookings and Sandbox Access
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://grc-backend-prod.delightfulwave-81a84bdf.eastus.azurecontainerapps.io/api'
-const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'https://grc-frontend-prod.delightfulwave-81a84bdf.eastus.azurecontainerapps.io'
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
+const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173'
 
 /**
  * Submit booking request to Azure Functions
@@ -41,10 +41,10 @@ export const submitBooking = async (bookingData) => {
     }
 
     const data = await response.json()
-    
+
     // Track successful submission
     trackBookingEvent('booking_submitted', bookingData.requestType, data.bookingId)
-    
+
     return {
       success: true,
       bookingId: data.bookingId,
@@ -53,13 +53,13 @@ export const submitBooking = async (bookingData) => {
     }
   } catch (error) {
     console.error('Booking submission error:', error)
-    
+
     // Track error
     trackBookingEvent('booking_error', bookingData.requestType, error.message)
-    
+
     // Fallback: Store locally and retry
     await storeBookingLocally(bookingData)
-    
+
     throw new Error('Failed to submit booking. We have saved your request and will contact you shortly.')
   }
 }
@@ -71,7 +71,7 @@ export const submitBooking = async (bookingData) => {
  */
 export const calculateLeadScore = (bookingData) => {
   let score = 0
-  
+
   // Company size scoring
   const sizeScores = {
     'small': 10,
@@ -80,7 +80,7 @@ export const calculateLeadScore = (bookingData) => {
     'enterprise': 50
   }
   score += sizeScores[bookingData.companySize] || 0
-  
+
   // Sector scoring (high-value sectors)
   const sectorScores = {
     'financial': 20,
@@ -92,21 +92,21 @@ export const calculateLeadScore = (bookingData) => {
     'other': 5
   }
   score += sectorScores[bookingData.sector] || 0
-  
+
   // Request type scoring
   score += bookingData.requestType === 'poc' ? 20 : 10
-  
+
   // Message provided (shows engagement)
   if (bookingData.message && bookingData.message.length > 20) {
     score += 10
   }
-  
+
   // Email domain check (corporate email)
-  if (bookingData.email && !bookingData.email.includes('@gmail.com') && 
+  if (bookingData.email && !bookingData.email.includes('@gmail.com') &&
       !bookingData.email.includes('@yahoo.com') && !bookingData.email.includes('@outlook.com')) {
     score += 5
   }
-  
+
   return Math.min(score, 100)
 }
 
@@ -134,11 +134,11 @@ const storeBookingLocally = async (bookingData) => {
 export const retryPendingBookings = async () => {
   try {
     const localBookings = JSON.parse(localStorage.getItem('pending_bookings') || '[]')
-    
+
     if (localBookings.length === 0) return
-    
+
     const successfulRetries = []
-    
+
     for (const booking of localBookings) {
       if (booking.retryCount < 3) {
         try {
@@ -149,13 +149,13 @@ export const retryPendingBookings = async () => {
         }
       }
     }
-    
+
     // Remove successful retries
     const remainingBookings = localBookings.filter(
       b => !successfulRetries.includes(b)
     )
     localStorage.setItem('pending_bookings', JSON.stringify(remainingBookings))
-    
+
   } catch (error) {
     console.error('Retry failed:', error)
   }
@@ -176,7 +176,7 @@ const trackBookingEvent = (eventName, bookingType, value) => {
       timestamp: new Date().toISOString()
     })
   }
-  
+
   // Azure Application Insights
   if (window.appInsights) {
     window.appInsights.trackEvent({
@@ -187,7 +187,7 @@ const trackBookingEvent = (eventName, bookingType, value) => {
       }
     })
   }
-  
+
   // Facebook Pixel
   if (window.fbq) {
     window.fbq('track', 'Lead', {
@@ -195,7 +195,7 @@ const trackBookingEvent = (eventName, bookingType, value) => {
       value: value
     })
   }
-  
+
   // LinkedIn Insight Tag
   if (window.lintrk) {
     window.lintrk('track', { conversion_id: '12345678' })
@@ -252,11 +252,11 @@ export const getAvailableTimeSlots = async (date, type = 'demo') => {
         'Accept': 'application/json'
       }
     })
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch availability')
     }
-    
+
     const data = await response.json()
     return {
       availableSlots: data.availableSlots || [],
@@ -295,11 +295,11 @@ export const getAvailableDates = async (type = 'demo', startDate = null) => {
         'Accept': 'application/json'
       }
     })
-    
+
     if (!response.ok) {
       throw new Error('Failed to fetch available dates')
     }
-    
+
     const data = await response.json()
     return data.availableDates || []
   } catch (error) {
@@ -340,11 +340,11 @@ export const isBookingWindowOpen = () => {
   const now = new Date()
   const dayOfWeek = now.getDay() // 0 = Sunday, 6 = Saturday
   const hour = now.getHours()
-  
+
   // Saudi Arabia business hours: Sunday-Thursday, 8 AM - 5 PM
   const isBusinessDay = dayOfWeek >= 0 && dayOfWeek <= 4
   const isBusinessHour = hour >= 8 && hour < 17
-  
+
   return isBusinessDay && isBusinessHour
 }
 

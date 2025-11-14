@@ -1,839 +1,434 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, useLocation } from 'react-router-dom';
-import { Shield, Eye, Settings, Users, Database, BarChart3, AlertTriangle, Building2, FileText } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import ErrorBoundary from './components/common/ErrorBoundary';
+import { useI18n } from './hooks/useI18n.jsx';
+import { useTheme } from './components/theme/ThemeProvider';
 
-// Import all pages
-import { 
+// Import ALL pages from centralized index
+import {
+  // Enhanced Modules (New Implementation)
   EnhancedDashboard,
-  AssessmentDetailsCollaborative,
+  AssessmentsModuleEnhanced,
   ComplianceTrackingModuleEnhanced,
   RiskManagementModuleEnhanced,
+  FrameworksModuleEnhanced,
   ControlsModuleEnhanced,
+
+  // Legacy Modules
+  Dashboard,
+  Assessments,
+  ComplianceTrackingPage,
+  RiskManagementPage,
+  FrameworksPage,
+  ControlsPage,
+  Controls,
+  Risks,
   Evidence,
+
+  // Organizations
   OrganizationsPage,
   OrganizationDetails,
+  OrganizationForm,
+
+  // Reports & Documents
+  ReportsPage,
+  DocumentManagementPage,
+
+  // Users & Access
   UserManagementPage,
   AuditLogsPage,
+
+  // Workflows & Automation
   WorkflowManagementPage,
-  NotificationManagementPage,
-  DocumentManagementPage,
   AISchedulerPage,
-  RAGServicePage,
+
+  // Regulatory Intelligence
+  RegulatoryIntelligencePage,
+  RegulatorsPage,
+  SectorIntelligence,
+
+  // Partners & Vendors
+  PartnerManagementPage,
+
+  // Notifications
+  NotificationManagementPage,
+
+  // System Management
   SettingsPage,
   DatabasePage,
   APIManagementPage,
   PerformanceMonitorPage,
+
+  // AI & RAG Services
+  RAGServicePage,
+
+  // MSP License & Renewal Pages
   LicensesManagementPage,
   RenewalsPipelinePage,
+  UsageDashboardPage,
   UpgradePage,
   AutoAssessmentGeneratorPage,
-  PartnerManagementPage,
-  RegulatoryIntelligenceEnginePage,
-  RegulatoryIntelligencePage,
-  RegulatorsPage,
-  SectorIntelligence,
-  KSAGRCPage,
-  ReportsPage,
   ModernAdvancedDashboard,
+
+  // Auth & Public Pages
+  LoginPage,
+  StoryDrivenRegistration,
+  NotFoundPage,
+
+  // Demo, Partner, POC Access Paths
+  DemoLanding,
+  DemoRegister,
+  DemoAppLayout,
+  PartnerLanding,
+  PartnerLogin,
+  PartnerAppLayout,
+  PocLanding,
+  PocRequest,
+  PocAppLayout,
+
+  // Special Pages
+  KSAGRCPage,
+  AssessmentDetailsCollaborative,
   TenantDashboard,
   RegulatoryMarketDashboard,
-  UsageDashboardPage,
-  SimpleLoginPage,
-  StoryDrivenRegistration,
-  LandingPage,
-  DemoPage,
-  ComponentsDemo,
-  ModernComponentsDemo,
-  SystemHealthDashboard,
-  MissionControlPage
 } from './pages';
 
-import AdvancedShell from './components/layout/AdvancedShell';
-import { AppProvider } from './context/AppContext';
-import { I18nProvider } from './hooks/useI18n';
-import { ThemeProvider } from './components/theme/ThemeProvider';
-import { PermissionPageTemplate, RoleDashboardCards } from './components/common/PermissionPageTemplate';
+// Layouts
+import AppLayout from './components/layout/AppLayout';
+import AdvancedAppShell from './components/layout/AdvancedAppShell';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
-const AppContent = () => {
-  const [currentPage, setCurrentPage] = useState('login');
-  const location = useLocation();
-
-  useEffect(() => {
-    const path = location.pathname.substring(1) || 'login';
-    setCurrentPage(path);
-  }, [location]);
-
-  const renderCurrentPage = () => {
-    switch (currentPage) {
-      // Dashboard pages with permission-based templates
-      case 'dashboard':
-        return (
-          <PermissionPageTemplate
-            pageTitle="GRC Dashboard"
-            pageDescription="Comprehensive governance, risk, and compliance overview"
-            showHeader={true}
-            showStats={true}
-            tools={[
-              {
-                title: 'Role-Based Dashboard Cards',
-                description: 'Dynamic cards based on your role',
-                icon: <Shield className="h-6 w-6" />,
-                requiredPermissions: ['dashboard:read'],
-                culturalPattern: true,
-                glowEffect: true
-              }
-            ]}
-          >
-            <EnhancedDashboard />
-            <RoleDashboardCards className="mt-6" />
-          </PermissionPageTemplate>
-        );
-      case 'modern-dashboard':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Modern Dashboard"
-            pageDescription="Advanced analytics and insights"
-            requiredPermissions={['dashboard:read', 'analytics:read']}
-          >
-            <ModernAdvancedDashboard />
-          </PermissionPageTemplate>
-        );
-      case 'tenant-dashboard':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Tenant Dashboard"
-            pageDescription="Multi-tenant management overview"
-            requiredRole="tenant_admin"
-          >
-            <TenantDashboard />
-          </PermissionPageTemplate>
-        );
-      case 'regulatory-dashboard':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Regulatory Dashboard"
-            pageDescription="Regulatory compliance monitoring"
-            requiredPermissions={['regulatory:read']}
-          >
-            <RegulatoryMarketDashboard />
-          </PermissionPageTemplate>
-        );
-      case 'usage-dashboard':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Usage Dashboard"
-            pageDescription="System usage analytics"
-            requiredPermissions={['usage:read']}
-          >
-            <UsageDashboardPage />
-          </PermissionPageTemplate>
-        );
-      
-      // Core GRC pages
-      case 'assessments':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Assessments"
-            pageDescription="Compliance assessments and evaluations"
-            requiredPermissions={['assessments:read']}
-            tools={[
-              {
-                title: 'Assessment Tools',
-                description: 'Create and manage assessments',
-                icon: <FileText className="h-6 w-6" />,
-                requiredPermissions: ['assessments:create'],
-                culturalPattern: true,
-                glowEffect: true
-              }
-            ]}
-          >
-            <AssessmentDetailsCollaborative />
-          </PermissionPageTemplate>
-        );
-      case 'frameworks':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Frameworks Management"
-            pageDescription="Compliance frameworks and standards"
-            requiredPermissions={['frameworks:read']}
-            tools={[
-              {
-                title: 'Framework Library',
-                description: 'Browse compliance frameworks',
-                icon: <Shield className="h-6 w-6" />,
-                requiredPermissions: ['frameworks:read'],
-                culturalPattern: true,
-                glowEffect: false
-              }
-            ]}
-          >
-            <div className="p-6"><h1 className="text-2xl font-bold">Frameworks Management</h1><p>Framework management page coming soon...</p></div>
-          </PermissionPageTemplate>
-        );
-      case 'evidence':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Evidence Management"
-            pageDescription="Compliance evidence and documentation"
-            requiredPermissions={['evidence:read']}
-            tools={[
-              {
-                title: 'Evidence Collection',
-                description: 'Upload and manage evidence',
-                icon: <Database className="h-6 w-6" />,
-                requiredPermissions: ['evidence:create'],
-                culturalPattern: false,
-                glowEffect: true
-              }
-            ]}
-          >
-            <Evidence />
-          </PermissionPageTemplate>
-        );
-      
-      // Risk & Compliance pages
-      case 'risks':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Risk Management"
-            pageDescription="Enterprise risk management and mitigation"
-            requiredPermissions={['risks:read']}
-            tools={[
-              {
-                title: 'Risk Assessment',
-                description: 'Identify and assess risks',
-                icon: <AlertTriangle className="h-6 w-6" />,
-                requiredPermissions: ['risks:create'],
-                culturalPattern: true,
-                glowEffect: true
-              }
-            ]}
-          >
-            <RiskManagementModuleEnhanced />
-          </PermissionPageTemplate>
-        );
-      case 'compliance':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Compliance Tracking"
-            pageDescription="Regulatory compliance monitoring and tracking"
-            requiredPermissions={['compliance:read']}
-            tools={[
-              {
-                title: 'Compliance Status',
-                description: 'Monitor compliance status',
-                icon: <Shield className="h-6 w-6" />,
-                requiredPermissions: ['compliance:read'],
-                culturalPattern: true,
-                glowEffect: false
-              }
-            ]}
-          >
-            <ComplianceTrackingModuleEnhanced />
-          </PermissionPageTemplate>
-        );
-      case 'controls':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Controls Management"
-            pageDescription="Internal controls and procedures"
-            requiredPermissions={['controls:read']}
-            tools={[
-              {
-                title: 'Control Library',
-                description: 'Manage control frameworks',
-                icon: <Settings className="h-6 w-6" />,
-                requiredPermissions: ['controls:read'],
-                culturalPattern: false,
-                glowEffect: true
-              }
-            ]}
-          >
-            <ControlsModuleEnhanced />
-          </PermissionPageTemplate>
-        );
-      
-      // Organization pages
-      case 'organizations':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Organizations"
-            pageDescription="Organization management and hierarchy"
-            requiredPermissions={['organizations:read']}
-            tools={[
-              {
-                title: 'Organization Tree',
-                description: 'View organization structure',
-                icon: <Building2 className="h-6 w-6" />,
-                requiredPermissions: ['organizations:read'],
-                culturalPattern: true,
-                glowEffect: false
-              }
-            ]}
-          >
-            <OrganizationsPage />
-          </PermissionPageTemplate>
-        );
-      case 'users':
-        return (
-          <PermissionPageTemplate
-            pageTitle="User Management"
-            pageDescription="System users and access management"
-            requiredPermissions={['users:read']}
-            tools={[
-              {
-                title: 'User Directory',
-                description: 'Browse system users',
-                icon: <Users className="h-6 w-6" />,
-                requiredPermissions: ['users:read'],
-                culturalPattern: true,
-                glowEffect: true
-              }
-            ]}
-          >
-            <UserManagementPage />
-          </PermissionPageTemplate>
-        );
-      case 'organization-details':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Organization Details"
-            pageDescription="Detailed organization information"
-            requiredPermissions={['organizations:read']}
-          >
-            <OrganizationDetails />
-          </PermissionPageTemplate>
-        );
-      
-      // System & Admin pages with permission-based templates
-      case 'settings':
-        return (
-          <PermissionPageTemplate
-            pageTitle="System Settings"
-            pageDescription="Configure system parameters and preferences"
-            requiredPermissions={['settings:read']}
-            tools={[
-              {
-                title: 'Permission Settings',
-                description: 'Manage role-based permissions',
-                icon: <Shield className="h-6 w-6" />,
-                requiredPermissions: ['permissions:manage'],
-                culturalPattern: true,
-                glowEffect: true
-              },
-              {
-                title: 'System Configuration',
-                description: 'Advanced system settings',
-                icon: <Settings className="h-6 w-6" />,
-                requiredPermissions: ['system:config'],
-                culturalPattern: false,
-                glowEffect: false
-              }
-            ]}
-          >
-            <SettingsPage />
-          </PermissionPageTemplate>
-        );
-      case 'database':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Database Management"
-            pageDescription="System database administration"
-            requiredPermissions={['system:manage']}
-            requiredRole="system_admin"
-            tools={[
-              {
-                title: 'Database Health',
-                description: 'Monitor database performance',
-                icon: <Database className="h-6 w-6" />,
-                requiredPermissions: ['system:monitor'],
-                culturalPattern: true,
-                glowEffect: true
-              }
-            ]}
-          >
-            <DatabasePage />
-          </PermissionPageTemplate>
-        );
-      case 'api-management':
-        return (
-          <PermissionPageTemplate
-            pageTitle="API Management"
-            pageDescription="Manage system APIs and endpoints"
-            requiredPermissions={['system:manage']}
-            tools={[
-              {
-                title: 'API Health Check',
-                description: 'Test API connectivity',
-                icon: <Shield className="h-6 w-6" />,
-                requiredPermissions: ['system:monitor'],
-                culturalPattern: true,
-                glowEffect: false
-              }
-            ]}
-          >
-            <APIManagementPage />
-          </PermissionPageTemplate>
-        );
-      case 'performance':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Performance Monitor"
-            pageDescription="System performance monitoring"
-            requiredPermissions={['system:monitor']}
-            tools={[
-              {
-                title: 'Real-time Metrics',
-                description: 'Live system performance',
-                icon: <BarChart3 className="h-6 w-6" />,
-                requiredPermissions: ['system:monitor'],
-                culturalPattern: false,
-                glowEffect: false
-              }
-            ]}
-          >
-            <PerformanceMonitorPage />
-          </PermissionPageTemplate>
-        );
-      case 'audit-logs':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Audit Logs"
-            pageDescription="System audit trail and logs"
-            requiredPermissions={['audit:read']}
-            tools={[
-              {
-                title: 'Audit Trail',
-                description: 'Complete audit history',
-                icon: <Eye className="h-6 w-6" />,
-                requiredPermissions: ['audit:read'],
-                culturalPattern: true,
-                glowEffect: false
-              }
-            ]}
-          >
-            <AuditLogsPage />
-          </PermissionPageTemplate>
-        );
-      case 'workflows':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Workflow Management"
-            pageDescription="Manage system workflows and processes"
-            requiredPermissions={['workorders:read']}
-            tools={[
-              {
-                title: 'Workflow Designer',
-                description: 'Create custom workflows',
-                icon: <Settings className="h-6 w-6" />,
-                requiredPermissions: ['workorders:create'],
-                culturalPattern: false,
-                glowEffect: true
-              }
-            ]}
-          >
-            <WorkflowManagementPage />
-          </PermissionPageTemplate>
-        );
-      case 'notifications':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Notification Management"
-            pageDescription="System notifications and alerts"
-            requiredPermissions={['notifications:read']}
-          >
-            <NotificationManagementPage />
-          </PermissionPageTemplate>
-        );
-      case 'vercel-status':
-        return (
-          <PermissionPageTemplate
-            pageTitle="360° System Health"
-            pageDescription="Live monitoring of your cloud, local, and application status"
-            requiredRole="super_admin" // Protect this page
-            requiredPermissions={['system:monitor']}
-          >
-            <SystemHealthDashboard />
-          </PermissionPageTemplate>
-        );
-      case 'mission-control':
-        return (
-          <PermissionPageTemplate
-            pageTitle="AI Mission Control"
-            pageDescription="A Multi-Project, Multi-Model AI Agent Command Center"
-            requiredRole="super_admin"
-          >
-            <MissionControlPage />
-          </PermissionPageTemplate>
-        );
-
-      case 'documents':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Document Management"
-            pageDescription="System documents and files"
-            requiredPermissions={['documents:read']}
-          >
-            <DocumentManagementPage />
-          </PermissionPageTemplate>
-        );
-      case 'regulatory':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Regulatory Intelligence"
-            pageDescription="Regulatory compliance monitoring"
-            requiredPermissions={['regulatory:read']}
-            tools={[
-              {
-                title: 'Regulatory Updates',
-                description: 'Latest regulatory changes',
-                icon: <Shield className="h-6 w-6" />,
-                requiredPermissions: ['regulatory:read'],
-                culturalPattern: true,
-                glowEffect: false
-              }
-            ]}
-          >
-            <RegulatoryIntelligencePage />
-          </PermissionPageTemplate>
-        );
-      
-      // AI Services pages
-      case 'ai-scheduler':
-        return (
-          <PermissionPageTemplate
-            pageTitle="AI Scheduler"
-            pageDescription="AI-powered scheduling and automation"
-            requiredPermissions={['ai:read']}
-            tools={[
-              {
-                title: 'AI Automation',
-                description: 'AI-powered task scheduling',
-                icon: <Settings className="h-6 w-6" />,
-                requiredPermissions: ['ai:create'],
-                culturalPattern: true,
-                glowEffect: true
-              }
-            ]}
-          >
-            <AISchedulerPage />
-          </PermissionPageTemplate>
-        );
-      case 'rag':
-        return (
-          <PermissionPageTemplate
-            pageTitle="RAG Service"
-            pageDescription="Retrieval-Augmented Generation service"
-            requiredPermissions={['ai:read']}
-            tools={[
-              {
-                title: 'RAG Engine',
-                description: 'AI knowledge retrieval',
-                icon: <Database className="h-6 w-6" />,
-                requiredPermissions: ['ai:create'],
-                culturalPattern: true,
-                glowEffect: false
-              }
-            ]}
-          >
-            <RAGServicePage />
-          </PermissionPageTemplate>
-        );
-      
-      // Platform & Licensing pages
-      case 'licenses':
-        return (
-          <PermissionPageTemplate
-            pageTitle="License Management"
-            pageDescription="Software license administration"
-            requiredPermissions={['licenses:read']}
-            tools={[
-              {
-                title: 'License Inventory',
-                description: 'Manage software licenses',
-                icon: <Shield className="h-6 w-6" />,
-                requiredPermissions: ['licenses:read'],
-                culturalPattern: false,
-                glowEffect: false
-              }
-            ]}
-          >
-            <LicensesManagementPage />
-          </PermissionPageTemplate>
-        );
-      case 'renewals':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Renewals Pipeline"
-            pageDescription="License renewal management"
-            requiredPermissions={['licenses:manage']}
-            tools={[
-              {
-                title: 'Renewal Calendar',
-                description: 'Track license renewals',
-                icon: <Settings className="h-6 w-6" />,
-                requiredPermissions: ['licenses:manage'],
-                culturalPattern: true,
-                glowEffect: true
-              }
-            ]}
-          >
-            <RenewalsPipelinePage />
-          </PermissionPageTemplate>
-        );
-      case 'upgrade':
-        return (
-          <PermissionPageTemplate
-            pageTitle="System Upgrade"
-            pageDescription="System upgrade and migration"
-            requiredPermissions={['system:upgrade']}
-            tools={[
-              {
-                title: 'Upgrade Tools',
-                description: 'System upgrade utilities',
-                icon: <Settings className="h-6 w-6" />,
-                requiredPermissions: ['system:upgrade'],
-                culturalPattern: false,
-                glowEffect: true
-              }
-            ]}
-          >
-            <UpgradePage />
-          </PermissionPageTemplate>
-        );
-      case 'auto-assessment':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Auto Assessment Generator"
-            pageDescription="Automated compliance assessment generation"
-            requiredPermissions={['assessments:create']}
-            tools={[
-              {
-                title: 'AI Assessment',
-                description: 'Generate assessments automatically',
-                icon: <FileText className="h-6 w-6" />,
-                requiredPermissions: ['assessments:create'],
-                culturalPattern: true,
-                glowEffect: true
-              }
-            ]}
-          >
-            <AutoAssessmentGeneratorPage />
-          </PermissionPageTemplate>
-        );
-      case 'partners':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Partner Management"
-            pageDescription="Business partner and vendor management"
-            requiredPermissions={['partners:read']}
-            tools={[
-              {
-                title: 'Partner Directory',
-                description: 'Manage business partners',
-                icon: <Users className="h-6 w-6" />,
-                requiredPermissions: ['partners:read'],
-                culturalPattern: true,
-                glowEffect: false
-              }
-            ]}
-          >
-            <PartnerManagementPage />
-          </PermissionPageTemplate>
-        );
-      
-      // Regulatory Intelligence pages
-      case 'regulatory-engine':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Regulatory Intelligence Engine"
-            pageDescription="AI-powered regulatory analysis"
-            requiredPermissions={['regulatory:read']}
-            tools={[
-              {
-                title: 'AI Regulatory Analysis',
-                description: 'Automated regulatory insights',
-                icon: <BarChart3 className="h-6 w-6" />,
-                requiredPermissions: ['regulatory:read'],
-                culturalPattern: true,
-                glowEffect: true
-              }
-            ]}
-          >
-            <RegulatoryIntelligenceEnginePage />
-          </PermissionPageTemplate>
-        );
-      case 'regulators':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Regulators"
-            pageDescription="Regulatory authority management"
-            requiredPermissions={['regulatory:read']}
-            tools={[
-              {
-                title: 'Regulator Directory',
-                description: 'Manage regulatory contacts',
-                icon: <Shield className="h-6 w-6" />,
-                requiredPermissions: ['regulatory:read'],
-                culturalPattern: false,
-                glowEffect: false
-              }
-            ]}
-          >
-            <RegulatorsPage />
-          </PermissionPageTemplate>
-        );
-      case 'sector-intelligence':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Sector Intelligence"
-            pageDescription="Industry-specific regulatory insights"
-            requiredPermissions={['regulatory:read']}
-            tools={[
-              {
-                title: 'Sector Analysis',
-                description: 'Industry regulatory trends',
-                icon: <BarChart3 className="h-6 w-6" />,
-                requiredPermissions: ['regulatory:read'],
-                culturalPattern: true,
-                glowEffect: true
-              }
-            ]}
-          >
-            <SectorIntelligence />
-          </PermissionPageTemplate>
-        );
-      case 'ksa-grc':
-        return (
-          <PermissionPageTemplate
-            pageTitle="KSA GRC"
-            pageDescription="Kingdom of Saudi Arabia GRC compliance"
-            requiredPermissions={['regulatory:read']}
-            tools={[
-              {
-                title: 'KSA Compliance',
-                description: 'Saudi regulatory compliance',
-                icon: <Shield className="h-6 w-6" />,
-                requiredPermissions: ['regulatory:read'],
-                culturalPattern: true,
-                glowEffect: false
-              }
-            ]}
-          >
-            <KSAGRCPage />
-          </PermissionPageTemplate>
-        );
-      
-      // Authentication pages
-      case 'login':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Login"
-            pageDescription="Secure system access"
-            showHeader={false}
-            showStats={false}
-          >
-            <SimpleLoginPage />
-          </PermissionPageTemplate>
-        );
-      case 'register':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Registration"
-            pageDescription="Create new account"
-            showHeader={false}
-            showStats={false}
-          >
-            <StoryDrivenRegistration />
-          </PermissionPageTemplate>
-        );
-      
-      // Reports page
-      case 'reports':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Reports"
-            pageDescription="Compliance and analytics reports"
-            requiredPermissions={['reports:read']}
-            tools={[
-              {
-                title: 'Report Generator',
-                description: 'Create custom reports',
-                icon: <BarChart3 className="h-6 w-6" />,
-                requiredPermissions: ['reports:create'],
-                culturalPattern: true,
-                glowEffect: true
-              }
-            ]}
-          >
-            <ReportsPage />
-          </PermissionPageTemplate>
-        );
-      
-      // Public pages (no permission required)
-      case 'landing':
-        return <LandingPage />;
-      case 'demo':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Demo"
-            pageDescription="System demonstration"
-            showHeader={false}
-            showStats={false}
-          >
-            <DemoPage />
-          </PermissionPageTemplate>
-        );
-      case 'components-demo':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Components Demo"
-            pageDescription="UI component showcase"
-            showHeader={false}
-            showStats={false}
-          >
-            <ComponentsDemo />
-          </PermissionPageTemplate>
-        );
-      case 'modern-demo':
-        return (
-          <PermissionPageTemplate
-            pageTitle="Modern Demo"
-            pageDescription="Modern UI demonstration"
-            showHeader={false}
-            showStats={false}
-          >
-            <ModernComponentsDemo />
-          </PermissionPageTemplate>
-        );
-      
-      default:
-        return <EnhancedDashboard />;
-    }
-  };
-
-  return (
-    <AdvancedShell 
-      activeSection={currentPage}
-      onNavigate={setCurrentPage}
-    >
-      {renderCurrentPage()}
-    </AdvancedShell>
-  );
-};
+// Dashboard & Main Pages
+import AdvancedGRCDashboard from './components/AdvancedGRCDashboard';
+import AdvancedAssessmentManager from './components/AdvancedAssessmentManager';
+import AdvancedFrameworkManager from './components/AdvancedFrameworkManager';
 
 const App = () => {
   return (
-    <ThemeProvider defaultTheme="light">
-      <I18nProvider defaultLanguage="ar">
-        <AppProvider>
-          <Router>
-            <AppContent />
-          </Router>
-        </AppProvider>
-      </I18nProvider>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <AppContent />
+    </ErrorBoundary>
   );
 };
 
-export default App; 
+const AppContent = () => {
+  // Get i18n and theme context
+  const { isRTL, language } = useI18n();
+  const theme = useTheme();
+
+  // Safely get isDark with fallback
+  const isDark = theme?.isDark || false;
+
+  // Apply direction to document root
+  useEffect(() => {
+    document.documentElement.dir = isRTL() ? 'rtl' : 'ltr';
+    document.documentElement.lang = language;
+  }, [isRTL, language, isDark]);
+
+  return (
+    <div
+      className={`arabic-text-engine min-h-screen transition-colors duration-200 ${
+        isDark ? 'bg-gray-900' : 'bg-gray-50'
+      } ${isRTL() ? 'rtl' : 'ltr'}`}
+    >
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/welcome" element={<Navigate to="/login" replace />} />
+
+        {/* ==================================================================
+            DEMO ACCESS PATH - /demo
+            ================================================================== */}
+        <Route path="/demo" element={<DemoLanding />} />
+        <Route path="/demo/register" element={<DemoRegister />} />
+        <Route path="/demo/app/*" element={<DemoAppLayout />} />
+
+        {/* ==================================================================
+            PARTNER ACCESS PATH - /partner
+            ================================================================== */}
+        <Route path="/partner" element={<PartnerLanding />} />
+        <Route path="/partner/login" element={<PartnerLogin />} />
+        <Route path="/partner/app/*" element={<PartnerAppLayout />} />
+
+        {/* ==================================================================
+            POC ACCESS PATH - /poc
+            ================================================================== */}
+        <Route path="/poc" element={<PocLanding />} />
+        <Route path="/poc/request" element={<PocRequest />} />
+        <Route path="/poc/app/*" element={<PocAppLayout />} />
+
+        {/* Authentication Routes */}
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login-glass" element={<LoginPage />} />
+        <Route path="/register" element={<StoryDrivenRegistration />} />
+
+        {/* External Landing Page Redirect */}
+        <Route path="/landing" element={<Navigate to="https://shahin-ai.com" replace />} />
+        <Route path="/home" element={<Navigate to="https://shahin-ai.com" replace />} />
+
+        {/* Advanced Dashboard Routes */}
+        <Route path="/advanced" element={
+          <ProtectedRoute>
+            <AdvancedAppShell />
+          </ProtectedRoute>
+        }>
+          <Route index element={<AdvancedGRCDashboard />} />
+          <Route path="assessments" element={<AdvancedAssessmentManager />} />
+          <Route path="frameworks" element={<AdvancedFrameworkManager />} />
+        </Route>
+
+        {/* Standard App Routes */}
+        <Route path="/app" element={
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        }>
+              {/* Dashboard - Enhanced with KPIs, Heatmaps, Trends */}
+              <Route index element={<EnhancedDashboard />} />
+              <Route path="dashboard" element={<EnhancedDashboard />} />
+              <Route path="dashboard/legacy" element={<Dashboard />} />
+              <Route path="dashboard/advanced" element={<AdvancedGRCDashboard />} />
+              <Route path="dashboard/tenant" element={<TenantDashboard />} />
+              <Route path="dashboard/regulatory-market" element={<RegulatoryMarketDashboard />} />
+
+              {/* Core GRC Management - Enhanced Modules */}
+
+              {/* Assessments - Enhanced with RAG, Questions, Collaboration */}
+              <Route path="assessments" element={<AssessmentsModuleEnhanced />} />
+              <Route path="assessments/enhanced" element={<AssessmentsModuleEnhanced />} />
+              <Route path="assessments/legacy" element={<Assessments />} />
+              <Route path="assessments/new" element={<AssessmentsModuleEnhanced />} />
+              <Route path="assessments/:id" element={<AssessmentDetailsCollaborative />} />
+              <Route path="assessments/:id/edit" element={<AssessmentsModuleEnhanced />} />
+
+              {/* Frameworks - Enhanced with Templates, Automation */}
+              <Route path="frameworks" element={<FrameworksModuleEnhanced />} />
+              <Route path="frameworks/enhanced" element={<FrameworksModuleEnhanced />} />
+              <Route path="frameworks/legacy" element={<FrameworksPage />} />
+              <Route path="frameworks/new" element={<FrameworksModuleEnhanced />} />
+              <Route path="frameworks/:id" element={<FrameworksModuleEnhanced />} />
+              <Route path="frameworks/:id/edit" element={<FrameworksModuleEnhanced />} />
+
+              {/* Controls - Enhanced with Mapping, Evidence, Testing */}
+              <Route path="controls" element={<ControlsModuleEnhanced />} />
+              <Route path="controls/enhanced" element={<ControlsModuleEnhanced />} />
+              <Route path="controls/legacy" element={<ControlsPage />} />
+              <Route path="controls/legacy-list" element={<Controls />} />
+              <Route path="controls/new" element={<ControlsModuleEnhanced />} />
+              <Route path="controls/:id" element={<ControlsModuleEnhanced />} />
+              <Route path="controls/:id/edit" element={<ControlsModuleEnhanced />} />
+
+              {/* Risk Management - Enhanced with AI, Analytics */}
+              <Route path="risks" element={<RiskManagementModuleEnhanced />} />
+              <Route path="risks/enhanced" element={<RiskManagementModuleEnhanced />} />
+              <Route path="risks/legacy" element={<RiskManagementPage />} />
+              <Route path="risks/legacy-list" element={<Risks />} />
+              <Route path="risks/new" element={<RiskManagementModuleEnhanced />} />
+              <Route path="risks/:id" element={<RiskManagementModuleEnhanced />} />
+              <Route path="risks/:id/edit" element={<RiskManagementModuleEnhanced />} />
+
+              {/* Compliance Tracking - Enhanced with Monitoring, Reporting */}
+              <Route path="compliance" element={<ComplianceTrackingModuleEnhanced />} />
+              <Route path="compliance/enhanced" element={<ComplianceTrackingModuleEnhanced />} />
+              <Route path="compliance/legacy" element={<ComplianceTrackingPage />} />
+              <Route path="compliance/new" element={<ComplianceTrackingModuleEnhanced />} />
+              <Route path="compliance/:id" element={<ComplianceTrackingModuleEnhanced />} />
+              <Route path="compliance/:id/edit" element={<ComplianceTrackingModuleEnhanced />} />
+
+              {/* Evidence Management */}
+              <Route path="evidence" element={<Evidence />} />
+              <Route path="evidence/new" element={<Evidence />} />
+              <Route path="evidence/:id" element={<Evidence />} />
+
+              {/* Document Management */}
+              <Route path="documents" element={<DocumentManagementPage />} />
+              <Route path="documents/new" element={<DocumentManagementPage />} />
+              <Route path="documents/:id" element={<DocumentManagementPage />} />
+
+              {/* Organizations & Tenants */}
+              <Route path="organizations" element={<OrganizationsPage />} />
+              <Route path="organizations/new" element={<OrganizationForm />} />
+              <Route path="organizations/:id" element={<OrganizationDetails />} />
+              <Route path="organizations/:id/edit" element={<OrganizationForm />} />
+
+              {/* Users & Access Management */}
+              <Route path="users" element={<UserManagementPage />} />
+              <Route path="users/new" element={<UserManagementPage />} />
+              <Route path="users/:id" element={<UserManagementPage />} />
+              <Route path="users/:id/edit" element={<UserManagementPage />} />
+
+              {/* Reports & Analytics */}
+              <Route path="reports" element={<ReportsPage />} />
+              <Route path="reports/compliance" element={<ComplianceTrackingModuleEnhanced />} />
+              <Route path="reports/risk" element={<RiskManagementModuleEnhanced />} />
+              <Route path="reports/frameworks" element={<FrameworksModuleEnhanced />} />
+              <Route path="reports/assessments" element={<AssessmentsModuleEnhanced />} />
+
+              {/* System Management */}
+              <Route path="settings" element={<SettingsPage />} />
+              <Route path="settings/general" element={<SettingsPage />} />
+              <Route path="settings/security" element={<SettingsPage />} />
+              <Route path="settings/notifications" element={<SettingsPage />} />
+              <Route path="settings/integrations" element={<SettingsPage />} />
+
+              {/* Database & System */}
+              <Route path="database" element={<DatabasePage />} />
+              <Route path="system" element={<DatabasePage />} />
+              <Route path="system/health" element={<PerformanceMonitorPage />} />
+              <Route path="system/api" element={<APIManagementPage />} />
+
+              {/* Workflows & Automation */}
+              <Route path="workflows" element={<WorkflowManagementPage />} />
+              <Route path="workflows/new" element={<WorkflowManagementPage />} />
+              <Route path="workflows/:id" element={<WorkflowManagementPage />} />
+
+              {/* AI & RAG Services */}
+              <Route path="ai" element={<AISchedulerPage />} />
+              <Route path="ai/scheduler" element={<AISchedulerPage />} />
+              <Route path="ai/rag" element={<RAGServicePage />} />
+              <Route path="rag" element={<RAGServicePage />} />
+
+              {/* Notifications & Communications */}
+              <Route path="notifications" element={<NotificationManagementPage />} />
+              <Route path="notifications/settings" element={<NotificationManagementPage />} />
+
+              {/* Regulatory Intelligence */}
+              <Route path="regulatory" element={<RegulatoryIntelligencePage />} />
+              <Route path="regulatory/ksa" element={<KSAGRCPage />} />
+              <Route path="regulatory/sectors" element={<SectorIntelligence />} />
+              <Route path="regulators" element={<RegulatorsPage />} />
+
+              {/* Partners & Collaborations */}
+              <Route path="partners" element={<PartnerManagementPage />} />
+              <Route path="partners/new" element={<PartnerManagementPage />} />
+              <Route path="partners/:id" element={<PartnerManagementPage />} />
+
+              {/* Audit & Logs */}
+              <Route path="audit" element={<AuditLogsPage />} />
+              <Route path="logs" element={<AuditLogsPage />} />
+              <Route path="audit-logs" element={<AuditLogsPage />} />
+
+              {/* License & Renewal Management */}
+              <Route path="licenses" element={<LicensesManagementPage />} />
+              <Route path="licenses/new" element={<LicensesManagementPage />} />
+              <Route path="licenses/:id" element={<LicensesManagementPage />} />
+              <Route path="renewals" element={<RenewalsPipelinePage />} />
+              <Route path="renewals/new" element={<RenewalsPipelinePage />} />
+              <Route path="usage" element={<UsageDashboardPage />} />
+              <Route path="upgrade" element={<UpgradePage />} />
+
+              {/* Auto Assessment Generator */}
+              <Route path="auto-assessment" element={<AutoAssessmentGeneratorPage />} />
+              <Route path="assessment-generator" element={<AutoAssessmentGeneratorPage />} />
+
+              {/* Advanced Dashboard */}
+              <Route path="advanced" element={<ModernAdvancedDashboard />} />
+
+              {/* System Health & Monitoring */}
+              <Route path="health" element={<PerformanceMonitorPage />} />
+              <Route path="monitor" element={<PerformanceMonitorPage />} />
+              <Route path="status" element={<PerformanceMonitorPage />} />
+            </Route>
+
+            {/* Public API Documentation */}
+            <Route path="/api" element={<APIManagementPage publicView={true} />} />
+            <Route path="/api/docs" element={<APIManagementPage publicView={true} />} />
+            <Route path="/api/status" element={<PerformanceMonitorPage publicView={true} />} />
+
+            {/* Public Integration Endpoints */}
+            <Route path="/integrations" element={<PartnerManagementPage publicView={true} />} />
+            <Route path="/integrations/webhook" element={<NotificationManagementPage publicView={true} />} />
+            <Route path="/integrations/sso" element={<LoginPage ssoMode={true} />} />
+
+            {/* Public Regulatory Intelligence */}
+            <Route path="/regulatory" element={<RegulatoryIntelligencePage publicView={true} />} />
+            <Route path="/regulatory/ksa" element={<KSAGRCPage publicView={true} />} />
+            <Route path="/regulatory/sectors" element={<SectorIntelligence publicView={true} />} />
+
+            {/* Public Reports & Analytics */}
+            <Route path="/reports" element={<ReportsPage publicView={true} />} />
+            <Route path="/reports/compliance" element={<ComplianceTrackingModuleEnhanced publicView={true} />} />
+            <Route path="/reports/risk" element={<RiskManagementModuleEnhanced publicView={true} />} />
+
+            {/* Bridge & Transfer Endpoints */}
+            <Route path="/bridge" element={<WorkflowManagementPage bridgeMode={true} />} />
+            <Route path="/bridge/status" element={<PerformanceMonitorPage bridgeMode={true} />} />
+            <Route path="/bridge/approval" element={<UserManagementPage approvalMode={true} />} />
+
+            {/* External Web App Integration Points */}
+            <Route path="/external" element={<Navigate to="/external/dashboard" replace />} />
+            <Route path="/external/dashboard" element={<EnhancedDashboard externalMode={true} />} />
+            <Route path="/external/assessments" element={<AssessmentsModuleEnhanced externalMode={true} />} />
+            <Route path="/external/compliance" element={<ComplianceTrackingModuleEnhanced externalMode={true} />} />
+            <Route path="/external/frameworks" element={<FrameworksModuleEnhanced externalMode={true} />} />
+            <Route path="/external/controls" element={<ControlsModuleEnhanced externalMode={true} />} />
+            <Route path="/external/risks" element={<RiskManagementModuleEnhanced externalMode={true} />} />
+            <Route path="/external/reports" element={<ReportsPage externalMode={true} />} />
+            <Route path="/external/organizations" element={<OrganizationsPage externalMode={true} />} />
+
+            {/* Microservices Public Endpoints */}
+            <Route path="/services" element={<APIManagementPage servicesView={true} />} />
+            <Route path="/services/license" element={<LicensesManagementPage serviceMode={true} />} />
+            <Route path="/services/tenant" element={<OrganizationsPage serviceMode={true} />} />
+            <Route path="/services/analytics" element={<UsageDashboardPage serviceMode={true} />} />
+            <Route path="/services/notification" element={<NotificationManagementPage serviceMode={true} />} />
+            <Route path="/services/billing" element={<SettingsPage billingServiceMode={true} />} />
+            <Route path="/services/auth" element={<LoginPage serviceMode={true} />} />
+            <Route path="/services/reporting" element={<ReportsPage serviceMode={true} />} />
+            <Route path="/services/workflow" element={<WorkflowManagementPage serviceMode={true} />} />
+
+            {/* Public Health & Monitoring */}
+            <Route path="/health" element={<PerformanceMonitorPage publicView={true} />} />
+            <Route path="/status" element={<PerformanceMonitorPage statusOnly={true} />} />
+            <Route path="/metrics" element={<UsageDashboardPage metricsOnly={true} />} />
+
+            {/* ========================================== */}
+            {/* AUTHENTICATED ROUTES                      */}
+            {/* ========================================== */}
+            <Route path="/tenant/:tenantId" element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }>
+              {/* Tenant Dashboard */}
+              <Route index element={<EnhancedDashboard />} />
+              <Route path="dashboard" element={<EnhancedDashboard />} />
+
+              {/* Tenant License & Usage */}
+              <Route path="licenses" element={<LicensesManagementPage />} />
+              <Route path="usage" element={<UsageDashboardPage />} />
+              <Route path="upgrade" element={<UpgradePage />} />
+              <Route path="billing" element={<SettingsPage />} />
+
+              {/* Tenant GRC Modules */}
+              <Route path="assessments" element={<AssessmentsModuleEnhanced />} />
+              <Route path="frameworks" element={<FrameworksModuleEnhanced />} />
+              <Route path="controls" element={<ControlsModuleEnhanced />} />
+              <Route path="risks" element={<RiskManagementModuleEnhanced />} />
+              <Route path="compliance" element={<ComplianceTrackingModuleEnhanced />} />
+              <Route path="organizations" element={<OrganizationsPage />} />
+              <Route path="users" element={<UserManagementPage />} />
+              <Route path="reports" element={<ReportsPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+              <Route path="notifications" element={<NotificationManagementPage />} />
+
+              {/* Tenant AI & Automation */}
+              <Route path="workflows" element={<WorkflowManagementPage />} />
+              <Route path="rag" element={<RAGServicePage />} />
+              <Route path="documents" element={<DocumentManagementPage />} />
+              <Route path="regulatory-intelligence" element={<RegulatoryIntelligencePage />} />
+            </Route>
+
+            {/* Legacy Routes for backward compatibility */}
+            <Route path="/dashboard" element={<Navigate to="/app" replace />} />
+            <Route path="/admin" element={<Navigate to="/advanced" replace />} />
+
+            {/* Error Pages */}
+            <Route path="/404" element={<NotFoundPage />} />
+            <Route path="*" element={<Navigate to="/404" replace />} />
+          </Routes>
+        </div>
+  );
+};
+
+export default App;

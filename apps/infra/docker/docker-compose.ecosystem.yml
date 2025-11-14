@@ -1,0 +1,286 @@
+version: '3.8'
+
+services:
+  # Frontend Web Application
+  web:
+    build:
+      context: ../../web
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5174:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3005
+      - VITE_WS_URL=http://localhost:3008
+      - NODE_ENV=development
+    volumes:
+      - ../../apps/web:/app
+      - /app/node_modules
+    depends_on:
+      - bff
+    networks:
+      - grc-network
+
+  # Authentication Service
+  auth-service:
+    build:
+      context: ../../services/auth-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - PORT=3001
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=grc_ecosystem
+      - DB_USER=${DB_USER:-grc_user}
+      - DB_PASSWORD=${DB_PASSWORD:-grc_password}
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - JWT_EXPIRES_IN=24h
+      - BCRYPT_ROUNDS=12
+      - SERVICE_TOKEN=${SERVICE_TOKEN:-default-token}
+      - CORS_ORIGIN=http://localhost:5174,http://localhost:3005
+    volumes:
+      - ../../apps/services/auth-service:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend for Frontend (API Gateway)
+  bff:
+    build:
+      context: ../../bff
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3005:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - GRC_API_URL=http://grc-api:3000
+      - AUTH_SERVICE_URL=http://auth-service:3001
+      - DOCUMENT_SERVICE_URL=http://document-service:3002
+      - PARTNER_SERVICE_URL=http://partner-service:3003
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3004
+      - AI_SCHEDULER_SERVICE_URL=http://ai-scheduler-service:3005
+      - RAG_SERVICE_URL=http://rag-service:3007
+      - SERVICE_TOKEN=${SERVICE_TOKEN:-default-token}
+      - FRONTEND_URL=http://localhost:5174
+    volumes:
+      - ../../apps/bff:/app
+      - /app/node_modules
+    depends_on:
+      - grc-api
+      - auth-service
+      - document-service
+      - partner-service
+      - notification-service
+    networks:
+      - grc-network
+
+  # GRC Core API Service
+  grc-api:
+    build:
+      context: ../../services/grc-api
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=grc_ecosystem
+      - DB_USER=${DB_USER:-grc_user}
+      - DB_PASSWORD=${DB_PASSWORD:-grc_password}
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - TENANT_ISOLATION_ENABLED=true
+      - SERVICE_TOKEN=${SERVICE_TOKEN:-default-token}
+    volumes:
+      - ../../apps/services/grc-api:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - grc-network
+
+  # Document Processing Service
+  document-service:
+    build:
+      context: ../../services/document-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=grc_ecosystem
+      - DB_USER=${DB_USER:-grc_user}
+      - DB_PASSWORD=${DB_PASSWORD:-grc_password}
+      - SERVICE_TOKEN=${SERVICE_TOKEN:-default-token}
+      - UPLOAD_DIR=/app/uploads
+      - MAX_FILE_SIZE=52428800
+    volumes:
+      - ../../apps/services/document-service:/app
+      - /app/node_modules
+      - document_storage:/app/storage
+      - document_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - grc-network
+
+  # Partner Management Service
+  partner-service:
+    build:
+      context: ../../services/partner-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=development
+      - PORT=3003
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=grc_ecosystem
+      - DB_USER=${DB_USER:-grc_user}
+      - DB_PASSWORD=${DB_PASSWORD:-grc_password}
+      - NOTIFICATION_SERVICE_URL=http://notification-service:3004
+      - SERVICE_TOKEN=${SERVICE_TOKEN:-default-token}
+    volumes:
+      - ../../apps/services/partner-service:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - grc-network
+
+  # Notification Service
+  notification-service:
+    build:
+      context: ../../services/notification-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=development
+      - PORT=3004
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=grc_ecosystem
+      - DB_USER=${DB_USER:-grc_user}
+      - DB_PASSWORD=${DB_PASSWORD:-grc_password}
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM=${SMTP_FROM:-noreply@grc-system.com}
+      - SERVICE_TOKEN=${SERVICE_TOKEN:-default-token}
+    volumes:
+      - ../../apps/services/notification-service:/app
+      - /app/node_modules
+      - notification_templates:/app/templates
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - grc-network
+
+  # WebSocket Service for Real-time Collaboration
+  websocket-service:
+    build:
+      context: ../../services/websocket-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3008:3008"
+    environment:
+      - NODE_ENV=development
+      - PORT=3008
+      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-in-production}
+      - REDIS_URL=redis://redis:6379
+      - FRONTEND_URL=http://localhost:5174
+      - RATE_LIMIT_POINTS=100
+      - RATE_LIMIT_DURATION=60
+    volumes:
+      - ../../apps/services/websocket-service:/app
+      - /app/node_modules
+    depends_on:
+      - redis
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3008/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis for WebSocket session management
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - grc-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Shared PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=grc_ecosystem
+      - POSTGRES_USER=${DB_USER:-grc_user}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-grc_password}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF8 --locale=C
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ../../infra/db/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-grc_user} -d grc_ecosystem"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - grc-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  document_storage:
+    driver: local
+  document_uploads:
+    driver: local
+  notification_templates:
+    driver: local
+
+networks:
+  grc-network:
+    driver: bridge
+    name: grc-ecosystem-network

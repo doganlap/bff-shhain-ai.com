@@ -5,11 +5,59 @@ import {
   Globe, Target, AlertCircle, CheckCircle
 } from 'lucide-react';
 import apiService from '../../services/apiEndpoints';
+import { useApiData } from '../../hooks/useApiData';
 import { toast } from 'sonner';
 import ErrorFallback from '../../components/common/ErrorFallback';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { DataTable, StatCard } from '../../components/advanced';
 import { Chart } from "react-google-charts";
+
+// Simple StatCard component
+const StatCard = ({ title, value, icon: Icon, trend, color = 'blue' }) => (
+  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+    <div className="flex items-center justify-between mb-2">
+      <div className={`p-2 rounded-lg bg-${color}-100 dark:bg-${color}-900/30`}>
+        <Icon className={`h-5 w-5 text-${color}-600 dark:text-${color}-400`} />
+      </div>
+    </div>
+    <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">{title}</h3>
+    <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{value}</p>
+    {trend && <p className="text-xs text-gray-500 dark:text-gray-400">{trend}</p>}
+  </div>
+);
+
+// Simple DataTable component
+const DataTable = ({ columns, data, loading }) => (
+  <div className="overflow-x-auto">
+    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+      <thead className="bg-gray-50 dark:bg-gray-900">
+        <tr>
+          {columns.map((col, idx) => (
+            <th key={idx} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {col.header}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+        {loading ? (
+          <tr><td colSpan={columns.length} className="px-6 py-4 text-center"><LoadingSpinner /></td></tr>
+        ) : data.length === 0 ? (
+          <tr><td colSpan={columns.length} className="px-6 py-4 text-center text-gray-500">No data available</td></tr>
+        ) : (
+          data.map((row, idx) => (
+            <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+              {columns.map((col, colIdx) => (
+                <td key={colIdx} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  {col.accessor ? row[col.accessor] : col.cell(row)}
+                </td>
+              ))}
+            </tr>
+          ))
+        )}
+      </tbody>
+    </table>
+  </div>
+);
 
 const SectorIntelligence = () => {
   const [selectedSector, setSelectedSector] = useState('all');
@@ -149,7 +197,7 @@ const SectorIntelligence = () => {
       };
 
       // This would need to be implemented in the backend
-      const response = await apiServices.sectorControls.getAll(params);
+      const response = await apiService.sectorControls.getAll(params);
       
       // For now, create a simple CSV export
       if (format === 'csv') {

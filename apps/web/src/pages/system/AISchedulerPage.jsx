@@ -6,6 +6,7 @@ import {
   RefreshCw, Eye, Download, Share2, MessageSquare, Star, ArrowRight
 } from 'lucide-react';
 import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
+import { useCRUD } from '../../hooks/useCRUD';
 import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner, AnimatedProgress } from '../../components/Animation/InteractiveAnimationToolkit';
 import AIStatusPanel from '../../components/ai/AIStatusPanel';
 import apiService from '../../services/apiEndpoints';
@@ -13,6 +14,19 @@ import { useI18n } from '../../hooks/useI18n';
 
 const AISchedulerPage = () => {
   const { t, language, isRTL } = useI18n();
+  const {
+    data: jobList,
+    loading: crudLoading,
+    create,
+    update,
+    remove,
+    fetchAll,
+    formData,
+    setFormData,
+    resetForm,
+    selectedItem,
+    setSelectedItem
+  } = useCRUD(apiService.scheduler, 'Job');
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);
   const [automationRules, setAutomationRules] = useState([]);
@@ -23,32 +37,31 @@ const AISchedulerPage = () => {
 
   // AI Scheduler statistics
   const [schedulerStats, setSchedulerStats] = useState({
-    totalTasks: 158,
-    activeTasks: 42,
-    completedToday: 18,
-    aiSuggestions: 7,
-    automationRate: 78.5,
-    avgCompletionTime: '2.3 hours'
+    totalTasks: 0,
+    activeTasks: 0,
+    completedToday: 0,
+    aiSuggestions: 0,
+    automationRate: 0,
+    avgCompletionTime: '0 hours'
   });
 
   const loadSchedulerData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const [tasksRes, rulesRes, suggestionsRes, analyticsRes] = await Promise.all([
-        apiService.scheduler.getJobs({ status: 'all', limit: 50 }),
-        apiService.scheduler.getRuns({ limit: 20 }),
-        apiService.rag.ask('What are the recommended automation improvements for our GRC processes?', { context: 'scheduler' }),
-        apiService.scheduler.getJobs({ analytics: true })
+      const [jobsRes, runsRes, statsRes] = await Promise.all([
+        apiService.scheduler.getAll({ status: 'all', limit: 50 }),
+        apiService.scheduler.getRuns({ limit: 50 }),
+        apiService.scheduler.getStats ? apiService.scheduler.getStats() : Promise.resolve({ data: { data: {} } })
       ]);
 
-      // Process tasks data
-      const tasksData = tasksRes.data || tasksRes || [];
-      const processedTasks = tasksData.map(task => ({
+      const jobsData = jobsRes?.data?.data || [];
+
+      const processedTasks = jobsData.map(task => ({
         id: task.id,
         title: {
-          en: task.name || task.title,
-          ar: task.name_ar || task.title_ar || task.name || task.title
+          en: task.name || task.title || 'Unnamed Task',
+          ar: task.name_ar || task.title_ar || task.name || task.title || 'مهمة بدون اسم'
         },
         description: {
           en: task.description || 'Automated GRC task',
@@ -57,74 +70,51 @@ const AISchedulerPage = () => {
         type: task.type || 'assessment',
         status: task.status || 'pending',
         priority: task.priority || 'medium',
-        schedule: task.schedule || task.cron_expression,
-        nextRun: task.next_run || task.next_execution,
-        lastRun: task.last_run || task.last_execution,
-        createdBy: task.created_by || 'System',
-        framework: task.framework || 'General'
+        schedule: task.schedule || task.cronExpression,
+        nextRun: task.nextRun,
+        lastRun: task.lastRun,
+        createdBy: task.createdBy || 'System',
+        framework: task.framework || 'General',
+        isActive: task.isActive !== false
       }));
 
       setTasks(processedTasks);
 
-      // Process automation rules
-      const rulesData = rulesRes.data || rulesRes || [];
-      const processedRules = rulesData.map(rule => ({
-        id: rule.id,
-        name: {
-          en: rule.name || 'Automation Rule',
-          ar: rule.name_ar || rule.name || 'قاعدة الأتمتة'
-        },
-        description: {
-          en: rule.description || 'Automated rule',
-          ar: rule.description_ar || rule.description || 'قاعدة آلية'
-        },
-        trigger: rule.trigger || 'schedule',
-        action: rule.action || 'execute',
-        status: rule.status || 'active',
-        conditions: rule.conditions || [],
-        lastTriggered: rule.last_triggered
-      }));
+      const stats = statsRes?.data?.data || {};
+      setSchedulerStats({
+        totalTasks: stats.totalJobs ?? jobsData.length ?? 0,
+        activeTasks: stats.activeJobs ?? jobsData.filter(t => t.isActive).length ?? 0,
+        completedToday: stats.successfulRuns ?? 0,
+        aiSuggestions: 0,
+        automationRate: stats.successRate ?? 0,
+        avgCompletionTime: '0 hours'
+      });
+
+      const processedRules = jobsData.flatMap(job =>
+        (job.triggers || []).map((trigger, index) => ({
+          id: `${job.id}-${index}`,
+          name: {
+            en: `${job.name} Trigger`,
+            ar: `مُحفّز ${job.name}`
+          },
+          description: {
+            en: trigger.type || 'Automated trigger',
+            ar: trigger.type || 'مُحفّز آلي'
+          },
+          trigger: trigger.type || 'schedule',
+          action: 'execute',
+          status: trigger.isActive ? 'active' : 'inactive',
+          conditions: trigger.conditions || [],
+          lastTriggered: trigger.lastTriggered
+        }))
+      );
 
       setAutomationRules(processedRules);
 
-      // Process AI suggestions
-      const suggestionsData = suggestionsRes.data || suggestionsRes || {};
-      const processedSuggestions = [
-        {
-          id: 'suggestion-001',
-          type: 'optimization',
-          title: {
-            en: 'Optimize Assessment Scheduling',
-            ar: 'تحسين جدولة التقييمات'
-          },
-          description: {
-            en: suggestionsData.answer || 'AI-powered scheduling optimization recommendations',
-            ar: 'توصيات تحسين الجدولة المدعومة بالذكاء الاصطناعي'
-          },
-          impact: 'high',
-          effort: 'medium',
-          confidence: suggestionsData.confidence || 0.85
-        }
-      ];
-
-      setAiSuggestions(processedSuggestions);
-
-      // Update statistics
-      setSchedulerStats({
-        totalTasks: processedTasks.length,
-        activeTasks: processedTasks.filter(t => t.status === 'active').length,
-        completedToday: processedTasks.filter(t => {
-          const today = new Date().toDateString();
-          return t.lastRun && new Date(t.lastRun).toDateString() === today;
-        }).length,
-        successRate: Math.round((processedTasks.filter(t => t.status === 'completed').length / processedTasks.length) * 100) || 0
-      });
-
+      setAiSuggestions([]);
     } catch (error) {
       console.error('Error loading scheduler data:', error);
       setError(error.message || 'Failed to load scheduler data');
-      
-      // Set empty data instead of mock data
       setTasks([]);
       setAutomationRules([]);
       setAiSuggestions([]);
@@ -132,7 +122,9 @@ const AISchedulerPage = () => {
         totalTasks: 0,
         activeTasks: 0,
         completedToday: 0,
-        successRate: 0
+        aiSuggestions: 0,
+        automationRate: 0,
+        avgCompletionTime: '0 hours'
       });
     } finally {
       setLoading(false);
@@ -157,7 +149,7 @@ const AISchedulerPage = () => {
   // Task creation handler
   const createTask = async (taskData) => {
     try {
-      await apiService.scheduler.createJob({
+      await create({
         name: taskData.title,
         description: taskData.description,
         type: taskData.type,
@@ -165,10 +157,22 @@ const AISchedulerPage = () => {
         priority: taskData.priority,
         framework: taskData.framework
       });
-      loadSchedulerData(); // Refresh data
-    } catch (error) {
-      console.error('Error creating task:', error);
-    }
+      loadSchedulerData();
+    } catch (error) {}
+  };
+
+  const updateTask = async (id, taskData) => {
+    try {
+      await update(id, taskData);
+      loadSchedulerData();
+    } catch (error) {}
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await remove(id);
+      loadSchedulerData();
+    } catch (error) {}
   };
 
   const getPriorityColor = (priority) => {
@@ -481,6 +485,9 @@ const AISchedulerPage = () => {
                   </button>
                   <button className="p-2 text-gray-400 hover:text-gray-600">
                     <Edit className="h-4 w-4" />
+                  </button>
+                  <button className="p-2 text-gray-400 hover:text-gray-600" onClick={() => handleDelete(task.id)}>
+                    <Trash2 className="h-4 w-4" />
                   </button>
                   {task.status === 'running' ? (
                     <button className="p-2 text-gray-400 hover:text-gray-600">

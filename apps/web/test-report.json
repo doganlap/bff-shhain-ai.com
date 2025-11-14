@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-11-14T00:37:38.724Z",
+  "duration": 63325,
+  "summary": {
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 0,
+    "passRate": "NaN"
+  },
+  "suites": [
+    {
+      "name": "API Service Tests",
+      "pattern": "src/__tests__/api/*.test.{js,jsx}",
+      "passed": 0,
+      "failed": 0,
+      "duration": 12485,
+      "output": "\n\u001b[7m\u001b[1m\u001b[36m RUN \u001b[39m\u001b[22m\u001b[27m \u001b[36mv1.6.1\u001b[39m \u001b[90mD:/Projects/GRC-Master/Assessmant-GRC/apps/web\u001b[39m\n\u001b[2m      Coverage enabled with \u001b[22m\u001b[33mv8\u001b[39m\n\n\u001b[34m % \u001b[39m\u001b[2mCoverage report from \u001b[22m\u001b[33mv8\u001b[39m\n-------------------|---------|----------|---------|---------|-------------------\nFile               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s \n-------------------|---------|----------|---------|---------|-------------------\nAll files          |       0 |        0 |       0 |       0 |                   \n src               |       0 |        0 |       0 |       0 |                   \n  App.jsx          |       0 |        0 |       0 |       0 | 1-414             \n  deploy.js        |       0 |        0 |       0 |       0 | 1-324             \n  ...-mock-data.js |       0 |        0 |       0 |       0 | 1-377             \n  ...dit-report.js |       0 |        0 |       0 |       0 | 1-461             \n  ...ck-unified.js |       0 |        0 |       0 |    "
+    },
+    {
+      "name": "Page Integration Tests",
+      "pattern": "src/__tests__/pages/*.test.{js,jsx}",
+      "passed": 0,
+      "failed": 0,
+      "duration": 12101,
+      "output": "\n\u001b[7m\u001b[1m\u001b[36m RUN \u001b[39m\u001b[22m\u001b[27m \u001b[36mv1.6.1\u001b[39m \u001b[90mD:/Projects/GRC-Master/Assessmant-GRC/apps/web\u001b[39m\n\u001b[2m      Coverage enabled with \u001b[22m\u001b[33mv8\u001b[39m\n\n\u001b[34m % \u001b[39m\u001b[2mCoverage report from \u001b[22m\u001b[33mv8\u001b[39m\n-------------------|---------|----------|---------|---------|-------------------\nFile               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s \n-------------------|---------|----------|---------|---------|-------------------\nAll files          |       0 |        0 |       0 |       0 |                   \n src               |       0 |        0 |       0 |       0 |                   \n  App.jsx          |       0 |        0 |       0 |       0 | 1-414             \n  deploy.js        |       0 |        0 |       0 |       0 | 1-324             \n  ...-mock-data.js |       0 |        0 |       0 |       0 | 1-377             \n  ...dit-report.js |       0 |        0 |       0 |       0 | 1-461             \n  ...ck-unified.js |       0 |        0 |       0 |    "
+    },
+    {
+      "name": "End-to-End Tests",
+      "pattern": "src/__tests__/e2e/*.test.{js,jsx}",
+      "passed": 0,
+      "failed": 0,
+      "duration": 17333,
+      "output": "\n\u001b[7m\u001b[1m\u001b[36m RUN \u001b[39m\u001b[22m\u001b[27m \u001b[36mv1.6.1\u001b[39m \u001b[90mD:/Projects/GRC-Master/Assessmant-GRC/apps/web\u001b[39m\n\u001b[2m      Coverage enabled with \u001b[22m\u001b[33mv8\u001b[39m\n\n\u001b[34m % \u001b[39m\u001b[2mCoverage report from \u001b[22m\u001b[33mv8\u001b[39m\n-------------------|---------|----------|---------|---------|-------------------\nFile               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s \n-------------------|---------|----------|---------|---------|-------------------\nAll files          |       0 |        0 |       0 |       0 |                   \n src               |       0 |        0 |       0 |       0 |                   \n  App.jsx          |       0 |        0 |       0 |       0 | 1-414             \n  deploy.js        |       0 |        0 |       0 |       0 | 1-324             \n  ...-mock-data.js |       0 |        0 |       0 |       0 | 1-377             \n  ...dit-report.js |       0 |        0 |       0 |       0 | 1-461             \n  ...ck-unified.js |       0 |        0 |       0 |    "
+    },
+    {
+      "name": "Component Unit Tests",
+      "pattern": "src/__tests__/components/*.test.{js,jsx}",
+      "passed": 0,
+      "failed": 0,
+      "duration": 21385,
+      "output": "\n\u001b[7m\u001b[1m\u001b[36m RUN \u001b[39m\u001b[22m\u001b[27m \u001b[36mv1.6.1\u001b[39m \u001b[90mD:/Projects/GRC-Master/Assessmant-GRC/apps/web\u001b[39m\n\u001b[2m      Coverage enabled with \u001b[22m\u001b[33mv8\u001b[39m\n\n\u001b[34m % \u001b[39m\u001b[2mCoverage report from \u001b[22m\u001b[33mv8\u001b[39m\n-------------------|---------|----------|---------|---------|-------------------\nFile               | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s \n-------------------|---------|----------|---------|---------|-------------------\nAll files          |       0 |        0 |       0 |       0 |                   \n src               |       0 |        0 |       0 |       0 |                   \n  App.jsx          |       0 |        0 |       0 |       0 | 1-414             \n  deploy.js        |       0 |        0 |       0 |       0 | 1-324             \n  ...-mock-data.js |       0 |        0 |       0 |       0 | 1-377             \n  ...dit-report.js |       0 |        0 |       0 |       0 | 1-461             \n  ...ck-unified.js |       0 |        0 |       0 |    "
+    }
+  ],
+  "environment": {
+    "node": "v20.19.5",
+    "platform": "win32",
+    "arch": "x64"
+  }
+}

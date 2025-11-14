@@ -1,14 +1,16 @@
-import React from 'react';  
-import ReactDOM from 'react-dom/client';  
-import App from './App.jsx';  
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
 import { AppProvider } from './context/AppContext.jsx';
 import { I18nProvider } from './hooks/useI18n.jsx';
 import { ThemeProvider } from './components/theme/ThemeProvider.jsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter as Router } from 'react-router-dom';
 import './i18n'; // Initialize i18n
 import './index.css';
+import './App.css';
 import './styles/glassmorphism-light.css';
-import './styles/responsive.css';  
+import './styles/responsive.css';
 
 // Create a client for React Query with enhanced error handling
 const queryClient = new QueryClient({
@@ -47,13 +49,15 @@ const renderApp = () => {
 
     const root = ReactDOM.createRoot(rootElement);
     
-    root.render(  
-      <React.StrictMode>  
+    root.render(
+      <React.StrictMode>
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="light">
             <I18nProvider defaultLanguage="ar">
               <AppProvider>
-                <App />
+                <Router>
+                  <App />
+                </Router>
               </AppProvider>
             </I18nProvider>
           </ThemeProvider>
@@ -115,4 +119,4 @@ window.addEventListener('error', (event) => {
 
 window.addEventListener('unhandledrejection', (event) => {
   console.error('Unhandled promise rejection:', event.reason);
-}); 
+});

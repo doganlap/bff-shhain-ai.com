@@ -187,7 +187,7 @@ const RegulatoryMarketDashboard = () => {
     return Object.entries(segments).map(([name, value]) => ({
       name,
       value,
-      growth: Math.floor(Math.random() * 15) + 2 // Placeholder until we have real growth data
+      growth: 0 // Placeholder until we have real growth data
     }));
   };
 

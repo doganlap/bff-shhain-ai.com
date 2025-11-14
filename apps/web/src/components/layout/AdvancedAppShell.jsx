@@ -7,7 +7,7 @@ import { Toaster } from 'sonner';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../theme/ThemeProvider';
-import ModernSlideNavigator from '../navigation/ModernSlideNavigator';
+import ModernSlideNavigator from '../Navigation/ModernSlideNavigator';
 
 const AdvancedAppShell = () => {
   const navigate = useNavigate();

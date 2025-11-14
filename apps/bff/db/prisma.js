@@ -1,13 +1,9 @@
 // db/prisma.js
 
-import { PrismaClient } from '@prisma/client/edge';
-import { withAccelerate } from '@prisma/extension-accelerate';
+const { PrismaClient } = require('@prisma/client');
 
 // Initialize the Prisma Client
-const prismaClient = new PrismaClient();
+const prisma = new PrismaClient();
 
-// Extend it with Vercel Accelerate
-const prisma = prismaClient.$extends(withAccelerate());
-
-// Export the accelerated client
-export default prisma;
+// Export the client
+module.exports = prisma;

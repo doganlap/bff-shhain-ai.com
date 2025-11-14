@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "GRC Assessment Ecosystem",
   "scripts": {
-    "dev:bff": "cd apps/bff && set PORT=3006 && npm run dev",
+    "dev:bff": "cd apps/bff && npm run dev",
     "dev:grc-api": "cd apps/services/grc-api && npm run dev",
     "dev:web": "cd apps/web && npm run dev",
-    "start:bff": "cd apps/bff && set PORT=3006 && node index.js",
+    "start:bff": "cd apps/bff && node index.js",
     "start:grc-api": "cd apps/services/grc-api && node server.js",
     "docker:up": "docker-compose -f docker-compose.ecosystem.yml up -d",
     "docker:down": "docker-compose -f docker-compose.ecosystem.yml down",
@@ -18,7 +18,17 @@
     "docker:production:rebuild": "docker-compose -f infra/deployment/docker-compose.production.yml down && docker system prune -f && docker-compose -f infra/deployment/docker-compose.production.yml build --no-cache --pull && docker-compose -f infra/deployment/docker-compose.production.yml up -d",
     "docker:clean": "docker system prune -af && docker volume prune -f",
     "docker:status": "bash scripts/docker-status.sh",
-    "test:admin": "curl http://localhost:3005/api/admin/health || echo 'Admin endpoints not available'"
+    "config:setup": "node scripts/setup-unified-config.js",
+    "config:health": "node scripts/health-check-unified.js",
+    "config:validate": "node scripts/health-check-unified.js development",
+    "config:report": "node scripts/health-check-unified.js development report",
+    "config:db-test": "node scripts/health-check-unified.js development db-test",
+    "config:auth-test": "node scripts/health-check-unified.js development auth-test",
+    "test:admin": "curl http://localhost:5001/api/admin/health || echo 'Admin endpoints not available'",
+    "test:auto-assessment": "node tests/test_auto_assessment_generator.js",
+    "test:workflow": "node tests/test_workflow_engine.js",
+    "test:features": "node tests/run_all_tests.js",
+    "test:quick": "node tests/quick_start.js"
   },
   "workspaces": [
     "apps/*",
@@ -27,6 +37,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",
     "@google/generative-ai": "^0.24.1",
+    "@prisma/client": "^6.19.0",
     "openai": "^6.8.1"
   },
   "main": "complete-setup.js",
@@ -35,7 +46,8 @@
     "test": "tests"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "prisma": "^6.19.0"
   },
   "keywords": [],
   "author": "",

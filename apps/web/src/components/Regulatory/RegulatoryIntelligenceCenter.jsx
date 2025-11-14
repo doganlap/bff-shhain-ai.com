@@ -105,14 +105,12 @@ const RegulatoryIntelligenceCenter = () => {
     } catch (error) {
       console.error('Error loading regulatory data:', error);
       setError(error.message || 'Failed to load regulatory data');
-      
-      // Fallback to mock data if API fails
-      setChanges(generateMockRegulatoryChanges());
+      setChanges([]);
       setStats({
-        total_changes: 24,
-        critical_changes: 3,
-        changes_last_week: 7,
-        changes_last_month: 18
+        total_changes: 0,
+        critical_changes: 0,
+        changes_last_week: 0,
+        changes_last_month: 0
       });
     } finally {
       setLoading(false);
@@ -129,7 +127,7 @@ const RegulatoryIntelligenceCenter = () => {
       setCalendarEvents(eventsResponse.data || eventsResponse || []);
     } catch (error) {
       console.error('Error loading calendar events:', error);
-      setCalendarEvents(generateMockCalendarEvents());
+      setCalendarEvents([]);
     }
   };
 

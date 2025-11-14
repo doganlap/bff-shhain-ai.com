@@ -159,14 +159,14 @@ api.interceptors.response.use(
           // Validation error
           return Promise.reject(new APIError('Validation failed', 'VALIDATION_ERROR', 422, data));
 
-        case 429:
-          // Rate limit exceeded
+        case 429: {
           // Rate limit exceeded - include retry information if available
           const retryAfter = data?.retryAfter || data?.retry_after;
           const message = retryAfter 
             ? `Too many requests. Please try again in ${retryAfter} seconds.`
             : 'Too many requests. Please try again later.';
           return Promise.reject(new APIError(message, 'RATE_LIMIT_EXCEEDED', 429, data));
+        }
 
         case 500:
         case 502:

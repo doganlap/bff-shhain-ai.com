@@ -1,0 +1,1237 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.3.2 (Python 3.11.9 on win32)" generated="2025-11-14T13:48:10.285098" rpa="false" schemaversion="5">
+<suite id="s1" name="Visual Tests" source="D:\Projects\GRC-Master\Assessmant-GRC\tests\robot\visual_tests.robot">
+<kw name="Setup Test Environment" type="SETUP">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:48:10.569094" level="INFO">Setting up test environment</msg>
+<arg>Setting up test environment</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:48:10.569094" elapsed="0.000000"/>
+</kw>
+<kw name="Create Directory" owner="OperatingSystem">
+<msg time="2025-11-14T13:48:10.569094" level="INFO" html="true">Directory '&lt;a href="file://D:\Projects\GRC-Master\Assessmant-GRC\test-results\screenshots"&gt;D:\Projects\GRC-Master\Assessmant-GRC\test-results\screenshots&lt;/a&gt;' already exists.</msg>
+<arg>${SCREENSHOT_DIR}</arg>
+<doc>Creates the specified directory.</doc>
+<status status="PASS" start="2025-11-14T13:48:10.569094" elapsed="0.000000"/>
+</kw>
+<kw name="Create Directory" owner="OperatingSystem">
+<msg time="2025-11-14T13:48:10.570685" level="INFO" html="true">Directory '&lt;a href="file://D:\Projects\GRC-Master\Assessmant-GRC\test-results\videos"&gt;D:\Projects\GRC-Master\Assessmant-GRC\test-results\videos&lt;/a&gt;' already exists.</msg>
+<arg>${VIDEO_DIR}</arg>
+<doc>Creates the specified directory.</doc>
+<status status="PASS" start="2025-11-14T13:48:10.570685" elapsed="0.000000"/>
+</kw>
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:10.570685" level="INFO">Opening browser 'chrome' to base url 'http://localhost:5173'.</msg>
+<arg>${BASE_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:48:10.570685" elapsed="1.289174"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2025-11-14T13:48:11.860401" elapsed="0.033092"/>
+</kw>
+<kw name="Set Selenium Speed" owner="SeleniumLibrary">
+<arg>0.5s</arg>
+<doc>Sets the delay that is waited after each Selenium command.</doc>
+<status status="PASS" start="2025-11-14T13:48:11.894015" elapsed="0.000557"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:48:11.895101" level="INFO">Test environment setup completed</msg>
+<arg>Test environment setup completed</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:48:11.894572" elapsed="0.000529"/>
+</kw>
+<doc>Initialize test environment and directories</doc>
+<status status="PASS" start="2025-11-14T13:48:10.568058" elapsed="1.327043"/>
+</kw>
+<test id="s1-t1" name="Test 01 - Landing Page Load And Visual Check" line="21">
+<kw name="Start Screen Recording" type="SETUP">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:48:11.896714" level="INFO">${test_name} = Test 01 - Landing Page Load And Visual Check</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:48:11.896714" elapsed="0.000545"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:48:11.897259" level="INFO">Starting screen recording for: Test 01 - Landing Page Load And Visual Check</msg>
+<arg>Starting screen recording for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:48:11.897259" elapsed="0.000000"/>
+</kw>
+<doc>Start recording screen for current test</doc>
+<status status="PASS" start="2025-11-14T13:48:11.896177" elapsed="0.001626"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:11.898888" level="INFO">Opening url 'http://localhost:5173'</msg>
+<arg>${BASE_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:48:11.898355" elapsed="0.547702"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:48:17.446994" level="INFO">Slept 5 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:48:12.446615" elapsed="5.000379"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:18.043609" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/01-landing-page-initial.png"&gt;&lt;img src="../../../screenshots/01-landing-page-initial.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>01-landing-page-initial.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:17.446994" elapsed="0.596615"/>
+</kw>
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<arg>css:body</arg>
+<arg>timeout=${PAGE_LOAD_TIMEOUT}</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="PASS" start="2025-11-14T13:48:18.043609" elapsed="0.510368"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:48:21.554640" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:48:18.554484" elapsed="3.000156"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:22.140818" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/01-landing-page-full.png"&gt;&lt;img src="../../../screenshots/01-landing-page-full.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>01-landing-page-full.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:21.554640" elapsed="0.586178"/>
+</kw>
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:22.141817" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:48:22.141817" elapsed="0.505655"/>
+</kw>
+<arg>Execute Javascript</arg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2025-11-14T13:48:22.141817" elapsed="0.505655"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:48:23.648715" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:48:22.648006" elapsed="1.000709"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:24.249341" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/01-landing-top-section.png"&gt;&lt;img src="../../../screenshots/01-landing-top-section.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>01-landing-top-section.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:23.649219" elapsed="0.600122"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:24.250348" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight/2)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight/2)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:48:24.250348" elapsed="0.505829"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:48:27.756966" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:48:24.756689" elapsed="3.000277"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:28.340686" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/01-landing-middle-section.png"&gt;&lt;img src="../../../screenshots/01-landing-middle-section.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>01-landing-middle-section.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:27.756966" elapsed="0.583720"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:28.341685" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:48:28.341685" elapsed="0.505655"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:48:31.847645" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:48:28.847340" elapsed="3.000305"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:32.439386" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/01-landing-bottom-section.png"&gt;&lt;img src="../../../screenshots/01-landing-bottom-section.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>01-landing-bottom-section.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:31.847645" elapsed="0.591741"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:48:32.439890" level="INFO">Landing page visual test completed</msg>
+<arg>Landing page visual test completed</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:48:32.439890" elapsed="0.000000"/>
+</kw>
+<kw name="Stop Screen Recording And Capture Screenshot" type="TEARDOWN">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:48:32.440972" level="INFO">${test_name} = Test 01 - Landing Page Load And Visual Check</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:48:32.440445" elapsed="0.000527"/>
+</kw>
+<kw name="Get Time" owner="BuiltIn">
+<msg time="2025-11-14T13:48:32.440972" level="INFO">${timestamp} = 1763117312</msg>
+<var>${timestamp}</var>
+<arg>epoch</arg>
+<doc>Returns the given time in the requested format.</doc>
+<status status="PASS" start="2025-11-14T13:48:32.440972" elapsed="0.000000"/>
+</kw>
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:33.023778" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/final-Test%2001%20-%20Landing%20Page%20Load%20And%20Visual%20Check-1763117312.png"&gt;&lt;img src="../../../screenshots/final-Test%2001%20-%20Landing%20Page%20Load%20And%20Visual%20Check-1763117312.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:32.440972" elapsed="0.583812"/>
+</kw>
+<arg>Capture Page Screenshot</arg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2025-11-14T13:48:32.440972" elapsed="0.583812"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:48:33.024784" level="INFO">Screen recording stopped for: Test 01 - Landing Page Load And Visual Check</msg>
+<arg>Screen recording stopped for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:48:33.024784" elapsed="0.000000"/>
+</kw>
+<doc>Stop recording and capture final screenshot</doc>
+<status status="PASS" start="2025-11-14T13:48:32.440445" elapsed="0.584339"/>
+</kw>
+<doc>Test landing page loads correctly with all visual elements</doc>
+<tag>critical</tag>
+<tag>landing</tag>
+<tag>visual</tag>
+<status status="PASS" start="2025-11-14T13:48:11.895101" elapsed="21.129683"/>
+</test>
+<test id="s1-t2" name="Test 02 - Login Page And Authentication" line="51">
+<kw name="Start Screen Recording" type="SETUP">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:48:33.027424" level="INFO">${test_name} = Test 02 - Login Page And Authentication</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:48:33.026826" elapsed="0.000598"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:48:33.027424" level="INFO">Starting screen recording for: Test 02 - Login Page And Authentication</msg>
+<arg>Starting screen recording for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:48:33.027424" elapsed="0.000542"/>
+</kw>
+<doc>Start recording screen for current test</doc>
+<status status="PASS" start="2025-11-14T13:48:33.026826" elapsed="0.001140"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:33.028556" level="INFO">Opening url 'http://localhost:5173/login'</msg>
+<arg>${BASE_URL}/login</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:48:33.027966" elapsed="2.215698"/>
+</kw>
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<arg>css:form</arg>
+<arg>timeout=10s</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="PASS" start="2025-11-14T13:48:35.244168" elapsed="0.508877"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:36.477058" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/02-login-page.png"&gt;&lt;img src="../../../screenshots/02-login-page.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>02-login-page.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:35.753644" elapsed="0.723414"/>
+</kw>
+<kw name="Page Should Contain Element" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:36.985063" level="INFO">Current page contains element 'css:input[type="email"]'.</msg>
+<arg>css:input[type="email"]</arg>
+<doc>Verifies that element ``locator`` is found on the current page.</doc>
+<status status="PASS" start="2025-11-14T13:48:36.477058" elapsed="0.508005"/>
+</kw>
+<kw name="Page Should Contain Element" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:37.494385" level="INFO">Current page contains element 'css:input[type="password"]'.</msg>
+<arg>css:input[type="password"]</arg>
+<doc>Verifies that element ``locator`` is found on the current page.</doc>
+<status status="PASS" start="2025-11-14T13:48:36.985568" elapsed="0.508817"/>
+</kw>
+<kw name="Page Should Contain Button" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:40.053812" level="INFO">Current page contains button 'css:button[type="submit"]'.</msg>
+<arg>css:button[type="submit"]</arg>
+<doc>Verifies button ``locator`` is found from current page.</doc>
+<status status="PASS" start="2025-11-14T13:48:37.494976" elapsed="2.558836"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:48:43.055067" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:48:40.054342" elapsed="3.000725"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:43.782915" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/02-login-form-elements.png"&gt;&lt;img src="../../../screenshots/02-login-form-elements.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>02-login-form-elements.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:43.055580" elapsed="0.728845"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:48:43.785435" level="INFO">Login page visual test completed</msg>
+<arg>Login page visual test completed</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:48:43.784425" elapsed="0.001010"/>
+</kw>
+<kw name="Stop Screen Recording And Capture Screenshot" type="TEARDOWN">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:48:43.785435" level="INFO">${test_name} = Test 02 - Login Page And Authentication</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:48:43.785435" elapsed="0.000998"/>
+</kw>
+<kw name="Get Time" owner="BuiltIn">
+<msg time="2025-11-14T13:48:43.786433" level="INFO">${timestamp} = 1763117323</msg>
+<var>${timestamp}</var>
+<arg>epoch</arg>
+<doc>Returns the given time in the requested format.</doc>
+<status status="PASS" start="2025-11-14T13:48:43.786433" elapsed="0.000000"/>
+</kw>
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:44.514497" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/final-Test%2002%20-%20Login%20Page%20And%20Authentication-1763117323.png"&gt;&lt;img src="../../../screenshots/final-Test%2002%20-%20Login%20Page%20And%20Authentication-1763117323.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:43.786433" elapsed="0.728064"/>
+</kw>
+<arg>Capture Page Screenshot</arg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2025-11-14T13:48:43.786433" elapsed="0.728064"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:48:44.514497" level="INFO">Screen recording stopped for: Test 02 - Login Page And Authentication</msg>
+<arg>Screen recording stopped for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:48:44.514497" elapsed="0.000000"/>
+</kw>
+<doc>Stop recording and capture final screenshot</doc>
+<status status="PASS" start="2025-11-14T13:48:43.785435" elapsed="0.729062"/>
+</kw>
+<doc>Test login page and authentication flow</doc>
+<tag>auth</tag>
+<tag>critical</tag>
+<tag>visual</tag>
+<status status="PASS" start="2025-11-14T13:48:33.025784" elapsed="11.489714"/>
+</test>
+<test id="s1-t3" name="Test 03 - Dashboard Page Visual Check" line="69">
+<kw name="Start Screen Recording" type="SETUP">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:48:44.517514" level="INFO">${test_name} = Test 03 - Dashboard Page Visual Check</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:48:44.517514" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:48:44.517514" level="INFO">Starting screen recording for: Test 03 - Dashboard Page Visual Check</msg>
+<arg>Starting screen recording for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:48:44.517514" elapsed="0.000000"/>
+</kw>
+<doc>Start recording screen for current test</doc>
+<status status="PASS" start="2025-11-14T13:48:44.517514" elapsed="0.000000"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:44.517514" level="INFO">Opening url 'http://localhost:5173/demo/app/dashboard'</msg>
+<arg>${BASE_URL}/demo/app/dashboard</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:48:44.517514" elapsed="1.192505"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:48:50.710976" level="INFO">Slept 5 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:48:45.710535" elapsed="5.000441"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:51.457652" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/03-dashboard-loading.png"&gt;&lt;img src="../../../screenshots/03-dashboard-loading.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>03-dashboard-loading.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:50.711500" elapsed="0.747153"/>
+</kw>
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<arg>css:body</arg>
+<arg>timeout=${PAGE_LOAD_TIMEOUT}</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="PASS" start="2025-11-14T13:48:51.458653" elapsed="0.509508"/>
+</kw>
+<arg>Wait Until Page Contains Element</arg>
+<arg>css:body</arg>
+<arg>timeout=${PAGE_LOAD_TIMEOUT}</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2025-11-14T13:48:51.458653" elapsed="0.509508"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:48:54.969321" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:48:51.968161" elapsed="3.001160"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:55.713810" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/03-dashboard-full-view.png"&gt;&lt;img src="../../../screenshots/03-dashboard-full-view.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>03-dashboard-full-view.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:54.969825" elapsed="0.745495"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:55.716331" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:48:55.715320" elapsed="0.506583"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:48:59.222980" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:48:56.222410" elapsed="3.000570"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:59.966608" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/03-dashboard-top.png"&gt;&lt;img src="../../../screenshots/03-dashboard-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>03-dashboard-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:48:59.223500" elapsed="0.743108"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:48:59.968217" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight/2)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight/2)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:48:59.967142" elapsed="0.506371"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:03.474234" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:00.474018" elapsed="3.000216"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:04.219564" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/03-dashboard-middle.png"&gt;&lt;img src="../../../screenshots/03-dashboard-middle.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>03-dashboard-middle.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:03.474740" elapsed="0.745836"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:04.221586" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:49:04.221081" elapsed="0.506211"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:07.727648" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:04.727292" elapsed="3.000356"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:08.474073" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/03-dashboard-bottom.png"&gt;&lt;img src="../../../screenshots/03-dashboard-bottom.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>03-dashboard-bottom.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:07.727648" elapsed="0.746425"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:49:08.474588" level="INFO">Dashboard visual test completed</msg>
+<arg>Dashboard visual test completed</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:49:08.474588" elapsed="0.000000"/>
+</kw>
+<kw name="Stop Screen Recording And Capture Screenshot" type="TEARDOWN">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:49:08.476103" level="INFO">${test_name} = Test 03 - Dashboard Page Visual Check</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:49:08.476103" elapsed="0.000000"/>
+</kw>
+<kw name="Get Time" owner="BuiltIn">
+<msg time="2025-11-14T13:49:08.477109" level="INFO">${timestamp} = 1763117348</msg>
+<var>${timestamp}</var>
+<arg>epoch</arg>
+<doc>Returns the given time in the requested format.</doc>
+<status status="PASS" start="2025-11-14T13:49:08.476103" elapsed="0.001006"/>
+</kw>
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:09.233696" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/final-Test%2003%20-%20Dashboard%20Page%20Visual%20Check-1763117348.png"&gt;&lt;img src="../../../screenshots/final-Test%2003%20-%20Dashboard%20Page%20Visual%20Check-1763117348.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:08.477109" elapsed="0.756587"/>
+</kw>
+<arg>Capture Page Screenshot</arg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2025-11-14T13:49:08.477109" elapsed="0.757596"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:49:09.234705" level="INFO">Screen recording stopped for: Test 03 - Dashboard Page Visual Check</msg>
+<arg>Screen recording stopped for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:49:09.234705" elapsed="0.000000"/>
+</kw>
+<doc>Stop recording and capture final screenshot</doc>
+<status status="PASS" start="2025-11-14T13:49:08.475597" elapsed="0.759108"/>
+</kw>
+<doc>Test main dashboard visualization</doc>
+<tag>dashboard</tag>
+<tag>high-priority</tag>
+<tag>visual</tag>
+<status status="PASS" start="2025-11-14T13:48:44.516507" elapsed="24.719189"/>
+</test>
+<test id="s1-t4" name="Test 04 - Assessments Module Visual Test" line="100">
+<kw name="Start Screen Recording" type="SETUP">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:49:09.237210" level="INFO">${test_name} = Test 04 - Assessments Module Visual Test</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:49:09.237210" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:49:09.237210" level="INFO">Starting screen recording for: Test 04 - Assessments Module Visual Test</msg>
+<arg>Starting screen recording for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:49:09.237210" elapsed="0.000000"/>
+</kw>
+<doc>Start recording screen for current test</doc>
+<status status="PASS" start="2025-11-14T13:49:09.237210" elapsed="0.000000"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:09.238210" level="INFO">Opening url 'http://localhost:5173/demo/app/assessments'</msg>
+<arg>${BASE_URL}/demo/app/assessments</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:49:09.238210" elapsed="0.829912"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:15.069103" level="INFO">Slept 5 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:10.068630" elapsed="5.000473"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:15.813330" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/04-assessments-loading.png"&gt;&lt;img src="../../../screenshots/04-assessments-loading.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>04-assessments-loading.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:15.069626" elapsed="0.743704"/>
+</kw>
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<arg>css:body</arg>
+<arg>timeout=${PAGE_LOAD_TIMEOUT}</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="PASS" start="2025-11-14T13:49:15.813882" elapsed="0.506718"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:19.320881" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:16.320600" elapsed="3.000281"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:20.065266" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/04-assessments-main-view.png"&gt;&lt;img src="../../../screenshots/04-assessments-main-view.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>04-assessments-main-view.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:19.320881" elapsed="0.744385"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:20.065794" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:49:20.065794" elapsed="0.504549"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:21.571507" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:20.570847" elapsed="1.000660"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:22.314263" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/04-assessments-top.png"&gt;&lt;img src="../../../screenshots/04-assessments-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>04-assessments-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:21.572011" elapsed="0.742252"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:22.315406" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:49:22.314869" elapsed="0.505902"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:25.822060" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:22.820771" elapsed="3.001289"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:26.555421" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/04-assessments-full-page.png"&gt;&lt;img src="../../../screenshots/04-assessments-full-page.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>04-assessments-full-page.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:25.822060" elapsed="0.733361"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:49:26.555421" level="INFO">Assessments module visual test completed</msg>
+<arg>Assessments module visual test completed</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:49:26.555421" elapsed="0.000000"/>
+</kw>
+<kw name="Stop Screen Recording And Capture Screenshot" type="TEARDOWN">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:49:26.557047" level="INFO">${test_name} = Test 04 - Assessments Module Visual Test</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:49:26.557047" elapsed="0.000000"/>
+</kw>
+<kw name="Get Time" owner="BuiltIn">
+<msg time="2025-11-14T13:49:26.558054" level="INFO">${timestamp} = 1763117366</msg>
+<var>${timestamp}</var>
+<arg>epoch</arg>
+<doc>Returns the given time in the requested format.</doc>
+<status status="PASS" start="2025-11-14T13:49:26.557047" elapsed="0.001007"/>
+</kw>
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:27.317068" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/final-Test%2004%20-%20Assessments%20Module%20Visual%20Test-1763117366.png"&gt;&lt;img src="../../../screenshots/final-Test%2004%20-%20Assessments%20Module%20Visual%20Test-1763117366.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:26.558054" elapsed="0.759014"/>
+</kw>
+<arg>Capture Page Screenshot</arg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2025-11-14T13:49:26.558054" elapsed="0.759014"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:49:27.317068" level="INFO">Screen recording stopped for: Test 04 - Assessments Module Visual Test</msg>
+<arg>Screen recording stopped for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:49:27.317068" elapsed="0.001006"/>
+</kw>
+<doc>Stop recording and capture final screenshot</doc>
+<status status="PASS" start="2025-11-14T13:49:26.557047" elapsed="0.761027"/>
+</kw>
+<doc>Test assessments module UI and interactions</doc>
+<tag>assessments</tag>
+<tag>module</tag>
+<tag>visual</tag>
+<status status="PASS" start="2025-11-14T13:49:09.236203" elapsed="18.081871"/>
+</test>
+<test id="s1-t5" name="Test 05 - Frameworks Module Visual Test" line="123">
+<kw name="Start Screen Recording" type="SETUP">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:49:27.319074" level="INFO">${test_name} = Test 05 - Frameworks Module Visual Test</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:49:27.319074" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:49:27.320663" level="INFO">Starting screen recording for: Test 05 - Frameworks Module Visual Test</msg>
+<arg>Starting screen recording for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:49:27.319074" elapsed="0.001589"/>
+</kw>
+<doc>Start recording screen for current test</doc>
+<status status="PASS" start="2025-11-14T13:49:27.319074" elapsed="0.001589"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:27.320663" level="INFO">Opening url 'http://localhost:5173/demo/app/frameworks'</msg>
+<arg>${BASE_URL}/demo/app/frameworks</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:49:27.320663" elapsed="0.670395"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:32.991615" level="INFO">Slept 5 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:27.991564" elapsed="5.000051"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:33.741797" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/05-frameworks-loading.png"&gt;&lt;img src="../../../screenshots/05-frameworks-loading.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>05-frameworks-loading.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:32.991615" elapsed="0.750686"/>
+</kw>
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<arg>css:body</arg>
+<arg>timeout=${PAGE_LOAD_TIMEOUT}</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="PASS" start="2025-11-14T13:49:33.742301" elapsed="0.525036"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:37.268172" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:34.267894" elapsed="3.000278"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:38.005735" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/05-frameworks-main-view.png"&gt;&lt;img src="../../../screenshots/05-frameworks-main-view.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>05-frameworks-main-view.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:37.268172" elapsed="0.737563"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:38.006742" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:49:38.006742" elapsed="0.504869"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:39.512291" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:38.512205" elapsed="1.000086"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:40.258853" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/05-frameworks-top.png"&gt;&lt;img src="../../../screenshots/05-frameworks-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>05-frameworks-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:39.512911" elapsed="0.745942"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:40.259852" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:49:40.258853" elapsed="0.505987"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:43.765601" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:40.765355" elapsed="3.000246"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:44.513145" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/05-frameworks-full.png"&gt;&lt;img src="../../../screenshots/05-frameworks-full.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>05-frameworks-full.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:43.766131" elapsed="0.747014"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:49:44.513652" level="INFO">Frameworks module visual test completed</msg>
+<arg>Frameworks module visual test completed</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:49:44.513652" elapsed="0.000000"/>
+</kw>
+<kw name="Stop Screen Recording And Capture Screenshot" type="TEARDOWN">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:49:44.515159" level="INFO">${test_name} = Test 05 - Frameworks Module Visual Test</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:49:44.513652" elapsed="0.001507"/>
+</kw>
+<kw name="Get Time" owner="BuiltIn">
+<msg time="2025-11-14T13:49:44.515159" level="INFO">${timestamp} = 1763117384</msg>
+<var>${timestamp}</var>
+<arg>epoch</arg>
+<doc>Returns the given time in the requested format.</doc>
+<status status="PASS" start="2025-11-14T13:49:44.515159" elapsed="0.000000"/>
+</kw>
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:45.245453" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/final-Test%2005%20-%20Frameworks%20Module%20Visual%20Test-1763117384.png"&gt;&lt;img src="../../../screenshots/final-Test%2005%20-%20Frameworks%20Module%20Visual%20Test-1763117384.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:44.515159" elapsed="0.730822"/>
+</kw>
+<arg>Capture Page Screenshot</arg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2025-11-14T13:49:44.515159" elapsed="0.730822"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:49:45.245981" level="INFO">Screen recording stopped for: Test 05 - Frameworks Module Visual Test</msg>
+<arg>Screen recording stopped for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:49:45.245981" elapsed="0.000000"/>
+</kw>
+<doc>Stop recording and capture final screenshot</doc>
+<status status="PASS" start="2025-11-14T13:49:44.513652" elapsed="0.732329"/>
+</kw>
+<doc>Test frameworks module UI</doc>
+<tag>frameworks</tag>
+<tag>module</tag>
+<tag>visual</tag>
+<status status="PASS" start="2025-11-14T13:49:27.318074" elapsed="17.928915"/>
+</test>
+<test id="s1-t6" name="Test 06 - Risk Management Module Visual Test" line="146">
+<kw name="Start Screen Recording" type="SETUP">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:49:45.248577" level="INFO">${test_name} = Test 06 - Risk Management Module Visual Test</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:49:45.248577" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:49:45.248577" level="INFO">Starting screen recording for: Test 06 - Risk Management Module Visual Test</msg>
+<arg>Starting screen recording for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:49:45.248577" elapsed="0.000000"/>
+</kw>
+<doc>Start recording screen for current test</doc>
+<status status="PASS" start="2025-11-14T13:49:45.248577" elapsed="0.001052"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:45.249629" level="INFO">Opening url 'http://localhost:5173/demo/app/risks'</msg>
+<arg>${BASE_URL}/demo/app/risks</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:49:45.249629" elapsed="0.854187"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:51.105639" level="INFO">Slept 5 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:46.103816" elapsed="5.001823"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:52.006675" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/06-risks-loading.png"&gt;&lt;img src="../../../screenshots/06-risks-loading.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>06-risks-loading.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:51.106186" elapsed="0.901053"/>
+</kw>
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<arg>css:body</arg>
+<arg>timeout=${PAGE_LOAD_TIMEOUT}</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="PASS" start="2025-11-14T13:49:52.007239" elapsed="0.508180"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:55.515784" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:52.515419" elapsed="3.000365"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:56.404140" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/06-risks-main-view.png"&gt;&lt;img src="../../../screenshots/06-risks-main-view.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>06-risks-main-view.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:55.515784" elapsed="0.888356"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:56.405658" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:49:56.405658" elapsed="0.505879"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:49:57.912656" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:56.912119" elapsed="1.000537"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:58.811967" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/06-risks-top.png"&gt;&lt;img src="../../../screenshots/06-risks-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>06-risks-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:49:57.913228" elapsed="0.898739"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:49:58.813546" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight/2)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight/2)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:49:58.813025" elapsed="0.505576"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:50:02.319328" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:49:59.319116" elapsed="3.000212"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:50:03.255491" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/06-risks-middle.png"&gt;&lt;img src="../../../screenshots/06-risks-middle.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>06-risks-middle.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:50:02.319328" elapsed="0.936703"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:50:03.256544" level="INFO">Executing JavaScript:
+window.scrollTo(0, document.body.scrollHeight)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:50:03.256544" elapsed="0.508295"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:50:06.765874" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:50:03.765349" elapsed="3.000525"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:50:07.540952" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/06-risks-full.png"&gt;&lt;img src="../../../screenshots/06-risks-full.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>06-risks-full.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:50:06.766284" elapsed="0.774668"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:50:07.542044" level="INFO">Risk management visual test completed</msg>
+<arg>Risk management visual test completed</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:50:07.542044" elapsed="0.000555"/>
+</kw>
+<kw name="Stop Screen Recording And Capture Screenshot" type="TEARDOWN">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:50:07.544111" level="INFO">${test_name} = Test 06 - Risk Management Module Visual Test</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:50:07.543605" elapsed="0.000506"/>
+</kw>
+<kw name="Get Time" owner="BuiltIn">
+<msg time="2025-11-14T13:50:07.544111" level="INFO">${timestamp} = 1763117407</msg>
+<var>${timestamp}</var>
+<arg>epoch</arg>
+<doc>Returns the given time in the requested format.</doc>
+<status status="PASS" start="2025-11-14T13:50:07.544111" elapsed="0.000000"/>
+</kw>
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:50:08.288818" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/final-Test%2006%20-%20Risk%20Management%20Module%20Visual%20Test-1763117407.png"&gt;&lt;img src="../../../screenshots/final-Test%2006%20-%20Risk%20Management%20Module%20Visual%20Test-1763117407.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:50:07.545115" elapsed="0.744260"/>
+</kw>
+<arg>Capture Page Screenshot</arg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2025-11-14T13:50:07.545115" elapsed="0.744260"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:50:08.289927" level="INFO">Screen recording stopped for: Test 06 - Risk Management Module Visual Test</msg>
+<arg>Screen recording stopped for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:50:08.289375" elapsed="0.000552"/>
+</kw>
+<doc>Stop recording and capture final screenshot</doc>
+<status status="PASS" start="2025-11-14T13:50:07.543605" elapsed="0.746322"/>
+</kw>
+<doc>Test risk management module and heatmap</doc>
+<tag>module</tag>
+<tag>risks</tag>
+<tag>visual</tag>
+<status status="PASS" start="2025-11-14T13:49:45.247571" elapsed="23.042894"/>
+</test>
+<test id="s1-t7" name="Test 07 - Evidence Module Visual Test" line="173">
+<kw name="Start Screen Recording" type="SETUP">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:50:08.292074" level="INFO">${test_name} = Test 07 - Evidence Module Visual Test</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:50:08.292074" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:50:08.293597" level="INFO">Starting screen recording for: Test 07 - Evidence Module Visual Test</msg>
+<arg>Starting screen recording for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:50:08.292074" elapsed="0.001523"/>
+</kw>
+<doc>Start recording screen for current test</doc>
+<status status="PASS" start="2025-11-14T13:50:08.292074" elapsed="0.001523"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:50:08.294603" level="INFO">Opening url 'http://localhost:5173/demo/app/evidence'</msg>
+<arg>${BASE_URL}/demo/app/evidence</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:50:08.293597" elapsed="0.729421"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:50:14.024479" level="INFO">Slept 5 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:50:09.023536" elapsed="5.000943"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:50:14.816206" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/07-evidence-loading.png"&gt;&lt;img src="../../../screenshots/07-evidence-loading.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>07-evidence-loading.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:50:14.024479" elapsed="0.792723"/>
+</kw>
+<kw name="Wait Until Page Contains Element" owner="SeleniumLibrary">
+<arg>css:body</arg>
+<arg>timeout=${PAGE_LOAD_TIMEOUT}</arg>
+<doc>Waits until the element ``locator`` appears on the current page.</doc>
+<status status="PASS" start="2025-11-14T13:50:14.817202" elapsed="0.508599"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:50:18.326163" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:50:15.325801" elapsed="3.000362"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:50:18.943568" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None)': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:23.022277" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220D1E10&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:27.136416" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220D2A50&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:31.209170" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: HTTPConnectionPool(host='localhost', port=60620): Max retries exceeded with url: /session/5c869aba271acb88ec840c6cc3427bfb/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C6F90&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</msg>
+<arg>07-evidence-main-view.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="FAIL" start="2025-11-14T13:50:18.326163" elapsed="12.883007">Execution terminated by signal</status>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="NOT RUN" start="2025-11-14T13:50:31.209170" elapsed="0.000000"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2025-11-14T13:50:31.209170" elapsed="0.000000"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<arg>07-evidence-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="NOT RUN" start="2025-11-14T13:50:31.209170" elapsed="0.000000"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<arg>window.scrollTo(0, document.body.scrollHeight)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="NOT RUN" start="2025-11-14T13:50:31.210683" elapsed="0.000000"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2025-11-14T13:50:31.210683" elapsed="0.000000"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<arg>07-evidence-full.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="NOT RUN" start="2025-11-14T13:50:31.210683" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Evidence module visual test completed</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-14T13:50:31.210683" elapsed="0.000000"/>
+</kw>
+<kw name="Stop Screen Recording And Capture Screenshot" type="TEARDOWN">
+<kw name="Get Variable Value" owner="BuiltIn">
+<msg time="2025-11-14T13:50:31.211705" level="INFO">${test_name} = Test 07 - Evidence Module Visual Test</msg>
+<var>${test_name}</var>
+<arg>${TEST_NAME}</arg>
+<arg>default_test</arg>
+<doc>Returns variable value or ``default`` if the variable does not exist.</doc>
+<status status="PASS" start="2025-11-14T13:50:31.211705" elapsed="0.000000"/>
+</kw>
+<kw name="Get Time" owner="BuiltIn">
+<msg time="2025-11-14T13:50:31.211705" level="INFO">${timestamp} = 1763117431</msg>
+<var>${timestamp}</var>
+<arg>epoch</arg>
+<doc>Returns the given time in the requested format.</doc>
+<status status="PASS" start="2025-11-14T13:50:31.211705" elapsed="0.000000"/>
+</kw>
+<kw name="Run Keyword And Ignore Error" owner="BuiltIn">
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:50:35.302143" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220B9E10&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:39.400210" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D022095910&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:43.494837" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C7E90&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:51.674488" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C6790&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:55.747663" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C4810&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:59.823484" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C7D10&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:51:03.878738" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: HTTPConnectionPool(host='localhost', port=60620): Max retries exceeded with url: /session/5c869aba271acb88ec840c6cc3427bfb/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220B8510&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</msg>
+<msg time="2025-11-14T13:51:03.879797" level="FAIL">MaxRetryError: HTTPConnectionPool(host='localhost', port=60620): Max retries exceeded with url: /session/5c869aba271acb88ec840c6cc3427bfb/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C7BD0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</msg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="FAIL" start="2025-11-14T13:50:31.212256" elapsed="32.795492">MaxRetryError: HTTPConnectionPool(host='localhost', port=60620): Max retries exceeded with url: /session/5c869aba271acb88ec840c6cc3427bfb/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C7BD0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</status>
+</kw>
+<arg>Capture Page Screenshot</arg>
+<arg>final-${test_name}-${timestamp}.png</arg>
+<doc>Runs the given keyword with the given arguments and ignores possible error.</doc>
+<status status="PASS" start="2025-11-14T13:50:31.211705" elapsed="32.796043"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:51:04.007748" level="INFO">Screen recording stopped for: Test 07 - Evidence Module Visual Test</msg>
+<arg>Screen recording stopped for: ${test_name}</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:51:04.007748" elapsed="0.000000"/>
+</kw>
+<doc>Stop recording and capture final screenshot</doc>
+<status status="PASS" start="2025-11-14T13:50:31.211195" elapsed="32.796553"/>
+</kw>
+<doc>Test evidence module UI</doc>
+<tag>evidence</tag>
+<tag>module</tag>
+<tag>visual</tag>
+<status status="FAIL" start="2025-11-14T13:50:08.291524" elapsed="55.717223">Execution terminated by signal</status>
+</test>
+<test id="s1-t8" name="Test 08 - Responsive Design Check Mobile View" line="196">
+<doc>Test mobile responsiveness</doc>
+<tag>mobile</tag>
+<tag>responsive</tag>
+<tag>robot:exit</tag>
+<tag>visual</tag>
+<status status="FAIL" start="2025-11-14T13:51:04.008747" elapsed="0.001003">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-t9" name="Test 09 - Responsive Design Check Tablet View" line="216">
+<doc>Test tablet responsiveness</doc>
+<tag>responsive</tag>
+<tag>robot:exit</tag>
+<tag>tablet</tag>
+<tag>visual</tag>
+<status status="FAIL" start="2025-11-14T13:51:04.009750" elapsed="0.001002">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-t10" name="Test 10 - Dark Mode Toggle Visual Test" line="231">
+<doc>Test dark mode switching</doc>
+<tag>darkmode</tag>
+<tag>robot:exit</tag>
+<tag>theme</tag>
+<tag>visual</tag>
+<status status="FAIL" start="2025-11-14T13:51:04.011260" elapsed="0.000519">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-t11" name="Test 11 - Bilingual UI Test Arabic" line="249">
+<doc>Test Arabic RTL layout</doc>
+<tag>arabic</tag>
+<tag>i18n</tag>
+<tag>robot:exit</tag>
+<tag>visual</tag>
+<status status="FAIL" start="2025-11-14T13:51:04.011779" elapsed="0.000000">Test execution stopped due to a fatal error.</status>
+</test>
+<test id="s1-t12" name="Test 12 - Navigation Flow Test" line="269">
+<doc>Test navigation between main pages</doc>
+<tag>flow</tag>
+<tag>navigation</tag>
+<tag>robot:exit</tag>
+<tag>visual</tag>
+<status status="FAIL" start="2025-11-14T13:51:04.012785" elapsed="0.000000">Test execution stopped due to a fatal error.</status>
+</test>
+<kw name="Teardown Test Environment" type="TEARDOWN">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:51:04.013897" level="INFO">Tearing down test environment</msg>
+<arg>Tearing down test environment</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:51:04.013897" elapsed="0.000000"/>
+</kw>
+<kw name="Close All Browsers" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:51:08.103597" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0224F1110&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb</msg>
+<msg time="2025-11-14T13:51:12.185595" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0224F18D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb</msg>
+<msg time="2025-11-14T13:51:16.250854" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0224F2010&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb</msg>
+<doc>Closes all open browsers and resets the browser cache.</doc>
+<status status="PASS" start="2025-11-14T13:51:04.013897" elapsed="16.355268"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:51:20.370769" level="INFO">Test environment teardown completed</msg>
+<arg>Test environment teardown completed</arg>
+<arg>level=INFO</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:51:20.370769" elapsed="0.000000"/>
+</kw>
+<doc>Clean up after all tests</doc>
+<status status="PASS" start="2025-11-14T13:51:04.013897" elapsed="16.356872"/>
+</kw>
+<status status="FAIL" start="2025-11-14T13:48:10.286101" elapsed="190.084668"/>
+</suite>
+<statistics>
+<total>
+<stat pass="6" fail="6" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat info="combined" combined="NOT robot:exit" pass="6" fail="1" skip="0">NOT robot:exit</stat>
+<stat pass="0" fail="1" skip="0">arabic</stat>
+<stat pass="1" fail="0" skip="0">assessments</stat>
+<stat pass="1" fail="0" skip="0">auth</stat>
+<stat pass="2" fail="0" skip="0">critical</stat>
+<stat pass="0" fail="1" skip="0">darkmode</stat>
+<stat pass="1" fail="0" skip="0">dashboard</stat>
+<stat pass="0" fail="1" skip="0">evidence</stat>
+<stat pass="0" fail="1" skip="0">flow</stat>
+<stat pass="1" fail="0" skip="0">frameworks</stat>
+<stat pass="1" fail="0" skip="0">high-priority</stat>
+<stat pass="0" fail="1" skip="0">i18n</stat>
+<stat pass="1" fail="0" skip="0">landing</stat>
+<stat pass="0" fail="1" skip="0">mobile</stat>
+<stat pass="3" fail="1" skip="0">module</stat>
+<stat pass="0" fail="1" skip="0">navigation</stat>
+<stat pass="0" fail="2" skip="0">responsive</stat>
+<stat pass="1" fail="0" skip="0">risks</stat>
+<stat pass="0" fail="1" skip="0">tablet</stat>
+<stat pass="0" fail="1" skip="0">theme</stat>
+<stat pass="6" fail="6" skip="0">visual</stat>
+</tag>
+<suite>
+<stat name="Visual Tests" id="s1" pass="6" fail="6" skip="0">Visual Tests</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2025-11-14T13:50:18.943568" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None)': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:23.022277" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220D1E10&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:27.136416" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220D2A50&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:31.209170" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: HTTPConnectionPool(host='localhost', port=60620): Max retries exceeded with url: /session/5c869aba271acb88ec840c6cc3427bfb/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C6F90&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</msg>
+<msg time="2025-11-14T13:50:35.302143" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220B9E10&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:39.400210" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D022095910&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:43.494837" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C7E90&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:51.674488" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C6790&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:55.747663" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C4810&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:50:59.823484" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220C7D10&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb/screenshot</msg>
+<msg time="2025-11-14T13:51:03.878738" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: HTTPConnectionPool(host='localhost', port=60620): Max retries exceeded with url: /session/5c869aba271acb88ec840c6cc3427bfb/screenshot (Caused by NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0220B8510&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))</msg>
+<msg time="2025-11-14T13:51:08.103597" level="WARN">Retrying (Retry(total=2, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0224F1110&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb</msg>
+<msg time="2025-11-14T13:51:12.185595" level="WARN">Retrying (Retry(total=1, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0224F18D0&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb</msg>
+<msg time="2025-11-14T13:51:16.250854" level="WARN">Retrying (Retry(total=0, connect=None, read=None, redirect=None, status=None)) after connection broken by 'NewConnectionError('&lt;urllib3.connection.HTTPConnection object at 0x000001D0224F2010&gt;: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')': /session/5c869aba271acb88ec840c6cc3427bfb</msg>
+</errors>
+</robot>

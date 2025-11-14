@@ -106,7 +106,10 @@ vi.mock('axios', () => ({
 }));
 
 // Mock environment variables
-vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:3001/api');
+vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:5001/api');
+vi.stubEnv('VITE_API_URL', 'http://localhost:5001');
+vi.stubEnv('VITE_WS_URL', 'ws://localhost:5001');
+vi.stubEnv('BYPASS_AUTH', 'true');
 vi.stubEnv('VITE_SUPABASE_URL', 'https://mock-supabase-url.supabase.co');
 vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'mock-anon-key');
 

@@ -1,0 +1,38 @@
+============================================================
+DIAGNOSTIC REPORT - 2025-11-13T18:40:59.378Z
+============================================================
+
+ENVIRONMENT VARIABLES:
+  DB_HOST: localhost (default)
+  DB_PORT: 5432 (default)
+  DB_USER: postgres (default)
+  DB_PASSWORD: ***SET***
+  COMPLIANCE_DB: shahin_ksa_compliance (default)
+
+ATTEMPTING CONNECTION:
+  Host: localhost:5432
+  User: postgres
+
+✅ PostgreSQL CONNECTION: SUCCESS
+  Version: PostgreSQL 17.4 on x86_64-windows
+
+AVAILABLE DATABASES:
+  - grc_master
+  - postgres
+  - shahin_access_control
+  - shahin_ksa_compliance
+
+GRC DATABASES CHECK:
+  ✅ shahin_ksa_compliance - EXISTS
+  ✅ grc_master - EXISTS
+  ✅ shahin_access_control - EXISTS
+
+============================================================
+CONCLUSION:
+✅ PostgreSQL is accessible and at least one GRC database exists
+
+NEXT STEPS:
+  1. Set environment variable: $env:DB_PASSWORD="postgres"
+  2. Run tests: npm run test:features
+
+============================================================

@@ -1,0 +1,903 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model activity_logs {
+  id          Int       @id @default(autoincrement())
+  user_id     Int?
+  action      String    @db.VarChar(100)
+  entity_type String    @db.VarChar(50)
+  entity_id   Int
+  old_values  Json?
+  new_values  Json?
+  ip_address  String?   @db.Inet
+  user_agent  String?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  users       users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([action], map: "idx_activity_action")
+  @@index([created_at(sort: Desc)], map: "idx_activity_created")
+  @@index([entity_type, entity_id], map: "idx_activity_entity")
+  @@index([user_id], map: "idx_activity_user")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model analytics_events {
+  id         Int       @id @default(autoincrement())
+  event_type String    @db.VarChar(100)
+  event_name String    @db.VarChar(255)
+  user_id    Int?
+  session_id String?   @db.VarChar(255)
+  properties Json?     @default("{}")
+  timestamp  DateTime? @default(now()) @db.Timestamp(6)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([timestamp(sort: Desc)], map: "idx_analytics_timestamp")
+  @@index([event_type], map: "idx_analytics_type")
+  @@index([user_id], map: "idx_analytics_user")
+}
+
+model api_tokens {
+  id           Int       @id @default(autoincrement())
+  user_id      Int?
+  token_hash   String?   @unique @db.VarChar(255)
+  name         String?   @db.VarChar(100)
+  scopes       Json?
+  last_used_at DateTime? @db.Timestamp(6)
+  expires_at   DateTime? @db.Timestamp(6)
+  is_active    Boolean?  @default(true)
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model assessment_comments {
+  id                  Int                  @id @default(autoincrement())
+  assessment_id       Int?
+  control_id          Int?
+  user_id             Int?
+  comment             String
+  comment_type        String?              @default("general") @db.VarChar(50)
+  is_internal         Boolean?             @default(true)
+  created_at          DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at          DateTime?            @default(now()) @db.Timestamp(6)
+  assessments         assessments?         @relation(fields: [assessment_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  assessment_controls assessment_controls? @relation(fields: [control_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users               users?               @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([assessment_id], map: "idx_comments_assessment")
+  @@index([control_id], map: "idx_comments_control")
+  @@index([comment_type], map: "idx_comments_type")
+  @@index([user_id], map: "idx_comments_user")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model assessment_controls {
+  id                                           Int                   @id @default(autoincrement())
+  assessment_id                                Int?
+  control_id                                   Int?
+  status                                       String?               @default("not_started") @db.VarChar(50)
+  implementation_status                        String?               @default("not_implemented") @db.VarChar(50)
+  compliance_status                            String?               @default("unknown") @db.VarChar(50)
+  risk_rating                                  String?               @default("unknown") @db.VarChar(20)
+  score                                        Decimal?              @db.Decimal(5, 2)
+  assigned_to                                  Int?
+  implementation_notes                         String?
+  evidence_provided                            String?
+  evidence_files                               Json?                 @default("[]")
+  remediation_plan                             String?
+  remediation_due_date                         DateTime?             @db.Date
+  last_reviewed_date                           DateTime?             @db.Date
+  reviewed_by                                  Int?
+  is_demo                                      Boolean?              @default(false)
+  metadata                                     Json?                 @default("{}")
+  created_at                                   DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at                                   DateTime?             @default(now()) @db.Timestamp(6)
+  assessment_comments                          assessment_comments[]
+  assessments                                  assessments?          @relation(fields: [assessment_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_assessment_controls_assigned_toTousers users?                @relation("assessment_controls_assigned_toTousers", fields: [assigned_to], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  framework_controls                           framework_controls?   @relation(fields: [control_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_assessment_controls_reviewed_byTousers users?                @relation("assessment_controls_reviewed_byTousers", fields: [reviewed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  assessment_history                           assessment_history[]
+
+  @@unique([assessment_id, control_id])
+  @@index([assessment_id], map: "idx_assessment_controls_assessment")
+  @@index([assigned_to], map: "idx_assessment_controls_assigned")
+  @@index([compliance_status], map: "idx_assessment_controls_compliance")
+  @@index([control_id], map: "idx_assessment_controls_control")
+  @@index([is_demo], map: "idx_assessment_controls_demo")
+  @@index([status], map: "idx_assessment_controls_status")
+}
+
+model assessment_history {
+  id                  Int                  @id @default(autoincrement())
+  assessment_id       Int?
+  control_id          Int?
+  user_id             Int?
+  action              String               @db.VarChar(100)
+  field_name          String?              @db.VarChar(100)
+  old_value           String?
+  new_value           String?
+  description         String?
+  created_at          DateTime?            @default(now()) @db.Timestamp(6)
+  assessments         assessments?         @relation(fields: [assessment_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  assessment_controls assessment_controls? @relation(fields: [control_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users               users?               @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([action], map: "idx_history_action")
+  @@index([assessment_id], map: "idx_history_assessment")
+  @@index([control_id], map: "idx_history_control")
+  @@index([created_at(sort: Desc)], map: "idx_history_created")
+  @@index([user_id], map: "idx_history_user")
+}
+
+model assessment_responses {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  assessment_id    String?   @db.Uuid
+  control_id       String?   @db.Uuid
+  compliance_score Decimal?  @db.Decimal(5, 2)
+  status           String?   @default("pending") @db.VarChar(20)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model assessment_workflow {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  assessment_id    String?   @db.Uuid
+  workflow_type    String    @db.VarChar(100)
+  status           String?   @default("pending") @db.VarChar(50)
+  priority         String?   @default("medium") @db.VarChar(50)
+  assigned_to      String?   @db.Uuid
+  assigned_by      String?   @db.Uuid
+  delegated_from   String?   @db.Uuid
+  due_date         DateTime? @db.Timestamp(6)
+  approved_at      DateTime? @db.Timestamp(6)
+  approved_by      String?   @db.Uuid
+  rejected_at      DateTime? @db.Timestamp(6)
+  rejected_by      String?   @db.Uuid
+  rejection_reason String?
+  comments         String?
+  is_active        Boolean?  @default(true)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  updated_at       DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model assessments {
+  id                      Int                   @id @default(autoincrement())
+  title                   String                @db.VarChar(500)
+  description             String?
+  framework_id            Int?
+  organization_id         Int?
+  created_by              Int?
+  assigned_to             Json?                 @default("[]")
+  status                  String?               @default("draft") @db.VarChar(50)
+  priority                String?               @default("medium") @db.VarChar(20)
+  start_date              DateTime?             @db.Date
+  due_date                DateTime?             @db.Date
+  completed_date          DateTime?             @db.Date
+  progress                Int?                  @default(0)
+  risk_level              String?               @default("unknown") @db.VarChar(20)
+  overall_score           Decimal?              @db.Decimal(5, 2)
+  compliance_percentage   Decimal?              @db.Decimal(5, 2)
+  controls_total          Int?                  @default(0)
+  controls_completed      Int?                  @default(0)
+  controls_passed         Int?                  @default(0)
+  controls_failed         Int?                  @default(0)
+  controls_not_applicable Int?                  @default(0)
+  is_demo                 Boolean?              @default(false)
+  metadata                Json?                 @default("{}")
+  created_at              DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?             @default(now()) @db.Timestamp(6)
+  finance_database        String?               @default("grc_master") @db.VarChar(50)
+  auth_database           String?               @default("shahin_access_control") @db.VarChar(50)
+  created_by_user_id      String?               @db.Uuid
+  assigned_to_user_id     String?               @db.Uuid
+  tenant_id               String?               @db.Uuid
+  assessment_comments     assessment_comments[]
+  assessment_controls     assessment_controls[]
+  assessment_history      assessment_history[]
+  users                   users?                @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  frameworks              frameworks?           @relation(fields: [framework_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  organizations           organizations?        @relation(fields: [organization_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([assigned_to_user_id], map: "idx_assessments_assignee")
+  @@index([created_by], map: "idx_assessments_created_by")
+  @@index([created_by_user_id], map: "idx_assessments_creator")
+  @@index([is_demo], map: "idx_assessments_demo")
+  @@index([due_date], map: "idx_assessments_due_date")
+  @@index([framework_id], map: "idx_assessments_framework")
+  @@index([organization_id], map: "idx_assessments_org")
+  @@index([priority], map: "idx_assessments_priority")
+  @@index([status], map: "idx_assessments_status")
+  @@index([tenant_id], map: "idx_assessments_tenant")
+}
+
+model audit_logs {
+  id          Int       @id @default(autoincrement())
+  user_id     Int?
+  action      String?   @db.VarChar(100)
+  entity_type String?   @db.VarChar(100)
+  entity_id   String?   @db.VarChar(100)
+  changes     Json?
+  ip_address  String?   @db.VarChar(50)
+  user_agent  String?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model contact_messages {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(255)
+  email       String    @db.VarChar(255)
+  phone       String?   @db.VarChar(50)
+  company     String?   @db.VarChar(255)
+  subject     String    @db.VarChar(500)
+  message     String
+  type        String?   @default("general") @db.VarChar(50)
+  status      String?   @default("new") @db.VarChar(50)
+  assigned_to Int?
+  resolved_at DateTime? @db.Timestamp(6)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  users       users?    @relation(fields: [assigned_to], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([created_at(sort: Desc)], map: "idx_contact_created")
+  @@index([email], map: "idx_contact_email")
+  @@index([status], map: "idx_contact_status")
+  @@index([type], map: "idx_contact_type")
+}
+
+model dunning_schedules {
+  id              Int       @id @default(autoincrement())
+  name            String?   @db.VarChar(100)
+  description     String?
+  schedule_config Json?
+  is_active       Boolean?  @default(true)
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model framework_controls {
+  id                      Int                   @id @default(autoincrement())
+  framework_id            Int?
+  control_id              String                @db.VarChar(50)
+  title                   String                @db.VarChar(500)
+  description             String?
+  category                String?               @db.VarChar(100)
+  subcategory             String?               @db.VarChar(100)
+  control_type            String?               @default("requirement") @db.VarChar(50)
+  priority                String?               @default("medium") @db.VarChar(20)
+  implementation_guidance String?
+  evidence_requirements   Json?                 @default("[]")
+  is_active               Boolean?              @default(true)
+  created_at              DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?             @default(now()) @db.Timestamp(6)
+  assessment_controls     assessment_controls[]
+  frameworks              frameworks?           @relation(fields: [framework_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([framework_id, control_id])
+  @@index([category], map: "idx_controls_category")
+  @@index([control_id], map: "idx_controls_control_id")
+  @@index([framework_id], map: "idx_controls_framework")
+  @@index([priority], map: "idx_controls_priority")
+  @@index([control_id], map: "idx_framework_controls_control")
+  @@index([framework_id], map: "idx_framework_controls_framework")
+}
+
+model frameworks {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @unique @db.VarChar(255)
+  version            String?              @db.VarChar(50)
+  description        String?
+  category           String?              @db.VarChar(100)
+  authority          String?              @db.VarChar(255)
+  is_active          Boolean?             @default(true)
+  metadata           Json?                @default("{}")
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  assessments        assessments[]
+  framework_controls framework_controls[]
+
+  @@index([is_active], map: "idx_frameworks_active")
+  @@index([category], map: "idx_frameworks_category")
+  @@index([name], map: "idx_frameworks_name")
+}
+
+model grc_controls {
+  id                      String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  framework_id            String?           @db.Uuid
+  control_id              String            @db.VarChar(100)
+  title                   String            @db.VarChar(500)
+  description             String?
+  control_type            String?           @default("policy") @db.VarChar(100)
+  priority_level          String?           @default("medium") @db.VarChar(50)
+  implementation_guidance String?
+  testing_procedures      String?
+  sector_specific_notes   String?
+  status                  String?           @default("active") @db.VarChar(50)
+  created_at              DateTime?         @default(now()) @db.Timestamp(6)
+  updated_at              DateTime?         @default(now()) @db.Timestamp(6)
+  grc_frameworks          grc_frameworks?   @relation(fields: [framework_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  sector_controls         sector_controls[]
+
+  @@unique([framework_id, control_id], map: "unique_framework_control")
+  @@index([control_type], map: "idx_controls_type")
+}
+
+model grc_frameworks {
+  id                   String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                 String         @db.VarChar(255)
+  version              String?        @db.VarChar(50)
+  description          String?
+  sector_applicability String[]
+  complexity_level     Int?           @default(3)
+  status               String?        @default("active") @db.VarChar(50)
+  created_at           DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at           DateTime?      @default(now()) @db.Timestamp(6)
+  grc_controls         grc_controls[]
+
+  @@unique([name, version], map: "unique_framework_name_version")
+  @@index([status], map: "idx_frameworks_status")
+}
+
+model invoices {
+  id              Int       @id @default(autoincrement())
+  tenant_id       String?   @db.Uuid
+  subscription_id Int?
+  amount          Decimal?  @db.Decimal(10, 2)
+  currency        String?   @default("USD") @db.VarChar(3)
+  status          String?   @default("pending") @db.VarChar(50)
+  due_date        DateTime? @db.Timestamp(6)
+  paid_date       DateTime? @db.Timestamp(6)
+  created_at      DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model landing_content {
+  id            Int       @id @default(autoincrement())
+  hero_title    String
+  hero_subtitle String?
+  active        Boolean?  @default(true)
+  updated_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_by    Int?
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+
+  @@index([active, updated_at(sort: Desc)], map: "idx_landing_content_active")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model landing_requests {
+  id               Int       @id @default(autoincrement())
+  name             String    @db.VarChar(255)
+  company          String    @db.VarChar(255)
+  email            String    @db.VarChar(255)
+  phone            String?   @db.VarChar(50)
+  preferred_date   DateTime? @db.Date
+  preferred_time   String?   @db.VarChar(20)
+  access_type      String    @db.VarChar(20)
+  package          String?   @db.VarChar(100)
+  features         Json?
+  message          String?
+  lead_score       Int?      @default(0)
+  status           String?   @default("pending") @db.VarChar(20)
+  approval_token   String?
+  approved_at      DateTime? @db.Timestamp(6)
+  rejected_at      DateTime? @db.Timestamp(6)
+  rejection_reason String?
+  confirmed_at     DateTime? @db.Timestamp(6)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  updated_at       DateTime? @default(now()) @db.Timestamp(6)
+  sandbox_user_id  Int?
+  users            users?    @relation(fields: [sandbox_user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([preferred_date, access_type, status], map: "idx_landing_requests_date")
+  @@index([preferred_date, preferred_time, access_type], map: "idx_landing_requests_date_time")
+  @@index([email], map: "idx_landing_requests_email")
+  @@index([status, created_at(sort: Desc)], map: "idx_landing_requests_status")
+}
+
+model licenses {
+  id           Int       @id @default(autoincrement())
+  tenant_id    String?   @db.Uuid
+  license_key  String?   @unique @db.VarChar(255)
+  license_type String?   @db.VarChar(50)
+  max_users    Int?
+  expiry_date  DateTime? @db.Timestamp(6)
+  is_active    Boolean?  @default(true)
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+  updated_at   DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model migrations {
+  id          Int       @id @default(autoincrement())
+  filename    String    @unique @db.VarChar(255)
+  executed_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model notifications {
+  id          Int       @id @default(autoincrement())
+  user_id     Int?
+  title       String    @db.VarChar(255)
+  message     String
+  type        String?   @default("info") @db.VarChar(50)
+  entity_type String?   @db.VarChar(50)
+  entity_id   Int?
+  is_read     Boolean?  @default(false)
+  read_at     DateTime? @db.Timestamp(6)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  users       users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([created_at(sort: Desc)], map: "idx_notifications_created")
+  @@index([is_read], map: "idx_notifications_read")
+  @@index([type], map: "idx_notifications_type")
+  @@index([user_id], map: "idx_notifications_user")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model organizations {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @db.VarChar(255)
+  type               String?              @default("company") @db.VarChar(100)
+  country            String?              @db.VarChar(100)
+  industry           String?              @db.VarChar(100)
+  size               String?              @db.VarChar(50)
+  website            String?              @db.VarChar(255)
+  description        String?
+  logo_url           String?
+  created_by         Int?
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  is_demo            Boolean?             @default(false)
+  assessments        assessments[]
+  users              users?               @relation(fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  projects           projects[]
+  teams              teams[]
+  user_organizations user_organizations[]
+
+  @@index([country], map: "idx_orgs_country")
+  @@index([name], map: "idx_orgs_name")
+  @@index([type], map: "idx_orgs_type")
+}
+
+model permissions {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique @db.VarChar(100)
+  description String?
+  resource    String?   @db.VarChar(100)
+  action      String?   @db.VarChar(50)
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model project_milestones {
+  id             Int       @id @default(autoincrement())
+  project_id     Int?
+  name           String    @db.VarChar(255)
+  description    String?
+  status         String?   @default("pending") @db.VarChar(50)
+  due_date       DateTime? @db.Date
+  completed_date DateTime? @db.Date
+  progress       Int?      @default(0)
+  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  updated_at     DateTime? @default(now()) @db.Timestamp(6)
+  projects       projects? @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tasks          tasks[]
+
+  @@index([due_date], map: "idx_milestones_due_date")
+  @@index([project_id], map: "idx_milestones_project")
+  @@index([status], map: "idx_milestones_status")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model projects {
+  id                 Int                  @id @default(autoincrement())
+  name               String               @db.VarChar(255)
+  description        String?
+  status             String?              @default("planning") @db.VarChar(50)
+  priority           String?              @default("medium") @db.VarChar(20)
+  start_date         DateTime?            @db.Date
+  end_date           DateTime?            @db.Date
+  actual_end_date    DateTime?            @db.Date
+  progress           Int?                 @default(0)
+  budget             Decimal?             @db.Decimal(15, 2)
+  spent              Decimal?             @default(0) @db.Decimal(15, 2)
+  organization_id    Int?
+  team_id            Int?
+  project_manager_id Int?
+  technologies       Json?                @default("[]")
+  tags               Json?                @default("[]")
+  metadata           Json?                @default("{}")
+  created_at         DateTime?            @default(now()) @db.Timestamp(6)
+  updated_at         DateTime?            @default(now()) @db.Timestamp(6)
+  project_milestones project_milestones[]
+  organizations      organizations?       @relation(fields: [organization_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users              users?               @relation(fields: [project_manager_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  teams              teams?               @relation(fields: [team_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tasks              tasks[]
+
+  @@index([start_date, end_date], map: "idx_projects_dates")
+  @@index([project_manager_id], map: "idx_projects_manager")
+  @@index([organization_id], map: "idx_projects_org")
+  @@index([priority], map: "idx_projects_priority")
+  @@index([status], map: "idx_projects_status")
+  @@index([team_id], map: "idx_projects_team")
+}
+
+model role_permissions {
+  id            Int       @id @default(autoincrement())
+  role_id       Int?
+  permission_id Int?
+  granted_at    DateTime? @default(now()) @db.Timestamp(6)
+
+  @@unique([role_id, permission_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sandbox_feedback {
+  id                     Int               @id @default(autoincrement())
+  session_id             Int?
+  rating                 Int?
+  experience             String?           @db.VarChar(50)
+  features               Json?             @default("[]")
+  issues                 Json?             @default("[]")
+  suggestions            String?
+  would_recommend        Boolean?          @default(false)
+  interested_in_purchase Boolean?          @default(false)
+  contact_for_followup   Boolean?          @default(false)
+  created_at             DateTime?         @default(now()) @db.Timestamp(6)
+  sandbox_sessions       sandbox_sessions? @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([interested_in_purchase], map: "idx_feedback_interested")
+  @@index([rating], map: "idx_feedback_rating")
+  @@index([session_id], map: "idx_feedback_session")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model sandbox_sessions {
+  id               Int                @id @default(autoincrement())
+  user_id          Int?
+  session_type     String             @db.VarChar(50)
+  source           String?            @default("landing-page") @db.VarChar(100)
+  features         Json?              @default("{}")
+  metadata         Json?              @default("{}")
+  expires_at       DateTime           @db.Timestamp(6)
+  last_accessed_at DateTime?          @db.Timestamp(6)
+  access_count     Int?               @default(0)
+  is_active        Boolean?           @default(true)
+  created_at       DateTime?          @default(now()) @db.Timestamp(6)
+  sandbox_feedback sandbox_feedback[]
+  users            users?             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([expires_at], map: "idx_sandbox_expires")
+  @@index([session_type], map: "idx_sandbox_type")
+  @@index([user_id], map: "idx_sandbox_user")
+}
+
+model sector_controls {
+  id                        String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  control_id                String?       @db.Uuid
+  sector                    String        @db.VarChar(100)
+  applicability_score       Int?          @default(50)
+  implementation_complexity String?       @default("medium") @db.VarChar(50)
+  sector_notes              String?
+  created_at                DateTime?     @default(now()) @db.Timestamp(6)
+  grc_controls              grc_controls? @relation(fields: [control_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([control_id, sector], map: "unique_sector_control")
+  @@index([applicability_score], map: "idx_sector_controls_score")
+  @@index([sector], map: "idx_sector_controls_sector")
+}
+
+model subscription_plans {
+  id            Int       @id @default(autoincrement())
+  name          String    @db.VarChar(100)
+  description   String?
+  price         Decimal?  @db.Decimal(10, 2)
+  billing_cycle String?   @db.VarChar(20)
+  features      Json?     @default("{}")
+  is_active     Boolean?  @default(true)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_at    DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model subscriptions {
+  id         Int       @id @default(autoincrement())
+  tenant_id  String?   @db.Uuid
+  plan_id    Int?
+  status     String?   @default("active") @db.VarChar(50)
+  start_date DateTime? @db.Timestamp(6)
+  end_date   DateTime? @db.Timestamp(6)
+  auto_renew Boolean?  @default(true)
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  updated_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model system_settings {
+  id          Int       @id @default(autoincrement())
+  key         String    @unique @db.VarChar(255)
+  value       Json
+  description String?
+  category    String?   @default("general") @db.VarChar(100)
+  is_public   Boolean?  @default(false)
+  updated_by  Int?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  updated_at  DateTime? @default(now()) @db.Timestamp(6)
+  users       users?    @relation(fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([category], map: "idx_settings_category")
+  @@index([key], map: "idx_settings_key")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model task_comments {
+  id         Int       @id @default(autoincrement())
+  task_id    Int?
+  user_id    Int?
+  comment    String
+  type       String?   @default("comment") @db.VarChar(50)
+  metadata   Json?     @default("{}")
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  tasks      tasks?    @relation(fields: [task_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users      users?    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([task_id], map: "idx_task_comments_task")
+  @@index([type], map: "idx_task_comments_type")
+  @@index([user_id], map: "idx_task_comments_user")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model tasks {
+  id                             Int                 @id @default(autoincrement())
+  title                          String              @db.VarChar(255)
+  description                    String?
+  status                         String?             @default("todo") @db.VarChar(50)
+  priority                       String?             @default("medium") @db.VarChar(20)
+  project_id                     Int?
+  milestone_id                   Int?
+  assignee_id                    Int?
+  reporter_id                    Int?
+  due_date                       DateTime?           @db.Date
+  completed_date                 DateTime?           @db.Date
+  estimated_hours                Decimal?            @db.Decimal(5, 2)
+  actual_hours                   Decimal?            @db.Decimal(5, 2)
+  tags                           Json?               @default("[]")
+  metadata                       Json?               @default("{}")
+  created_at                     DateTime?           @default(now()) @db.Timestamp(6)
+  updated_at                     DateTime?           @default(now()) @db.Timestamp(6)
+  task_comments                  task_comments[]
+  users_tasks_assignee_idTousers users?              @relation("tasks_assignee_idTousers", fields: [assignee_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  project_milestones             project_milestones? @relation(fields: [milestone_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  projects                       projects?           @relation(fields: [project_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users_tasks_reporter_idTousers users?              @relation("tasks_reporter_idTousers", fields: [reporter_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([assignee_id], map: "idx_tasks_assignee")
+  @@index([due_date], map: "idx_tasks_due_date")
+  @@index([milestone_id], map: "idx_tasks_milestone")
+  @@index([priority], map: "idx_tasks_priority")
+  @@index([project_id], map: "idx_tasks_project")
+  @@index([status], map: "idx_tasks_status")
+}
+
+model team_members {
+  id        Int       @id @default(autoincrement())
+  team_id   Int?
+  user_id   Int?
+  role      String?   @default("member") @db.VarChar(50)
+  joined_at DateTime? @default(now()) @db.Timestamp(6)
+  teams     teams?    @relation(fields: [team_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users     users?    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([team_id, user_id])
+  @@index([team_id], map: "idx_team_members_team")
+  @@index([user_id], map: "idx_team_members_user")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model teams {
+  id              Int            @id @default(autoincrement())
+  name            String         @db.VarChar(255)
+  description     String?
+  organization_id Int?
+  team_lead_id    Int?
+  status          String?        @default("active") @db.VarChar(20)
+  created_at      DateTime?      @default(now()) @db.Timestamp(6)
+  updated_at      DateTime?      @default(now()) @db.Timestamp(6)
+  projects        projects[]
+  team_members    team_members[]
+  organizations   organizations? @relation(fields: [organization_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users           users?         @relation(fields: [team_lead_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([team_lead_id], map: "idx_teams_lead")
+  @@index([organization_id], map: "idx_teams_org")
+  @@index([status], map: "idx_teams_status")
+}
+
+model tenant_licenses {
+  id            Int       @id @default(autoincrement())
+  tenant_id     String?   @db.Uuid
+  license_id    Int?
+  assigned_date DateTime? @default(now()) @db.Timestamp(6)
+  revoked_date  DateTime? @db.Timestamp(6)
+  is_active     Boolean?  @default(true)
+}
+
+model tenants {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String              @db.VarChar(255)
+  sector            String?             @db.VarChar(100)
+  industry          String?             @db.VarChar(100)
+  contact_email     String              @unique(map: "unique_tenant_email") @db.VarChar(255)
+  contact_phone     String?             @db.VarChar(50)
+  status            String?             @default("active") @db.VarChar(50)
+  subscription_tier String?             @default("basic") @db.VarChar(50)
+  created_at        DateTime?           @default(now()) @db.Timestamp(6)
+  updated_at        DateTime?           @default(now()) @db.Timestamp(6)
+  deleted_at        DateTime?           @db.Timestamp(6)
+  workflow_triggers workflow_triggers[]
+
+  @@index([sector], map: "idx_tenants_sector")
+  @@index([status], map: "idx_tenants_status")
+}
+
+model user_organizations {
+  id              Int            @id @default(autoincrement())
+  user_id         Int?
+  organization_id Int?
+  role            String?        @default("member") @db.VarChar(50)
+  created_at      DateTime?      @default(now()) @db.Timestamp(6)
+  organizations   organizations? @relation(fields: [organization_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users           users?         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, organization_id])
+  @@index([organization_id], map: "idx_user_orgs_org")
+  @@index([user_id], map: "idx_user_orgs_user")
+}
+
+model user_sessions {
+  id            Int       @id @default(autoincrement())
+  user_id       Int?
+  session_token String?   @unique @db.VarChar(255)
+  ip_address    String?   @db.VarChar(50)
+  user_agent    String?
+  expires_at    DateTime? @db.Timestamp(6)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  last_activity DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model users {
+  id                                                         Int                   @id @default(autoincrement())
+  username                                                   String                @unique @db.VarChar(255)
+  email                                                      String                @unique @db.VarChar(255)
+  password_hash                                              String                @db.VarChar(255)
+  full_name                                                  String                @db.VarChar(255)
+  role                                                       String?               @default("user") @db.VarChar(50)
+  permissions                                                Json?                 @default("[\"read\"]")
+  status                                                     String?               @default("active") @db.VarChar(20)
+  avatar_url                                                 String?
+  phone                                                      String?               @db.VarChar(50)
+  department                                                 String?               @db.VarChar(100)
+  position                                                   String?               @db.VarChar(100)
+  last_login                                                 DateTime?             @db.Timestamp(6)
+  login_count                                                Int?                  @default(0)
+  is_active                                                  Boolean?              @default(true)
+  email_verified                                             Boolean?              @default(false)
+  two_factor_enabled                                         Boolean?              @default(false)
+  created_at                                                 DateTime?             @default(now()) @db.Timestamp(6)
+  updated_at                                                 DateTime?             @default(now()) @db.Timestamp(6)
+  is_sandbox                                                 Boolean?              @default(false)
+  sandbox_expires_at                                         DateTime?             @db.Timestamp(6)
+  activity_logs                                              activity_logs[]
+  analytics_events                                           analytics_events[]
+  assessment_comments                                        assessment_comments[]
+  assessment_controls_assessment_controls_assigned_toTousers assessment_controls[] @relation("assessment_controls_assigned_toTousers")
+  assessment_controls_assessment_controls_reviewed_byTousers assessment_controls[] @relation("assessment_controls_reviewed_byTousers")
+  assessment_history                                         assessment_history[]
+  assessments                                                assessments[]
+  contact_messages                                           contact_messages[]
+  landing_requests                                           landing_requests[]
+  notifications                                              notifications[]
+  organizations                                              organizations[]
+  projects                                                   projects[]
+  sandbox_sessions                                           sandbox_sessions[]
+  system_settings                                            system_settings[]
+  task_comments                                              task_comments[]
+  tasks_tasks_assignee_idTousers                             tasks[]               @relation("tasks_assignee_idTousers")
+  tasks_tasks_reporter_idTousers                             tasks[]               @relation("tasks_reporter_idTousers")
+  team_members                                               team_members[]
+  teams                                                      teams[]
+  user_organizations                                         user_organizations[]
+
+  @@index([is_active], map: "idx_users_active")
+  @@index([email], map: "idx_users_email")
+  @@index([role], map: "idx_users_role")
+  @@index([status], map: "idx_users_status")
+  @@index([username], map: "idx_users_username")
+}
+
+model workflow_executions {
+  id            String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workflow_id   String?   @db.Uuid
+  assessment_id String?   @db.Uuid
+  status        String?   @default("running") @db.VarChar(50)
+  started_at    DateTime? @default(now()) @db.Timestamp(6)
+  completed_at  DateTime? @db.Timestamp(6)
+}
+
+model workflow_history {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workflow_id  String?   @db.Uuid
+  action       String    @db.VarChar(100)
+  performed_by String?   @db.Uuid
+  status_from  String?   @db.VarChar(50)
+  status_to    String?   @db.VarChar(50)
+  comments     String?
+  created_at   DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model workflow_steps {
+  id          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workflow_id String?    @db.Uuid
+  step_name   String     @db.VarChar(255)
+  step_type   String     @db.VarChar(50)
+  step_config Json?
+  step_order  Int
+  created_at  DateTime?  @default(now()) @db.Timestamp(6)
+  workflows   workflows? @relation(fields: [workflow_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([workflow_id, step_order])
+}
+
+model workflow_trigger_executions {
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  trigger_id        String?   @db.Uuid
+  assessment_id     String?   @db.Uuid
+  executed_at       DateTime? @default(now()) @db.Timestamp(6)
+  result            Json?
+  execution_time_ms Int?
+}
+
+model workflow_triggers {
+  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant_id            String?   @db.Uuid
+  trigger_name         String    @db.VarChar(255)
+  trigger_type         String    @db.VarChar(50)
+  trigger_event        String    @db.VarChar(100)
+  trigger_conditions   Json?
+  target_workflow_type String?   @db.VarChar(100)
+  is_active            Boolean?  @default(true)
+  created_at           DateTime? @default(now()) @db.Timestamp(6)
+  updated_at           DateTime? @default(now()) @db.Timestamp(6)
+  tenants              tenants?  @relation(fields: [tenant_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([is_active], map: "idx_workflow_triggers_active")
+  @@index([trigger_event], map: "idx_workflow_triggers_event")
+  @@index([tenant_id], map: "idx_workflow_triggers_tenant")
+}
+
+model workflows {
+  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenant_id      String?          @db.Uuid
+  name           String           @db.VarChar(255)
+  description    String?
+  category       String?          @db.VarChar(100)
+  trigger_type   String?          @default("manual") @db.VarChar(50)
+  trigger_config Json?
+  status         String?          @default("active") @db.VarChar(50)
+  created_by     String?          @db.Uuid
+  created_at     DateTime?        @default(now()) @db.Timestamp(6)
+  updated_at     DateTime?        @default(now()) @db.Timestamp(6)
+  workflow_steps workflow_steps[]
+}

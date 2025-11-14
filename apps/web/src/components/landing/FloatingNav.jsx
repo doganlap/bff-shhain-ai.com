@@ -70,33 +70,48 @@ const FloatingNav = () => {
                 <motion.div
                   key={section.id}
                   className="relative group"
-                  whileHover={{ scale: 1.15 }}
-                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.95 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 17 }}
                 >
                   <motion.button
                     onClick={() => smoothScrollTo(section.id)}
-                    className={`relative p-2 rounded-full transition-all ${
+                    className={`relative p-2 rounded-full transition-all duration-300 ease-out ${
                       isActive 
                         ? 'bg-gradient-to-br from-brand-accent to-brand-gold text-white shadow-lg' 
-                        : 'hover:bg-white/60 dark:hover:bg-gray-700/60 text-gray-600 dark:text-gray-400'
+                        : 'hover:bg-white/40 dark:hover:bg-gray-700/40 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                     }`}
+                    whileHover={!isActive ? { backgroundColor: 'rgba(255, 255, 255, 0.5)' } : {}}
                     title={section.label}
                     aria-label={`انتقل إلى ${section.label}`}
                     aria-current={isActive ? 'page' : undefined}
                   >
-                    <section.icon 
-                      className="w-4 h-4" 
-                      strokeWidth={isActive ? 2.5 : 2} 
-                      aria-hidden="true" 
-                    />
+                    <motion.div
+                      animate={{
+                        scale: isActive ? 1 : 0.95,
+                        rotate: isActive ? 0 : 0
+                      }}
+                      transition={{ duration: 0.3, ease: 'easeOut' }}
+                    >
+                      <section.icon 
+                        className="w-4 h-4" 
+                        strokeWidth={isActive ? 2.5 : 2} 
+                        aria-hidden="true" 
+                      />
+                    </motion.div>
                   </motion.button>
                   
-                  {/* Slim Tooltip */}
-                  <div className="absolute right-full mr-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-                    <div className="bg-gray-900 text-white px-3 py-1.5 rounded-lg text-xs whitespace-nowrap shadow-xl">
+                  {/* Smooth Tooltip */}
+                  <motion.div 
+                    initial={{ opacity: 0, x: 10 }}
+                    whileHover={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                    className="absolute right-full mr-3 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none z-50"
+                  >
+                    <div className="bg-gray-900/95 backdrop-blur-sm text-white px-3 py-1.5 rounded-xl text-xs whitespace-nowrap shadow-2xl border border-white/10">
                       <div className="font-arabic font-semibold">{section.label}</div>
                     </div>
-                  </div>
+                  </motion.div>
                 </motion.div>
               )
             })}

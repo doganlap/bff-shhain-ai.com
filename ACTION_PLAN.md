@@ -18,21 +18,40 @@ Our analysis has revealed two critical issues:
 - **Action:** Migrate data from the four original databases into the new, single Vercel Postgres database.
 - **Status:** **Blocked**. I need the connection details (host, port, user, password, database name) for the four original databases to proceed.
 
-### Priority 2: Fix Broken Pages
+### Priority 2: Connect Pages to Real APIs
 
-- **Action:** Once data is available, debug and fix pages that are currently crashing due to code errors.
-- **Pages:**
-      - `WorkflowManagementPage.jsx` (crashes due to undefined `workflowTemplates`)
+- **Action:** Connect all pages to the new centralized BFF APIs and remove mock data.
+- **Status:** 5 of 30 pages are fully connected. 2 are in progress. 23 are pending.
+
+**Completed Pages (5/30):**
+- `EnhancedDashboard`
+- `UserManagementPage`
+- `AdvancedShell (Header/Sidebar)`
+- `RiskManagementModuleEnhanced`
+- `ComplianceTrackingModuleEnhanced`
+
+**In Progress (2/30):**
+- `OrganizationsPage`: API calls added, but has syntax errors.
+- `ReportsPage`: API calls added, but has syntax errors.
+
+**Next Priority Actions:**
+1.  **Fix Broken Pages:**
+    -   `OrganizationsPage`: Clean up syntax errors.
+    -   `ReportsPage`: Clean up syntax errors.
+2.  **Connect High-Priority Pages:**
+    -   `AssessmentDetailsCollaborative`
+    -   `ControlsModuleEnhanced`
+    -   `Evidence`
+3.  **Connect System Pages:**
+    -   `SettingsPage`
+    -   `WorkflowManagementPage`
+    -   `NotificationManagementPage`
+    -   `DocumentManagementPage`
+    -   `AuditLogsPage`
 
 ### Priority 3: Implement Missing UI Features
 
-- **Action:** Add the missing "create", "update", and "delete" functionality to existing pages.
-- **Modules to update:**
-      - Frameworks
-      - Risks
-      - Assessments
-      - Organizations
-      - And others as identified.
+- **Action:** Add the missing "create", "update", and "delete" functionality to existing pages. This will be done as part of connecting each page to the API.
 
 ### Priority 4: Build UI for Missing Modules
 
@@ -45,12 +64,7 @@ Our analysis has revealed two critical issues:
       - RAG Service
       - And others from the API report.
 
-### Priority 5: Remove All Mock Data
-
-- **Action:** Remove all hardcoded mock data and fallback logic from the UI components to comply with project rules.
-- **Example Page:** `RiskManagementPage.jsx`
-
-### Priority 6: Backend Cleanup
+### Priority 5: Backend Cleanup
 
 - **Action:** Remove all unused API endpoints from the BFF to clean up the codebase.
 - **Example Endpoints:** `apiService.dashboard.getActivity`, `apiService.frameworks.import`, and many others identified in the report.
@@ -85,7 +99,13 @@ The following routes have been migrated from the old `grc-api` microservice to t
 - `/api/notifications`
 - `/api/reports`
 
----PI Endpoint Usage Report
+---
+
+### API Endpoint Usage Report
+
+**Verification Summary (November 13, 2025):**
+A comprehensive analysis of the frontend codebase (`apps/web/src`) was performed to verify the status of each API endpoint. The findings confirm that the report below is **accurate**. Endpoints marked as **"Not In Use"** have defined backend routes and corresponding functions in the frontend's `apiService`, but no user interface component currently calls them. The "Not In Use" status reflects missing or incomplete UI features.
+
 Here is the complete analysis of all 45 API endpoints defined in
 apiEndpoints.js
 .

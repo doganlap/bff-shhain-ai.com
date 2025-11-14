@@ -1,0 +1,12 @@
+// Empty Schema for Prisma Studio Demo
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+// Empty schema - no models, no data
+// This will show Prisma Studio with no tables

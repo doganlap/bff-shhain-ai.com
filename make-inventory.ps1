@@ -1,90 +1,115 @@
 param(
-    [string[]]$Exclude = @('node_modules','dist','build','.git','.next','coverage','logs','.cache'),
-    [switch]$NoTruncate,
-    [switch]$NoHash,
-    [switch]$IncludeExcluded
+    [string]$RootPath = (Get-Location),
+    [string]$OutputPath = "project-inventory.csv",
+    [string]$SummaryOutputPath = "project-inventory-by-extension.csv",
+    [int]$MaxPreviewChars = 200
 )
 
-$root = (Get-Location).Path
-$ts = Get-Date -Format 'yyyyMMdd_HHmm'
-$outDir = Join-Path $root ("_inventory_" + $ts)
-$contentsDir = Join-Path $outDir 'contents'
-New-Item -ItemType Directory -Path $outDir -Force | Out-Null
-New-Item -ItemType Directory -Path $contentsDir -Force | Out-Null
+# مجلدات هنستبعدها من الفحص عشان ما يطوّلش قوي
+$excludedDirectories = @(
+    "node_modules",
+    ".git",
+    ".turbo",
+    ".next",
+    "dist",
+    "build",
+    ".vercel",
+    ".idea",
+    ".vscode",
+    "coverage",
+    "logs"
+)
 
-$textExt = @('.js','.ts','.tsx','.jsx','.json','.md','.txt','.py','.go','.rs','.java','.cs','.yaml','.yml','.env','.html','.css','.scss','.less','.sql','.sh','.ps1','.psm1','.c','.cpp','.h','.hpp','.rb','.php','.ini','.toml','.cfg')
-$maxBytes = if ($NoTruncate) { [int64]::MaxValue } else { 2MB }
+Write-Host "Scanning root path: $RootPath" -ForegroundColor Cyan
 
-$files = Get-ChildItem -Path $root -File -Recurse -Force
-if (-not $IncludeExcluded) {
-    $files = $files | Where-Object { $p = $_.FullName.ToLower(); -not ($Exclude | ForEach-Object { $p -like (Join-Path $root $_).ToLower() + '*' }) }
-}
+# نحصل على كل الملفات مع استبعاد مجلدات معينة
+$allFiles = Get-ChildItem -Path $RootPath -Recurse -File -ErrorAction SilentlyContinue | Where-Object {
+    $fullPath = $_.FullName
+    $include = $true
 
-$rows = @()
-$jsonlPath = Join-Path $outDir 'inventory.jsonl'
-Remove-Item -Path $jsonlPath -ErrorAction SilentlyContinue
-
-foreach ($f in $files) {
-    $rel = $f.FullName.Substring($root.Length).TrimStart('\')
-    $ext = ($f.Extension ?? '').ToLower()
-    $isText = $textExt -contains $ext
-    $hash = $null
-    if (-not $NoHash) { try { $hash = (Get-FileHash -Algorithm SHA256 -Path $f.FullName).Hash } catch { $hash = $null } }
-
-    $lineCount = $null
-    $wordCount = $null
-    $contentOutPath = $null
-    if ($isText) {
-        try {
-            $bytes = [System.IO.File]::ReadAllBytes($f.FullName)
-            $useBytes = if ($bytes.Length -gt $maxBytes) { $bytes[0..($maxBytes-1)] } else { $bytes }
-            $text = [System.Text.Encoding]::UTF8.GetString($useBytes)
-            $lineCount = ($text -split "`r?`n").Length
-            $wordCount = (($text -split '\s+') | Where-Object { $_.Length -gt 0 }).Length
-            $dest = Join-Path $contentsDir ($rel + '.txt')
-            $destDir = Split-Path -Parent $dest
-            if (-not (Test-Path $destDir)) { New-Item -ItemType Directory -Path $destDir -Force | Out-Null }
-            [System.IO.File]::WriteAllText($dest, $text)
-            $contentOutPath = $dest
-        } catch {
-            $isText = $false
+    foreach ($dir in $excludedDirectories) {
+        if ($fullPath -like "*\$dir\*") {
+            $include = $false
+            break
         }
     }
 
-    $obj = [pscustomobject]@{
-        path = $rel
-        full_path = $f.FullName
-        size = $f.Length
-        last_write = $f.LastWriteTimeUtc
-        ext = $ext
-        sha256 = $hash
-        is_text = $isText
-        line_count = $lineCount
-        word_count = $wordCount
-        content_dump = $contentOutPath
-    }
-    $rows += $obj
-    ($obj | ConvertTo-Json -Depth 6) | Add-Content -Path $jsonlPath -Encoding UTF8
+    $include
 }
 
-$csvPath = Join-Path $outDir 'manifest.csv'
-$jsonPath = Join-Path $outDir 'manifest.json'
-$indexPath = Join-Path $outDir 'index.md'
-$rows | Export-Csv -Path $csvPath -NoTypeInformation -Encoding UTF8
-($rows | ConvertTo-Json -Depth 6) | Set-Content -Path $jsonPath -Encoding UTF8
+Write-Host "Total files found (after exclusions): $($allFiles.Count)" -ForegroundColor Yellow
 
-$total = $rows.Count
-$textCount = ($rows | Where-Object { $_.is_text }).Count
-$totalBytes = ($rows | Measure-Object -Property size -Sum).Sum
-@(
-    "Inventory: $ts",
-    "Total files: $total",
-    "Text files: $textCount",
-    "Total size (bytes): $totalBytes",
-    "Outputs:",
-    "- manifest.csv",
-    "- manifest.json",
-    "- inventory.jsonl",
-    "- contents/",
-    "Root: $root"
-) | Set-Content -Path $indexPath -Encoding UTF8
+$rows = @()
+
+foreach ($file in $allFiles) {
+    try {
+        # Path نسبي من RootPath
+        $relativePath = $file.FullName.Substring($RootPath.TrimEnd('\','/').Length).TrimStart('\','/')
+
+        $extension = $file.Extension
+        $sizeKB = [math]::Round($file.Length / 1KB, 2)
+        $lastWrite = $file.LastWriteTime
+        $created = $file.CreationTime
+
+        $contentPreview = ""
+
+        # نحاول نقرأ محتوى بسيط لو الملف مش كبير جدا
+        if ($file.Length -lt 5MB) {
+            try {
+                $text = Get-Content -LiteralPath $file.FullName -Raw -ErrorAction Stop
+
+                if ($text.Length -gt $MaxPreviewChars) {
+                    $contentPreview = $text.Substring(0, $MaxPreviewChars)
+                }
+                else {
+                    $contentPreview = $text
+                }
+
+                # نشيل الـ newlines عشان CSV
+                $contentPreview = $contentPreview -replace "`r", " " -replace "`n", " "
+            }
+            catch {
+                $contentPreview = ""
+            }
+        }
+
+        $rows += [PSCustomObject]@{
+            RelativePath   = $relativePath
+            Name           = $file.Name
+            Extension      = $extension
+            SizeKB         = $sizeKB
+            LastWriteTime  = $lastWrite
+            CreationTime   = $created
+            ContentPreview = $contentPreview
+        }
+    }
+    catch {
+        Write-Warning "Failed to process file: $($file.FullName). Error: $($_.Exception.Message)"
+    }
+}
+
+# نكتب الملف التفصيلي
+$rows | Export-Csv -Path $OutputPath -NoTypeInformation -Encoding UTF8
+Write-Host "Detailed inventory written to: $OutputPath" -ForegroundColor Green
+
+# نعمل Summary بحسب الامتداد
+$summaryRows = @()
+
+$grouped = $rows | Group-Object Extension | Sort-Object Count -Descending
+
+foreach ($group in $grouped) {
+    $extName = if ([string]::IsNullOrWhiteSpace($group.Name)) { "<no extension>" } else { $group.Name }
+
+    $totalSize = ($group.Group | Measure-Object -Property SizeKB -Sum).Sum
+
+    $summaryRows += [PSCustomObject]@{
+        Extension    = $extName
+        FileCount    = $group.Count
+        TotalSizeKB  = [math]::Round($totalSize, 2)
+    }
+}
+
+$summaryRows | Export-Csv -Path $SummaryOutputPath -NoTypeInformation -Encoding UTF8
+Write-Host "Summary inventory written to: $SummaryOutputPath" -ForegroundColor Green
+
+Write-Host "Done. Files scanned: $($rows.Count)" -ForegroundColor Cyan

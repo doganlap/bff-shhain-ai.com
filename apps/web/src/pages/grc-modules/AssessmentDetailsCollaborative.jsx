@@ -191,7 +191,7 @@ const AssessmentDetailsCollaborative = () => {
                     resourceType="assessment"
                     resourceId={id}
                     field="title"
-                    initialValue={assessment.title}
+                    initialValue={assessment?.title || ''}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter assessment title..."
                   />
@@ -209,8 +209,8 @@ const AssessmentDetailsCollaborative = () => {
                     resourceId={id}
                     field="status"
                     type="select"
-                    initialValue={assessment.status}
-                    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${getStatusColor(assessment.status)}`}
+                    initialValue={assessment?.status || 'not_started'}
+                    className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${assessment?.status ? getStatusColor(assessment.status) : 'text-gray-600 bg-gray-100'}`}
                   >
                     <option value="not_started">Not Started</option>
                     <option value="in_progress">In Progress</option>
@@ -231,7 +231,7 @@ const AssessmentDetailsCollaborative = () => {
                     resourceId={id}
                     field="dueDate"
                     type="date"
-                    initialValue={assessment.dueDate}
+                    initialValue={assessment?.dueDate || ''}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -247,7 +247,7 @@ const AssessmentDetailsCollaborative = () => {
                     resourceType="assessment"
                     resourceId={id}
                     field="assessor"
-                    initialValue={assessment.assessor}
+                    initialValue={assessment?.assessor || ''}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Enter assessor name..."
                   />
@@ -268,7 +268,7 @@ const AssessmentDetailsCollaborative = () => {
                 resourceId={id}
                 field="description"
                 type="textarea"
-                initialValue={assessment.description}
+                initialValue={assessment?.description || ''}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 rows={4}
                 placeholder="Enter assessment description..."
@@ -288,7 +288,7 @@ const AssessmentDetailsCollaborative = () => {
               </h3>
               <RealTimeEditor
                 documentId={`assessment_notes_${id}`}
-                content={assessment.findings || ''}
+                content={assessment?.findings || ''}
                 onChange={(content) => handleFieldUpdate('findings', content)}
                 className="min-h-[200px]"
               />
@@ -304,7 +304,7 @@ const AssessmentDetailsCollaborative = () => {
               </h3>
               <RealTimeEditor
                 documentId={`assessment_recommendations_${id}`}
-                content={assessment.recommendations || ''}
+                content={assessment?.recommendations || ''}
                 onChange={(content) => handleFieldUpdate('recommendations', content)}
                 className="min-h-[150px]"
               />
@@ -379,12 +379,12 @@ const AssessmentDetailsCollaborative = () => {
                 <div>
                   <div className="flex justify-between text-sm text-gray-600 mb-1">
                     <span>Overall Progress</span>
-                    <span>{assessment.progress}%</span>
+                    <span>{assessment?.progress || 0}%</span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
                       className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${assessment.progress}%` }}
+                      style={{ width: `${assessment?.progress || 0}%` }}
                     ></div>
                   </div>
                 </div>

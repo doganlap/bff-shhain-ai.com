@@ -106,10 +106,48 @@ vi.mock('axios', () => ({
 }));
 
 // Mock environment variables
-vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:3001/api');
+vi.stubEnv('VITE_API_BASE_URL', 'http://localhost:5001/api');
+vi.stubEnv('VITE_API_URL', 'http://localhost:5001');
+vi.stubEnv('VITE_WS_URL', 'ws://localhost:5001');
+vi.stubEnv('BYPASS_AUTH', 'true');
 vi.stubEnv('VITE_SUPABASE_URL', 'https://mock-supabase-url.supabase.co');
 vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'mock-anon-key');
 
 // Mock date for consistent testing
 vi.useFakeTimers();
 vi.setSystemTime(new Date('2024-01-01T00:00:00Z'));
+
+// Mock window.matchMedia properly
+const mockMatchMedia = vi.fn().mockImplementation(query => ({
+  matches: query === '(prefers-color-scheme: dark)' ? false : query === '(prefers-reduced-motion: reduce)' ? true : false,
+  media: query,
+  onchange: null,
+  addListener: vi.fn(),
+  removeListener: vi.fn(),
+  addEventListener: vi.fn(),
+  removeEventListener: vi.fn(),
+  dispatchEvent: vi.fn(),
+}));
+
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: mockMatchMedia,
+});
+
+// Mock window.innerWidth and innerHeight
+Object.defineProperty(window, 'innerWidth', {
+  writable: true,
+  value: 1024,
+});
+Object.defineProperty(window, 'innerHeight', {
+  writable: true,
+  value: 768,
+});
+
+// Mock lucide-react icons to avoid missing exports
+vi.mock('lucide-react', () => {
+  const StubIcon = () => null;
+  return new Proxy({}, {
+    get: () => StubIcon,
+  });
+});

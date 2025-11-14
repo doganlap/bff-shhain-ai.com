@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
-  Shield, Search, Eye, AlertCircle, CheckCircle, Clock, XCircle
+  Shield, Search, Eye, AlertCircle, CheckCircle, Clock, XCircle, Edit2, Trash2, Plus, X
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -37,6 +37,16 @@ const FrameworksManagementPage = () => {
   const [filterBy, setFilterBy] = useState('all');
   const [sortBy, setSortBy] = useState('name');
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedFramework, setSelectedFramework] = useState(null);
+  const [formData, setFormData] = useState({
+    name: '',
+    description: '',
+    category: '',
+    version: '',
+    isActive: true
+  });
 
   // Analytics Data
   const [analyticsData, setAnalyticsData] = useState({
@@ -138,18 +148,74 @@ const FrameworksManagementPage = () => {
     }
   };
 
-  const handleCreateFramework = async (frameworkData) => {
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      description: '',
+      category: '',
+      version: '',
+      isActive: true
+    });
+    setSelectedFramework(null);
+  };
+
+  const handleCreateFramework = async (e) => {
+    e.preventDefault();
     try {
-      const response = await apiService.frameworks.create(frameworkData);
-      if (response?.data?.success) {
-        toast.success('Framework created successfully');
+      const response = await apiService.frameworks.create(formData);
+      if (response?.data?.success || response?.status === 201) {
+        toast.success(t('frameworks.create.success') || 'Framework created successfully');
         setShowCreateModal(false);
+        resetForm();
         fetchFrameworks();
       }
     } catch (error) {
       console.error('Error creating framework:', error);
-      toast.error('Failed to create framework');
+      toast.error(t('frameworks.create.error') || 'Failed to create framework');
     }
+  };
+
+  const handleEditFramework = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await apiService.frameworks.update(selectedFramework.id, formData);
+      if (response?.data?.success || response?.status === 200) {
+        toast.success(t('frameworks.update.success') || 'Framework updated successfully');
+        setShowEditModal(false);
+        resetForm();
+        fetchFrameworks();
+      }
+    } catch (error) {
+      console.error('Error updating framework:', error);
+      toast.error(t('frameworks.update.error') || 'Failed to update framework');
+    }
+  };
+
+  const handleDeleteFramework = async () => {
+    try {
+      const response = await apiService.frameworks.delete(selectedFramework.id);
+      if (response?.data?.success || response?.status === 200) {
+        toast.success(t('frameworks.delete.success') || 'Framework deleted successfully');
+        setShowDeleteModal(false);
+        resetForm();
+        fetchFrameworks();
+      }
+    } catch (error) {
+      console.error('Error deleting framework:', error);
+      toast.error(t('frameworks.delete.error') || 'Failed to delete framework');
+    }
+  };
+
+  const handleOpenEditModal = (framework) => {
+    setSelectedFramework(framework);
+    setFormData({
+      name: framework.name || '',
+      description: framework.description || '',
+      category: framework.category || '',
+      version: framework.version || '',
+      isActive: framework.isActive !== false
+    });
+    setShowEditModal(true);
   };
 
   const exportFrameworks = async () => {
@@ -395,14 +461,30 @@ const FrameworksManagementPage = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center justify-between text-xs mb-4">
                   <span className={isDark ? 'text-gray-500' : 'text-gray-500'}>
                     {language === 'ar' ? 'آخر تحديث:' : 'Updated:'} {new Date(framework.updated_at || Date.now()).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
                   </span>
-                  <div className="flex items-center gap-1">
-                    <Eye className="w-3 h-3" />
-                    <span>{language === 'ar' ? 'عرض التفاصيل' : 'View Details'}</span>
-                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-4 border-t" style={{ borderColor: isDark ? '#374151' : '#e5e7eb' }}>
+                  <button
+                    onClick={() => handleOpenEditModal(framework)}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                    {language === 'ar' ? 'تعديل' : 'Edit'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedFramework(framework);
+                      setShowDeleteModal(true);
+                    }}
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    {language === 'ar' ? 'حذف' : 'Delete'}
+                  </button>
                 </div>
               </AnimatedCard>
             );
@@ -463,23 +545,149 @@ const FrameworksManagementPage = () => {
         )}
 
         {showCreateModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg p-6 w-full max-w-md">
-              <h2 className="text-xl font-bold mb-4">Create New Framework</h2>
-              <form onSubmit={(e) => { e.preventDefault(); handleCreateFramework({ name: e.target.name.value, description: e.target.description.value }); }}>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className={`rounded-lg p-6 w-full max-w-md ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  {language === 'ar' ? 'إنشاء إطار جديد' : 'Create New Framework'}
+                </h2>
+                <button onClick={() => { setShowCreateModal(false); resetForm(); }} className={`p-2 rounded hover:${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <form onSubmit={handleCreateFramework}>
                 <div className="mb-4">
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-                  <input type="text" name="name" id="name" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" />
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {language === 'ar' ? 'الاسم' : 'Name'}
+                  </label>
+                  <input 
+                    type="text" 
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className={`mt-1 block w-full px-3 py-2 border rounded-md focus:border-blue-500 focus:ring-blue-500 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                    required
+                  />
                 </div>
                 <div className="mb-4">
-                  <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
-                  <textarea name="description" id="description" rows="3" className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"></textarea>
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {language === 'ar' ? 'الوصف' : 'Description'}
+                  </label>
+                  <textarea 
+                    rows="3"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className={`mt-1 block w-full px-3 py-2 border rounded-md focus:border-blue-500 focus:ring-blue-500 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {language === 'ar' ? 'الفئة' : 'Category'}
+                  </label>
+                  <input 
+                    type="text" 
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className={`mt-1 block w-full px-3 py-2 border rounded-md focus:border-blue-500 focus:ring-blue-500 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  />
                 </div>
                 <div className="flex justify-end gap-4 mt-4">
-                  <button type="button" onClick={() => setShowCreateModal(false)} className="px-4 py-2 bg-gray-200 rounded">Cancel</button>
-                  <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Create</button>
+                  <button type="button" onClick={() => { setShowCreateModal(false); resetForm(); }} className={`px-4 py-2 rounded ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-900'}`}>
+                    {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                  </button>
+                  <button type="submit" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+                    {language === 'ar' ? 'إنشاء' : 'Create'}
+                  </button>
                 </div>
               </form>
+            </div>
+          </div>
+        )}
+
+        {showEditModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className={`rounded-lg p-6 w-full max-w-md ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                  {language === 'ar' ? 'تعديل الإطار' : 'Edit Framework'}
+                </h2>
+                <button onClick={() => { setShowEditModal(false); resetForm(); }} className={`p-2 rounded hover:${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <form onSubmit={handleEditFramework}>
+                <div className="mb-4">
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {language === 'ar' ? 'الاسم' : 'Name'}
+                  </label>
+                  <input 
+                    type="text" 
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className={`mt-1 block w-full px-3 py-2 border rounded-md focus:border-blue-500 focus:ring-blue-500 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                    required
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {language === 'ar' ? 'الوصف' : 'Description'}
+                  </label>
+                  <textarea 
+                    rows="3"
+                    value={formData.description}
+                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    className={`mt-1 block w-full px-3 py-2 border rounded-md focus:border-blue-500 focus:ring-blue-500 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+                    {language === 'ar' ? 'الفئة' : 'Category'}
+                  </label>
+                  <input 
+                    type="text" 
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className={`mt-1 block w-full px-3 py-2 border rounded-md focus:border-blue-500 focus:ring-blue-500 ${isDark ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'}`}
+                  />
+                </div>
+                <div className="flex justify-end gap-4 mt-4">
+                  <button type="button" onClick={() => { setShowEditModal(false); resetForm(); }} className={`px-4 py-2 rounded ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-900'}`}>
+                    {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                  </button>
+                  <button type="submit" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
+                    {language === 'ar' ? 'تحديث' : 'Update'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className={`rounded-lg p-6 w-full max-w-sm ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+              <h2 className={`text-xl font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
+                {language === 'ar' ? 'تأكيد الحذف' : 'Confirm Delete'}
+              </h2>
+              <p className={`text-sm mb-6 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                {language === 'ar' 
+                  ? `هل أنت متأكد من حذف الإطار "${selectedFramework?.name}"؟ لا يمكن التراجع عن هذا الإجراء.`
+                  : `Are you sure you want to delete the framework "${selectedFramework?.name}"? This action cannot be undone.`
+                }
+              </p>
+              <div className="flex justify-end gap-4">
+                <button 
+                  onClick={() => { setShowDeleteModal(false); resetForm(); }} 
+                  className={`px-4 py-2 rounded ${isDark ? 'bg-gray-700 hover:bg-gray-600 text-white' : 'bg-gray-200 hover:bg-gray-300 text-gray-900'}`}
+                >
+                  {language === 'ar' ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button 
+                  onClick={handleDeleteFramework}
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded"
+                >
+                  {language === 'ar' ? 'حذف' : 'Delete'}
+                </button>
+              </div>
             </div>
           </div>
         )}

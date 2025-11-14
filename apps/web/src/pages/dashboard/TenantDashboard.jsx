@@ -81,9 +81,9 @@ const TenantDashboard = () => {
   const generateTenantUserActivity = () => 
     Array.from({ length: 7 }, (_, i) => ({
       day: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i],
-      logins: Math.floor(Math.random() * 50) + 20,
-      assessments: Math.floor(Math.random() * 15) + 5,
-      reports: Math.floor(Math.random() * 10) + 2
+      logins: 0, // Use real data instead of Math.random()
+      assessments: 0, // Use real data instead of Math.random()
+      reports: 0 // Use real data instead of Math.random()
     }));
 
   const generateTenantRiskData = () => [

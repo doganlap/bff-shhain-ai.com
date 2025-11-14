@@ -82,7 +82,7 @@ const DemoBooking = ({ isOpen, onClose, type = 'demo' }) => {
       if (formData.preferredDate && step === 3) {
         setLoadingAvailability(true)
         try {
-          const { getAvailableTimeSlots } = await import('../../services/bookingService.js')
+          const { getAvailableTimeSlots } = await import('../../services/bookingService')
           const availability = await getAvailableTimeSlots(formData.preferredDate, type)
           
           setAvailableSlots(availability.availableSlots || [])
@@ -186,7 +186,7 @@ const DemoBooking = ({ isOpen, onClose, type = 'demo' }) => {
     
     try {
       // Import booking service
-      const { submitBooking, calculateLeadScore } = await import('../../services/bookingService.js')
+      const { submitBooking, calculateLeadScore } = await import('../../services/bookingService')
       
       // Calculate lead score
       const leadScore = calculateLeadScore(formData)
@@ -222,7 +222,7 @@ const DemoBooking = ({ isOpen, onClose, type = 'demo' }) => {
         setSubmitError('هذا الوقت محجوز بالفعل. يرجى اختيار وقت آخر.')
         // Refresh availability
         if (formData.preferredDate) {
-          const { getAvailableTimeSlots } = await import('../../services/bookingService.js')
+          const { getAvailableTimeSlots } = await import('../../services/bookingService')
           const availability = await getAvailableTimeSlots(formData.preferredDate, type)
           setAvailableSlots(availability.availableSlots || [])
           setBookedSlots(availability.bookedSlots || [])

@@ -1,0 +1,128 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: grc-postgres-dev
+    environment:
+      POSTGRES_DB: grc_main
+      POSTGRES_USER: grc_user
+      POSTGRES_PASSWORD: grc_secure_password_2024
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ./database-schema:/docker-entrypoint-initdb.d
+    networks:
+      - grc-network-dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U grc_user -d grc_main"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bff:
+    build:
+      context: ../../
+      dockerfile: apps/bff/Dockerfile.dev
+    container_name: grc-backend-dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=grc_template
+      - DB_USER=grc_user
+      - DB_PASSWORD=grc_secure_password_2024
+      - PORT=5001
+      - NODE_ENV=development
+      - API_BASE_URL=http://localhost:5001
+      - JWT_SECRET=grc_jwt_secret_key_shahin_ai_2024_secure
+      - JWT_EXPIRES_IN=24h
+      - BCRYPT_ROUNDS=12
+      - CORS_ORIGIN=http://localhost:5173,http://localhost:3000
+    ports:
+      - "5001:5001"
+    volumes:
+      - ../../apps/bff:/app
+      - ../../apps/bff/uploads:/app/uploads
+      - ../../apps/bff/logs:/app/logs
+      - /app/node_modules
+    networks:
+      - grc-network-dev
+    restart: unless-stopped
+
+  redis:
+    image: redis:6-alpine
+    container_name: grc-redis-dev
+    ports:
+      - "6381:6379"
+    networks:
+      - grc-network-dev
+    restart: unless-stopped
+
+  # Enhanced Notification Service
+  notification-service-enhanced:
+    build:
+      context: ../../
+      dockerfile: apps/services/notification-service/Dockerfile.dev
+    container_name: grc-notification-enhanced-dev
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - NODE_ENV=development
+      - PORT=3004
+      - DATABASE_URL=postgresql://grc_user:grc_password@postgres:5432/grc_dev
+      - REDIS_URL=redis://redis:6379
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASS=${SMTP_PASS}
+      - SMTP_FROM=${SMTP_FROM}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_FROM_NUMBER=${TWILIO_FROM_NUMBER}
+      - SERVICE_TOKEN=${NOTIFICATION_SERVICE_TOKEN}
+      - EMAIL_TRACKING=true
+      - LOG_LEVEL=info
+    ports:
+      - "3004:3004"
+    volumes:
+      - ../../apps/services/notification-service:/app
+      - ../../apps/services/notification-service/logs:/app/logs
+      - notification_templates:/app/templates
+      - /app/node_modules
+    networks:
+      - grc-network-dev
+    restart: unless-stopped
+
+  web:
+    build:
+      context: ../../
+      dockerfile: apps/web/Dockerfile.dev
+    container_name: grc-frontend-dev
+    depends_on:
+      - bff
+    environment:
+      - VITE_API_URL=http://bff:5001
+      - NODE_ENV=development
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../../apps/web:/app
+      - /app/node_modules
+    networks:
+      - grc-network-dev
+    restart: unless-stopped
+
+volumes:
+  postgres_data_dev:
+    driver: local
+  notification_templates:
+    driver: local
+
+networks:
+  grc-network-dev:
+    driver: bridge

@@ -1,130 +1,121 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { 
-  FileText, Upload, Download, Eye, Edit, Trash2, Search, 
-  Filter, Star, Tag, Calendar, User, CheckCircle, Clock, 
-  XCircle, AlertTriangle, Folder, Image, File, Archive,
-  RefreshCw, Plus, Grid, List, SortAsc, Share2
-} from 'lucide-react';
-import { toast } from 'sonner';
-
-// Services and Hooks
-import { useI18n } from '../../hooks/useI18n';
-import { useTheme } from '../../components/theme/ThemeProvider';
-import apiService from '../../services/apiEndpoints';
-
-// Advanced Components
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  PermissionBasedCard,
-  PermissionBasedButton,
-  RoleDashboardCards
-} from '../../components/common/PermissionBasedCard';
-import AdvancedAnalyticsPanel from '../../components/analytics/AdvancedAnalyticsPanel';
-import RealTimeMonitor from '../../components/monitoring/RealTimeMonitor';
-import QuickActionsToolbar from '../../components/ui/QuickActionsToolbar';
-import { AnimatedCard, CulturalLoadingSpinner } from '../../components/Animation/InteractiveAnimationToolkit';
+  FileText, Upload, Download, Eye, Trash2, Search, Filter,
+  Calendar, CheckCircle, Clock, XCircle, AlertTriangle,
+  Grid, List, ChevronUp, ChevronDown, RefreshCw, Plus, Shield, Folder, TrendingUp
+} from 'lucide-react';
+import EnterprisePageLayout from '../../components/layout/EnterprisePageLayout';
+import apiService from '../../services/apiEndpoints';
+import { toast } from 'sonner';
+import { format } from 'date-fns';
 
 const EvidenceManagementPage = () => {
-  const { t, language, isRTL } = useI18n();
-  const { isDark } = useTheme();
-
-  // State Management
   const [evidence, setEvidence] = useState([]);
-  const [selectedEvidence, setSelectedEvidence] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [realTimeEnabled, setRealTimeEnabled] = useState(true);
-  const [analyticsMode, setAnalyticsMode] = useState('standard');
-  const [viewMode, setViewMode] = useState('grid');
-
-  // Filters and Search
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBy, setFilterBy] = useState('all');
-  const [sortBy, setSortBy] = useState('created_at');
   const [categoryFilter, setCategoryFilter] = useState('all');
-
-  // Analytics Data
-  const [analyticsData, setAnalyticsData] = useState({
+  const [viewMode, setViewMode] = useState('grid');
+  const [sortField, setSortField] = useState('created_at');
+  const [sortDirection, setSortDirection] = useState('desc');
+  const [stats, setStats] = useState({
     totalEvidence: 0,
     recentUploads: 0,
-    categories: {},
-    sizeStats: {},
-    trends: []
+    approvedCount: 0,
+    pendingCount: 0
   });
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
-  useEffect(() => {
-    fetchEvidence();
-    fetchAnalytics();
-    
-    if (realTimeEnabled) {
-      const interval = setInterval(() => {
-        fetchAnalytics();
-      }, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [searchTerm, filterBy, sortBy, categoryFilter, realTimeEnabled]);
-
-  const fetchEvidence = async () => {
+  // Fetch evidence data
+  const fetchEvidence = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiService.evidence.getAll({
         search: searchTerm,
         status: filterBy !== 'all' ? filterBy : undefined,
         category: categoryFilter !== 'all' ? categoryFilter : undefined,
-        sort: sortBy,
+        sort: sortField,
         include_metadata: true
       });
 
-      if (response?.data?.success) {
-        setEvidence(response.data.data || []);
+      if (response?.data) {
+        setEvidence(response.data.data || response.data || []);
       } else {
         setEvidence([]);
       }
     } catch (error) {
       console.error('Error fetching evidence:', error);
-      toast.error(t('evidence.error.fetch_failed'));
+      toast.error('Failed to load evidence');
       setEvidence([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, filterBy, categoryFilter, sortField]);
 
-  const fetchAnalytics = async () => {
+  // Fetch statistics
+  const fetchStats = useCallback(async () => {
     try {
-      const response = await apiService.evidence.getAnalytics();
-      if (response?.data?.success) {
-        setAnalyticsData(response.data.data);
+      const response = await apiService.evidence.getStats();
+      if (response?.data) {
+        setStats(response.data);
       }
     } catch (error) {
-      console.error('Error fetching evidence analytics:', error);
+      console.error('Error fetching evidence stats:', error);
     }
+  }, []);
+
+  useEffect(() => {
+    fetchEvidence();
+    fetchStats();
+  }, [fetchEvidence, fetchStats]);
+
+  // Calculate metrics
+  const calculateMetrics = () => {
+    const totalEvidence = stats.totalEvidence || evidence.length;
+    const recentUploads = stats.recentUploads || evidence.filter(e => {
+      const dayAgo = new Date();
+      dayAgo.setDate(dayAgo.getDate() - 7);
+      return new Date(e.created_at) > dayAgo;
+    }).length;
+    const approvedCount = stats.approvedCount || evidence.filter(e => e.status === 'approved').length;
+    const pendingCount = stats.pendingCount || evidence.filter(e => e.status === 'pending').length;
+
+    return [
+      {
+        title: 'Total Evidence',
+        value: totalEvidence,
+        icon: FileText,
+        color: 'blue',
+        trend: `${evidence.length} items`
+      },
+      {
+        title: 'Recent Uploads',
+        value: recentUploads,
+        icon: TrendingUp,
+        color: 'green',
+        trend: 'Last 7 days'
+      },
+      {
+        title: 'Approved',
+        value: approvedCount,
+        icon: CheckCircle,
+        color: 'green',
+        trend: `${((approvedCount / totalEvidence) * 100 || 0).toFixed(0)}% of total`
+      },
+      {
+        title: 'Pending Review',
+        value: pendingCount,
+        icon: Clock,
+        color: 'yellow',
+        trend: 'Needs attention'
+      }
+    ];
   };
 
-  const handleQuickAction = (action) => {
-    switch (action) {
-      case 'upload':
-        document.getElementById('evidence-upload').click();
-        break;
-      case 'export':
-        exportEvidence();
-        break;
-      case 'refresh':
-        fetchEvidence();
-        break;
-      case 'analytics':
-        setAnalyticsMode(analyticsMode === 'standard' ? 'advanced' : 'standard');
-        break;
-      case 'realtime':
-        setRealTimeEnabled(!realTimeEnabled);
-        break;
-      case 'view':
-        setViewMode(viewMode === 'grid' ? 'list' : 'grid');
-        break;
-      default:
-        console.log('Action:', action);
-    }
-  };
+  const statsCards = calculateMetrics();
 
+  // File upload handler
   const handleFileUpload = async (event) => {
     const files = event.target.files;
     if (!files.length) return;
@@ -136,408 +127,434 @@ const EvidenceManagementPage = () => {
         formData.append('file', file);
         formData.append('category', categoryFilter !== 'all' ? categoryFilter : 'general');
         formData.append('auto_classify', 'true');
+        formData.append('name', file.name);
 
         return apiService.evidence.upload(formData);
       });
 
       await Promise.all(uploadPromises);
-      toast.success(t('evidence.upload.success'));
+      toast.success(`${files.length} evidence file(s) uploaded successfully`);
+      setIsUploadModalOpen(false);
       fetchEvidence();
-      fetchAnalytics();
+      fetchStats();
     } catch (error) {
       console.error('Error uploading evidence:', error);
-      toast.error(t('evidence.upload.failed'));
+      toast.error('Failed to upload evidence');
     } finally {
       setUploading(false);
-      event.target.value = '';
     }
   };
 
-  const exportEvidence = async () => {
-    try {
-      const exportData = {
-        evidence,
-        analytics: analyticsData,
-        timestamp: new Date().toISOString(),
-        filters: { searchTerm, filterBy, sortBy, categoryFilter }
-      };
-      
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { 
-        type: 'application/json' 
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `evidence-export-${new Date().toISOString().split('T')[0]}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-      
-      toast.success(t('evidence.export.success'));
-    } catch (error) {
-      console.error('Export failed:', error);
-      toast.error(t('evidence.export.failed'));
+  // Delete evidence
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this evidence? This action cannot be undone.')) {
+      try {
+        await apiService.evidence.delete(id);
+        toast.success('Evidence deleted successfully');
+        fetchEvidence();
+        fetchStats();
+      } catch (error) {
+        toast.error('Failed to delete evidence');
+      }
     }
   };
 
-  const getFileIcon = (fileType) => {
-    if (fileType?.startsWith('image/')) return Image;
-    if (fileType?.includes('pdf')) return FileText;
-    return File;
-  };
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case 'approved': return CheckCircle;
-      case 'pending': return Clock;
-      case 'rejected': return XCircle;
-      default: return AlertTriangle;
-    }
-  };
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'approved': return 'text-green-500';
-      case 'pending': return 'text-yellow-500';
-      case 'rejected': return 'text-red-500';
-      default: return 'text-gray-500';
-    }
-  };
-
-  const formatFileSize = (bytes) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  };
-
-  const filteredEvidence = evidence.filter(item => {
+  // Filter and sort data
+  const filteredData = evidence.filter(item => {
     const matchesSearch = item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         item.description?.toLowerCase().includes(searchTerm.toLowerCase());
+                          item.description?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = filterBy === 'all' || item.status === filterBy;
     const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
     return matchesSearch && matchesFilter && matchesCategory;
   });
 
-  if (loading) {
+  const sortedData = [...filteredData].sort((a, b) => {
+    const aValue = a[sortField];
+    const bValue = b[sortField];
+    if (sortDirection === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    } else {
+      return aValue < bValue ? 1 : -1;
+    }
+  });
+
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'approved': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'pending': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'rejected': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'approved': return <CheckCircle className="h-4 w-4 text-green-600" />;
+      case 'pending': return <Clock className="h-4 w-4 text-yellow-600" />;
+      case 'rejected': return <XCircle className="h-4 w-4 text-red-600" />;
+      default: return <AlertTriangle className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
+  if (loading && evidence.length === 0) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <CulturalLoadingSpinner />
-      </div>
+      <EnterprisePageLayout
+        title="Evidence Management"
+        subtitle="Manage and track compliance evidence and documentation"
+      >
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </EnterprisePageLayout>
     );
   }
 
   return (
-    <div className={`min-h-screen p-6 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-      <div className="max-w-7xl mx-auto space-y-6">
-        
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
-              {language === 'ar' ? 'إدارة الأدلة والوثائق' : 'Evidence Management'}
-            </h1>
-            <p className={`mt-1 text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              {language === 'ar' 
-                ? 'إدارة شاملة لأدلة الامتثال والوثائق الداعمة' 
-                : 'Comprehensive management of compliance evidence and supporting documents'
-              }
-            </p>
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <span className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              {filteredEvidence.length} {language === 'ar' ? 'وثيقة' : 'documents'}
-            </span>
-          </div>
-        </div>
-
-        {/* Quick Actions */}
-        <QuickActionsToolbar
-          actions={[
-            { id: 'upload', label: language === 'ar' ? 'رفع وثيقة' : 'Upload Evidence', icon: 'upload', variant: 'primary' },
-            { id: 'export', label: language === 'ar' ? 'تصدير' : 'Export', icon: 'download', variant: 'secondary' },
-            { id: 'refresh', label: language === 'ar' ? 'تحديث' : 'Refresh', icon: 'refresh', variant: 'secondary' },
-            { id: 'view', label: viewMode === 'grid' ? (language === 'ar' ? 'عرض قائمة' : 'List View') : (language === 'ar' ? 'عرض شبكي' : 'Grid View'), icon: viewMode === 'grid' ? 'list' : 'grid', variant: 'secondary' },
-            { id: 'analytics', label: analyticsMode === 'standard' ? (language === 'ar' ? 'تحليلات متقدمة' : 'Advanced Analytics') : (language === 'ar' ? 'عرض أساسي' : 'Standard View'), icon: 'chart', variant: 'secondary' },
-            { id: 'realtime', label: realTimeEnabled ? (language === 'ar' ? 'إيقاف الوقت الفعلي' : 'Disable Real-time') : (language === 'ar' ? 'تفعيل الوقت الفعلي' : 'Enable Real-time'), icon: 'pulse', variant: 'secondary' }
-          ]}
-          onAction={handleQuickAction}
-          loading={uploading}
-        />
-
-        {/* Hidden File Input */}
-        <input
-          id="evidence-upload"
-          type="file"
-          multiple
-          accept=".pdf,.doc,.docx,.xlsx,.jpg,.jpeg,.png,.gif"
-          onChange={handleFileUpload}
-          className="hidden"
-        />
-
-        {/* Analytics Dashboard */}
-        <RoleDashboardCards
-          data={{
-            kpis: {
-              totalEvidence: { value: analyticsData.totalEvidence || 0, trend: 'up', delta: '+5', status: 'info' },
-              recentUploads: { value: analyticsData.recentUploads || 0, trend: 'up', delta: '+2', status: 'success' },
-              categories: { value: Object.keys(analyticsData.categories || {}).length, trend: 'neutral', delta: '0', status: 'info' },
-              storageUsed: { value: formatFileSize(analyticsData.sizeStats?.total || 0), trend: 'up', delta: '+10%', status: 'warning' }
-            }
-          }}
-          loading={loading}
-        />
-
-        {/* Advanced Analytics Panel */}
-        {analyticsMode === 'advanced' && (
-          <PermissionBasedCard
-            requiredPermission="evidence.view_analytics"
-            title={language === 'ar' ? 'تحليلات متقدمة للأدلة' : 'Advanced Evidence Analytics'}
-            subtitle={language === 'ar' ? 'رؤى شاملة لإدارة الوثائق والأدلة' : 'Comprehensive insights into document and evidence management'}
+    <EnterprisePageLayout
+      title="Evidence Management"
+      subtitle="Manage and track compliance evidence and documentation"
+      actions={
+        <div className="flex gap-2">
+          <button
+            onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
+            className="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+            title={`Switch to ${viewMode === 'grid' ? 'table' : 'grid'} view`}
           >
-            <AdvancedAnalyticsPanel
-              data={{
-                trends: analyticsData.trends || [],
-                distribution: Object.entries(analyticsData.categories || {}).map(([name, count]) => ({
-                  name,
-                  value: count,
-                  color: '#3b82f6'
-                })),
-                heatmap: filteredEvidence.map(e => ({
-                  document: e.name,
-                  category: e.category,
-                  status: e.status
-                }))
-              }}
-              filters={{ searchTerm, filterBy, sortBy, categoryFilter }}
-              loading={loading}
-            />
-          </PermissionBasedCard>
-        )}
-
-        {/* Search and Filters */}
-        <div className={`p-4 rounded-lg ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder={language === 'ar' ? 'البحث في الوثائق...' : 'Search documents...'}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    isDark 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                  }`}
-                />
+            {viewMode === 'grid' ? <List className="h-4 w-4" /> : <Grid className="h-4 w-4" />}
+          </button>
+          <button
+            onClick={() => setIsUploadModalOpen(true)}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            <Upload className="h-4 w-4 mr-2" />
+            Upload Evidence
+          </button>
+        </div>
+      }
+    >
+      <div className="space-y-6">
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {statsCards.map((stat, index) => (
+            <div
+              key={index}
+              className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className={`p-2 rounded-lg bg-${stat.color}-100 dark:bg-${stat.color}-900/30`}>
+                  <stat.icon className={`h-5 w-5 text-${stat.color}-600 dark:text-${stat.color}-400`} />
+                </div>
               </div>
+              <h3 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+                {stat.title}
+              </h3>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                {stat.value}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {stat.trend}
+              </p>
             </div>
-            
-            <div className="flex gap-2">
-              <select
-                value={filterBy}
-                onChange={(e) => setFilterBy(e.target.value)}
-                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white' 
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-              >
-                <option value="all">{language === 'ar' ? 'جميع الحالات' : 'All Status'}</option>
-                <option value="approved">{language === 'ar' ? 'معتمد' : 'Approved'}</option>
-                <option value="pending">{language === 'ar' ? 'قيد المراجعة' : 'Pending'}</option>
-                <option value="rejected">{language === 'ar' ? 'مرفوض' : 'Rejected'}</option>
-              </select>
-              
-              <select
-                value={categoryFilter}
-                onChange={(e) => setCategoryFilter(e.target.value)}
-                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white' 
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-              >
-                <option value="all">{language === 'ar' ? 'جميع الفئات' : 'All Categories'}</option>
-                <option value="policy">{language === 'ar' ? 'سياسة' : 'Policy'}</option>
-                <option value="procedure">{language === 'ar' ? 'إجراء' : 'Procedure'}</option>
-                <option value="audit">{language === 'ar' ? 'مراجعة' : 'Audit'}</option>
-                <option value="compliance">{language === 'ar' ? 'امتثال' : 'Compliance'}</option>
-              </select>
-              
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className={`px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                  isDark 
-                    ? 'bg-gray-700 border-gray-600 text-white' 
-                    : 'bg-white border-gray-300 text-gray-900'
-                }`}
-              >
-                <option value="created_at">{language === 'ar' ? 'تاريخ الإضافة' : 'Date Added'}</option>
-                <option value="name">{language === 'ar' ? 'الاسم' : 'Name'}</option>
-                <option value="size">{language === 'ar' ? 'الحجم' : 'Size'}</option>
-                <option value="status">{language === 'ar' ? 'الحالة' : 'Status'}</option>
-              </select>
+          ))}
+        </div>
+
+        {/* Filters */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <input
+                type="text"
+                placeholder="Search evidence by name or description..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
             </div>
+
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              <option value="all">All Categories</option>
+              <option value="compliance">Compliance</option>
+              <option value="audit">Audit</option>
+              <option value="policy">Policy</option>
+              <option value="control">Control</option>
+              <option value="assessment">Assessment</option>
+            </select>
+
+            <select
+              value={filterBy}
+              onChange={(e) => setFilterBy(e.target.value)}
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+            >
+              <option value="all">All Status</option>
+              <option value="approved">Approved</option>
+              <option value="pending">Pending Review</option>
+              <option value="rejected">Rejected</option>
+              <option value="draft">Draft</option>
+            </select>
           </div>
         </div>
 
-        {/* Evidence Grid/List */}
-        <div className={viewMode === 'grid' 
-          ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6' 
-          : 'space-y-4'
-        }>
-          {filteredEvidence.map((item) => {
-            const FileIcon = getFileIcon(item.file_type);
-            const StatusIcon = getStatusIcon(item.status);
-            
-            if (viewMode === 'list') {
-              return (
-                <AnimatedCard
+        {/* Data Display */}
+        {viewMode === 'grid' ? (
+          /* Grid View */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {sortedData.length === 0 ? (
+              <div className="col-span-full">
+                <div className="border-2 border-dashed rounded-lg p-12 text-center border-gray-300 dark:border-gray-600">
+                  <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                    No evidence found
+                  </h3>
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">
+                    Upload your first evidence file to get started
+                  </p>
+                  <button
+                    onClick={() => setIsUploadModalOpen(true)}
+                    className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Upload Evidence
+                  </button>
+                </div>
+              </div>
+            ) : (
+              sortedData.map((item) => (
+                <div
                   key={item.id}
-                  className={`p-4 cursor-pointer transition-all hover:shadow-lg ${
-                    isDark ? 'bg-gray-800 hover:bg-gray-750' : 'bg-white hover:bg-gray-50'
-                  }`}
-                  onClick={() => setSelectedEvidence(item)}
+                  className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-center gap-4">
-                    <FileIcon className="w-10 h-10 text-blue-600 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <h3 className={`font-semibold truncate ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                        {item.name}
-                      </h3>
-                      <p className={`text-sm truncate ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                        {item.description || (language === 'ar' ? 'لا يوجد وصف' : 'No description')}
-                      </p>
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center gap-3 flex-1 min-w-0">
+                      <FileText className="h-8 w-8 text-blue-600 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                          {item.name || 'Untitled Evidence'}
+                        </h3>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {item.category || 'General'}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>
-                        {formatFileSize(item.file_size || 0)}
-                      </span>
-                      <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>
-                        {new Date(item.created_at || Date.now()).toLocaleDateString()}
-                      </span>
-                      <StatusIcon className={`w-5 h-5 ${getStatusColor(item.status)}`} />
+
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => window.open(item.file_url, '_blank')}
+                        className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                        title="View"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(item.id)}
+                        className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
-                </AnimatedCard>
-              );
-            }
 
-            return (
-              <AnimatedCard
-                key={item.id}
-                className={`p-6 cursor-pointer transition-all hover:shadow-lg ${
-                  isDark ? 'bg-gray-800 hover:bg-gray-750' : 'bg-white hover:bg-gray-50'
-                }`}
-                onClick={() => setSelectedEvidence(item)}
-              >
-                <div className="flex items-start justify-between mb-4">
-                  <FileIcon className="w-12 h-12 text-blue-600" />
-                  <StatusIcon className={`w-5 h-5 ${getStatusColor(item.status)}`} />
-                </div>
+                  {item.description && (
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+                      {item.description}
+                    </p>
+                  )}
 
-                <h3 className={`font-semibold mb-2 line-clamp-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>
-                  {item.name}
-                </h3>
+                  <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-2">
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {format(new Date(item.created_at || Date.now()), 'MMM d, yyyy')}
+                    </div>
 
-                <p className={`text-sm mb-3 line-clamp-2 ${isDark ? 'text-gray-300' : 'text-gray-600'}`}>
-                  {item.description || (language === 'ar' ? 'لا يوجد وصف متاح' : 'No description available')}
-                </p>
-
-                <div className="flex items-center justify-between text-xs">
-                  <span className={isDark ? 'text-gray-500' : 'text-gray-500'}>
-                    {formatFileSize(item.file_size || 0)}
-                  </span>
-                  <span className={isDark ? 'text-gray-500' : 'text-gray-500'}>
-                    {new Date(item.created_at || Date.now()).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}
-                  </span>
-                </div>
-
-                <div className="mt-3 flex items-center justify-between">
-                  <span className={`text-xs px-2 py-1 rounded ${
-                    item.category === 'policy' ? 'bg-blue-100 text-blue-800' :
-                    item.category === 'procedure' ? 'bg-green-100 text-green-800' :
-                    item.category === 'audit' ? 'bg-purple-100 text-purple-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {item.category || 'General'}
-                  </span>
-                  
-                  <div className="flex items-center gap-1">
-                    <Eye className="w-3 h-3" />
-                    <span className="text-xs">
-                      {language === 'ar' ? 'عرض' : 'View'}
+                    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(item.status)}`}>
+                      {getStatusIcon(item.status)}
+                      {item.status || 'pending'}
                     </span>
                   </div>
-                </div>
-              </AnimatedCard>
-            );
-          })}
-        </div>
 
-        {/* Empty State */}
-        {filteredEvidence.length === 0 && !loading && (
-          <div className={`text-center py-12 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-            <FileText className="w-16 h-16 mx-auto mb-4 opacity-50" />
-            <h3 className="text-lg font-semibold mb-2">
-              {language === 'ar' ? 'لا توجد وثائق متاحة' : 'No Evidence Available'}
-            </h3>
-            <p className="mb-4">
-              {language === 'ar' 
-                ? 'لم يتم العثور على وثائق تطابق معايير البحث' 
-                : 'No evidence documents found matching your search criteria'
-              }
-            </p>
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setFilterBy('all');
-                setCategoryFilter('all');
-              }}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              {language === 'ar' ? 'مسح المرشحات' : 'Clear Filters'}
-            </button>
+                  {item.uploaded_by && (
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      By {item.uploaded_by.name || item.uploaded_by.email}
+                    </p>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+        ) : (
+          /* Table View */
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-900">
+                  <tr>
+                    <th className="px-6 py-3 text-left">
+                      <button
+                        onClick={() => handleSort('name')}
+                        className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-200"
+                      >
+                        Name
+                        {sortField === 'name' && (
+                          sortDirection === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                        )}
+                      </button>
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Category
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left">
+                      <button
+                        onClick={() => handleSort('created_at')}
+                        className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider hover:text-gray-700 dark:hover:text-gray-200"
+                      >
+                        Date
+                        {sortField === 'created_at' && (
+                          sortDirection === 'asc' ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />
+                        )}
+                      </button>
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Uploaded By
+                    </th>
+                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  {sortedData.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-3">
+                          <FileText className="h-6 w-6 text-blue-600" />
+                          <div>
+                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                              {item.name || 'Untitled Evidence'}
+                            </div>
+                            {item.description && (
+                              <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-xs">
+                                {item.description}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        {item.category || 'General'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold ${getStatusColor(item.status)}`}>
+                          {getStatusIcon(item.status)}
+                          {item.status || 'pending'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        {format(new Date(item.created_at || Date.now()), 'MMM d, yyyy')}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        {item.uploaded_by?.name || item.uploaded_by?.email || 'Unknown'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => window.open(item.file_url, '_blank')}
+                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                            title="View"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item.id)}
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                            title="Delete"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {sortedData.length === 0 && (
+              <div className="p-12 text-center">
+                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                  No evidence found
+                </h3>
+                <p className="text-gray-500 dark:text-gray-400 mb-4">
+                  Try adjusting your search or filter criteria
+                </p>
+              </div>
+            )}
           </div>
         )}
 
-        {/* Real-time Monitor */}
-        {realTimeEnabled && (
-          <PermissionBasedCard
-            requiredPermission="evidence.view_monitoring"
-            title={language === 'ar' ? 'مراقبة الوقت الفعلي' : 'Real-time Monitoring'}
-            subtitle={language === 'ar' ? 'تحديثات مباشرة لحالة الوثائق والأدلة' : 'Live updates on document and evidence status'}
-          >
-            <RealTimeMonitor
-              data={{
-                kpis: {
-                  totalEvidence: { value: analyticsData.totalEvidence || 0, trend: 'up', delta: '+5', status: 'info' },
-                  recentUploads: { value: analyticsData.recentUploads || 0, trend: 'up', delta: '+2', status: 'success' }
-                },
-                activityFeed: filteredEvidence.slice(0, 5).map(e => ({
-                  id: e.id,
-                  user: e.uploaded_by || 'System',
-                  action: 'uploaded',
-                  target: e.name,
-                  time: new Date(e.created_at || Date.now()).toLocaleTimeString(),
-                  status: e.status
-                }))
-              }}
-              enabled={realTimeEnabled}
-              loading={loading}
-            />
-          </PermissionBasedCard>
-        )}
+        {/* Upload Modal */}
+        {isUploadModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  Upload Evidence
+                </h2>
+                <button
+                  onClick={() => setIsUploadModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                >
+                  <XCircle className="h-5 w-5" />
+                </button>
+              </div>
 
+              <div className="border-2 border-dashed rounded-lg p-8 text-center border-gray-300 dark:border-gray-600">
+                <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 dark:text-gray-400 mb-2">
+                  Select evidence files to upload
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mb-4">
+                  Supports PDF, DOC, images, and more
+                </p>
+                <input
+                  type="file"
+                  id="evidence-upload"
+                  multiple
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png,.xls,.xlsx"
+                />
+                <button
+                  onClick={() => document.getElementById('evidence-upload').click()}
+                  disabled={uploading}
+                  className="mt-2 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {uploading ? 'Uploading...' : 'Browse Files'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </div>
+    </EnterprisePageLayout>
   );
 };
 

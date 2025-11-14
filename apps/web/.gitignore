@@ -139,3 +139,5 @@ jspm_packages/
 
 # Deployment
 windsurf_deployment.yaml
+
+.vercel

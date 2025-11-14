@@ -1,0 +1,1367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.3.2 (Python 3.11.9 on win32)" generated="2025-11-14T13:55:48.166794" rpa="false" schemaversion="5">
+<suite id="s1" name="Complete Ui Tests" source="D:\Projects\GRC-Master\Assessmant-GRC\tests\robot\complete_ui_tests.robot">
+<kw name="Setup Test Environment" type="SETUP">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:55:48.646957" level="INFO">========================================</msg>
+<arg>========================================</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:55:48.646957" elapsed="0.001001"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:55:48.648464" level="INFO">Setting up Shahin-AI UI Test Environment</msg>
+<arg>Setting up Shahin-AI UI Test Environment</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:55:48.647958" elapsed="0.000506"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:55:48.648985" level="INFO">========================================</msg>
+<arg>========================================</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:55:48.648985" elapsed="0.000562"/>
+</kw>
+<kw name="Create Directory" owner="OperatingSystem">
+<msg time="2025-11-14T13:55:48.649547" level="INFO" html="true">Directory '&lt;a href="file://D:\Projects\GRC-Master\Assessmant-GRC\test-results\screenshots\20251114_135547"&gt;D:\Projects\GRC-Master\Assessmant-GRC\test-results\screenshots\20251114_135547&lt;/a&gt;' already exists.</msg>
+<arg>${SCREENSHOT_DIR}</arg>
+<doc>Creates the specified directory.</doc>
+<status status="PASS" start="2025-11-14T13:55:48.649547" elapsed="0.000000"/>
+</kw>
+<kw name="Open Browser" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:55:48.650555" level="INFO">Opening browser 'chrome' to base url 'http://localhost:5175'.</msg>
+<arg>${BASE_URL}</arg>
+<arg>${BROWSER}</arg>
+<doc>Opens a new browser instance to the optional ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:55:48.649547" elapsed="3.757927"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2025-11-14T13:55:52.407474" elapsed="0.072803"/>
+</kw>
+<kw name="Set Selenium Speed" owner="SeleniumLibrary">
+<arg>0.5s</arg>
+<doc>Sets the delay that is waited after each Selenium command.</doc>
+<status status="PASS" start="2025-11-14T13:55:52.480277" elapsed="0.000000"/>
+</kw>
+<kw name="Set Selenium Timeout" owner="SeleniumLibrary">
+<arg>30s</arg>
+<doc>Sets the timeout that is used by various keywords.</doc>
+<status status="PASS" start="2025-11-14T13:55:52.480277" elapsed="0.502093"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:55:52.982370" level="INFO">Browser opened successfully</msg>
+<arg>Browser opened successfully</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:55:52.982370" elapsed="0.001006"/>
+</kw>
+<doc>Initialize test environment</doc>
+<status status="PASS" start="2025-11-14T13:55:48.645383" elapsed="4.337993"/>
+</kw>
+<test id="s1-t1" name="Test 001 - Landing Page Complete Capture" line="18">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:55:52.984378" level="INFO">Testing Landing Page</msg>
+<arg>Testing Landing Page</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:55:52.984378" elapsed="0.000000"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:55:52.985378" level="INFO">Opening url 'http://localhost:5175'</msg>
+<arg>${BASE_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:55:52.984378" elapsed="1.168672"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:00.153242" level="INFO">Slept 6 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:55:54.153050" elapsed="6.000192"/>
+</kw>
+<kw name="Maximize Browser Window" owner="SeleniumLibrary">
+<doc>Maximizes current browser window.</doc>
+<status status="PASS" start="2025-11-14T13:56:00.153748" elapsed="0.503894"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:01.396301" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/001-landing-initial.png"&gt;&lt;img src="../../../screenshots/001-landing-initial.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>001-landing-initial.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:00.657642" elapsed="0.739182"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:01.397346" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:01.397346" elapsed="0.506876"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:03.905327" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:01.904829" elapsed="2.000498"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:04.662966" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/001-landing-top.png"&gt;&lt;img src="../../../screenshots/001-landing-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>001-landing-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:03.905864" elapsed="0.757102"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:04.664025" level="INFO">Executing JavaScript:
+return document.body.scrollHeight
+Without any arguments.</msg>
+<msg time="2025-11-14T13:56:05.169723" level="INFO">${height} = 636</msg>
+<var>${height}</var>
+<arg>return document.body.scrollHeight</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:04.663501" elapsed="0.506222"/>
+</kw>
+<kw name="Evaluate" owner="BuiltIn">
+<msg time="2025-11-14T13:56:05.171844" level="INFO">${scroll_step} = 159.0</msg>
+<var>${scroll_step}</var>
+<arg>${height} / 4</arg>
+<doc>Evaluates the given expression in Python and returns the result.</doc>
+<status status="PASS" start="2025-11-14T13:56:05.170738" elapsed="0.001106"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:05.173356" level="INFO">Executing JavaScript:
+window.scrollTo(0, 159.0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${scroll_step})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:05.171844" elapsed="0.511682"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:07.684053" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:05.683526" elapsed="2.000527"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:08.482975" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/001-landing-section-1.png"&gt;&lt;img src="../../../screenshots/001-landing-section-1.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>001-landing-section-1.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:07.684053" elapsed="0.798922"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:08.484490" level="INFO">Executing JavaScript:
+window.scrollTo(0, 159.0 * 2)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${scroll_step} * 2)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:08.482975" elapsed="0.509227"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:10.992608" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:08.992202" elapsed="2.000406"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:11.742550" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/001-landing-section-2.png"&gt;&lt;img src="../../../screenshots/001-landing-section-2.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>001-landing-section-2.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:10.992608" elapsed="0.749942"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:11.743557" level="INFO">Executing JavaScript:
+window.scrollTo(0, 159.0 * 3)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${scroll_step} * 3)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:11.743557" elapsed="0.506854"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:14.251229" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:12.250917" elapsed="2.000312"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:15.000638" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/001-landing-section-3.png"&gt;&lt;img src="../../../screenshots/001-landing-section-3.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>001-landing-section-3.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:14.251740" elapsed="0.748898"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:15.002064" level="INFO">Executing JavaScript:
+window.scrollTo(0, 636)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:15.000638" elapsed="0.506469"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:17.508246" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:15.507708" elapsed="2.000538"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:18.241596" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/001-landing-bottom.png"&gt;&lt;img src="../../../screenshots/001-landing-bottom.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>001-landing-bottom.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:17.508757" elapsed="0.732839"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:56:18.242596" level="INFO">Landing page captured successfully</msg>
+<arg>Landing page captured successfully</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:56:18.241596" elapsed="0.001000"/>
+</kw>
+<doc>Capture complete landing page with all sections</doc>
+<tag>landing</tag>
+<tag>public</tag>
+<status status="PASS" start="2025-11-14T13:55:52.983376" elapsed="25.259220"/>
+</test>
+<test id="s1-t2" name="Test 002 - Login Page" line="55">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:56:18.244101" level="INFO">Testing Login Page</msg>
+<arg>Testing Login Page</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:56:18.243596" elapsed="0.000505"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:18.244605" level="INFO">Opening url 'http://localhost:5175/login'</msg>
+<arg>${BASE_URL}/login</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:56:18.244605" elapsed="0.697629"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:21.943157" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:18.942739" elapsed="3.000418"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:22.693420" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/002-login-page.png"&gt;&lt;img src="../../../screenshots/002-login-page.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>002-login-page.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:21.943660" elapsed="0.749760"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:56:22.694426" level="INFO">Login page captured</msg>
+<arg>Login page captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:56:22.693420" elapsed="0.001006"/>
+</kw>
+<doc>Capture login page</doc>
+<tag>auth</tag>
+<tag>public</tag>
+<status status="PASS" start="2025-11-14T13:56:18.242596" elapsed="4.451830"/>
+</test>
+<test id="s1-t3" name="Test 003 - Register Page" line="65">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:56:22.695931" level="INFO">Testing Register Page</msg>
+<arg>Testing Register Page</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:56:22.695931" elapsed="0.000000"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:22.695931" level="INFO">Opening url 'http://localhost:5175/register'</msg>
+<arg>${BASE_URL}/register</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:56:22.695931" elapsed="0.677661"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:26.375075" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:23.373592" elapsed="3.001483"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:27.351702" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/003-register-page.png"&gt;&lt;img src="../../../screenshots/003-register-page.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>003-register-page.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:26.375579" elapsed="0.976123"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:56:27.353555" level="INFO">Register page captured</msg>
+<arg>Register page captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:56:27.352995" elapsed="0.000560"/>
+</kw>
+<doc>Capture register page</doc>
+<tag>auth</tag>
+<tag>public</tag>
+<status status="PASS" start="2025-11-14T13:56:22.695427" elapsed="4.658128"/>
+</test>
+<test id="s1-t4" name="Test 004 - Main Dashboard Direct Access" line="75">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:56:27.355561" level="INFO">Testing Main Dashboard</msg>
+<arg>Testing Main Dashboard</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:56:27.354561" elapsed="0.001000"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:27.355561" level="INFO">Opening url 'http://localhost:5175/dashboard'</msg>
+<arg>${BASE_URL}/dashboard</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:56:27.355561" elapsed="0.774554"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:34.130627" level="INFO">Slept 6 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:28.130115" elapsed="6.000512"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:34.990323" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/004-dashboard-main.png"&gt;&lt;img src="../../../screenshots/004-dashboard-main.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>004-dashboard-main.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:34.130627" elapsed="0.859696"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:34.991329" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:34.990323" elapsed="0.507822"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:37.499244" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:35.498666" elapsed="2.000578"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:38.365442" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/004-dashboard-top.png"&gt;&lt;img src="../../../screenshots/004-dashboard-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>004-dashboard-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:37.499244" elapsed="0.866198"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:38.366450" level="INFO">Executing JavaScript:
+return document.body.scrollHeight
+Without any arguments.</msg>
+<msg time="2025-11-14T13:56:38.871693" level="INFO">${height} = 636</msg>
+<var>${height}</var>
+<arg>return document.body.scrollHeight</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:38.365442" elapsed="0.506251"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:38.872198" level="INFO">Executing JavaScript:
+window.scrollTo(0, 636/2)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height}/2)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:38.872198" elapsed="0.506946"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:41.380222" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:39.379654" elapsed="2.000568"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:42.208622" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/004-dashboard-middle.png"&gt;&lt;img src="../../../screenshots/004-dashboard-middle.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>004-dashboard-middle.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:41.380222" elapsed="0.828400"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:42.209634" level="INFO">Executing JavaScript:
+window.scrollTo(0, 636)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:42.208622" elapsed="0.507246"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:44.716313" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:42.715868" elapsed="2.000445"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:45.539631" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/004-dashboard-bottom.png"&gt;&lt;img src="../../../screenshots/004-dashboard-bottom.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>004-dashboard-bottom.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:44.716825" elapsed="0.822806"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:56:45.540631" level="INFO">Dashboard captured</msg>
+<arg>Dashboard captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:56:45.539631" elapsed="0.001000"/>
+</kw>
+<doc>Try to access main dashboard</doc>
+<tag>dashboard</tag>
+<status status="PASS" start="2025-11-14T13:56:27.354561" elapsed="18.186070"/>
+</test>
+<test id="s1-t5" name="Test 005 - Assessments Page" line="99">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:56:45.542631" level="INFO">Testing Assessments</msg>
+<arg>Testing Assessments</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:56:45.541635" elapsed="0.000996"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:45.542631" level="INFO">Opening url 'http://localhost:5175/assessments'</msg>
+<arg>${BASE_URL}/assessments</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:56:45.542631" elapsed="1.032762"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:52.576125" level="INFO">Slept 6 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:46.575925" elapsed="6.000200"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:53.343202" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/005-assessments-main.png"&gt;&lt;img src="../../../screenshots/005-assessments-main.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>005-assessments-main.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:52.576125" elapsed="0.767077"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:53.344301" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:53.343754" elapsed="0.504990"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:55.850193" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:53.849842" elapsed="2.000351"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:56.616955" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/005-assessments-top.png"&gt;&lt;img src="../../../screenshots/005-assessments-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>005-assessments-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:55.850728" elapsed="0.766227"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:56.617498" level="INFO">Executing JavaScript:
+return document.body.scrollHeight
+Without any arguments.</msg>
+<msg time="2025-11-14T13:56:57.123669" level="INFO">${height} = 636</msg>
+<var>${height}</var>
+<arg>return document.body.scrollHeight</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:56.617498" elapsed="0.506171"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:56:57.124188" level="INFO">Executing JavaScript:
+window.scrollTo(0, 636)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:56:57.124188" elapsed="0.505119"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:56:59.631038" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:56:57.630365" elapsed="2.000673"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:00.370696" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/005-assessments-full.png"&gt;&lt;img src="../../../screenshots/005-assessments-full.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>005-assessments-full.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:56:59.631555" elapsed="0.739141"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:57:00.370696" level="INFO">Assessments captured</msg>
+<arg>Assessments captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:57:00.370696" elapsed="0.000000"/>
+</kw>
+<doc>Capture assessments module</doc>
+<tag>module</tag>
+<status status="PASS" start="2025-11-14T13:56:45.541635" elapsed="14.830069"/>
+</test>
+<test id="s1-t6" name="Test 006 - Frameworks Page" line="119">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:57:00.372266" level="INFO">Testing Frameworks</msg>
+<arg>Testing Frameworks</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:57:00.372266" elapsed="0.000000"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:00.373271" level="INFO">Opening url 'http://localhost:5175/frameworks'</msg>
+<arg>${BASE_URL}/frameworks</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:57:00.372266" elapsed="0.723326"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:07.096634" level="INFO">Slept 6 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:01.096130" elapsed="6.000504"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:07.954908" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/006-frameworks-main.png"&gt;&lt;img src="../../../screenshots/006-frameworks-main.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>006-frameworks-main.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:07.096634" elapsed="0.858274"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:07.956415" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:07.955905" elapsed="0.506008"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:10.462463" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:08.461913" elapsed="2.000550"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:11.323504" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/006-frameworks-top.png"&gt;&lt;img src="../../../screenshots/006-frameworks-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>006-frameworks-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:10.463043" elapsed="0.860461"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:11.324064" level="INFO">Executing JavaScript:
+return document.body.scrollHeight
+Without any arguments.</msg>
+<msg time="2025-11-14T13:57:11.829542" level="INFO">${height} = 636</msg>
+<var>${height}</var>
+<arg>return document.body.scrollHeight</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:11.324064" elapsed="0.505478"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:11.830152" level="INFO">Executing JavaScript:
+window.scrollTo(0, 636)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:11.830152" elapsed="0.506822"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:14.338438" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:12.336974" elapsed="2.001464"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:15.171935" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/006-frameworks-full.png"&gt;&lt;img src="../../../screenshots/006-frameworks-full.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>006-frameworks-full.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:14.338947" elapsed="0.832988"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:57:15.171935" level="INFO">Frameworks captured</msg>
+<arg>Frameworks captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:57:15.171935" elapsed="0.001509"/>
+</kw>
+<doc>Capture frameworks module</doc>
+<tag>module</tag>
+<status status="PASS" start="2025-11-14T13:57:00.372266" elapsed="14.801178"/>
+</test>
+<test id="s1-t7" name="Test 007 - Risk Management Page" line="139">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:57:15.173966" level="INFO">Testing Risk Management</msg>
+<arg>Testing Risk Management</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:57:15.173966" elapsed="0.000000"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:15.175503" level="INFO">Opening url 'http://localhost:5175/risks'</msg>
+<arg>${BASE_URL}/risks</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:57:15.173966" elapsed="0.765817"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:21.939973" level="INFO">Slept 6 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:15.939783" elapsed="6.000190"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:22.783825" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/007-risks-main.png"&gt;&lt;img src="../../../screenshots/007-risks-main.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>007-risks-main.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:21.940478" elapsed="0.844353"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:22.784831" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:22.784831" elapsed="0.506771"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:25.292132" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:23.291602" elapsed="2.000530"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:26.140423" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/007-risks-top.png"&gt;&lt;img src="../../../screenshots/007-risks-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>007-risks-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:25.292132" elapsed="0.848291"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:26.141423" level="INFO">Executing JavaScript:
+return document.body.scrollHeight
+Without any arguments.</msg>
+<msg time="2025-11-14T13:57:26.646542" level="INFO">${height} = 636</msg>
+<var>${height}</var>
+<arg>return document.body.scrollHeight</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:26.140423" elapsed="0.506119"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:26.647550" level="INFO">Executing JavaScript:
+window.scrollTo(0, 636/2)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height}/2)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:26.646542" elapsed="0.506256"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:29.153203" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:27.152798" elapsed="2.000405"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:29.980995" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/007-risks-middle.png"&gt;&lt;img src="../../../screenshots/007-risks-middle.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>007-risks-middle.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:29.153203" elapsed="0.827792"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:29.981520" level="INFO">Executing JavaScript:
+window.scrollTo(0, 636)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:29.981520" elapsed="0.506575"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:32.488645" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:30.488095" elapsed="2.000550"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:33.305735" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/007-risks-bottom.png"&gt;&lt;img src="../../../screenshots/007-risks-bottom.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>007-risks-bottom.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:32.489157" elapsed="0.816578"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:57:33.305735" level="INFO">Risk Management captured</msg>
+<arg>Risk Management captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:57:33.305735" elapsed="0.000000"/>
+</kw>
+<doc>Capture risk management</doc>
+<tag>module</tag>
+<status status="PASS" start="2025-11-14T13:57:15.173966" elapsed="18.132777"/>
+</test>
+<test id="s1-t8" name="Test 008 - Evidence Page" line="163">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:57:33.307818" level="INFO">Testing Evidence</msg>
+<arg>Testing Evidence</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:57:33.306743" elapsed="0.001075"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:33.307818" level="INFO">Opening url 'http://localhost:5175/evidence'</msg>
+<arg>${BASE_URL}/evidence</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:57:33.307818" elapsed="1.068157"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:40.376545" level="INFO">Slept 6 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:34.375975" elapsed="6.000570"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:41.241869" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/008-evidence-main.png"&gt;&lt;img src="../../../screenshots/008-evidence-main.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>008-evidence-main.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:40.376545" elapsed="0.865324"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:41.241869" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:41.241869" elapsed="0.506922"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:43.749524" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:41.748791" elapsed="2.000733"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:44.604404" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/008-evidence-top.png"&gt;&lt;img src="../../../screenshots/008-evidence-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>008-evidence-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:43.749524" elapsed="0.854880"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:44.604404" level="INFO">Executing JavaScript:
+return document.body.scrollHeight
+Without any arguments.</msg>
+<msg time="2025-11-14T13:57:45.109764" level="INFO">${height} = 636</msg>
+<var>${height}</var>
+<arg>return document.body.scrollHeight</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:44.604404" elapsed="0.505360"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:45.110774" level="INFO">Executing JavaScript:
+window.scrollTo(0, 636)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:45.109764" elapsed="0.506576"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:47.617385" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:45.616847" elapsed="2.000538"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:48.461033" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/008-evidence-full.png"&gt;&lt;img src="../../../screenshots/008-evidence-full.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>008-evidence-full.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:47.617385" elapsed="0.843648"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:57:48.461565" level="INFO">Evidence captured</msg>
+<arg>Evidence captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:57:48.461565" elapsed="0.000563"/>
+</kw>
+<doc>Capture evidence module</doc>
+<tag>module</tag>
+<status status="PASS" start="2025-11-14T13:57:33.306743" elapsed="15.155385"/>
+</test>
+<test id="s1-t9" name="Test 009 - Organizations Page" line="183">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:57:48.462655" level="INFO">Testing Organizations</msg>
+<arg>Testing Organizations</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:57:48.462655" elapsed="0.001013"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:48.463668" level="INFO">Opening url 'http://localhost:5175/organizations'</msg>
+<arg>${BASE_URL}/organizations</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:57:48.463668" elapsed="0.829606"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:55.294215" level="INFO">Slept 6 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:49.293801" elapsed="6.000414"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:56.143779" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/009-organizations-main.png"&gt;&lt;img src="../../../screenshots/009-organizations-main.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>009-organizations-main.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:55.294215" elapsed="0.849564"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:56.145477" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:56.143779" elapsed="0.507283"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:57:58.651649" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:57:56.651062" elapsed="2.000587"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:59.493769" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/009-organizations-top.png"&gt;&lt;img src="../../../screenshots/009-organizations-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>009-organizations-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:57:58.652187" elapsed="0.841582"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:57:59.493769" level="INFO">Executing JavaScript:
+return document.body.scrollHeight
+Without any arguments.</msg>
+<msg time="2025-11-14T13:58:00.000008" level="INFO">${height} = 636</msg>
+<var>${height}</var>
+<arg>return document.body.scrollHeight</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:57:59.493769" elapsed="0.506239"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:00.000008" level="INFO">Executing JavaScript:
+window.scrollTo(0, 636)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:58:00.000008" elapsed="0.506711"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:58:02.507136" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:58:00.506719" elapsed="2.000417"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:03.347528" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/009-organizations-full.png"&gt;&lt;img src="../../../screenshots/009-organizations-full.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>009-organizations-full.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:58:02.507136" elapsed="0.840392"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:58:03.348068" level="INFO">Organizations captured</msg>
+<arg>Organizations captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:58:03.348068" elapsed="0.000000"/>
+</kw>
+<doc>Capture organizations module</doc>
+<tag>module</tag>
+<status status="PASS" start="2025-11-14T13:57:48.462655" elapsed="14.885413"/>
+</test>
+<test id="s1-t10" name="Test 010 - Settings Page" line="203">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:58:03.349745" level="INFO">Testing Settings</msg>
+<arg>Testing Settings</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:58:03.349224" elapsed="0.000521"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:03.349745" level="INFO">Opening url 'http://localhost:5175/settings'</msg>
+<arg>${BASE_URL}/settings</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:58:03.349745" elapsed="1.036237"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:58:10.386658" level="INFO">Slept 6 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:58:04.386509" elapsed="6.000149"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:11.124657" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/010-settings-main.png"&gt;&lt;img src="../../../screenshots/010-settings-main.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>010-settings-main.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:58:10.387196" elapsed="0.737461"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:11.126163" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:58:11.125657" elapsed="0.506082"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:58:13.631858" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:58:11.631739" elapsed="2.000119"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:14.566297" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/010-settings-top.png"&gt;&lt;img src="../../../screenshots/010-settings-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>010-settings-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:58:13.632411" elapsed="0.933886"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:14.567296" level="INFO">Executing JavaScript:
+return document.body.scrollHeight
+Without any arguments.</msg>
+<msg time="2025-11-14T13:58:15.073055" level="INFO">${height} = 636</msg>
+<var>${height}</var>
+<arg>return document.body.scrollHeight</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:58:14.566297" elapsed="0.506758"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:15.073577" level="INFO">Executing JavaScript:
+window.scrollTo(0, 636)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:58:15.073577" elapsed="0.507358"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:58:17.581590" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:58:15.581463" elapsed="2.000127"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:18.451931" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/010-settings-full.png"&gt;&lt;img src="../../../screenshots/010-settings-full.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>010-settings-full.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:58:17.581590" elapsed="0.870341"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:58:18.453944" level="INFO">Settings captured</msg>
+<arg>Settings captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:58:18.452948" elapsed="0.000996"/>
+</kw>
+<doc>Capture settings page</doc>
+<tag>system</tag>
+<status status="PASS" start="2025-11-14T13:58:03.349224" elapsed="15.104720"/>
+</test>
+<test id="s1-t11" name="Test 011 - Documents Page" line="223">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:58:18.455455" level="INFO">Testing Documents</msg>
+<arg>Testing Documents</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:58:18.455455" elapsed="0.000000"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:18.455455" level="INFO">Opening url 'http://localhost:5175/documents'</msg>
+<arg>${BASE_URL}/documents</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:58:18.455455" elapsed="0.975255"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:58:25.432177" level="INFO">Slept 6 seconds.</msg>
+<arg>${LONG_DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:58:19.430710" elapsed="6.001467"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:26.132950" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/011-documents-main.png"&gt;&lt;img src="../../../screenshots/011-documents-main.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>011-documents-main.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:58:25.432177" elapsed="0.700773"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:26.132950" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:58:26.132950" elapsed="0.505176"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:58:28.638981" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:58:26.638631" elapsed="2.000350"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:29.354594" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/011-documents-top.png"&gt;&lt;img src="../../../screenshots/011-documents-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>011-documents-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:58:28.639486" elapsed="0.715108"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:29.355130" level="INFO">Executing JavaScript:
+return document.body.scrollHeight
+Without any arguments.</msg>
+<msg time="2025-11-14T13:58:29.861805" level="INFO">${height} = 636</msg>
+<var>${height}</var>
+<arg>return document.body.scrollHeight</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:58:29.354594" elapsed="0.507211"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:29.862861" level="INFO">Executing JavaScript:
+window.scrollTo(0, 636)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:58:29.862346" elapsed="0.506345"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:58:32.369336" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:58:30.369203" elapsed="2.000133"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:33.144373" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/011-documents-full.png"&gt;&lt;img src="../../../screenshots/011-documents-full.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>011-documents-full.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:58:32.369842" elapsed="0.774531"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:58:33.145885" level="INFO">Documents captured</msg>
+<arg>Documents captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:58:33.145380" elapsed="0.000505"/>
+</kw>
+<doc>Capture documents module</doc>
+<tag>module</tag>
+<status status="PASS" start="2025-11-14T13:58:18.453944" elapsed="14.692454"/>
+</test>
+<test id="s1-t12" name="Test 012 - Mobile View Landing" line="243">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:58:33.147403" level="INFO">Testing Mobile View</msg>
+<arg>Testing Mobile View</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:58:33.147403" elapsed="0.000000"/>
+</kw>
+<kw name="Set Window Size" owner="SeleniumLibrary">
+<arg>375</arg>
+<arg>667</arg>
+<doc>Sets current windows size to given ``width`` and ``height``.</doc>
+<status status="PASS" start="2025-11-14T13:58:33.147403" elapsed="0.906771"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:34.054174" level="INFO">Opening url 'http://localhost:5175'</msg>
+<arg>${BASE_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:58:34.054174" elapsed="0.990316"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:58:38.044933" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:58:35.044490" elapsed="3.000443"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:39.080306" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/012-mobile-landing.png"&gt;&lt;img src="../../../screenshots/012-mobile-landing.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>012-mobile-landing.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:58:38.045448" elapsed="1.034858"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:39.081830" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<msg time="2025-11-14T13:58:51.666190" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/selenium-screenshot-12.png"&gt;&lt;img src="../../../screenshots/selenium-screenshot-12.png" width="800px"&gt;&lt;/a&gt;</msg>
+<msg time="2025-11-14T13:58:51.666190" level="FAIL">TimeoutException: Message: timeout
+from aborted by navigation: loader has changed while resolving nodes
+  (Session info: chrome=142.0.7444.136)
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff7fd78a235
+	0x7ff7fd4e2650
+	0x7ff7fd2716dd
+	0x7ff7fd27827d
+	0x7ff7fd27c8c2
+	0x7ff7fd31ce53
+	0x7ff7fd2f2b0a
+	0x7ff7fd31baba
+	0x7ff7fd2bb0ed
+	0x7ff7fd2bbf63
+	0x7ff7fd7b5d60
+	0x7ff7fd7afe8a
+	0x7ff7fd7d1005
+	0x7ff7fd4fd73e
+	0x7ff7fd504e3f
+	0x7ff7fd4eb7e4
+	0x7ff7fd4eb99f
+	0x7ff7fd4d1908
+	0x7ff96c95e8d7
+	0x7ff96dfac53c
+</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="FAIL" start="2025-11-14T13:58:39.080306" elapsed="12.606122">TimeoutException: Message: timeout
+from aborted by navigation: loader has changed while resolving nodes
+  (Session info: chrome=142.0.7444.136)
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff7fd78a235
+	0x7ff7fd4e2650
+	0x7ff7fd2716dd
+	0x7ff7fd27827d
+	0x7ff7fd27c8c2
+	0x7ff7fd31ce53
+	0x7ff7fd2f2b0a
+	0x7ff7fd31baba
+	0x7ff7fd2bb0ed
+	0x7ff7fd2bbf63
+	0x7ff7fd7b5d60
+	0x7ff7fd7afe8a
+	0x7ff7fd7d1005
+	0x7ff7fd4fd73e
+	0x7ff7fd504e3f
+	0x7ff7fd4eb7e4
+	0x7ff7fd4eb99f
+	0x7ff7fd4d1908
+	0x7ff96c95e8d7
+	0x7ff96dfac53c
+</status>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2025-11-14T13:58:51.688510" elapsed="0.000000"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<arg>012-mobile-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="NOT RUN" start="2025-11-14T13:58:51.688510" elapsed="0.000000"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<var>${height}</var>
+<arg>return document.body.scrollHeight</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="NOT RUN" start="2025-11-14T13:58:51.688510" elapsed="0.000000"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<arg>window.scrollTo(0, ${height})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="NOT RUN" start="2025-11-14T13:58:51.689516" elapsed="0.000000"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2025-11-14T13:58:51.689516" elapsed="0.000000"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<arg>012-mobile-bottom.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="NOT RUN" start="2025-11-14T13:58:51.689516" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Mobile view captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-14T13:58:51.690518" elapsed="0.000000"/>
+</kw>
+<doc>Test mobile responsiveness</doc>
+<tag>mobile</tag>
+<status status="FAIL" start="2025-11-14T13:58:33.146398" elapsed="18.544120">TimeoutException: Message: timeout
+from aborted by navigation: loader has changed while resolving nodes
+  (Session info: chrome=142.0.7444.136)
+Stacktrace:
+Symbols not available. Dumping unresolved backtrace:
+	0x7ff7fd78a235
+	0x7ff7fd4e2650
+	0x7ff7fd2716dd
+	0x7ff7fd27827d
+	0x7ff7fd27c8c2
+	0x7ff7fd31ce53
+	0x7ff7fd2f2b0a
+	0x7ff7fd31baba
+	0x7ff7fd2bb0ed
+	0x7ff7fd2bbf63
+	0x7ff7fd7b5d60
+	0x7ff7fd7afe8a
+	0x7ff7fd7d1005
+	0x7ff7fd4fd73e
+	0x7ff7fd504e3f
+	0x7ff7fd4eb7e4
+	0x7ff7fd4eb99f
+	0x7ff7fd4d1908
+	0x7ff96c95e8d7
+	0x7ff96dfac53c
+</status>
+</test>
+<test id="s1-t13" name="Test 013 - Tablet View Landing" line="264">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:58:51.692030" level="INFO">Testing Tablet View</msg>
+<arg>Testing Tablet View</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:58:51.692030" elapsed="0.000000"/>
+</kw>
+<kw name="Set Window Size" owner="SeleniumLibrary">
+<arg>768</arg>
+<arg>1024</arg>
+<doc>Sets current windows size to given ``width`` and ``height``.</doc>
+<status status="PASS" start="2025-11-14T13:58:51.692030" elapsed="0.876846"/>
+</kw>
+<kw name="Go To" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:52.569400" level="INFO">Opening url 'http://localhost:5175'</msg>
+<arg>${BASE_URL}</arg>
+<doc>Navigates the current browser window to the provided ``url``.</doc>
+<status status="PASS" start="2025-11-14T13:58:52.569400" elapsed="0.806701"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:58:56.376880" level="INFO">Slept 3 seconds.</msg>
+<arg>${DELAY}</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:58:53.376706" elapsed="3.000174"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:57.177357" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/013-tablet-landing.png"&gt;&lt;img src="../../../screenshots/013-tablet-landing.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>013-tablet-landing.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:58:56.376880" elapsed="0.800477"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:57.178393" level="INFO">Executing JavaScript:
+window.scrollTo(0, 0)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, 0)</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:58:57.177866" elapsed="0.509058"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:58:58.687439" level="INFO">Slept 1 second.</msg>
+<arg>1s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:58:57.686924" elapsed="1.000515"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:59.437205" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/013-tablet-top.png"&gt;&lt;img src="../../../screenshots/013-tablet-top.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>013-tablet-top.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:58:58.687439" elapsed="0.749766"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:59.438207" level="INFO">Executing JavaScript:
+return document.body.scrollHeight
+Without any arguments.</msg>
+<msg time="2025-11-14T13:58:59.944399" level="INFO">${height} = 694</msg>
+<var>${height}</var>
+<arg>return document.body.scrollHeight</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:58:59.438207" elapsed="0.506192"/>
+</kw>
+<kw name="Execute Javascript" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:58:59.945982" level="INFO">Executing JavaScript:
+window.scrollTo(0, 694)
+Without any arguments.</msg>
+<arg>window.scrollTo(0, ${height})</arg>
+<doc>Executes the given JavaScript code with possible arguments.</doc>
+<status status="PASS" start="2025-11-14T13:58:59.945405" elapsed="0.507345"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<msg time="2025-11-14T13:59:02.452996" level="INFO">Slept 2 seconds.</msg>
+<arg>2s</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="PASS" start="2025-11-14T13:59:00.452750" elapsed="2.000246"/>
+</kw>
+<kw name="Capture Page Screenshot" owner="SeleniumLibrary">
+<msg time="2025-11-14T13:59:03.170721" level="INFO" html="true">&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan="3"&gt;&lt;a href="../../../screenshots/013-tablet-bottom.png"&gt;&lt;img src="../../../screenshots/013-tablet-bottom.png" width="800px"&gt;&lt;/a&gt;</msg>
+<arg>013-tablet-bottom.png</arg>
+<doc>Takes a screenshot of the current page and embeds it into a log file.</doc>
+<status status="PASS" start="2025-11-14T13:59:02.452996" elapsed="0.717725"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:59:03.171733" level="INFO">Tablet view captured</msg>
+<arg>Tablet view captured</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:59:03.170721" elapsed="0.001012"/>
+</kw>
+<doc>Test tablet responsiveness</doc>
+<tag>tablet</tag>
+<status status="PASS" start="2025-11-14T13:58:51.691024" elapsed="11.480709"/>
+</test>
+<kw name="Teardown Test Environment" type="TEARDOWN">
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:59:03.173873" level="INFO">========================================</msg>
+<arg>========================================</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:59:03.173873" elapsed="0.000555"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:59:03.174428" level="INFO">Test Environment Cleanup</msg>
+<arg>Test Environment Cleanup</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:59:03.174428" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:59:03.174428" level="INFO">========================================</msg>
+<arg>========================================</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:59:03.174428" elapsed="0.000000"/>
+</kw>
+<kw name="Count Files In Directory" owner="OperatingSystem">
+<msg time="2025-11-14T13:59:03.175944" level="INFO" html="true">Listing contents of directory '&lt;a href="file://D:\Projects\GRC-Master\Assessmant-GRC\test-results\screenshots\20251114_135547"&gt;D:\Projects\GRC-Master\Assessmant-GRC\test-results\screenshots\20251114_135547&lt;/a&gt;'.</msg>
+<msg time="2025-11-14T13:59:03.175944" level="INFO">0 files.</msg>
+<msg time="2025-11-14T13:59:03.175944" level="INFO">${screenshot_count} = 0</msg>
+<var>${screenshot_count}</var>
+<arg>${SCREENSHOT_DIR}</arg>
+<arg>*.png</arg>
+<doc>Wrapper for `Count Items In Directory` returning only file count.</doc>
+<status status="PASS" start="2025-11-14T13:59:03.174428" elapsed="0.001516"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:59:03.175944" level="INFO">Total screenshots captured: 0</msg>
+<arg>Total screenshots captured: ${screenshot_count}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:59:03.175944" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:59:03.176949" level="INFO">Screenshots saved to: test-results\screenshots\20251114_135547</msg>
+<arg>Screenshots saved to: ${SCREENSHOT_DIR}</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:59:03.176949" elapsed="0.000000"/>
+</kw>
+<kw name="Close All Browsers" owner="SeleniumLibrary">
+<doc>Closes all open browsers and resets the browser cache.</doc>
+<status status="PASS" start="2025-11-14T13:59:03.176949" elapsed="2.591194"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-14T13:59:05.768143" level="INFO">Teardown completed</msg>
+<arg>Teardown completed</arg>
+<arg>console=True</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-14T13:59:05.768143" elapsed="0.000000"/>
+</kw>
+<doc>Clean up after tests</doc>
+<status status="PASS" start="2025-11-14T13:59:03.173242" elapsed="2.595909"/>
+</kw>
+<status status="FAIL" start="2025-11-14T13:55:48.169418" elapsed="197.599733"/>
+</suite>
+<statistics>
+<total>
+<stat pass="12" fail="1" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="2" fail="0" skip="0">auth</stat>
+<stat pass="1" fail="0" skip="0">dashboard</stat>
+<stat pass="1" fail="0" skip="0">landing</stat>
+<stat pass="0" fail="1" skip="0">mobile</stat>
+<stat pass="6" fail="0" skip="0">module</stat>
+<stat pass="3" fail="0" skip="0">public</stat>
+<stat pass="1" fail="0" skip="0">system</stat>
+<stat pass="1" fail="0" skip="0">tablet</stat>
+</tag>
+<suite>
+<stat name="Complete Ui Tests" id="s1" pass="12" fail="1" skip="0">Complete Ui Tests</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>
