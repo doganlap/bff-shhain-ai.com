@@ -1,7 +1,8 @@
 // Complete 5500+ Controls Seed for Prisma Postgres
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 
 const prisma = new PrismaClient()
+type ControlSeed = Prisma.grc_controlsCreateInput
 
 async function main() {
   console.log('🚀 Seeding 5500+ Saudi GRC Controls to Prisma Postgres')
@@ -122,8 +123,8 @@ async function main() {
   console.log('================================================')
 }
 
-function generateNCAControls(frameworkId: string) {
-  const controls = []
+function generateNCAControls(frameworkId: string): ControlSeed[] {
+  const controls: ControlSeed[] = []
   const domains = [
     { id: '1', name: 'Cybersecurity Governance', nameAr: 'حوكمة الأمن السيبراني', count: 20 },
     { id: '2', name: 'Cybersecurity Defense', nameAr: 'دفاعات الأمن السيبراني', count: 35 },
@@ -155,8 +156,8 @@ function generateNCAControls(frameworkId: string) {
   return controls
 }
 
-function generateSAMAControls(frameworkId: string) {
-  const controls = []
+function generateSAMAControls(frameworkId: string): ControlSeed[] {
+  const controls: ControlSeed[] = []
   const categories = [
     { id: '1', name: 'Cybersecurity Governance', nameAr: 'حوكمة الأمن السيبراني', count: 25 },
     { id: '2', name: 'Cybersecurity Defense', nameAr: 'الدفاع السيبراني', count: 40 },
@@ -189,8 +190,8 @@ function generateSAMAControls(frameworkId: string) {
   return controls
 }
 
-function generateISO27001Controls(frameworkId: string) {
-  const controls = []
+function generateISO27001Controls(frameworkId: string): ControlSeed[] {
+  const controls: ControlSeed[] = []
   const annexA = [
     { id: '5', name: 'Organizational Controls', nameAr: 'ضوابط المنظمة', count: 37 },
     { id: '6', name: 'People Controls', nameAr: 'ضوابط الأفراد', count: 8 },

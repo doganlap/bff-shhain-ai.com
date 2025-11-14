@@ -94,7 +94,7 @@ import {
 } from './pages';
 
 // Onboarding & New Modules
-import OnboardingPage from './pages/onboarding/OnboardingPage';
+import OnboardingPage from './pages/organizations/OnboardingPage';
 import OrganizationDashboard from './pages/organizations/OrganizationDashboard';
 import AssessmentPage from './pages/assessments/AssessmentPage';
 import EvidenceUploadPage from './pages/evidence/EvidenceUploadPage';
