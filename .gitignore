@@ -10,12 +10,31 @@ dist/
 build/  
 out/  
   
-# Environment files  
-.env  
-.env.local  
-.env.development.local  
-.env.test.local  
-.env.production.local  
+# Environment files - CRITICAL: Never commit sensitive data
+.env
+.env.*
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+
+# App-specific environment files
+apps/bff/.env
+apps/bff/.env.*
+apps/web/.env
+apps/web/.env.*
+apps/infra/deployment/.env*
+apps/*/.env
+apps/*/.env.*
+
+# Environment templates (safe to commit)
+!.env.template
+!.env.example
+!**/.env.template
+!**/.env.example
   
 # IDE files  
 .vscode/  
@@ -37,3 +56,5 @@ Thumbs.db
 logs/  
 *.log 
 .vercel
+
+/generated/prisma
