@@ -1,0 +1,11 @@
+id,name,version,description,sector_applicability,complexity_level,status,created_at,updated_at
+713715b8-3ac4-4fa9-96b2-01e2c4194626,ISO 27001,2022,Information Security Management System,"{finance,healthcare,technology}",4,active,2025-11-13 17:38:57.804138,2025-11-13 17:38:57.804138
+0e422e90-c022-4e13-b20c-182b02cd6322,NIST CSF,1.1,NIST Cybersecurity Framework,"{finance,energy,healthcare}",3,active,2025-11-13 17:38:57.804138,2025-11-13 17:38:57.804138
+ca388d0d-ad94-48ca-b4c8-c350ff008d08,SOC 2,Type II,Service Organization Control 2,"{technology,finance}",3,active,2025-11-13 17:38:57.804138,2025-11-13 17:38:57.804138
+88aff602-50b0-4ce5-924c-c12b1d2acec4,SAMA Cybersecurity,1.0,SAMA Cybersecurity Framework for KSA Financial Sector,"{finance,banking}",5,active,2025-11-13 17:38:57.804138,2025-11-13 17:38:57.804138
+a790f636-9fad-47e2-b141-e04ccb0aa095,PCI-DSS,4.0,Payment Card Industry Data Security Standard,"{finance,retail,ecommerce}",4,active,2025-11-13 17:38:57.804138,2025-11-13 17:38:57.804138
+6d677043-533d-4444-b259-fd6e9ed3d14a,GDPR,2016/679,General Data Protection Regulation,{all},3,active,2025-11-13 17:38:57.804138,2025-11-13 17:38:57.804138
+f7690af1-c788-47cf-96c1-97126344a67f,Basel III,2023,Basel III Banking Regulations,"{finance,banking}",5,active,2025-11-13 17:38:57.804138,2025-11-13 17:38:57.804138
+6744f31a-f4a8-4caa-abba-639677141473,MOH Health Data Protection,1.0,MOH Healthcare Data Protection Standards,{healthcare},4,active,2025-11-13 17:38:57.804138,2025-11-13 17:38:57.804138
+03f1271f-204f-4174-a856-2108464e4982,CITC Telecom Regulations,1.0,CITC Telecommunications Regulations,{telecom},3,active,2025-11-13 17:38:57.804138,2025-11-13 17:38:57.804138
+d9a2aa3b-1083-4ccc-be50-c80d27d36e04,ECRA Energy Standards,1.0,ECRA Energy Sector Standards,{energy},3,active,2025-11-13 17:38:57.804138,2025-11-13 17:38:57.804138

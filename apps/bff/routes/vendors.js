@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../db/prisma');
+const vendorService = require('../src/services/vendor.service');
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {
@@ -11,18 +12,9 @@ const handleError = (res, error, message) => {
 // GET /api/vendors/stats - Get vendor statistics
 router.get('/stats', async (req, res) => {
   try {
-    const totalVendors = await prisma.vendor.count();
-    const activeVendors = await prisma.vendor.count({
-      where: { isActive: true }
-    });
-    
-    const stats = {
-      totalVendors,
-      activeVendors,
-      inactiveVendors: totalVendors - activeVendors,
-    };
-
-    res.json(stats);
+    const tenantId = req.headers['x-tenant-id'] || req.user?.tenantId;
+    const stats = await vendorService.getVendorStats(tenantId);
+    res.json({ success: true, data: stats });
   } catch (error) {
     handleError(res, error, 'Error fetching vendor statistics');
   }
@@ -156,12 +148,12 @@ router.get('/stats', async (req, res) => {
     const highRiskVendors = await prisma.vendor.count({
       where: { riskLevel: 'high' }
     });
-    
+
     const vendorsByCategory = await prisma.vendor.groupBy({
       by: ['category'],
       _count: { id: true }
     });
-    
+
     const vendorsByRiskLevel = await prisma.vendor.groupBy({
       by: ['riskLevel'],
       _count: { id: true }

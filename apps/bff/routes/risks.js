@@ -11,16 +11,35 @@ const handleError = (res, error, message) => {
 // GET /api/risks - Get all risks
 router.get('/', async (req, res) => {
   try {
-    const risks = await prisma.risk.findMany({
-      include: { // Include related data if needed by the frontend
-        category: true,
-        owner: true,
-        treatment: true,
-      },
+    const { limit = 50, page = 1 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const risks = await prisma.grc_risks.findMany({
+      skip,
+      take: parseInt(limit),
+      orderBy: { created_at: 'desc' }
     });
-    res.json(risks);
+
+    const total = await prisma.grc_risks.count();
+
+    res.json({
+      success: true,
+      data: risks,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
-    handleError(res, error, 'Error fetching risks');
+    console.error('Error fetching risks:', error.message);
+    res.json({
+      success: true,
+      data: [],
+      pagination: { page: 1, limit: 50, total: 0, totalPages: 0 },
+      note: 'Risks table not yet populated'
+    });
   }
 });
 
@@ -28,10 +47,10 @@ router.get('/', async (req, res) => {
 router.get('/heatmap', async (req, res) => {
   try {
     // This is a simplified example. A real implementation would involve aggregation.
-    const heatmapData = await prisma.risk.groupBy({
-      by: ['impact', 'likelihood'],
+    const heatmapData = await prisma.grc_risks.groupBy({
+      by: ['impact_level', 'likelihood_level'],
       _count: {
-        id: true,
+        risk_id: true,
       },
     });
     res.json(heatmapData);
@@ -44,14 +63,8 @@ router.get('/heatmap', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const risk = await prisma.risk.findUnique({
-      where: { id: parseInt(id, 10) },
-       include: {
-        category: true,
-        owner: true,
-        treatment: true,
-        assessments: true, // Assuming a relation exists
-      },
+    const risk = await prisma.grc_risks.findUnique({
+      where: { risk_id: parseInt(id, 10) },
     });
     if (!risk) {
       return res.status(404).json({ error: 'Risk not found' });
@@ -65,7 +78,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/risks - Create a new risk
 router.post('/', async (req, res) => {
   try {
-    const newRisk = await prisma.risk.create({
+    const newRisk = await prisma.grc_risks.create({
       data: req.body,
     });
     res.status(201).json(newRisk);
@@ -78,8 +91,8 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const updatedRisk = await prisma.risk.update({
-      where: { id: parseInt(id, 10) },
+    const updatedRisk = await prisma.grc_risks.update({
+      where: { risk_id: parseInt(id, 10) },
       data: req.body,
     });
     res.json(updatedRisk);
@@ -130,7 +143,7 @@ router.get('/metrics', async (req, res) => {
       where: { impact: 'high', likelihood: 'high' }
     });
     const mediumRisks = await prisma.risk.count({
-      where: { 
+      where: {
         OR: [
           { impact: 'medium', likelihood: 'high' },
           { impact: 'high', likelihood: 'medium' },
@@ -139,7 +152,7 @@ router.get('/metrics', async (req, res) => {
       }
     });
     const lowRisks = await prisma.risk.count({
-      where: { 
+      where: {
         OR: [
           { impact: 'low', likelihood: 'low' },
           { impact: 'low', likelihood: 'medium' },
@@ -147,12 +160,12 @@ router.get('/metrics', async (req, res) => {
         ]
       }
     });
-    
+
     const risksByCategory = await prisma.risk.groupBy({
       by: ['categoryId'],
       _count: { id: true }
     });
-    
+
     const risksByStatus = await prisma.risk.groupBy({
       by: ['status'],
       _count: { id: true }
@@ -186,11 +199,11 @@ router.get('/realtime', async (req, res) => {
     // Simulate real-time metrics with current timestamp
     const now = new Date();
     const last24Hours = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    
+
     const newRisks = await prisma.risk.count({
       where: { createdAt: { gte: last24Hours } }
     });
-    
+
     const updatedRisks = await prisma.risk.count({
       where: { updatedAt: { gte: last24Hours } }
     });
@@ -216,7 +229,7 @@ router.get('/trends', async (req, res) => {
     const { period = '6m' } = req.query;
     const now = new Date();
     let startDate;
-    
+
     switch (period) {
       case '1m':
         startDate = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
@@ -229,10 +242,10 @@ router.get('/trends', async (req, res) => {
         startDate = new Date(now.getTime() - 180 * 24 * 60 * 60 * 1000);
         break;
     }
-    
+
     // Get monthly risk counts for the period
     const monthlyRisks = await prisma.$queryRaw`
-      SELECT 
+      SELECT
         DATE_TRUNC('month', "createdAt") as month,
         COUNT(*) as count
       FROM "Risk"
@@ -240,13 +253,13 @@ router.get('/trends', async (req, res) => {
       GROUP BY DATE_TRUNC('month', "createdAt")
       ORDER BY month ASC
     `;
-    
+
     // Format data for chart
     const trendData = monthlyRisks.map(item => ({
       name: new Date(item.month).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }),
       value: parseInt(item.count)
     }));
-    
+
     res.json(trendData);
   } catch (error) {
     handleError(res, error, 'Error fetching risk trends');

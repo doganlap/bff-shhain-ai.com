@@ -7,12 +7,35 @@ const jwt = require('jsonwebtoken');
 const Redis = require('ioredis');
 
 // Initialize Redis for token blacklist
-const redis = process.env.REDIS_URL 
+const redis = process.env.REDIS_URL
   ? new Redis(process.env.REDIS_URL)
   : null;
 
 // Token blacklist (in-memory fallback if no Redis)
 const tokenBlacklist = new Set();
+
+// ✅ NEW: User cache for authentication (5-minute TTL)
+const userCache = new Map();
+const USER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function getCachedUser(userId, tenantId) {
+  const key = `${userId}:${tenantId}`;
+  const cached = userCache.get(key);
+  if (cached && Date.now() - cached.timestamp < USER_CACHE_TTL) {
+    return cached.user;
+  }
+  return null;
+}
+
+function setCachedUser(userId, tenantId, user) {
+  const key = `${userId}:${tenantId}`;
+  userCache.set(key, { user, timestamp: Date.now() });
+  // Auto-cleanup old cache entries
+  if (userCache.size > 1000) {
+    const oldestKey = userCache.keys().next().value;
+    userCache.delete(oldestKey);
+  }
+}
 
 /**
  * Enhanced authentication middleware
@@ -89,23 +112,27 @@ const authenticateToken = async (req, res, next) => {
       res.setHeader('X-Token-Expires-In', timeToExpiry.toString());
     }
 
-    // ✅ NEW: Check if user still exists and is active
+    // ✅ NEW: Check if user still exists and is active (with caching)
     // This prevents deleted users from accessing with old tokens
-    const userExists = await verifyUserExists(decoded.id, decoded.tenantId);
-    if (!userExists) {
-      return res.status(401).json({
-        error: 'User not found',
-        message: 'User account no longer exists',
-        code: 'USER_NOT_FOUND'
-      });
+    let cachedUser = getCachedUser(decoded.id, decoded.tenantId);
+    if (!cachedUser) {
+      const userExists = await verifyUserExists(decoded.id, decoded.tenantId);
+      if (!userExists) {
+        return res.status(401).json({
+          error: 'User not found',
+          message: 'User account no longer exists',
+          code: 'USER_NOT_FOUND'
+        });
+      }
+      setCachedUser(decoded.id, decoded.tenantId, decoded);
     }
 
     req.user = decoded;
     next();
 
   } catch (error) {
-    const errorCode = error.name === 'TokenExpiredError' 
-      ? 'TOKEN_EXPIRED' 
+    const errorCode = error.name === 'TokenExpiredError'
+      ? 'TOKEN_EXPIRED'
       : error.name === 'JsonWebTokenError'
       ? 'TOKEN_INVALID'
       : 'TOKEN_ERROR';
@@ -161,7 +188,7 @@ async function verifyUserExists(userId, tenantId) {
   // Example:
   // const user = await db.query('SELECT id, is_active FROM users WHERE id = ? AND tenant_id = ?', [userId, tenantId]);
   // return user && user.is_active;
-  
+
   // For now, assume user exists
   return true;
 }
@@ -171,7 +198,7 @@ async function verifyUserExists(userId, tenantId) {
  */
 const refreshToken = async (req, res) => {
   const { refreshToken } = req.body;
-  
+
   if (!refreshToken) {
     return res.status(401).json({
       error: 'Refresh token required',
@@ -182,7 +209,7 @@ const refreshToken = async (req, res) => {
   try {
     // Verify refresh token
     const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
-    
+
     // Check if refresh token is blacklisted
     const isBlacklisted = await checkTokenBlacklist(refreshToken);
     if (isBlacklisted) {

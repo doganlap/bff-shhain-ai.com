@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../db/prisma');
+const organizationService = require('../src/services/organization.service');
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {
@@ -11,10 +12,27 @@ const handleError = (res, error, message) => {
 // GET /api/organizations - Get all organizations
 router.get('/', async (req, res) => {
   try {
-    const organizations = await prisma.organization.findMany({
-      include: { units: true },
+    const { limit = 50, page = 1 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const organizations = await prisma.organizations.findMany({
+      skip,
+      take: parseInt(limit),
+      orderBy: { created_at: 'desc' }
     });
-    res.json(organizations);
+
+    const total = await prisma.organizations.count();
+
+    res.json({
+      success: true,
+      data: organizations,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     handleError(res, error, 'Error fetching organizations');
   }
@@ -68,7 +86,7 @@ router.get('/:id/units', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     const { name, description, type, industry, size, website, contactEmail, isActive = true } = req.body;
-    
+
     if (!name) {
       return res.status(400).json({ error: 'Organization name is required' });
     }
@@ -113,7 +131,7 @@ router.post('/:id/units', async (req, res) => {
   const { id } = req.params;
   try {
     const { name, description, type, managerId, isActive = true } = req.body;
-    
+
     if (!name) {
       return res.status(400).json({ error: 'Business unit name is required' });
     }

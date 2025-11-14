@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../db/prisma');
+const notificationService = require('../src/services/notification.service');
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {

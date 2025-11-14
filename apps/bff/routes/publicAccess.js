@@ -9,6 +9,26 @@ const { logger } = require('../utils/logger');
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const JWT_EXPIRY = process.env.JWT_EXPIRY || '7d';
 
+// Email validation cache (5-minute TTL)
+const emailCache = new Map();
+const EMAIL_CACHE_TTL = 5 * 60 * 1000;
+
+function getCachedEmail(email) {
+  const cached = emailCache.get(email.toLowerCase());
+  if (cached && Date.now() - cached.timestamp < EMAIL_CACHE_TTL) {
+    return cached.data;
+  }
+  return null;
+}
+
+function setCachedEmail(email, data) {
+  emailCache.set(email.toLowerCase(), { data, timestamp: Date.now() });
+  if (emailCache.size > 1000) {
+    const oldestKey = emailCache.keys().next().value;
+    emailCache.delete(oldestKey);
+  }
+}
+
 /**
  * Helper: Generate slug from name
  */
@@ -22,9 +42,10 @@ function generateSlug(name, type) {
 }
 
 /**
- * Helper: Generate JWT token
+ * Helper: Generate JWT token with enhanced security
  */
 function generateToken(user, tenant) {
+  const now = Math.floor(Date.now() / 1000);
   return jwt.sign(
     {
       sub: user.id,
@@ -33,10 +54,16 @@ function generateToken(user, tenant) {
       tenantType: tenant.type,
       tenantSlug: tenant.slug,
       role: user.role,
-      iat: Math.floor(Date.now() / 1000)
+      iat: now,
+      jti: `${user.id}-${tenant.id}-${now}`, // JWT ID for token tracking
+      iss: 'grc-bff', // Issuer
+      aud: 'grc-platform' // Audience
     },
     JWT_SECRET,
-    { expiresIn: JWT_EXPIRY }
+    {
+      expiresIn: JWT_EXPIRY,
+      algorithm: 'HS256'
+    }
   );
 }
 
@@ -46,7 +73,7 @@ function generateToken(user, tenant) {
  */
 router.post('/public/demo/request', async (req, res) => {
   const requestId = uuidv4();
-  
+
   try {
     const {
       fullName,
@@ -81,7 +108,7 @@ router.post('/public/demo/request', async (req, res) => {
 
     if (existingDemoRequest && existingDemoRequest.tenant) {
       logger.info('Returning existing demo tenant', { requestId, tenantId: existingDemoRequest.tenant.id });
-      
+
       // Return existing tenant
       const existingUser = await prisma.users.findFirst({
         where: {

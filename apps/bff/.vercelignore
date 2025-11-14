@@ -1,0 +1,12 @@
+node_modules
+.env.local
+.env.development
+.env.*.local
+*.log
+logs/
+uploads/
+test-*.json
+export_*.csv
+prisma/migrations
+.git
+.gitignore

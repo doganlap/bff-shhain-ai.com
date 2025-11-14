@@ -1,0 +1,7 @@
+id,name,type,country,industry,size,website,description,logo_url,created_by,created_at,updated_at,is_demo
+1,Shahin AI,technology,Saudi Arabia,,,,,,1,2025-11-03 16:13:41.664619,2025-11-03 16:13:41.664619,f
+4,TechCorp Solutions,technology,Saudi Arabia,Software Development,small,https://techcorp.sa,Leading software development company specializing in AI solutions,,,2025-11-03 17:35:37.7534,2025-11-03 17:35:37.7534,f
+5,Global Finance Ltd,financial,UAE,Financial Services,medium,https://globalfinance.ae,Comprehensive financial services and investment solutions,,,2025-11-03 17:35:37.7534,2025-11-03 17:35:37.7534,f
+6,Healthcare Plus,healthcare,Saudi Arabia,Healthcare,large,https://healthcareplus.sa,Advanced healthcare management and medical technology,,,2025-11-03 17:35:37.7534,2025-11-03 17:35:37.7534,f
+7,Manufacturing Pro,manufacturing,Qatar,Manufacturing,large,https://manufacturingpro.qa,Industrial manufacturing and supply chain solutions,,,2025-11-03 17:35:37.7534,2025-11-03 17:35:37.7534,f
+8,Retail Excellence,retail,Kuwait,Retail,medium,https://retailexcellence.kw,Modern retail solutions and e-commerce platforms,,,2025-11-03 17:35:37.7534,2025-11-03 17:35:37.7534,f

@@ -2,6 +2,7 @@ const express = require('express');
 const prisma = require('../db/prisma');
 const { logger } = require('../utils/logger');
 const { requirePermission } = require('../middleware/rbac');
+const ragService = require('../src/services/rag.service');
 
 const router = express.Router();
 
@@ -21,7 +22,7 @@ router.get('/documents', async (req, res) => {
   try {
     const { status, type, limit = 50, offset = 0 } = req.query;
     const tenantId = req.headers['x-tenant-id'];
-    
+
     const where = { tenantId };
     if (status) where.status = status;
     if (type) where.type = type;
@@ -77,7 +78,7 @@ router.get('/documents/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const tenantId = req.headers['x-tenant-id'];
-    
+
     const document = await prisma.ragDocument.findFirst({
       where: { id, tenantId },
       include: {
@@ -301,7 +302,7 @@ router.get('/queries', async (req, res) => {
   try {
     const { limit = 50, offset = 0 } = req.query;
     const tenantId = req.headers['x-tenant-id'];
-    
+
     const [queries, total] = await Promise.all([
       prisma.ragQuery.findMany({
         where: { tenantId },
@@ -339,7 +340,7 @@ router.get('/queries', async (req, res) => {
 router.get('/stats', async (req, res) => {
   try {
     const tenantId = req.headers['x-tenant-id'];
-    
+
     const [
       totalDocuments,
       processedDocuments,
@@ -348,11 +349,11 @@ router.get('/stats', async (req, res) => {
       totalChunks
     ] = await Promise.all([
       prisma.ragDocument.count({ where: { tenantId } }),
-      prisma.ragDocument.count({ 
-        where: { 
-          tenantId, 
-          status: 'processed' 
-        } 
+      prisma.ragDocument.count({
+        where: {
+          tenantId,
+          status: 'processed'
+        }
       }),
       prisma.ragQuery.count({ where: { tenantId } }),
       prisma.ragQuery.aggregate({
@@ -388,7 +389,7 @@ router.get('/stats', async (req, res) => {
 router.post('/reindex', requirePermission('rag:manage'), async (req, res) => {
   try {
     const tenantId = req.headers['x-tenant-id'];
-    
+
     // TODO: Implement reindexing logic
     // This would typically:
     // 1. Queue a job to reprocess all documents

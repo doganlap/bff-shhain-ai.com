@@ -6,6 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../db/prisma');
+const schedulerService = require('../src/services/scheduler.service');
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {
@@ -17,7 +18,7 @@ const handleError = (res, error, message) => {
 router.get('/jobs', async (req, res) => {
   try {
     const { status, type, assignedTo, limit = 50, offset = 0 } = req.query;
-    
+
     const where = {};
     if (status) where.status = status;
     if (type) where.type = type;
@@ -94,8 +95,8 @@ router.post('/jobs', async (req, res) => {
     } = req.body;
 
     if (!name || !type) {
-      return res.status(400).json({ 
-        error: 'Name and type are required' 
+      return res.status(400).json({
+        error: 'Name and type are required'
       });
     }
 
@@ -177,7 +178,7 @@ router.delete('/jobs/:id', async (req, res) => {
     await prisma.schedulerTrigger.deleteMany({
       where: { jobId: parseInt(id, 10) }
     });
-    
+
     await prisma.schedulerRun.deleteMany({
       where: { jobId: parseInt(id, 10) }
     });
@@ -225,15 +226,15 @@ router.post('/jobs/:id/execute', async (req, res) => {
     // Update job status
     await prisma.schedulerJob.update({
       where: { id: parseInt(id, 10) },
-      data: { 
+      data: {
         status: 'running',
         lastRunAt: new Date()
       }
     });
 
-    res.json({ 
-      success: true, 
-      data: { 
+    res.json({
+      success: true,
+      data: {
         jobId: parseInt(id, 10),
         runId: run.id,
         status: 'running',
@@ -249,7 +250,7 @@ router.post('/jobs/:id/execute', async (req, res) => {
 router.get('/runs', async (req, res) => {
   try {
     const { jobId, status, limit = 50, offset = 0 } = req.query;
-    
+
     const where = {};
     if (jobId) where.jobId = parseInt(jobId, 10);
     if (status) where.status = status;
@@ -312,7 +313,7 @@ router.put('/runs/:id', async (req, res) => {
     if (status !== undefined) updateData.status = status;
     if (output !== undefined) updateData.output = output;
     if (runError !== undefined) updateData.error = runError;
-    
+
     if (status === 'completed' || status === 'failed') {
       updateData.finishedAt = new Date();
     }
@@ -348,8 +349,8 @@ router.post('/triggers', async (req, res) => {
     const { jobId, type, configuration, isActive = true } = req.body;
 
     if (!jobId || !type) {
-      return res.status(400).json({ 
-        error: 'Job ID and type are required' 
+      return res.status(400).json({
+        error: 'Job ID and type are required'
       });
     }
 
@@ -377,11 +378,11 @@ router.get('/stats', async (req, res) => {
     const totalJobs = await prisma.schedulerJob.count();
     const activeJobs = await prisma.schedulerJob.count({ where: { isActive: true } });
     const runningJobs = await prisma.schedulerJob.count({ where: { status: 'running' } });
-    
+
     const totalRuns = await prisma.schedulerRun.count();
     const successfulRuns = await prisma.schedulerRun.count({ where: { status: 'completed' } });
     const failedRuns = await prisma.schedulerRun.count({ where: { status: 'failed' } });
-    
+
     const stats = {
       totalJobs,
       activeJobs,

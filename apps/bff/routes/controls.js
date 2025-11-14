@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../db/prisma');
+const controlService = require('../src/services/control.service');
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {
@@ -11,10 +12,27 @@ const handleError = (res, error, message) => {
 // GET /api/controls - Get all controls
 router.get('/', async (req, res) => {
   try {
-    const controls = await prisma.control.findMany({
-      include: { framework: true, owner: true },
+    const { limit = 50, page = 1 } = req.query;
+    const skip = (page - 1) * limit;
+
+    const controls = await prisma.grc_controls.findMany({
+      skip,
+      take: parseInt(limit),
+      orderBy: { created_at: 'desc' }
     });
-    res.json(controls);
+
+    const total = await prisma.grc_controls.count();
+
+    res.json({
+      success: true,
+      data: controls,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
+    });
   } catch (error) {
     handleError(res, error, 'Error fetching controls');
   }

@@ -22,7 +22,7 @@ const stats: ImportStats[] = []
 async function readCSV(filePath: string): Promise<any[]> {
   return new Promise((resolve, reject) => {
     const results: any[] = []
-    
+
     if (!fs.existsSync(filePath)) {
       console.log(`⚠️  File not found: ${filePath}`)
       resolve([])
@@ -40,9 +40,9 @@ async function readCSV(filePath: string): Promise<any[]> {
 async function importGRCFrameworks() {
   console.log('\n📋 Importing GRC Frameworks...')
   const data = await readCSV('export_grc_frameworks.csv')
-  
+
   let imported = 0, failed = 0
-  
+
   for (const row of data) {
     try {
       await prisma.grc_frameworks.upsert({
@@ -75,7 +75,7 @@ async function importGRCFrameworks() {
       failed++
     }
   }
-  
+
   stats.push({ table: 'grc_frameworks', imported, failed, skipped: 0 })
   console.log(`✅ Imported ${imported} frameworks (${failed} failed)`)
 }
@@ -83,16 +83,16 @@ async function importGRCFrameworks() {
 async function importGRCControls() {
   console.log('\n🛡️  Importing GRC Controls (5500+ records)...')
   const data = await readCSV('export_grc_controls.csv')
-  
+
   let imported = 0, failed = 0, skipped = 0
-  
+
   console.log(`Found ${data.length} controls to import...`)
-  
+
   // Process in batches for better performance
   const batchSize = 100
   for (let i = 0; i < data.length; i += batchSize) {
     const batch = data.slice(i, i + batchSize)
-    
+
     for (const row of batch) {
       try {
         await prisma.grc_controls.upsert({
@@ -123,7 +123,7 @@ async function importGRCControls() {
           }
         })
         imported++
-        
+
         if (imported % 500 === 0) {
           console.log(`   Progress: ${imported}/${data.length} controls imported...`)
         }
@@ -137,7 +137,7 @@ async function importGRCControls() {
       }
     }
   }
-  
+
   stats.push({ table: 'grc_controls', imported, failed, skipped })
   console.log(`✅ Imported ${imported} controls (${failed} failed, ${skipped} skipped)`)
 }
@@ -145,9 +145,9 @@ async function importGRCControls() {
 async function importTenants() {
   console.log('\n🏢 Importing Tenants...')
   const data = await readCSV('export_tenants.csv')
-  
+
   let imported = 0, failed = 0
-  
+
   for (const row of data) {
     try {
       await prisma.tenants.upsert({
@@ -173,7 +173,7 @@ async function importTenants() {
       failed++
     }
   }
-  
+
   stats.push({ table: 'tenants', imported, failed, skipped: 0 })
   console.log(`✅ Imported ${imported} tenants (${failed} failed)`)
 }
@@ -181,9 +181,9 @@ async function importTenants() {
 async function importUsers() {
   console.log('\n👥 Importing Users...')
   const data = await readCSV('export_users.csv')
-  
+
   let imported = 0, failed = 0
-  
+
   for (const row of data) {
     try {
       await prisma.users.upsert({
@@ -210,7 +210,7 @@ async function importUsers() {
       failed++
     }
   }
-  
+
   stats.push({ table: 'users', imported, failed, skipped: 0 })
   console.log(`✅ Imported ${imported} users (${failed} failed)`)
 }
@@ -218,9 +218,9 @@ async function importUsers() {
 async function importOrganizations() {
   console.log('\n🏛️  Importing Organizations...')
   const data = await readCSV('export_organizations.csv')
-  
+
   let imported = 0, failed = 0
-  
+
   for (const row of data) {
     try {
       await prisma.organizations.upsert({
@@ -249,7 +249,7 @@ async function importOrganizations() {
       failed++
     }
   }
-  
+
   stats.push({ table: 'organizations', imported, failed, skipped: 0 })
   console.log(`✅ Imported ${imported} organizations (${failed} failed)`)
 }
@@ -258,22 +258,22 @@ async function printSummary() {
   console.log('\n========================================')
   console.log('📊 IMPORT SUMMARY')
   console.log('========================================')
-  
+
   let totalImported = 0
   let totalFailed = 0
   let totalSkipped = 0
-  
+
   for (const stat of stats) {
     console.log(`\n${stat.table}:`)
     console.log(`  ✅ Imported: ${stat.imported}`)
     if (stat.failed > 0) console.log(`  ❌ Failed: ${stat.failed}`)
     if (stat.skipped > 0) console.log(`  ⏭️  Skipped: ${stat.skipped}`)
-    
+
     totalImported += stat.imported
     totalFailed += stat.failed
     totalSkipped += stat.skipped
   }
-  
+
   console.log('\n========================================')
   console.log(`Total Imported: ${totalImported}`)
   console.log(`Total Failed: ${totalFailed}`)
@@ -285,7 +285,7 @@ async function main() {
   console.log('🚀 Starting Prisma Postgres Import')
   console.log('===================================')
   console.log('')
-  
+
   try {
     // Import in correct order (respecting foreign keys)
     await importTenants()
@@ -294,15 +294,15 @@ async function main() {
     await importGRCFrameworks()
     await importGRCControls()
     // Add more import functions here as needed
-    
+
     await printSummary()
-    
+
     console.log('\n✅ Import complete!')
     console.log('🎯 Next steps:')
     console.log('  1. Verify data in Prisma Studio: http://localhost:5560')
     console.log('  2. Test API connections')
     console.log('  3. Start frontend application')
-    
+
   } catch (error) {
     console.error('❌ Import failed:', error)
     throw error
