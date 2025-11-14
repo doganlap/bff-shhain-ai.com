@@ -52,9 +52,34 @@ apps/*/.env.*
 ehthumbs.db  
 Thumbs.db  
   
-# Logs  
+# Logs and Reports
 logs/  
-*.log 
+*.log
+log.html
+report.html
+lint_output.txt
+*.log.html
 .vercel
 
+# Generated Prisma
 /generated/prisma
+
+# Data Archives (moved to separate location)
+DB urgent/
+**/archive/
+**/unused-*/
+
+# Visual Studio artifacts
+.vs/
+*.vsidx
+*.db-shm
+*.db-wal
+slnx.sqlite
+workspaceFileList.bin
+
+# Deployment packages (use CI/CD instead)
+*.zip
+!node_modules.zip
+azure-deploy.zip
+deploy.zip
+shahin-ai-*.zip
