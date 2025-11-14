@@ -93,6 +93,16 @@ import {
   RegulatoryMarketDashboard,
 } from './pages';
 
+// Onboarding & New Modules
+import OnboardingPage from './pages/onboarding/OnboardingPage';
+import OrganizationDashboard from './pages/organizations/OrganizationDashboard';
+import AssessmentPage from './pages/assessments/AssessmentPage';
+import EvidenceUploadPage from './pages/evidence/EvidenceUploadPage';
+import TaskManagementPage from './pages/tasks/TaskManagementPage';
+import TaskDashboard from './pages/tasks/TaskDashboard';
+import GapAnalysisPage from './pages/gaps/GapAnalysisPage';
+import RemediationPlanPage from './pages/remediation/RemediationPlanPage';
+
 // Layouts
 import AppLayout from './components/layout/AppLayout';
 import AdvancedAppShell from './components/layout/AdvancedAppShell';
@@ -198,7 +208,9 @@ const AppContent = () => {
               <Route path="assessments/enhanced" element={<AssessmentsModuleEnhanced />} />
               <Route path="assessments/legacy" element={<Assessments />} />
               <Route path="assessments/new" element={<AssessmentsModuleEnhanced />} />
-              <Route path="assessments/:id" element={<AssessmentDetailsCollaborative />} />
+              <Route path="assessments/:id" element={<AssessmentPage />} />
+              <Route path="assessments/:id/controls/:controlId/evidence" element={<EvidenceUploadPage />} />
+              <Route path="assessments/:id/report" element={<AssessmentDetailsCollaborative />} />
               <Route path="assessments/:id/edit" element={<AssessmentsModuleEnhanced />} />
 
               {/* Frameworks - Enhanced with Templates, Automation */}
@@ -237,6 +249,7 @@ const AppContent = () => {
 
               {/* Evidence Management */}
               <Route path="evidence" element={<Evidence />} />
+              <Route path="evidence/upload" element={<EvidenceUploadPage />} />
               <Route path="evidence/new" element={<Evidence />} />
               <Route path="evidence/:id" element={<Evidence />} />
 
@@ -249,7 +262,12 @@ const AppContent = () => {
               <Route path="organizations" element={<OrganizationsPage />} />
               <Route path="organizations/new" element={<OrganizationForm />} />
               <Route path="organizations/:id" element={<OrganizationDetails />} />
+              <Route path="organizations/:id/dashboard" element={<OrganizationDashboard />} />
               <Route path="organizations/:id/edit" element={<OrganizationForm />} />
+
+              {/* Organization Onboarding */}
+              <Route path="onboarding" element={<OnboardingPage />} />
+              <Route path="onboarding/new" element={<OnboardingPage />} />
 
               {/* Users & Access Management */}
               <Route path="users" element={<UserManagementPage />} />
@@ -281,6 +299,20 @@ const AppContent = () => {
               <Route path="workflows" element={<WorkflowManagementPage />} />
               <Route path="workflows/new" element={<WorkflowManagementPage />} />
               <Route path="workflows/:id" element={<WorkflowManagementPage />} />
+
+              {/* Task Management - GRC Execution Tasks */}
+              <Route path="tasks" element={<TaskDashboard />} />
+              <Route path="tasks/board" element={<TaskDashboard />} />
+              <Route path="tasks/list" element={<TaskManagementPage />} />
+              <Route path="tasks/create" element={<TaskManagementPage />} />
+              <Route path="tasks/:id" element={<TaskManagementPage />} />
+
+              {/* Gap Analysis & Remediation */}
+              <Route path="gaps" element={<GapAnalysisPage />} />
+              <Route path="gaps/:id" element={<GapAnalysisPage />} />
+              <Route path="remediation" element={<RemediationPlanPage />} />
+              <Route path="remediation/create" element={<RemediationPlanPage />} />
+              <Route path="remediation/:id" element={<RemediationPlanPage />} />
 
               {/* AI & RAG Services */}
               <Route path="ai" element={<AISchedulerPage />} />

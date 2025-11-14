@@ -1,6 +1,6 @@
 @echo off
 echo ========================================
-echo COMPLETE DATABASE MIGRATION TO PRISMA  
+echo COMPLETE DATABASE MIGRATION TO PRISMA
 echo ========================================
 echo.
 echo Migrating ALL data from local PostgreSQL

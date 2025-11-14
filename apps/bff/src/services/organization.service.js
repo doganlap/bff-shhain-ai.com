@@ -3,7 +3,7 @@
  * Handles organizational hierarchy, business units, and structure management
  */
 
-const prisma = require('../lib/prisma');
+const prisma = require('../../db/prisma');
 
 /**
  * Create organization/business unit

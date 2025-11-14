@@ -173,7 +173,7 @@ Total Skipped: 0
 ## Files Created
 
 - `export-local-data.sql` - PostgreSQL export script
-- `apps/bff/prisma/import-to-prisma.ts` - TypeScript import script  
+- `apps/bff/prisma/import-to-prisma.ts` - TypeScript import script
 - `migrate-all-to-prisma.bat` - One-click migration batch file
 - `export_*.csv` - Temporary CSV files (safe to delete after import)
 

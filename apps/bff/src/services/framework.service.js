@@ -3,7 +3,7 @@
  * Handles framework controls mapping, analytics, and coverage analysis
  */
 
-const prisma = require('../lib/prisma');
+const prisma = require('../../db/prisma');
 
 /**
  * Calculate framework coverage

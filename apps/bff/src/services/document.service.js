@@ -3,7 +3,7 @@
  * Handles document management, versioning, and file uploads
  */
 
-const prisma = require('../lib/prisma');
+const prisma = require('../../db/prisma');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -12,7 +12,7 @@ const path = require('path');
  */
 function generateVersion(currentVersion) {
   if (!currentVersion) return '1.0';
-  
+
   const [major, minor] = currentVersion.split('.').map(Number);
   return `${major}.${minor + 1}`;
 }
@@ -67,13 +67,13 @@ async function createDocument(data) {
  */
 async function getDocuments(filters = {}) {
   const where = {};
-  
+
   if (filters.tenantId) where.tenantId = filters.tenantId;
   if (filters.category) where.category = filters.category;
   if (filters.type) where.type = filters.type;
   if (filters.status) where.status = filters.status;
   if (filters.ownerId) where.ownerId = filters.ownerId;
-  
+
   if (filters.search) {
     where.OR = [
       { title: { contains: filters.search, mode: 'insensitive' } },
@@ -138,7 +138,7 @@ async function deleteDocument(id) {
     if (document.filePath) {
       await fs.unlink(document.filePath);
     }
-    
+
     for (const version of document.versions) {
       if (version.filePath) {
         await fs.unlink(version.filePath);
@@ -168,13 +168,13 @@ async function uploadVersion(documentId, file, userId, comment) {
 
   const fileMetadata = parseFileMetadata(file);
   const hash = calculateHash(file.buffer || file.path);
-  
+
   // Check if content actually changed
   if (hash === document.hash) {
-    return { 
-      uploaded: false, 
+    return {
+      uploaded: false,
       reason: 'No changes detected',
-      document 
+      document
     };
   }
 
@@ -205,10 +205,10 @@ async function uploadVersion(documentId, file, userId, comment) {
     }
   });
 
-  return { 
-    uploaded: true, 
-    version, 
-    document: updated 
+  return {
+    uploaded: true,
+    version,
+    document: updated
   };
 }
 
@@ -295,13 +295,13 @@ async function getDocumentStats(tenantId) {
     storage: {
       totalSize,
       totalSizeMB: (totalSize / (1024 * 1024)).toFixed(2),
-      avgSizeMB: documents.length > 0 
+      avgSizeMB: documents.length > 0
         ? (totalSize / documents.length / (1024 * 1024)).toFixed(2)
         : 0
     },
     versions: {
       total: versionCount,
-      avgPerDoc: documents.length > 0 
+      avgPerDoc: documents.length > 0
         ? (versionCount / documents.length).toFixed(2)
         : 0
     }

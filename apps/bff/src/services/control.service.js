@@ -3,7 +3,7 @@
  * Handles control testing, evidence linking, and implementation tracking
  */
 
-const prisma = require('../lib/prisma');
+const prisma = require('../../db/prisma');
 
 /**
  * Calculate control effectiveness score

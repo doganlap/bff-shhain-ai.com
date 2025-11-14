@@ -1,0 +1,602 @@
+{
+  "timestamp": "2025-11-14T17:49:09.384Z",
+  "baseUrl": "http://localhost:3005",
+  "tenantId": "default",
+  "summary": {
+    "total": 56,
+    "passed": 2,
+    "failed": 29,
+    "skipped": 25,
+    "passRate": "3.57%"
+  },
+  "categories": {
+    "health": {
+      "passed": 1,
+      "failed": 1,
+      "skipped": 0,
+      "total": 2
+    },
+    "tasks": {
+      "passed": 1,
+      "failed": 3,
+      "skipped": 6,
+      "total": 10
+    },
+    "evidence": {
+      "passed": 0,
+      "failed": 3,
+      "skipped": 3,
+      "total": 6
+    },
+    "frameworks": {
+      "passed": 0,
+      "failed": 2,
+      "skipped": 3,
+      "total": 5
+    },
+    "risks": {
+      "passed": 0,
+      "failed": 2,
+      "skipped": 3,
+      "total": 5
+    },
+    "assessments": {
+      "passed": 0,
+      "failed": 2,
+      "skipped": 3,
+      "total": 5
+    },
+    "compliance": {
+      "passed": 0,
+      "failed": 2,
+      "skipped": 1,
+      "total": 3
+    },
+    "controls": {
+      "passed": 0,
+      "failed": 2,
+      "skipped": 3,
+      "total": 5
+    },
+    "organizations": {
+      "passed": 0,
+      "failed": 2,
+      "skipped": 3,
+      "total": 5
+    },
+    "vercel": {
+      "passed": 0,
+      "failed": 2,
+      "skipped": 0,
+      "total": 2
+    },
+    "commandCenter": {
+      "passed": 0,
+      "failed": 2,
+      "skipped": 0,
+      "total": 2
+    },
+    "admin": {
+      "passed": 0,
+      "failed": 3,
+      "skipped": 0,
+      "total": 3
+    },
+    "publicAccess": {
+      "passed": 0,
+      "failed": 3,
+      "skipped": 0,
+      "total": 3
+    }
+  },
+  "details": [
+    {
+      "category": "health",
+      "method": "GET",
+      "path": "/health",
+      "status": "PASSED",
+      "httpStatus": 200,
+      "responseTime": "46ms",
+      "responseStructure": "status, service, timestamp, uptime, environment, version"
+    },
+    {
+      "category": "health",
+      "method": "GET",
+      "path": "/health/detailed",
+      "status": "FAILED",
+      "httpStatus": 503,
+      "responseTime": "3033ms",
+      "error": "HTTP error",
+      "responseData": "{\"status\":\"unhealthy\",\"service\":\"BFF\",\"timestamp\":\"2025-11-14T17:48:53.317Z\",\"uptime\":882.4015487,\"e"
+    },
+    {
+      "category": "tasks",
+      "method": "GET",
+      "path": "/api/tasks",
+      "status": "FAILED",
+      "httpStatus": "NETWORK_ERROR",
+      "responseTime": "5014ms",
+      "error": "ECONNABORTED",
+      "details": "timeout of 5000ms exceeded"
+    },
+    {
+      "category": "tasks",
+      "method": "GET",
+      "path": "/api/tasks/stats",
+      "status": "PASSED",
+      "httpStatus": 200,
+      "responseTime": "2165ms",
+      "responseStructure": "success, stats"
+    },
+    {
+      "category": "tasks",
+      "method": "GET",
+      "path": "/api/tasks/my-tasks",
+      "status": "FAILED",
+      "httpStatus": 400,
+      "responseTime": "5ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"User ID is required\"}"
+    },
+    {
+      "category": "tasks",
+      "method": "POST",
+      "path": "/api/tasks",
+      "status": "FAILED",
+      "httpStatus": 400,
+      "responseTime": "211ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"\\nInvalid `prisma.tasks.create()` invocation in\\nd:\\\\Projects\\\\GRC-Master\\"
+    },
+    {
+      "category": "tasks",
+      "method": "GET",
+      "path": "/api/tasks/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "tasks",
+      "method": "PUT",
+      "path": "/api/tasks/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "tasks",
+      "method": "DELETE",
+      "path": "/api/tasks/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "tasks",
+      "method": "POST",
+      "path": "/api/tasks/:id/assign",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "tasks",
+      "method": "POST",
+      "path": "/api/tasks/:id/claim",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "tasks",
+      "method": "PATCH",
+      "path": "/api/tasks/:id/status",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "evidence",
+      "method": "GET",
+      "path": "/api/tasks/evidence-stats",
+      "status": "FAILED",
+      "httpStatus": 500,
+      "responseTime": "486ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Unexpected token 'E', \\\"Evidence d\\\"... is not valid JSON\"}"
+    },
+    {
+      "category": "evidence",
+      "method": "POST",
+      "path": "/api/tasks/evidence/upload",
+      "status": "FAILED",
+      "httpStatus": 400,
+      "responseTime": "4ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"taskId is required\"}"
+    },
+    {
+      "category": "evidence",
+      "method": "POST",
+      "path": "/api/tasks/evidence/upload-multiple",
+      "status": "FAILED",
+      "httpStatus": 400,
+      "responseTime": "5ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"taskId is required\"}"
+    },
+    {
+      "category": "evidence",
+      "method": "GET",
+      "path": "/api/tasks/evidence/:filename",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "evidence",
+      "method": "GET",
+      "path": "/api/tasks/:id/evidence",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "evidence",
+      "method": "DELETE",
+      "path": "/api/tasks/:id/evidence/:index",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "frameworks",
+      "method": "GET",
+      "path": "/api/frameworks",
+      "status": "FAILED",
+      "httpStatus": 500,
+      "responseTime": "223ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Failed to fetch frameworks\"}"
+    },
+    {
+      "category": "frameworks",
+      "method": "GET",
+      "path": "/api/frameworks/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "frameworks",
+      "method": "POST",
+      "path": "/api/frameworks",
+      "status": "FAILED",
+      "httpStatus": 400,
+      "responseTime": "5ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Name and description are required\"}"
+    },
+    {
+      "category": "frameworks",
+      "method": "PUT",
+      "path": "/api/frameworks/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "frameworks",
+      "method": "DELETE",
+      "path": "/api/frameworks/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "risks",
+      "method": "GET",
+      "path": "/api/risks",
+      "status": "FAILED",
+      "httpStatus": 500,
+      "responseTime": "8ms",
+      "error": "HTTP error",
+      "responseData": "{\"error\":\"Error fetching risks\"}"
+    },
+    {
+      "category": "risks",
+      "method": "GET",
+      "path": "/api/risks/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "risks",
+      "method": "POST",
+      "path": "/api/risks",
+      "status": "FAILED",
+      "httpStatus": 500,
+      "responseTime": "196ms",
+      "error": "HTTP error",
+      "responseData": "{\"error\":\"Error creating risk\"}"
+    },
+    {
+      "category": "risks",
+      "method": "PUT",
+      "path": "/api/risks/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "risks",
+      "method": "DELETE",
+      "path": "/api/risks/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "assessments",
+      "method": "GET",
+      "path": "/api/assessments",
+      "status": "FAILED",
+      "httpStatus": 500,
+      "responseTime": "207ms",
+      "error": "HTTP error",
+      "responseData": "{\"error\":\"Error fetching assessments\"}"
+    },
+    {
+      "category": "assessments",
+      "method": "GET",
+      "path": "/api/assessments/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "assessments",
+      "method": "POST",
+      "path": "/api/assessments",
+      "status": "FAILED",
+      "httpStatus": 500,
+      "responseTime": "204ms",
+      "error": "HTTP error",
+      "responseData": "{\"error\":\"Error creating assessment\"}"
+    },
+    {
+      "category": "assessments",
+      "method": "PUT",
+      "path": "/api/assessments/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "assessments",
+      "method": "DELETE",
+      "path": "/api/assessments/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "compliance",
+      "method": "GET",
+      "path": "/api/compliance",
+      "status": "FAILED",
+      "httpStatus": 404,
+      "responseTime": "7ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Not Found\",\"message\":\"Cannot GET /api/compliance\",\"code\":\"ENDPOINT_NOT_FOU"
+    },
+    {
+      "category": "compliance",
+      "method": "GET",
+      "path": "/api/compliance/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "compliance",
+      "method": "POST",
+      "path": "/api/compliance",
+      "status": "FAILED",
+      "httpStatus": 404,
+      "responseTime": "4ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Not Found\",\"message\":\"Cannot POST /api/compliance\",\"code\":\"ENDPOINT_NOT_FO"
+    },
+    {
+      "category": "controls",
+      "method": "GET",
+      "path": "/api/controls",
+      "status": "FAILED",
+      "httpStatus": 500,
+      "responseTime": "199ms",
+      "error": "HTTP error",
+      "responseData": "{\"error\":\"Error fetching controls\"}"
+    },
+    {
+      "category": "controls",
+      "method": "GET",
+      "path": "/api/controls/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "controls",
+      "method": "POST",
+      "path": "/api/controls",
+      "status": "FAILED",
+      "httpStatus": 404,
+      "responseTime": "4ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Not Found\",\"message\":\"Cannot POST /api/controls\",\"code\":\"ENDPOINT_NOT_FOUN"
+    },
+    {
+      "category": "controls",
+      "method": "PUT",
+      "path": "/api/controls/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "controls",
+      "method": "DELETE",
+      "path": "/api/controls/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "organizations",
+      "method": "GET",
+      "path": "/api/organizations",
+      "status": "FAILED",
+      "httpStatus": 500,
+      "responseTime": "191ms",
+      "error": "HTTP error",
+      "responseData": "{\"error\":\"Error fetching organizations\"}"
+    },
+    {
+      "category": "organizations",
+      "method": "GET",
+      "path": "/api/organizations/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "organizations",
+      "method": "POST",
+      "path": "/api/organizations",
+      "status": "FAILED",
+      "httpStatus": 400,
+      "responseTime": "5ms",
+      "error": "HTTP error",
+      "responseData": "{\"error\":\"Organization name is required\"}"
+    },
+    {
+      "category": "organizations",
+      "method": "PUT",
+      "path": "/api/organizations/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "organizations",
+      "method": "DELETE",
+      "path": "/api/organizations/:id",
+      "status": "SKIPPED",
+      "reason": "Parameterized route - requires real ID",
+      "responseTime": null
+    },
+    {
+      "category": "vercel",
+      "method": "GET",
+      "path": "/api/vercel/deployments",
+      "status": "FAILED",
+      "httpStatus": 500,
+      "responseTime": "757ms",
+      "error": "HTTP error",
+      "responseData": "{\"error\":\"Failed to fetch deployments\"}"
+    },
+    {
+      "category": "vercel",
+      "method": "GET",
+      "path": "/api/vercel/status",
+      "status": "FAILED",
+      "httpStatus": 500,
+      "responseTime": "254ms",
+      "error": "HTTP error",
+      "responseData": "{\"error\":\"Failed to fetch project status\"}"
+    },
+    {
+      "category": "commandCenter",
+      "method": "GET",
+      "path": "/api/command_center/stats",
+      "status": "FAILED",
+      "httpStatus": 404,
+      "responseTime": "4ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Not Found\",\"message\":\"Cannot GET /api/command_center/stats\",\"code\":\"ENDPOI"
+    },
+    {
+      "category": "commandCenter",
+      "method": "GET",
+      "path": "/api/command_center/dashboard",
+      "status": "FAILED",
+      "httpStatus": 404,
+      "responseTime": "5ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Not Found\",\"message\":\"Cannot GET /api/command_center/dashboard\",\"code\":\"EN"
+    },
+    {
+      "category": "admin",
+      "method": "GET",
+      "path": "/api/admin/organization/users",
+      "status": "FAILED",
+      "httpStatus": 401,
+      "responseTime": "4ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Authentication required\",\"message\":\"Admin access requires valid JWT token\""
+    },
+    {
+      "category": "admin",
+      "method": "GET",
+      "path": "/api/admin/organization/settings",
+      "status": "FAILED",
+      "httpStatus": 401,
+      "responseTime": "3ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Authentication required\",\"message\":\"Admin access requires valid JWT token\""
+    },
+    {
+      "category": "admin",
+      "method": "GET",
+      "path": "/api/admin/organization/departments",
+      "status": "FAILED",
+      "httpStatus": 401,
+      "responseTime": "4ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Authentication required\",\"message\":\"Admin access requires valid JWT token\""
+    },
+    {
+      "category": "publicAccess",
+      "method": "GET",
+      "path": "/api/demo/status",
+      "status": "FAILED",
+      "httpStatus": 404,
+      "responseTime": "4ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Not Found\",\"message\":\"Cannot GET /api/demo/status\",\"code\":\"ENDPOINT_NOT_FO"
+    },
+    {
+      "category": "publicAccess",
+      "method": "GET",
+      "path": "/api/partner/status",
+      "status": "FAILED",
+      "httpStatus": 404,
+      "responseTime": "4ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Not Found\",\"message\":\"Cannot GET /api/partner/status\",\"code\":\"ENDPOINT_NOT"
+    },
+    {
+      "category": "publicAccess",
+      "method": "GET",
+      "path": "/api/poc/status",
+      "status": "FAILED",
+      "httpStatus": 404,
+      "responseTime": "3ms",
+      "error": "HTTP error",
+      "responseData": "{\"success\":false,\"error\":\"Not Found\",\"message\":\"Cannot GET /api/poc/status\",\"code\":\"ENDPOINT_NOT_FOU"
+    }
+  ]
+}

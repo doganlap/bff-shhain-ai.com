@@ -1,0 +1,149 @@
+{
+  "timestamp": "2025-11-14T18:23:13.234Z",
+  "baseUrl": "http://localhost:3005",
+  "tenantId": "default",
+  "testData": {
+    "taskId": "8d97a949-4492-48cb-9787-2669a78f0711",
+    "evidenceFilename": null
+  },
+  "summary": {
+    "total": 14,
+    "passed": 9,
+    "failed": 5,
+    "passRate": "64.29%",
+    "avgResponseTime": "436ms"
+  },
+  "details": [
+    {
+      "status": "PASSED",
+      "category": "health",
+      "method": "GET",
+      "path": "/health",
+      "httpStatus": 200,
+      "responseTime": "4ms",
+      "responseKeys": "status, service, timestamp, uptime, environment, version"
+    },
+    {
+      "status": "FAILED",
+      "category": "health",
+      "method": "GET",
+      "path": "/health/detailed",
+      "httpStatus": 503,
+      "responseTime": "3040ms",
+      "error": "HTTP error",
+      "responsePreview": "{\"status\":\"unhealthy\",\"service\":\"BFF\",\"timestamp\":\"2025-11-14T18:23:10.162Z\",\"uptime\":211.2217604,\"environment\":\"development\",\"version\":\"1.0.0\",\"servi"
+    },
+    {
+      "status": "PASSED",
+      "category": "tasks",
+      "method": "GET",
+      "path": "/api/tasks/stats",
+      "httpStatus": 200,
+      "responseTime": "209ms",
+      "responseKeys": "success, stats"
+    },
+    {
+      "status": "PASSED",
+      "category": "tasks",
+      "method": "GET",
+      "path": "/api/tasks",
+      "httpStatus": 200,
+      "responseTime": "319ms",
+      "responseKeys": "success, data, pagination"
+    },
+    {
+      "status": "PASSED",
+      "category": "tasks",
+      "method": "GET",
+      "path": "/api/tasks/8d97a949-4492-48cb-9787-2669a78f0711",
+      "httpStatus": 200,
+      "responseTime": "225ms",
+      "responseKeys": "success, data"
+    },
+    {
+      "status": "PASSED",
+      "category": "tasks",
+      "method": "PATCH",
+      "path": "/api/tasks/8d97a949-4492-48cb-9787-2669a78f0711/status",
+      "httpStatus": 200,
+      "responseTime": "442ms",
+      "responseKeys": "success, data, message"
+    },
+    {
+      "status": "PASSED",
+      "category": "evidence",
+      "method": "GET",
+      "path": "/api/tasks/evidence-stats",
+      "httpStatus": 200,
+      "responseTime": "522ms",
+      "responseKeys": "success, data"
+    },
+    {
+      "status": "PASSED",
+      "category": "evidence",
+      "method": "GET",
+      "path": "/api/tasks/8d97a949-4492-48cb-9787-2669a78f0711/evidence",
+      "httpStatus": 200,
+      "responseTime": "238ms",
+      "responseKeys": "success, data, count"
+    },
+    {
+      "status": "FAILED",
+      "category": "frameworks",
+      "method": "GET",
+      "path": "/api/frameworks",
+      "httpStatus": 500,
+      "responseTime": "218ms",
+      "error": "HTTP error",
+      "responsePreview": "{\"success\":false,\"error\":\"Failed to fetch frameworks\"}"
+    },
+    {
+      "status": "FAILED",
+      "category": "risks",
+      "method": "GET",
+      "path": "/api/risks",
+      "httpStatus": 500,
+      "responseTime": "6ms",
+      "error": "HTTP error",
+      "responsePreview": "{\"error\":\"Error fetching risks\"}"
+    },
+    {
+      "status": "FAILED",
+      "category": "assessments",
+      "method": "GET",
+      "path": "/api/assessments",
+      "httpStatus": 500,
+      "responseTime": "4ms",
+      "error": "HTTP error",
+      "responsePreview": "{\"error\":\"Error fetching assessments\"}"
+    },
+    {
+      "status": "FAILED",
+      "category": "compliance",
+      "method": "GET",
+      "path": "/api/compliance",
+      "httpStatus": 500,
+      "responseTime": "3ms",
+      "error": "HTTP error",
+      "responsePreview": "{\"success\":false,\"error\":\"Error fetching compliance data\",\"details\":\"Cannot read properties of undefined (reading 'findMany')\"}"
+    },
+    {
+      "status": "PASSED",
+      "category": "controls",
+      "method": "GET",
+      "path": "/api/controls",
+      "httpStatus": 200,
+      "responseTime": "436ms",
+      "responseKeys": "success, data, pagination"
+    },
+    {
+      "status": "PASSED",
+      "category": "organizations",
+      "method": "GET",
+      "path": "/api/organizations",
+      "httpStatus": 200,
+      "responseTime": "440ms",
+      "responseKeys": "success, data, pagination"
+    }
+  ]
+}

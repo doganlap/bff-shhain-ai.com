@@ -3,7 +3,7 @@
  * Handles document embeddings, vector search, and AI-powered query processing
  */
 
-const prisma = require('../lib/prisma');
+const prisma = require('../../db/prisma');
 
 /**
  * Process document for RAG

@@ -3,7 +3,7 @@
  * Handles notification delivery, preferences, and read/unread state management
  */
 
-const prisma = require('../lib/prisma');
+const prisma = require('../../db/prisma');
 
 // Notification types and priorities
 const NOTIFICATION_TYPES = {

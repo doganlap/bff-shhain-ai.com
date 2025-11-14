@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LogIn, Play, FlaskConical, X } from 'lucide-react';
+import { LogIn, Play, FlaskConical, X, ExternalLink, Link2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const SmallIconSidebar = () => {
@@ -8,6 +8,16 @@ const SmallIconSidebar = () => {
   const [showPOCModal, setShowPOCModal] = useState(false);
 
   const icons = [
+    {
+      id: 'mirror',
+      icon: Link2,
+      label: 'الذهاب إلى صفحة الهبوط',
+      labelEn: 'Go to Landing Page',
+      color: 'from-orange-500 to-red-500',
+      action: () => {
+        window.location.href = 'http://localhost:4000';
+      }
+    },
     {
       id: 'login',
       icon: LogIn,
@@ -117,19 +127,30 @@ const SmallIconSidebar = () => {
               </button>
               
               <div className="text-center">
-                <div className="w-9 h-9 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-2 shadow-lg">
-                  <FlaskConical className="w-4.5 h-4.5 text-white" strokeWidth={2} />
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mx-auto mb-2.5 shadow-lg">
+                  <FlaskConical className="w-5 h-5 text-white" strokeWidth={2} />
                 </div>
                 
                 <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1">
-                  POC Request
+                  Proof of Concept
                 </h3>
-                <p className="text-[10px] text-gray-700 dark:text-gray-200 mb-0.5 font-medium">
-                  Coming Soon!
+                <p className="text-[10px] text-gray-700 dark:text-gray-200 mb-2 font-medium">
+                  Build your custom solution
                 </p>
-                <p className="text-[9px] text-gray-600 dark:text-gray-300 font-arabic">
-                  طلب إثبات المفهوم - قريباً!
+                <p className="text-[9px] text-gray-600 dark:text-gray-300 font-arabic mb-3">
+                  أثبت مفهومك الخاص
                 </p>
+                
+                <a
+                  href="https://www.shahin-ai.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                  className="inline-flex items-center justify-center w-full gap-1.5 px-3 py-1.5 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white text-[10px] font-semibold rounded-lg transition-all hover:scale-105 active:scale-95 shadow-lg"
+                >
+                  Visit shahin-ai.com
+                  <ExternalLink className="w-3 h-3" strokeWidth={2.5} />
+                </a>
               </div>
             </motion.div>
           </motion.div>

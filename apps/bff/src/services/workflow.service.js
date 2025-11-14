@@ -3,7 +3,7 @@
  * Handles workflow templates, instances, and state management
  */
 
-const prisma = require('../lib/prisma');
+const prisma = require('../../db/prisma');
 
 // Workflow state machine
 const WORKFLOW_STATES = {

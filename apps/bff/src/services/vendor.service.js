@@ -3,7 +3,7 @@
  * Handles vendor/third-party risk management (TPRM)
  */
 
-const prisma = require('../lib/prisma');
+const prisma = require('../../db/prisma');
 
 /**
  * Calculate vendor risk score

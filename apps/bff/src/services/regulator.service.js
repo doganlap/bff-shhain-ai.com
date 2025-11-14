@@ -3,7 +3,7 @@
  * Handles regulatory intelligence, change tracking, and compliance calendar
  */
 
-const prisma = require('../lib/prisma');
+const prisma = require('../../db/prisma');
 
 /**
  * Calculate regulatory impact score

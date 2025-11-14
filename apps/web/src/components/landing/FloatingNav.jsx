@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Home, Sparkles, Star, Shield, DollarSign, Mail, ArrowUp, Monitor, MessageSquare } from 'lucide-react'
+import { Home, Sparkles, Star, Shield, DollarSign, Mail, ArrowUp, Monitor, MessageSquare, Link2 } from 'lucide-react'
 import { useScrollSpy } from '../../hooks/useScrollSpy'
 
 const FloatingNav = () => {
@@ -118,6 +118,19 @@ const FloatingNav = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* Mirror Link Button */}
+      <motion.button
+        initial={{ scale: 0, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+        onClick={() => window.location.href = 'http://localhost:4000'}
+        title="Go to Landing Page"
+        aria-label="Navigate to Landing Page"
+        className="fixed left-6 bottom-32 w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 text-white rounded-full shadow-xl flex items-center justify-center z-40 hover:scale-110 transition-transform group"
+      >
+        <Link2 className="w-5 h-5" strokeWidth={2.5} />
+      </motion.button>
 
       {/* Slim Scroll to Top Button */}
       <AnimatePresence>

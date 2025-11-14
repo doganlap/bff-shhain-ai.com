@@ -3,7 +3,7 @@
  * Handles job scheduling, cron management, execution tracking
  */
 
-const prisma = require('../lib/prisma');
+const prisma = require('../../db/prisma');
 const cron = require('node-cron');
 
 // In-memory job registry

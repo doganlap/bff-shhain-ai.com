@@ -4,8 +4,8 @@
  */
 
 const axios = require('axios');
-const prisma = require('../db/prisma');
-const { logger } = require('../utils/logger');
+const prisma = require('../../db/prisma');
+const { logger } = require('../../utils/logger');
 
 // Stripe Configuration
 const STRIPE_CONFIG = {
