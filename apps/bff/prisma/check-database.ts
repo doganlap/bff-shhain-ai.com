@@ -16,7 +16,7 @@ async function main() {
       select: { id: true, name: true, total_controls: true }
     })
     frameworkList.forEach(f => {
-      console.log(`   • ${f.name} (expected: ${f.total_controls})`)
+      console.log(`   - ${f.name} (expected: ${f.total_controls})`)
     })
 
     // Check controls
@@ -30,10 +30,14 @@ async function main() {
     })
 
     for (const group of controlsByFramework) {
+      if (!group.framework_id) {
+        console.log(`   - (no framework): ${group._count} controls`)
+        continue
+      }
       const framework = await prisma.grc_frameworks.findUnique({
         where: { id: group.framework_id }
       })
-      console.log(`   • ${framework?.name}: ${group._count} controls`)
+      console.log(`   - ${framework?.name ?? group.framework_id}: ${group._count} controls`)
     }
 
     // Check other tables
@@ -84,3 +88,5 @@ main()
     await prisma.$disconnect()
     process.exit(1)
   })
+
+

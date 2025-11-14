@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
   ControlCard,
   MaturityBadge
-} from '@/components/cards/AssessmentCards';
+} from '../../components/cards/AssessmentCards';
 import {
   Shield, CheckCircle2, XCircle, AlertTriangle, FileText,
   ChevronDown, ChevronRight, Filter, Search, Download

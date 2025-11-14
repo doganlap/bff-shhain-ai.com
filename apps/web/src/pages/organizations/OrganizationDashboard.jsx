@@ -7,7 +7,7 @@ import {
   ScoreCard,
   AssessmentSummaryCard,
   MaturityBadge
-} from '@/components/cards/AssessmentCards';
+} from '../../components/cards/AssessmentCards';
 import {
   Shield, CheckCircle2, AlertTriangle, TrendingUp, FileText,
   Clock, Users, Target, Activity, ChevronRight, Download, Share2

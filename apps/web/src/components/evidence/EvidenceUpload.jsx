@@ -1,11 +1,11 @@
 import React, { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import {
-  FiUpload, FiFile, FiX, FiCheck, FiAlertCircle,
-  FiImage, FiFileText, FiDownload
-} from 'react-icons/fi';
+  Upload as FiUpload, File as FiFile, X as FiX, Check as FiCheck, AlertCircle as FiAlertCircle,
+  Image as FiImage, FileText as FiFileText, Download as FiDownload
+} from 'lucide-react';
 import { useI18n } from '../../hooks/useI18n';
-import api from '../../services/api';
+import { api } from '../../services/api';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = [

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import {
-  FiSearch, FiGrid, FiList, FiDownload, FiPlus,
-  FiClock, FiUser, FiCheckCircle, FiAlertCircle, FiTrendingUp
-} from 'react-icons/fi';
+  Search as FiSearch, Grid as FiGrid, List as FiList, Download as FiDownload, Plus as FiPlus,
+  Clock as FiClock, User as FiUser, CheckCircle as FiCheckCircle, AlertCircle as FiAlertCircle, TrendingUp as FiTrendingUp
+} from 'lucide-react';
 import { useI18n } from '../../hooks/useI18n';
-import api from '../../services/api';
+import { api } from '../../services/api';
 
 const TaskDashboard = () => {
   const { language } = useI18n();
