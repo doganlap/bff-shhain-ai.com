@@ -767,22 +767,25 @@ app.use((err, req, res, next) => {
 // START SERVER
 // ==========================================
 
-const server = app.listen(PORT, () => {
-  logger.info('BFF server started successfully', {
-    port: PORT,
-    environment: process.env.NODE_ENV,
-    servicesCount: Object.keys(services).length
-  });
+// Only start server if not in Vercel serverless environment
+let server;
+if (!process.env.VERCEL && process.env.NODE_ENV !== 'serverless') {
+  server = app.listen(PORT, () => {
+    logger.info('BFF server started successfully', {
+      port: PORT,
+      environment: process.env.NODE_ENV,
+      servicesCount: Object.keys(services).length
+    });
 
-  console.log('');
-  console.log('==========================================');
-  console.log('🚀 GRC BFF Server Running');
-  console.log('==========================================');
-  console.log(`Environment: ${process.env.NODE_ENV}`);
-  console.log(`Port: ${PORT}`);
-  console.log(`Health: http://localhost:${PORT}/health`);
-  console.log(`Detailed Health: http://localhost:${PORT}/health/detailed`);
-  console.log('');
+    console.log('');
+    console.log('==========================================');
+    console.log('🚀 GRC BFF Server Running');
+    console.log('==========================================');
+    console.log(`Environment: ${process.env.NODE_ENV}`);
+    console.log(`Port: ${PORT}`);
+    console.log(`Health: http://localhost:${PORT}/health`);
+    console.log(`Detailed Health: http://localhost:${PORT}/health/detailed`);
+    console.log('');
   console.log('Connected Services:');
   Object.entries(services).forEach(([name, url]) => {
     console.log(`  - ${name}: ${url}`);
@@ -819,13 +822,20 @@ process.on('SIGTERM', () => {
   }, 30000);
 });
 
+  });
+}
+
 process.on('SIGINT', () => {
   logger.info('SIGINT received, shutting down gracefully');
 
-  server.close(() => {
-    logger.info('Server closed, exiting process');
+  if (server) {
+    server.close(() => {
+      logger.info('Server closed, exiting process');
+      process.exit(0);
+    });
+  } else {
     process.exit(0);
-  });
+  }
 });
 
 // Handle uncaught exceptions
