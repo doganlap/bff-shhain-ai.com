@@ -8,8 +8,12 @@ const fs = require('fs');
 const os = require('os');
 
 // Use temp directory for Vercel serverless (read-only filesystem)
-const uploadDir = process.env.VERCEL ? os.tmpdir() : path.join(__dirname, '..', 'uploads');
-if (!process.env.VERCEL && !fs.existsSync(uploadDir)) {
+// Vercel sets VERCEL_ENV automatically (production, preview, or development)
+const isVercel = process.env.VERCEL_ENV || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+const uploadDir = isVercel ? os.tmpdir() : path.join(__dirname, '..', 'uploads');
+
+// Only create directory in local development (not in serverless environments)
+if (!isVercel && !fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
