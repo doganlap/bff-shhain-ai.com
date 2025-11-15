@@ -47,7 +47,7 @@ export interface OrganizationProfile {
   storesPii: boolean;
   processesPayments: boolean;
   hasOnlinePlatform: boolean;
-  usesCl oudServices: boolean;
+  usesCloudServices: boolean;
 
   // Compliance & Risk
   existingCertifications: string[];

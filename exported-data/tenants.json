@@ -1,0 +1,28 @@
+[
+  {
+    "id": "tenant-001",
+    "slug": "demo-tenant-1",
+    "display_name": "Demo Tenant 1",
+    "type": "demo",
+    "status": "active",
+    "country": "Saudi Arabia",
+    "sector": "technology",
+    "metadata": "{\"plan\":\"demo\",\"users\":5}",
+    "created_at": "2025-11-15T18:27:30.257Z",
+    "updated_at": "2025-11-15T18:27:30.254Z",
+    "expires_at": null
+  },
+  {
+    "id": "tenant-002",
+    "slug": "partner-tenant-1",
+    "display_name": "Partner Organization 1",
+    "type": "partner",
+    "status": "active",
+    "country": "Saudi Arabia",
+    "sector": "consulting",
+    "metadata": "{\"plan\":\"partner\",\"users\":10}",
+    "created_at": "2025-11-15T18:27:30.257Z",
+    "updated_at": "2025-11-15T18:27:30.255Z",
+    "expires_at": null
+  }
+]

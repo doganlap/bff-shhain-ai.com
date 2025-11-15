@@ -695,9 +695,20 @@ app.get('/', (req, res) => {
 // HEALTH CHECKS
 // ==========================================
 
-app.get('/healthz', (req, res) => {
-  res.status(200).send('ok');
-});
+// Basic health check - accessible at /healthz and /api/health
+const basicHealthCheck = (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    service: 'BFF',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    version: process.env.npm_package_version || '1.0.0'
+  });
+};
+
+app.get('/healthz', basicHealthCheck);
+app.get('/api/health', basicHealthCheck);
 
 app.get('/readyz', async (req, res) => {
   try {
