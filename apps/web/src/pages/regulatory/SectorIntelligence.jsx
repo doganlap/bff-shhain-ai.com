@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import ErrorFallback from '../../components/common/ErrorFallback';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { Chart } from "react-google-charts";
+import { useTheme } from '../../components/theme/ThemeProvider.jsx';
 
 // Simple StatCard component
 const StatCard = ({ title, value, icon: Icon, trend, color = 'blue' }) => (
@@ -25,42 +26,11 @@ const StatCard = ({ title, value, icon: Icon, trend, color = 'blue' }) => (
   </div>
 );
 
-// Simple DataTable component
-const DataTable = ({ columns, data, loading }) => (
-  <div className="overflow-x-auto">
-    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-      <thead className="bg-gray-50 dark:bg-gray-900">
-        <tr>
-          {columns.map((col, idx) => (
-            <th key={idx} className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-              {col.header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-        {loading ? (
-          <tr><td colSpan={columns.length} className="px-6 py-4 text-center"><LoadingSpinner /></td></tr>
-        ) : data.length === 0 ? (
-          <tr><td colSpan={columns.length} className="px-6 py-4 text-center text-gray-500">No data available</td></tr>
-        ) : (
-          data.map((row, idx) => (
-            <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-              {columns.map((col, colIdx) => (
-                <td key={colIdx} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                  {col.accessor ? row[col.accessor] : col.cell(row)}
-                </td>
-              ))}
-            </tr>
-          ))
-        )}
-      </tbody>
-    </table>
-  </div>
-);
+import DataGrid from '../../components/ui/DataGrid.jsx';
 
 const SectorIntelligence = () => {
   const [selectedSector, setSelectedSector] = useState('all');
+  const { getColor } = useTheme();
   const [selectedFramework, setSelectedFramework] = useState('all');
   const [selectedRegulator, setSelectedRegulator] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
@@ -161,10 +131,10 @@ const SectorIntelligence = () => {
       label: 'Risk Level', 
       sortable: true,
       render: (value) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          value === 'high' ? 'bg-red-100 text-red-800' :
-          value === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-          'bg-green-100 text-green-800'
+        <span className={`badge ${
+          value === 'high' ? 'badge-error' :
+          value === 'medium' ? 'badge-warning' :
+          'badge-success'
         }`}>
           {value?.toUpperCase() || 'LOW'}
         </span>
@@ -175,10 +145,10 @@ const SectorIntelligence = () => {
       label: 'Status', 
       sortable: true,
       render: (value) => (
-        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-          value === 'implemented' ? 'bg-green-100 text-green-800' :
-          value === 'in_progress' ? 'bg-blue-100 text-blue-800' :
-          'bg-gray-100 text-gray-800'
+        <span className={`badge ${
+          value === 'implemented' ? 'badge-success' :
+          value === 'in_progress' ? 'badge-info' :
+          'badge-gray'
         }`}>
           {value?.replace('_', ' ').toUpperCase() || 'NOT STARTED'}
         </span>
@@ -373,7 +343,14 @@ const SectorIntelligence = () => {
               options={{
                 title: 'Controls by Framework',
                 pieHole: 0.4,
-                colors: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4'],
+                colors: [
+                  getColor('primary.600'),
+                  getColor('success.500'),
+                  getColor('warning.500'),
+                  getColor('error.500'),
+                  getColor('primary.700'),
+                  getColor('info.500'),
+                ],
                 legend: { position: 'bottom' },
                 chartArea: { width: '90%', height: '80%' }
               }}
@@ -398,12 +375,31 @@ const SectorIntelligence = () => {
             <LoadingSpinner message="Loading sector controls..." />
           </div>
         ) : sectorControlsData?.data && sectorControlsData.data.length > 0 ? (
-          <DataTable
-            data={sectorControlsData.data}
-            columns={tableColumns}
-            searchable={false} // We have custom search above
-            exportable={true}
-            onExport={handleExport}
+          <DataGrid
+            data={sectorControlsData.data.map((row, idx) => ({ id: row.control_id || idx, ...row }))}
+            columns={[
+              { key: 'control_id', label: 'Control ID', sortable: true },
+              { key: 'title', label: 'Control Title', sortable: true },
+              { key: 'sector', label: 'Sector', sortable: true },
+              { key: 'framework_name', label: 'Framework', sortable: true },
+              { key: 'regulator_name', label: 'Regulator', sortable: true },
+              { key: 'risk_level', label: 'Risk Level', sortable: true, render: (value) => (
+                <span className={`badge ${
+                  value === 'high' ? 'badge-error' :
+                  value === 'medium' ? 'badge-warning' :
+                  'badge-success'
+                }`}>{(value || 'low').toUpperCase()}</span>
+              )},
+              { key: 'status', label: 'Status', sortable: true, render: (value) => (
+                <span className={`badge ${
+                  value === 'implemented' ? 'badge-success' :
+                  value === 'in_progress' ? 'badge-info' :
+                  'badge-gray'
+                }`}>{(value || 'not_started').replace('_', ' ').toUpperCase()}</span>
+              )},
+            ]}
+            pageSize={10}
+            onExport={(selected) => handleExport('csv')}
           />
         ) : (
           <div className="p-12 text-center">

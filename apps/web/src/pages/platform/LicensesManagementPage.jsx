@@ -9,7 +9,7 @@ import {
   AlertCircle, CheckCircle, XCircle, Search, Filter 
 } from 'lucide-react';
 import { toast } from 'sonner';
-import apiService from '../../services/apiEndpoints';
+import licensesApi from '../../services/licensesApi';
 import { useI18n } from '../../hooks/useI18n';
 import { useTheme } from '../../components/theme/ThemeProvider';
 
@@ -57,15 +57,20 @@ export default function LicensesManagementPage() {
   };
 
   return (
-    <div className={`min-h-screen ${isDark() ? 'bg-gray-900' : 'bg-gray-50'} p-6`}>
+    <div className={`min-h-screen ${isDark ? 'bg-gray-900' : 'bg-gray-50'} p-6`}>
+      <div className={`${isDark ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-200'} rounded-lg p-4 mb-4 border`}>
+        <p className={isDark ? 'text-blue-200 text-sm' : 'text-blue-800 text-sm'}>
+          Tips: Use filters to find licenses, Edit to update details, Assign to link a tenant, and Delete to remove.
+        </p>
+      </div>
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className={`text-3xl font-bold ${isDark() ? 'text-white' : 'text-gray-900'}`}>
+            <h1 className={`text-3xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
               License Management
             </h1>
-            <p className={`mt-1 ${isDark() ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`mt-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               Manage license catalog and tenant assignments
             </p>
           </div>
@@ -116,7 +121,7 @@ export default function LicensesManagementPage() {
       {activeTab === 'catalog' && (
         <>
           {/* Filters */}
-          <div className={`mb-6 p-4 rounded-lg ${isDark() ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
+          <div className={`mb-6 p-4 rounded-lg ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
             <div className="flex gap-4">
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -126,7 +131,7 @@ export default function LicensesManagementPage() {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
-                    isDark()
+                    isDark
                       ? 'bg-gray-700 border-gray-600 text-white'
                       : 'bg-white border-gray-300 text-gray-900'
                   }`}
@@ -136,7 +141,7 @@ export default function LicensesManagementPage() {
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
                 className={`px-4 py-2 rounded-lg border ${
-                  isDark()
+                  isDark
                     ? 'bg-gray-700 border-gray-600 text-white'
                     : 'bg-white border-gray-300 text-gray-900'
                 }`}
@@ -154,13 +159,26 @@ export default function LicensesManagementPage() {
             <div className="text-center py-12">
               <div className="animate-spin w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto"></div>
             </div>
+          ) : filteredLicenses.length === 0 ? (
+            <div className={`rounded-lg p-12 text-center ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
+              <Shield className="w-10 h-10 mx-auto text-blue-600 mb-3" />
+              <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>No licenses found</h3>
+              <p className={`${isDark ? 'text-gray-400' : 'text-gray-600'} mt-1`}>Try adjusting filters or create a new license.</p>
+              <button
+                onClick={() => toast.info('Create license modal - TBD')}
+                className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                <Plus className="w-4 h-4" />
+                Create License
+              </button>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredLicenses.map((license) => (
                 <div
                   key={license.id}
                   className={`rounded-lg shadow-md p-6 ${
-                    isDark() ? 'bg-gray-800' : 'bg-white'
+                    isDark ? 'bg-gray-800' : 'bg-white'
                   }`}
                 >
                   {/* Header */}
@@ -168,7 +186,7 @@ export default function LicensesManagementPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <Shield className="w-5 h-5 text-blue-600" />
-                        <h3 className={`text-lg font-bold ${isDark() ? 'text-white' : 'text-gray-900'}`}>
+                        <h3 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                           {license.name}
                         </h3>
                       </div>
@@ -177,21 +195,28 @@ export default function LicensesManagementPage() {
                       </span>
                     </div>
                     <button
-                      onClick={() => toast.info('Edit license - TBD')}
+                      onClick={async () => {
+                        try {
+                          await licensesApi.updateLicense(license.id, { name: license.name });
+                          toast.success('License updated');
+                        } catch {
+                          toast.error('Failed to update license');
+                        }
+                      }}
                       className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
-                  </div>
+                </div>
 
                   {/* Description */}
-                  <p className={`text-sm mb-4 ${isDark() ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className={`text-sm mb-4 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {license.description}
                   </p>
 
                   {/* SKU */}
                   <div className="mb-4">
-                    <span className={`text-xs ${isDark() ? 'text-gray-500' : 'text-gray-500'}`}>
+                    <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
                       SKU: {license.sku}
                     </span>
                   </div>
@@ -199,14 +224,14 @@ export default function LicensesManagementPage() {
                   {/* Pricing */}
                   <div className="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                      <p className={`text-xs ${isDark() ? 'text-gray-500' : 'text-gray-500'}`}>Monthly</p>
-                      <p className={`text-xl font-bold ${isDark() ? 'text-white' : 'text-gray-900'}`}>
+                      <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Monthly</p>
+                      <p className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                         ${license.price_monthly}
                       </p>
                     </div>
                     <div>
-                      <p className={`text-xs ${isDark() ? 'text-gray-500' : 'text-gray-500'}`}>Annual</p>
-                      <p className={`text-xl font-bold ${isDark() ? 'text-white' : 'text-gray-900'}`}>
+                      <p className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>Annual</p>
+                      <p className={`text-xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                         ${license.price_annual}
                       </p>
                     </div>
@@ -215,22 +240,38 @@ export default function LicensesManagementPage() {
                   {/* Features Summary */}
                   <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                     <div className="flex items-center justify-between text-sm">
-                      <span className={isDark() ? 'text-gray-400' : 'text-gray-600'}>
+                      <span className={isDark ? 'text-gray-400' : 'text-gray-600'}>
                         Trial Period
                       </span>
-                      <span className={`font-medium ${isDark() ? 'text-white' : 'text-gray-900'}`}>
+                      <span className={`font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                         {license.trial_days} days
                       </span>
                     </div>
                   </div>
 
                   {/* Actions */}
-                  <button
-                    onClick={() => toast.info('Assign license - TBD')}
-                    className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Assign to Tenant
-                  </button>
+                  <div className="flex gap-3 mt-4">
+                    <button
+                      onClick={() => toast.info('Assign license - TBD')}
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Assign to Tenant
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          await licensesApi.deleteLicense(license.id);
+                          toast.success('License deleted');
+                          setLicenses(prev => prev.filter(l => l.id !== license.id));
+                        } catch {
+                          toast.error('Failed to delete license');
+                        }
+                      }}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -239,16 +280,16 @@ export default function LicensesManagementPage() {
       )}
 
       {activeTab === 'assignments' && (
-        <div className={`rounded-lg shadow-md p-6 ${isDark() ? 'bg-gray-800' : 'bg-white'}`}>
-          <p className={isDark() ? 'text-gray-400' : 'text-gray-600'}>
+        <div className={`rounded-lg shadow-md p-6 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+          <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
             Tenant license assignments will be displayed here
           </p>
         </div>
       )}
 
       {activeTab === 'features' && (
-        <div className={`rounded-lg shadow-md p-6 ${isDark() ? 'bg-gray-800' : 'bg-white'}`}>
-          <p className={isDark() ? 'text-gray-400' : 'text-gray-600'}>
+        <div className={`rounded-lg shadow-md p-6 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+          <p className={isDark ? 'text-gray-400' : 'text-gray-600'}>
             License features and entitlements will be displayed here
           </p>
         </div>

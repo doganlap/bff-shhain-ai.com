@@ -9,10 +9,12 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../components/theme/ThemeProvider.jsx';
 import { Plus, Download, Filter as FilterIcon, AlertTriangle, Shield } from 'lucide-react';
 import EnterprisePageLayout from '../../components/layout/EnterprisePageLayout';
 import { useCRUD } from '../../hooks/useCRUD';
 import { HeatmapChart, PieChart, BarChart, GaugeChart, RadarChart, LineChart } from '../../components/charts/PlotlyCharts';
+import DataGrid from '../../components/ui/DataGrid.jsx';
 import apiService from '../../services/apiEndpoints';
 import {
   assessRisk,
@@ -37,6 +39,7 @@ const RiskManagementModuleV2 = () => {
   } = useCRUD(apiService.risks, 'Risk');
 
   const [riskMetrics, setRiskMetrics] = useState(null);
+  const { getColor } = useTheme();
   const [heatMapData, setHeatMapData] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [filters, setFilters] = useState({
@@ -80,7 +83,12 @@ const RiskManagementModuleV2 = () => {
       riskMetrics?.mediumCount || 0,
       riskMetrics?.lowCount || 0,
     ],
-    colors: ['#7f1d1d', '#ef4444', '#f59e0b', '#10b981'],
+    colors: [
+      getColor('error.700'),
+      getColor('error.500'),
+      getColor('warning.500'),
+      getColor('success.500'),
+    ],
   };
 
   const riskByCategoryData = [
@@ -136,13 +144,13 @@ const RiskManagementModuleV2 = () => {
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
           >
             <Plus className="h-4 w-4 mr-2" />
             New Risk
           </button>
 
-          <button className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+          <button className="inline-flex items-center px-4 py-2 bg-success-600 text-white rounded-lg hover:bg-success-700">
             <Download className="h-4 w-4 mr-2" />
             Export
           </button>
@@ -163,12 +171,12 @@ const RiskManagementModuleV2 = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-gray-500">Critical Risks</div>
-                  <div className="text-3xl font-bold text-red-600 mt-2">
+                  <div className="text-3xl font-bold text-error-600 mt-2">
                     {riskMetrics?.criticalCount || 0}
                   </div>
-                  <div className="text-sm text-red-600 mt-1">Immediate action required</div>
+                  <div className="text-sm text-error-600 mt-1">Immediate action required</div>
                 </div>
-                <AlertTriangle className="h-12 w-12 text-red-600 opacity-20" />
+                <AlertTriangle className="h-12 w-12 text-error-600 opacity-20" />
               </div>
             </div>
 
@@ -176,12 +184,12 @@ const RiskManagementModuleV2 = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-gray-500">High Risks</div>
-                  <div className="text-3xl font-bold text-orange-600 mt-2">
+                  <div className="text-3xl font-bold text-warning-600 mt-2">
                     {riskMetrics?.highCount || 0}
                   </div>
-                  <div className="text-sm text-orange-600 mt-1">Within 30 days</div>
+                  <div className="text-sm text-warning-600 mt-1">Within 30 days</div>
                 </div>
-                <AlertTriangle className="h-12 w-12 text-orange-600 opacity-20" />
+                <AlertTriangle className="h-12 w-12 text-warning-600 opacity-20" />
               </div>
             </div>
 
@@ -189,12 +197,12 @@ const RiskManagementModuleV2 = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-gray-500">Mitigated Risks</div>
-                  <div className="text-3xl font-bold text-green-600 mt-2">
+                  <div className="text-3xl font-bold text-success-600 mt-2">
                     {riskMetrics?.mitigatedCount || 0}
                   </div>
-                  <div className="text-sm text-green-600 mt-1">+5 this month</div>
+                  <div className="text-sm text-success-600 mt-1">+5 this month</div>
                 </div>
-                <Shield className="h-12 w-12 text-green-600 opacity-20" />
+                <Shield className="h-12 w-12 text-success-600 opacity-20" />
               </div>
             </div>
 
@@ -202,12 +210,12 @@ const RiskManagementModuleV2 = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-gray-500">Risk Score</div>
-                  <div className="text-3xl font-bold text-blue-600 mt-2">
+                  <div className="text-3xl font-bold text-primary-600 mt-2">
                     {riskMetrics?.overallScore || 0}
                   </div>
-                  <div className="text-sm text-blue-600 mt-1">-12% from last month</div>
+                  <div className="text-sm text-primary-600 mt-1">-12% from last month</div>
                 </div>
-                <AlertTriangle className="h-12 w-12 text-blue-600 opacity-20" />
+                <AlertTriangle className="h-12 w-12 text-primary-600 opacity-20" />
               </div>
             </div>
           </div>
@@ -286,47 +294,27 @@ const RiskManagementModuleV2 = () => {
           {/* Risks List */}
           <div className="bg-white p-6 rounded-lg shadow">
             <h3 className="text-lg font-semibold mb-4">Risk Register</h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Risk ID</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Severity</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {risks.map((risk) => (
-                    <tr key={risk.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {risk.risk_id || `R-${risk.id}`}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">{risk.description}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{risk.category}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs font-medium rounded ${
-                          risk.severity === 'critical' ? 'bg-red-100 text-red-800' :
-                          risk.severity === 'high' ? 'bg-orange-100 text-orange-800' :
-                          risk.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-green-100 text-green-800'
-                        }`}>
-                          {risk.severity}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{risk.status}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button className="text-blue-600 hover:text-blue-900 mr-3">View</button>
-                        <button className="text-green-600 hover:text-green-900 mr-3">Assess</button>
-                        <button className="text-red-600 hover:text-red-900">Mitigate</button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <DataGrid
+              data={risks.map(r => ({ id: r.id, ...r }))}
+              columns={[
+                { key: 'risk_id', label: 'Risk ID', sortable: true, render: (v, row) => v || `R-${row.id}` },
+                { key: 'description', label: 'Description', sortable: true },
+                { key: 'category', label: 'Category', sortable: true },
+                { key: 'severity', label: 'Severity', sortable: true, render: (v) => (
+                  <span className={`badge ${
+                    v === 'critical' ? 'badge-error' :
+                    v === 'high' ? 'badge-warning' :
+                    v === 'medium' ? 'badge-warning' :
+                    'badge-success'
+                  }`}>{(v || 'low').toUpperCase()}</span>
+                )},
+                { key: 'status', label: 'Status', sortable: true },
+              ]}
+              pageSize={10}
+              onRowClick={(row) => console.log('View', row)}
+              onExport={(selected) => console.log('Export selected', selected)}
+              selectable={true}
+            />
           </div>
         </div>
       )}

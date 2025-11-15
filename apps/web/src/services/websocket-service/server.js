@@ -349,7 +349,7 @@ process.on('SIGTERM', async () => {
 });
 
 // Start server
-const PORT = process.env.PORT || 3008;
+const PORT = process.env.PORT || 3009;
 
 // Initialize Redis connection
 redisClient.connect()

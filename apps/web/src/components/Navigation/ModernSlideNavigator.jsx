@@ -13,144 +13,17 @@ import {
 } from 'lucide-react';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../theme/ThemeProvider';
+import { useApp } from '../../context/AppContext';
+import { getNavigationForRole } from '../layout/MultiTenantNavigation';
 
-// Comprehensive page configuration with all available pages
-const PAGE_CATEGORIES = {
-  dashboard: {
-    id: 'dashboard',
-    name: 'لوحات القيادة',
-    nameEn: 'Dashboards',
-    icon: Home,
-    color: 'from-blue-500 to-blue-600',
-    pages: [
-      { id: 'enhanced-dashboard', name: 'لوحة القيادة المحسنة', nameEn: 'Enhanced Dashboard', path: '/app', icon: Home },
-      { id: 'dashboard-legacy', name: 'لوحة القيادة الكلاسيكية', nameEn: 'Legacy Dashboard', path: '/app/dashboard/legacy', icon: Activity },
-      { id: 'advanced-dashboard', name: 'لوحة القيادة المتقدمة', nameEn: 'Advanced Dashboard', path: '/app/dashboard/advanced', icon: TrendingUp },
-      { id: 'tenant-dashboard', name: 'لوحة قيادة المؤسسة', nameEn: 'Tenant Dashboard', path: '/tenant/:tenantId', icon: Building2 },
-      { id: 'regulatory-market', name: 'السوق التنظيمي', nameEn: 'Regulatory Market', path: '/app/dashboard/regulatory-market', icon: Globe },
-      { id: 'usage-dashboard', name: 'لوحة الاستخدام', nameEn: 'Usage Dashboard', path: '/platform/usage', icon: PieChart },
-      { id: 'modern-advanced', name: 'لوحة حديثة متقدمة', nameEn: 'Modern Advanced Dashboard', path: '/platform/advanced-dashboard', icon: Monitor }
-    ]
-  },
-  grc: {
-    id: 'grc',
-    name: 'إدارة المخاطر والامتثال',
-    nameEn: 'GRC Modules',
-    icon: Shield,
-    color: 'from-emerald-500 to-emerald-600',
-    pages: [
-      { id: 'assessments', name: 'التقييمات', nameEn: 'Assessments', path: '/app/assessments', icon: Shield },
-      { id: 'assessment-details', name: 'تفاصيل التقييم', nameEn: 'Assessment Details', path: '/app/assessments/:id', icon: FileText },
-      { id: 'frameworks', name: 'الأطر التنظيمية', nameEn: 'Frameworks', path: '/app/frameworks', icon: Target },
-      { id: 'controls', name: 'الضوابط', nameEn: 'Controls', path: '/app/controls', icon: CheckCircle },
-      { id: 'compliance-enhanced', name: 'الامتثال المحسن', nameEn: 'Compliance Enhanced', path: '/app/compliance', icon: ShieldCheck },
-      { id: 'compliance-legacy', name: 'الامتثال الكلاسيكي', nameEn: 'Compliance Legacy', path: '/app/compliance/legacy', icon: Archive },
-      { id: 'risk-enhanced', name: 'إدارة المخاطر المحسنة', nameEn: 'Risk Management Enhanced', path: '/app/risks', icon: AlertTriangle },
-      { id: 'risk-legacy', name: 'إدارة المخاطر الكلاسيكية', nameEn: 'Risk Management Legacy', path: '/app/risks/legacy', icon: Activity },
-      { id: 'risks-list', name: 'قائمة المخاطر', nameEn: 'Risks List', path: '/app/risks/list', icon: List },
-      { id: 'evidence', name: 'الأدلة', nameEn: 'Evidence', path: '/app/evidence', icon: FileText }
-    ]
-  },
-  organizations: {
-    id: 'organizations',
-    name: 'إدارة المؤسسات',
-    nameEn: 'Organizations',
-    icon: Building2,
-    color: 'from-purple-500 to-purple-600',
-    pages: [
-      { id: 'organizations-main', name: 'المؤسسات', nameEn: 'Organizations', path: '/app/organizations', icon: Building2 },
-      { id: 'organizations-list', name: 'قائمة المؤسسات', nameEn: 'Organizations List', path: '/app/organizations/list', icon: List },
-      { id: 'organization-new', name: 'مؤسسة جديدة', nameEn: 'New Organization', path: '/app/organizations/new', icon: Plus },
-      { id: 'organization-details', name: 'تفاصيل المؤسسة', nameEn: 'Organization Details', path: '/app/organizations/:id', icon: Eye },
-      { id: 'organization-edit', name: 'تعديل المؤسسة', nameEn: 'Edit Organization', path: '/app/organizations/:id/edit', icon: Edit }
-    ]
-  },
-  system: {
-    id: 'system',
-    name: 'إدارة النظام',
-    nameEn: 'System Management',
-    icon: Settings,
-    color: 'from-gray-500 to-gray-600',
-    pages: [
-      { id: 'settings', name: 'الإعدادات', nameEn: 'Settings', path: '/app/settings', icon: Settings },
-      { id: 'database', name: 'قاعدة البيانات', nameEn: 'Database', path: '/app/database', icon: Database },
-      { id: 'api-management', name: 'إدارة واجهة البرمجة', nameEn: 'API Management', path: '/app/api-management', icon: Server },
-      { id: 'performance', name: 'مراقبة الأداء', nameEn: 'Performance Monitor', path: '/app/performance', icon: Activity },
-      { id: 'users', name: 'إدارة المستخدمين', nameEn: 'User Management', path: '/app/users', icon: Users },
-      { id: 'audit-logs', name: 'سجلات التدقيق', nameEn: 'Audit Logs', path: '/app/audit-logs', icon: Archive },
-      { id: 'workflows', name: 'إدارة سير العمل', nameEn: 'Workflow Management', path: '/app/workflows', icon: Workflow },
-      { id: 'notifications', name: 'إدارة الإشعارات', nameEn: 'Notification Management', path: '/app/notifications', icon: Bell },
-      { id: 'documents', name: 'إدارة المستندات', nameEn: 'Document Management', path: '/app/documents', icon: FileText }
-    ]
-  },
-  ai: {
-    id: 'ai',
-    name: 'الذكاء الاصطناعي',
-    nameEn: 'AI Services',
-    icon: Bot,
-    color: 'from-indigo-500 to-indigo-600',
-    pages: [
-      { id: 'ai-scheduler', name: 'مجدول الذكاء الاصطناعي', nameEn: 'AI Scheduler', path: '/app/ai-scheduler', icon: Calendar },
-      { id: 'rag-service', name: 'خدمة RAG', nameEn: 'RAG Service', path: '/app/rag-service', icon: Cpu },
-      { id: 'auto-assessment', name: 'منشئ التقييم التلقائي', nameEn: 'Auto Assessment Generator', path: '/platform/auto-assessment', icon: Zap }
-    ]
-  },
-  platform: {
-    id: 'platform',
-    name: 'إدارة المنصة',
-    nameEn: 'Platform Management',
-    icon: Server,
-    color: 'from-orange-500 to-orange-600',
-    pages: [
-      { id: 'licenses', name: 'إدارة التراخيص', nameEn: 'License Management', path: '/platform/licenses', icon: FileCheck },
-      { id: 'renewals', name: 'خط تجديد التراخيص', nameEn: 'Renewals Pipeline', path: '/platform/renewals', icon: RefreshCw },
-      { id: 'upgrade', name: 'ترقية الحساب', nameEn: 'Upgrade Account', path: '/platform/upgrade', icon: TrendingUp },
-      { id: 'partners', name: 'إدارة الشركاء', nameEn: 'Partner Management', path: '/app/partners', icon: Briefcase }
-    ]
-  },
-  regulatory: {
-    id: 'regulatory',
-    name: 'الذكاء التنظيمي',
-    nameEn: 'Regulatory Intelligence',
-    icon: Globe,
-    color: 'from-teal-500 to-teal-600',
-    pages: [
-      { id: 'regulatory-intelligence', name: 'الذكاء التنظيمي', nameEn: 'Regulatory Intelligence', path: '/app/regulatory-intelligence', icon: Lightbulb },
-      { id: 'regulatory-engine', name: 'محرك التنظيم', nameEn: 'Regulatory Engine', path: '/app/regulatory-engine', icon: Cpu },
-      { id: 'regulators', name: 'الجهات التنظيمية', nameEn: 'Regulators', path: '/app/regulators', icon: Award },
-      { id: 'sector-intelligence', name: 'ذكاء القطاعات', nameEn: 'Sector Intelligence', path: '/app/sector-intelligence', icon: PieChart },
-      { id: 'ksa-grc', name: 'إدارة المخاطر السعودية', nameEn: 'KSA GRC', path: '/app/ksa-grc', icon: Globe }
-    ]
-  },
-  reports: {
-    id: 'reports',
-    name: 'التقارير والتحليلات',
-    nameEn: 'Reports & Analytics',
-    icon: BarChart3,
-    color: 'from-rose-500 to-rose-600',
-    pages: [
-      { id: 'reports', name: 'التقارير', nameEn: 'Reports', path: '/app/reports', icon: BarChart3 }
-    ]
-  },
-  demo: {
-    id: 'demo',
-    name: 'العروض التوضيحية',
-    nameEn: 'Demo & Components',
-    icon: Eye,
-    color: 'from-cyan-500 to-cyan-600',
-    pages: [
-      { id: 'components-demo', name: 'عرض المكونات', nameEn: 'Components Demo', path: '/app/components-demo', icon: Grid3X3 },
-      { id: 'modern-components', name: 'المكونات الحديثة', nameEn: 'Modern Components', path: '/app/modern-components-demo', icon: Smartphone },
-      { id: 'demo-page', name: 'صفحة التجربة', nameEn: 'Demo Page', path: '/demo', icon: Play }
-    ]
-  }
-};
+// Categories will be computed dynamically from spec navigation
 
 const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { language, isRTL, t } = useI18n();
   const { isDark } = useTheme();
+  const { state } = useApp();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -163,12 +36,52 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
   };
 
   // Filter pages based on search query and category
+  const specCategories = useMemo(() => {
+    let overrideRole = null;
+    try { overrideRole = localStorage.getItem('role_override'); } catch {}
+    const effectiveRole = overrideRole || state.user?.role || 'team_member';
+    const nav = getNavigationForRole(effectiveRole, state.currentTenant || { id: 1 }, state.stats || {});
+    const cats = {};
+    nav.forEach(section => {
+      const key = section.id || section.name;
+      let pages = (section.items || []).filter(it => !!it.path).map(it => ({
+        id: it.id || it.name,
+        name: it.name,
+        nameEn: it.name,
+        path: it.path,
+        icon: it.icon || Home,
+      }));
+      // If section has a direct path and no children, include it as a page
+      if ((!pages || pages.length === 0) && section.path) {
+        pages = [{
+          id: section.id || section.name,
+          name: section.name,
+          nameEn: section.name,
+          path: section.path,
+          icon: section.icon || Home,
+        }];
+      }
+      if (pages.length) {
+        cats[key] = {
+          id: key,
+          name: section.name,
+          nameEn: section.name,
+          icon: section.icon || Grid3X3,
+          color: 'from-blue-500 to-blue-600',
+          pages,
+        };
+      }
+    });
+    return cats;
+  }, [state.user, state.currentTenant, state.stats]);
+
   const filteredCategories = useMemo(() => {
-    if (!searchQuery && !selectedCategory) return PAGE_CATEGORIES;
+    const source = specCategories;
+    if (!searchQuery && !selectedCategory) return source;
 
     const filtered = {};
-    Object.keys(PAGE_CATEGORIES).forEach(categoryKey => {
-      const category = PAGE_CATEGORIES[categoryKey];
+    Object.keys(source).forEach(categoryKey => {
+      const category = source[categoryKey];
       let pages = category.pages;
 
       // Filter by search query
@@ -191,12 +104,12 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
     });
 
     return filtered;
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, specCategories]);
 
   // Get total page count
   const totalPages = useMemo(() => {
-    return Object.values(PAGE_CATEGORIES).reduce((total, category) => total + category.pages.length, 0);
-  }, []);
+    return Object.values(specCategories).reduce((total, category) => total + category.pages.length, 0);
+  }, [specCategories]);
 
   const handlePageClick = (path) => {
     navigate(path);
@@ -223,7 +136,7 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/30"
           onClick={onClose}
         />
 
@@ -233,21 +146,21 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.95, opacity: 0, y: 20 }}
           className={`relative w-full max-w-6xl max-h-[90vh] bg-white rounded-2xl shadow-2xl overflow-hidden ${
-            isDark() ? 'bg-gray-900 border border-gray-700' : 'bg-white'
+            isDark ? 'bg-gray-900 border border-gray-700' : 'bg-white'
           } ${className}`}
         >
           {/* Header */}
-          <div className={`p-6 border-b ${isDark() ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
+          <div className={`p-6 border-b ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg">
-                  <Grid3X3 className="h-6 w-6 text-white" />
+                <div className="p-2 bg-primary-50 rounded-lg">
+                  <Grid3X3 className="h-6 w-6 text-primary-600" />
                 </div>
                 <div>
-                  <h2 className={`text-2xl font-bold ${isDark() ? 'text-white' : 'text-gray-900'}`}>
+                  <h2 className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {language === 'ar' ? 'مستكشف الصفحات المتقدم' : 'Advanced Page Navigator'}
                   </h2>
-                  <p className={`text-sm ${isDark() ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {language === 'ar' ? `${totalPages} صفحة متاحة` : `${totalPages} pages available`}
                   </p>
                 </div>
@@ -255,7 +168,7 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
               <button
                 onClick={onClose}
                 className={`p-2 rounded-lg transition-colors ${
-                  isDark() ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-200 text-gray-600'
+                  isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-200 text-gray-600'
                 }`}
               >
                 <X className="h-5 w-5" />
@@ -266,7 +179,7 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
             <div className="flex items-center space-x-4">
               <div className="flex-1 relative">
                 <Search className={`absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 ${
-                  isDark() ? 'text-gray-400' : 'text-gray-500'
+                  isDark ? 'text-gray-400' : 'text-gray-500'
                 }`} />
                 <input
                   type="text"
@@ -274,7 +187,7 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className={`w-full pl-10 pr-4 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    isDark() 
+                    isDark 
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
                       : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
                   }`}
@@ -285,7 +198,7 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
                 <button
                   onClick={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
                   className={`p-2 rounded-lg transition-colors ${
-                    isDark() ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-200 text-gray-600'
+                    isDark ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-200 text-gray-600'
                   }`}
                 >
                   {viewMode === 'grid' ? <List className="h-4 w-4" /> : <Grid3X3 className="h-4 w-4" />}
@@ -295,13 +208,13 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
                   value={selectedCategory || ''}
                   onChange={(e) => setSelectedCategory(e.target.value || null)}
                   className={`px-3 py-2 rounded-lg border focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    isDark() 
+                    isDark 
                       ? 'bg-gray-700 border-gray-600 text-white' 
                       : 'bg-white border-gray-300 text-gray-900'
                   }`}
                 >
                   <option value="">{language === 'ar' ? 'جميع الفئات' : 'All Categories'}</option>
-                  {Object.entries(PAGE_CATEGORIES).map(([key, category]) => (
+                  {Object.entries(specCategories).map(([key, category]) => (
                     <option key={key} value={key}>
                       {getDisplayName(category)}
                     </option>
@@ -325,11 +238,11 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
                   <div className={`p-2 rounded-lg bg-gradient-to-r ${category.color}`}>
                     <category.icon className="h-5 w-5 text-white" />
                   </div>
-                  <h3 className={`text-lg font-semibold ${isDark() ? 'text-white' : 'text-gray-900'}`}>
+                  <h3 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                     {getDisplayName(category)}
                   </h3>
                   <span className={`px-2 py-1 text-xs rounded-full ${
-                    isDark() ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600'
+                    isDark ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-600'
                   }`}>
                     {category.pages.length}
                   </span>
@@ -354,36 +267,36 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
                           rounded-lg border transition-all duration-200 text-left w-full ${
                           isActive
                             ? 'border-blue-500 bg-blue-50 text-blue-900'
-                            : isDark()
+                            : isDark
                               ? 'border-gray-700 bg-gray-800 hover:bg-gray-700 text-white'
                               : 'border-gray-200 bg-white hover:bg-gray-50 text-gray-900'
                         }`}
                       >
                         {viewMode === 'grid' ? (
                           <div className="text-center">
-                            <div className={`inline-flex p-3 rounded-lg mb-3 ${
-                              isActive ? 'bg-blue-100' : isDark() ? 'bg-gray-700' : 'bg-gray-100'
+                              <div className={`inline-flex p-3 rounded-lg mb-3 ${
+                              isActive ? 'bg-blue-100' : isDark ? 'bg-gray-700' : 'bg-gray-100'
                             }`}>
                               <Icon className={`h-6 w-6 ${
-                                isActive ? 'text-blue-600' : isDark() ? 'text-gray-300' : 'text-gray-600'
+                                isActive ? 'text-blue-600' : isDark ? 'text-gray-300' : 'text-gray-600'
                               }`} />
                             </div>
                             <h4 className="font-medium text-sm mb-1">
                               {getDisplayName(page)}
                             </h4>
                             <p className={`text-xs ${
-                              isActive ? 'text-blue-600' : isDark() ? 'text-gray-400' : 'text-gray-500'
+                              isActive ? 'text-blue-600' : isDark ? 'text-gray-400' : 'text-gray-500'
                             }`}>
                               {page.path}
                             </p>
                           </div>
                         ) : (
                           <>
-                            <div className={`p-2 rounded-lg ${
-                              isActive ? 'bg-blue-100' : isDark() ? 'bg-gray-700' : 'bg-gray-100'
+                              <div className={`p-2 rounded-lg ${
+                              isActive ? 'bg-blue-100' : isDark ? 'bg-gray-700' : 'bg-gray-100'
                             }`}>
                               <Icon className={`h-4 w-4 ${
-                                isActive ? 'text-blue-600' : isDark() ? 'text-gray-300' : 'text-gray-600'
+                                isActive ? 'text-blue-600' : isDark ? 'text-gray-300' : 'text-gray-600'
                               }`} />
                             </div>
                             <div className="flex-1">
@@ -391,7 +304,7 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
                                 {getDisplayName(page)}
                               </h4>
                               <p className={`text-xs ${
-                                isActive ? 'text-blue-600' : isDark() ? 'text-gray-400' : 'text-gray-500'
+                                isActive ? 'text-blue-600' : isDark ? 'text-gray-400' : 'text-gray-500'
                               }`}>
                                 {page.path}
                               </p>
@@ -413,15 +326,15 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
             {Object.keys(filteredCategories).length === 0 && (
               <div className="text-center py-12">
                 <Search className={`h-12 w-12 mx-auto mb-4 ${
-                  isDark() ? 'text-gray-600' : 'text-gray-400'
+                  isDark ? 'text-gray-600' : 'text-gray-400'
                 }`} />
                 <h3 className={`text-lg font-medium mb-2 ${
-                  isDark() ? 'text-gray-300' : 'text-gray-600'
+                  isDark ? 'text-gray-300' : 'text-gray-600'
                 }`}>
                   {language === 'ar' ? 'لم توجد صفحات' : 'No pages found'}
                 </h3>
                 <p className={`text-sm ${
-                  isDark() ? 'text-gray-500' : 'text-gray-500'
+                  isDark ? 'text-gray-500' : 'text-gray-500'
                 }`}>
                   {language === 'ar' ? 'جرب مصطلح بحث مختلف' : 'Try a different search term'}
                 </p>
@@ -431,12 +344,12 @@ const ModernSlideNavigator = ({ isOpen, onClose, className = "" }) => {
 
           {/* Footer */}
           <div className={`p-4 border-t text-center ${
-            isDark() ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
+            isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'
           }`}>
-            <p className={`text-xs ${isDark() ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               {language === 'ar' 
-                ? `منصة إدارة المخاطر والامتثال • ${Object.keys(filteredCategories).length} فئة • ${Object.values(filteredCategories).reduce((total, cat) => total + cat.pages.length, 0)} صفحة`
-                : `GRC Master Platform • ${Object.keys(filteredCategories).length} categories • ${Object.values(filteredCategories).reduce((total, cat) => total + cat.pages.length, 0)} pages`
+                ? `شاهين الذكي • ${Object.keys(filteredCategories).length} فئة • ${Object.values(filteredCategories).reduce((total, cat) => total + cat.pages.length, 0)} صفحة`
+                : `Shahin AI • ${Object.keys(filteredCategories).length} categories • ${Object.values(filteredCategories).reduce((total, cat) => total + cat.pages.length, 0)} pages`
               }
             </p>
           </div>

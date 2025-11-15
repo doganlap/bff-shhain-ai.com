@@ -26,6 +26,20 @@ router.get('/templates', async (req, res) => {
   }
 });
 
+// PUT /api/workflows/templates/:id - Update workflow template (steps/rules)
+router.put('/templates/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updatedTemplate = await prisma.workflowTemplate.update({
+      where: { id: parseInt(id, 10) },
+      data: req.body,
+    });
+    res.json(updatedTemplate);
+  } catch (error) {
+    handleError(res, error, 'Error updating workflow template');
+  }
+});
+
 // GET /api/workflows/stats - Get workflow statistics
 router.get('/stats', async (req, res) => {
   try {

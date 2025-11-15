@@ -56,7 +56,7 @@ const SettingsPage = () => {
           passwordExpiry: 90,
           
           // Default appearance settings
-          theme: isDark() ? 'dark' : 'light',
+          theme: isDark ? 'dark' : 'light',
           language: language,
           dateFormat: 'DD/MM/YYYY',
           timezone: 'Asia/Riyadh',
@@ -84,7 +84,7 @@ const SettingsPage = () => {
         toast.success('Settings saved successfully');
         
         // Apply theme and language changes
-        if (settings.theme !== (isDark() ? 'dark' : 'light')) {
+        if (settings.theme !== (isDark ? 'dark' : 'light')) {
           toggleTheme();
         }
         if (settings.language !== language) {

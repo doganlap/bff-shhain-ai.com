@@ -114,7 +114,8 @@ function extractRequestMetadata(req) {
     method: req.method,
     path: req.path,
     query: req.query,
-    requestId: req.headers['x-request-id']
+    requestId: req.headers['x-request-id'],
+    auditAction: req.headers['x-audit-action']
   };
 }
 
@@ -149,12 +150,13 @@ function auditMiddleware(req, res, next) {
         ipAddress: metadata.ipAddress,
         userAgent: metadata.userAgent,
         resource: req.path,
-        action: req.method,
+        action: metadata.auditAction || req.method,
         details: {
           statusCode: res.statusCode,
           duration,
           query: metadata.query,
-          requestId: metadata.requestId
+          requestId: metadata.requestId,
+          auditAction: metadata.auditAction
         },
         success: res.statusCode < 400
       });

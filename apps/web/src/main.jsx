@@ -4,13 +4,16 @@ import App from './App.jsx';
 import { AppProvider } from './context/AppContext.jsx';
 import { I18nProvider } from './hooks/useI18n.jsx';
 import { ThemeProvider } from './components/theme/ThemeProvider.jsx';
+import { CulturalAdaptationProvider } from './components/Cultural/CulturalAdaptationProvider.jsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { BrowserRouter as Router } from 'react-router-dom';
 import './i18n'; // Initialize i18n
 import './index.css';
 import './App.css';
 import './styles/glassmorphism-light.css';
+import './styles/enterprise-modern.css';
 import './styles/responsive.css';
+import './styles/globals.css';
 
 // Create a client for React Query with enhanced error handling
 const queryClient = new QueryClient({
@@ -54,11 +57,13 @@ const renderApp = () => {
         <QueryClientProvider client={queryClient}>
           <ThemeProvider defaultTheme="light">
             <I18nProvider defaultLanguage="ar">
-              <AppProvider>
-                <Router>
-                  <App />
-                </Router>
-              </AppProvider>
+              <CulturalAdaptationProvider>
+                <AppProvider>
+                  <Router>
+                    <App />
+                  </Router>
+                </AppProvider>
+              </CulturalAdaptationProvider>
             </I18nProvider>
           </ThemeProvider>
         </QueryClientProvider>

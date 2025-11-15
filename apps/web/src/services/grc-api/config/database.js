@@ -66,7 +66,11 @@ const createPools = async () => {
             }
         }
 
-        pools[dbName] = new Pool(config);
+        if (process.env.POSTGRES_URL) {
+            pools[dbName] = new Pool({ connectionString: process.env.POSTGRES_URL, ssl: { rejectUnauthorized: false } });
+        } else {
+            pools[dbName] = new Pool(config);
+        }
         pools[dbName].on('error', (err, client) => {
             console.error(`Unexpected error on idle client for ${dbName}`, err);
         });

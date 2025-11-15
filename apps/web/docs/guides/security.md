@@ -234,6 +234,36 @@ When threats are detected:
 ## Backend Origin Enforcement
 
 - Login endpoints accept requests only when `Origin` is `https://www.shahin-ai.com` in production; others receive `403`
+
+## Professional Standards Tracker
+
+| Standard/Control | Implementation Area | File Reference | Status |
+|------------------|---------------------|----------------|--------|
+| HTTPS enforcement & HSTS | BFF middleware | `apps/bff/index.js:65–69` | Active |
+| HTTPS redirect (proxy header) | BFF middleware | `apps/bff/index.js:75–82` | Active |
+| CSP policy (frontend) | Meta header | `apps/web/index.html:12` | Active |
+| CSP policy (frontend server) | Helmet | `apps/web/api/index.js:14–34` | Active |
+| CORS canonical origins | BFF env + CORS | `apps/bff/config/env.js:12–24`, `apps/bff/index.js:110–116` | Active |
+| Canonical domain guard | Frontend routing | `apps/web/src/App.jsx:138–165` | Active (prod) |
+| Login via landing only | Frontend routing | `apps/web/src/App.jsx:172–201`, `apps/web/src/components/auth/ProtectedRoute.jsx:71–73` | Active |
+| Origin check on login (auth-service) | Backend route | `apps/web/src/services/auth-service/routes/auth.js:193–200` | Active |
+| Origin check on login (grc-api) | Backend route | `apps/web/src/services/grc-api/routes/auth.js:9–15` | Active |
+| Origin check on login (landing backend) | Backend route | `apps/web/www.shahin.com/backend/routes/auth.js:15–22` | Active |
+| Rate limiting (BFF) | Tenant + auth | `apps/bff/index.js:118–129` | Active |
+| Rate limiting (frontend server) | Global | `apps/web/api/index.js:50–59` | Active |
+| Audit logging | BFF middleware | `apps/bff/index.js:140–144` | Active |
+| Sentry integration | BFF init | `apps/bff/index.js:31–38`, `apps/bff/integrations/sentry.js` | Active |
+| Multi-tenancy isolation (RLS ctx) | BFF middleware | `apps/bff/middleware/tenantIsolation.js`, `apps/bff/index.js:14–17` | Active |
+| Health endpoints (frontend) | `/api/health` | `apps/web/api/index.js:69–77` | Active |
+| Health endpoints (BFF) | `/health` | `apps/bff/routes/health.js` | Active |
+| Secure cookies for tokens | Auth-service cookies | `apps/web/src/services/auth-service/routes/auth.js:147–159, 296–308` | Active |
+| JWT handling | Utility | `apps/web/src/services/auth-service/utils/jwt.js` | Active |
+| CI/CD workflows | GitHub Actions | `.github/workflows/*.yml` | Active |
+| Security headers (Nginx/Edge) | Infra configs | `apps/infra/deployment/nginx.production.conf`, `apps/web/www.shahin.com/landing-page/nginx.conf` | Active |
+
+Notes:
+- Align production edge/CDN headers with app-level Helmet/Meta to avoid conflicts.
+- Keep BFF as the public API surface; route microservices behind BFF for consistent policy enforcement.
 - User-reported incidents
 - Security scan findings
 

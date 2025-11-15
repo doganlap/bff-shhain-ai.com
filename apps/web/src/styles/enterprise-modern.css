@@ -5,18 +5,19 @@
  */
 
 :root {
-  --enterprise-bg-primary: #111827;      /* gray-900 */
-  --enterprise-bg-secondary: #1f2937;   /* gray-800 */
-  --enterprise-bg-tertiary: #374151;    /* gray-700 */
-  --enterprise-border-primary: #4b5563; /* gray-600 */
-  --enterprise-border-secondary: #374151;/* gray-700 */
+  /* Light enterprise palette */
+  --enterprise-bg-primary: #f9fafb;      /* gray-50 */
+  --enterprise-bg-secondary: #ffffff;    /* white */
+  --enterprise-bg-tertiary: #f3f4f6;     /* gray-100 */
+  --enterprise-border-primary: #e5e7eb;  /* gray-200 */
+  --enterprise-border-secondary: #e5e7eb;/* gray-200 */
 
-  --enterprise-text-primary: #f9fafb;     /* gray-50 */
-  --enterprise-text-secondary: #d1d5db;   /* gray-300 */
-  --enterprise-text-tertiary: #9ca3af;    /* gray-400 */
+  --enterprise-text-primary: #111827;    /* gray-900 */
+  --enterprise-text-secondary: #374151;  /* gray-700 */
+  --enterprise-text-tertiary: #6b7280;   /* gray-500 */
 
-  --enterprise-accent-primary: #3b82f6; /* blue-500 */
-  --enterprise-accent-secondary: #6366f1;/* indigo-500 */
+  --enterprise-accent-primary: #2563eb;  /* blue-600 */
+  --enterprise-accent-secondary: #1d4ed8;/* blue-700 */
 
   --enterprise-sidebar-width: 280px;
   --enterprise-header-height: 64px;
@@ -29,13 +30,17 @@
 
 .enterprise-sidebar {
   background-color: var(--enterprise-bg-secondary);
-  border-right: 1px solid var(--enterprise-border-secondary);
+  border-right: 1px solid var(--enterprise-border-primary);
   width: var(--enterprise-sidebar-width);
+  flex: 0 0 auto;
 }
+
+.sidebar-expanded { width: var(--enterprise-sidebar-width); }
+.sidebar-collapsed { width: 64px; }
 
 .enterprise-header {
   background-color: var(--enterprise-bg-secondary);
-  border-bottom: 1px solid var(--enterprise-border-secondary);
+  border-bottom: 1px solid var(--enterprise-border-primary);
   height: var(--enterprise-header-height);
 }
 
@@ -46,7 +51,7 @@
 
 .enterprise-card {
   background-color: var(--enterprise-bg-secondary);
-  border: 1px solid var(--enterprise-border-secondary);
+  border: 1px solid var(--enterprise-border-primary);
   border-radius: 0.75rem; /* 12px */
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06);
 }

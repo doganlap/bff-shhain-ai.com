@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../theme/ThemeProvider';
-import { Bell, Search, User, LogOut, Settings, Globe, Sun, Moon, Grid3X3, Star } from 'lucide-react';
+import { Bell, Search, User, LogOut, Settings, Globe, Grid3X3, Star, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import ModernSlideNavigator from '../navigation/ModernSlideNavigator';
+import ModernSlideNavigator from '../Navigation/ModernSlideNavigator';
+import { apiServices } from '../../services/api';
 
 const Header = () => {
   const { state, actions } = useApp();
@@ -12,6 +13,69 @@ const Header = () => {
   const { t, language, changeLanguage, isRTL } = useI18n();
   const { isDark, toggleTheme } = useTheme();
   const [navigatorOpen, setNavigatorOpen] = useState(false);
+  const [apiHealth, setApiHealth] = useState(null);
+  const [dbHealth, setDbHealth] = useState(null);
+  const [apiLatency, setApiLatency] = useState(null);
+  const [dbLatency, setDbLatency] = useState(null);
+  const [lastChecked, setLastChecked] = useState(null);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchHealth = async () => {
+      try {
+        const measure = async (fn) => {
+          const start = performance.now();
+          const result = await fn();
+          const duration = Math.round(performance.now() - start);
+          return { result, duration };
+        };
+
+        const apiStatus = await measure(() => apiServices.health.getApiStatus());
+        const dbStatus = await measure(() => apiServices.health.getDbStatus());
+        if (!mounted) return;
+        setApiHealth(apiStatus?.result || null);
+        setDbHealth(dbStatus?.result || null);
+        setApiLatency(apiStatus?.duration || null);
+        setDbLatency(dbStatus?.duration || null);
+        setLastChecked(new Date());
+      } catch {}
+    };
+    fetchHealth();
+    const interval = setInterval(fetchHealth, 30000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchHealth = async () => {
+      try {
+        const measure = async (fn) => {
+          const start = performance.now();
+          const result = await fn();
+          const duration = Math.round(performance.now() - start);
+          return { result, duration };
+        };
+
+        const apiStatus = await measure(() => apiServices.health.getApiStatus());
+        const dbStatus = await measure(() => apiServices.health.getDbStatus());
+        if (!mounted) return;
+        setApiHealth(apiStatus?.result || null);
+        setDbHealth(dbStatus?.result || null);
+        setApiLatency(apiStatus?.duration || null);
+        setDbLatency(dbStatus?.duration || null);
+        setLastChecked(new Date());
+      } catch {}
+    };
+    fetchHealth();
+    const interval = setInterval(fetchHealth, 30000);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, []);
 
   const handleLogout = () => {
     actions.logout();
@@ -19,8 +83,8 @@ const Header = () => {
 
   return (
     <header 
-      className={`glass-header shadow-sm border-b px-6 py-4 ${
-        isDark ? 'bg-gray-800/80 border-gray-700' : 'bg-white/80 border-gray-200'
+      className={`enterprise-header shadow-sm border-b px-6 py-4 ${
+        isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
       }`}
       dir={isRTL() ? 'rtl' : 'ltr'}
     >
@@ -40,22 +104,25 @@ const Header = () => {
         {/* Right Side */}
         <div className="flex items-center space-x-4">
           {/* Modern Page Navigator Button */}
-          <motion.button 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => setNavigatorOpen(true)}
-            className="p-2 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white rounded-lg transition-all duration-200 relative group"
-            title={language === 'ar' ? 'مستكشف الصفحات المتقدم' : 'Advanced Page Navigator'}
-          >
-            <Grid3X3 className={`h-5 w-5 ${isDark ? 'text-gray-300 group-hover:text-white' : 'text-gray-600 group-hover:text-white'}`} />
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="absolute -top-1 -right-1 h-3 w-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
+          <InfoTooltip content={language === 'ar' ? 'مستكشف الصفحات المتقدم' : 'Advanced Page Navigator'} position="bottom">
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setNavigatorOpen(true)}
+              type="button"
+              aria-label={language === 'ar' ? 'مستكشف الصفحات المتقدم' : 'Advanced Page Navigator'}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 relative group focus:outline-none focus:ring-2 focus:ring-primary-600"
             >
-              <Star className="h-2 w-2 text-white" />
-            </motion.span>
-          </motion.button>
+              <Grid3X3 className={`h-5 w-5 ${isDark ? 'text-gray-300 group-hover:text-primary-300' : 'text-gray-600 group-hover:text-primary-600'}`} />
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute -top-1 -right-1 h-3 w-3 bg-primary-500 rounded-full flex items-center justify-center"
+              >
+                <Star className="h-2 w-2 text-white" />
+              </motion.span>
+            </motion.button>
+          </InfoTooltip>
 
           {/* Compliance Score */}
           <div className={`hidden md:flex items-center ${isRTL() ? 'space-x-reverse' : ''} space-x-2 bg-green-50 text-green-700 px-3 py-1 rounded-full`}>
@@ -65,29 +132,52 @@ const Header = () => {
             </span>
           </div>
 
+          {/* API/DB Health Badges */}
+          <div className="hidden md:flex items-center space-x-2">
+            <span
+              className={`text-xs px-2 py-1 rounded-full ${apiHealth ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-500'}`}
+              title={`API ${apiLatency ? apiLatency + 'ms' : ''}${lastChecked ? ' • ' + lastChecked.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}`}
+            >
+              API {apiHealth ? 'OK' : '...'} {apiLatency ? `${apiLatency}ms` : ''}
+            </span>
+            <span
+              className={`text-xs px-2 py-1 rounded-full ${dbHealth ? 'bg-purple-50 text-purple-700' : 'bg-gray-100 text-gray-500'}`}
+              title={`DB ${dbLatency ? dbLatency + 'ms' : ''}${lastChecked ? ' • ' + lastChecked.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}`}
+            >
+              DB {dbHealth ? 'OK' : '...'} {dbLatency ? `${dbLatency}ms` : ''}
+            </span>
+          </div>
+
           {/* Language Toggle */}
-          <button 
-            onClick={() => changeLanguage(language === 'en' ? 'ar' : 'en')}
-            className={`p-2 ${isDark ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors`}
-            title={language === 'en' ? 'العربية' : 'English'}
-          >
-            <Globe className="h-5 w-5" />
-          </button>
+          <InfoTooltip content={language === 'en' ? 'العربية' : 'English'} position="bottom">
+            <button 
+              onClick={() => changeLanguage(language === 'en' ? 'ar' : 'en')}
+              className={`p-2 ${isDark ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors`}
+            >
+              <Globe className="h-5 w-5" />
+            </button>
+          </InfoTooltip>
 
           {/* Theme Toggle */}
-          <button 
-            onClick={toggleTheme}
-            className={`p-2 ${isDark() ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors`}
-            title={isDark ? t('action.switch_to_light') : t('action.switch_to_dark')}
-          >
-            {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </button>
+          <InfoTooltip content={isDark ? t('action.switch_to_light') : t('action.switch_to_dark')} position="bottom">
+            <button 
+              onClick={toggleTheme}
+              className={`p-2 ${isDark ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors`}
+              aria-label={isDark ? t('action.switch_to_light') : t('action.switch_to_dark')}
+            >
+              {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </button>
+          </InfoTooltip>
+
+          
 
           {/* Notifications */}
-          <button className={`relative p-2 ${isDark ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors`}>
-            <Bell className="h-5 w-5" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
+          <WarningTooltip content={t('nav.notifications')} position="bottom">
+            <button className={`relative p-2 ${isDark ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'} rounded-lg transition-colors`}>
+              <Bell className="h-5 w-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+          </WarningTooltip>
 
           {/* Tenant Selector */}
           {currentTenant && (
@@ -146,3 +236,4 @@ const Header = () => {
 };
 
 export default Header;
+import { InfoTooltip, WarningTooltip } from '../ui/Tooltip.jsx';

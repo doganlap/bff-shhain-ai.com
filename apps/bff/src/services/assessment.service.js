@@ -24,10 +24,9 @@ const ASSESSMENT_STATES = {
 function calculateProgress(assessment) {
   if (!assessment) return 0;
 
-  const progress = assessment.progress || 0;
+  const progress = assessment.progress;
   if (typeof progress === 'number') return Math.min(100, Math.max(0, progress));
 
-  // If progress is stored as steps completed
   if (assessment.steps_completed && assessment.total_steps) {
     return Math.round((assessment.steps_completed / assessment.total_steps) * 100);
   }

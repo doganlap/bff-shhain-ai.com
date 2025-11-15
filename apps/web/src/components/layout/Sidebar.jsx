@@ -3,6 +3,7 @@ import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../theme/ThemeProvider';
+import { getNavigationForRole } from './MultiTenantNavigation';
 import { 
   Home, Shield, Target, FileText, Building2, Users, 
   BarChart3, Database, Settings, Menu, X,
@@ -13,10 +14,12 @@ import {
   Plus, Edit, Trash2, RefreshCw, Filter, Search, Download, Upload,
   Play, Pause, Eye, EyeOff, Star, Heart, Share2, Copy
 } from 'lucide-react';
+import { RoleActivationPanel } from './MultiTenantNavigation';
+import { apiServices } from '../../services/api';
 
 const Sidebar = () => {
   const { state, actions } = useApp();
-  const { sidebarOpen, stats, user, isAuthenticated } = state;
+  const { sidebarOpen, stats, user, isAuthenticated, tenants, currentTenant } = state;
   const location = useLocation();
   const navigate = useNavigate();
   const { t, isRTL } = useI18n();
@@ -31,13 +34,19 @@ const Sidebar = () => {
   
   // State for collapsible groups (GRC business logic flow)
   const [collapsedGroups, setCollapsedGroups] = useState({
-    'dashboard': false,        // Always visible - starting point
-    'governance': false,        // Setup phase - open by default
-    'risk-management': true,    // Risk phase
-    'compliance': true,         // Compliance phase
-    'reporting': true,          // Reporting phase
-    'automation': true,         // AI & Automation
-    'administration': true      // System admin
+    'dashboard': true,
+    'governance': true,
+    'risk-management': true,
+    'compliance': true,
+    'reporting': true,
+    'automation': true,
+    'administration': true,
+    'platform': true,
+    'specialized': true,
+    'advanced-ui': true,
+    'tenant-management': true,
+    'legacy-versions': true,
+    'assessment-collaboration': true
   });
 
   const toggleGroup = (groupId) => {
@@ -206,6 +215,17 @@ const Sidebar = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [sidebarOpen, selectedIndex, searchTerm]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024 && sidebarOpen) {
+        actions.toggleSidebar();
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    handleResize();
+    return () => window.removeEventListener('resize', handleResize);
+  }, [sidebarOpen]);
 
   // Save user preferences
   useEffect(() => {
@@ -855,15 +875,15 @@ const Sidebar = () => {
           onClick={() => handleNavigation(item.path, item.id)}
           className={`flex items-center px-3 py-3 text-base font-semibold rounded-lg transition-all duration-200 ${
             active
-              ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/25'
+              ? 'bg-primary-50 text-title border border-app'
               : isSelected
-              ? 'bg-gray-700 text-blue-400 border border-gray-600'
-              : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+              ? 'bg-gray-100 text-primary-600 border border-soft'
+              : 'text-gray-700 hover:bg-gray-100'
           }`}
           title={!sidebarOpen ? item.name : ''}
         >
-          <item.icon className={`flex-shrink-0 h-6 w-6 ${sidebarOpen ? 'mr-3' : 'mx-auto'} drop-shadow-lg ${
-            active ? 'text-white drop-shadow-md' : 'text-gray-400 group-hover:text-white drop-shadow-sm'
+          <item.icon className={`flex-shrink-0 h-6 w-6 ${sidebarOpen ? 'mr-3' : 'mx-auto'} ${
+            active ? 'text-primary-600' : 'text-gray-500 group-hover:text-primary-600'
           }`} />
           
           {sidebarOpen && (
@@ -879,17 +899,11 @@ const Sidebar = () => {
                   )}
                 </div>
                 {item.description && (
-                  <span className="text-sm opacity-80 block truncate font-medium">{item.description}</span>
+                  <span className="text-sm text-muted block truncate font-medium">{item.description}</span>
                 )}
               </div>
               {item.badge && item.badge > 0 && (
-                <span className={`ml-2 px-2 py-0.5 text-xs font-medium rounded-full ${
-                  active 
-                    ? 'bg-white/20 text-white' 
-                    : 'bg-gray-700 text-blue-400'
-                }`}>
-                  {item.badge}
-                </span>
+                <span className={`ml-2 badge badge-info`}>{item.badge}</span>
               )}
             </div>
           )}
@@ -976,28 +990,27 @@ const Sidebar = () => {
     const hasActiveItem = group.items.some(item => isActive(item.path));
     
     return (
-      <div key={group.id} className="mb-2">
-        {/* Group Header - Dark Theme */}
+      <div key={group.id} className="mb-2 relative group">
         <button
           onClick={() => toggleGroup(group.id)}
           className={`w-full flex items-center px-3 py-3 text-base font-bold rounded-lg transition-all duration-200 ${
             hasActiveItem
-              ? 'bg-gray-700 text-blue-400 border border-gray-600'
-              : 'text-gray-300 hover:bg-gray-700'
+              ? 'bg-primary-50 text-primary-700 border border-app'
+              : 'text-gray-700 hover:bg-gray-100'
           } ${!sidebarOpen ? 'justify-center' : 'justify-between'}`}
           title={!sidebarOpen ? group.name : ''}
         >
           <div className="flex items-center">
-            <group.icon className={`h-6 w-6 ${sidebarOpen ? 'mr-3' : ''} drop-shadow-lg ${
-              hasActiveItem ? 'text-blue-400 drop-shadow-md' : 'text-gray-500 drop-shadow-sm'
+            <group.icon className={`h-6 w-6 ${sidebarOpen ? 'mr-3' : ''} ${
+              hasActiveItem ? 'text-primary-600' : 'text-gray-500'
             }`} />
             {sidebarOpen && (
-              <span className="font-bold text-lg">{group.name}</span>
+              <span className="font-bold text-lg text-title">{group.name}</span>
             )}
           </div>
           {sidebarOpen && (
             <div className="flex items-center">
-              <span className="text-xs text-gray-400 mr-2">
+              <span className="text-xs text-muted mr-2">
                 {group.items.length}
               </span>
               {isCollapsed ? (
@@ -1008,10 +1021,27 @@ const Sidebar = () => {
             </div>
           )}
         </button>
-        
+
+        {!sidebarOpen && (
+          <div className={`absolute top-0 ${isRTL() ? 'right-full' : 'left-full'} ml-2 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50`}>
+            <div className="grid grid-cols-2 gap-2">
+              {group.items.map((child) => (
+                <button
+                  key={child.id}
+                  onClick={() => handleNavigation(child.path, child.id)}
+                  className="flex items-center p-2 rounded hover:bg-gray-100 text-gray-700"
+                >
+                  <child.icon className="h-4 w-4 mr-2" />
+                  <span className="truncate text-sm">{child.name}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Group Items */}
         {sidebarOpen && !isCollapsed && (
-          <div className="mt-1 ml-4 space-y-1 border-l border-gray-600 pl-4">
+          <div className="mt-1 ml-4 space-y-1 border-l border-gray-200 pl-4">
             {group.items.map((item, index) => renderNavigationItem(item, index))}
           </div>
         )}
@@ -1019,10 +1049,33 @@ const Sidebar = () => {
     );
   };
 
+  const renderSection = (section, index) => {
+    const hasChildren = Array.isArray(section.items) && section.items.length > 0;
+    if (hasChildren) {
+      return renderNavigationGroup(section);
+    }
+    if (section.path) {
+      const item = {
+        id: section.id,
+        name: section.name,
+        path: section.path,
+        icon: section.icon,
+        description: section.description,
+        badge: section.badge
+      };
+      return (
+        <div key={section.id}>
+          {renderNavigationItem(item, index)}
+        </div>
+      );
+    }
+    return null;
+  };
+
   return (
     <div 
-      className={`glass-sidebar transition-all duration-300 bg-gray-900 ${
-        sidebarOpen ? 'w-72' : 'w-16'
+      className={`enterprise-sidebar transition-all duration-300 sidebar-auto ${
+        sidebarOpen ? 'sidebar-expanded w-72' : 'sidebar-collapsed w-16'
       }`}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
@@ -1030,15 +1083,15 @@ const Sidebar = () => {
     >
       <div className="flex flex-col h-full">
         {/* Enhanced Enterprise Header - Dark Theme */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gradient-to-r from-gray-900 to-gray-800">
+        <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white">
           {sidebarOpen && (
             <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
-                <Shield className="h-6 w-6 text-white" />
+              <div className="p-2 bg-primary-50 rounded-xl shadow-sm">
+                <Shield className="h-6 w-6 text-primary-600" />
               </div>
               <div>
-                <h1 className="text-xl font-black text-white drop-shadow-sm">Shahin-AI KSA</h1>
-                <p className="text-sm text-gray-300 font-semibold" dir="rtl">شاهين الذكي السعودية</p>
+                <h1 className="text-xl font-black text-title">Shahin AI</h1>
+                <p className="text-sm text-muted font-semibold" dir="rtl">شاهين الذكي</p>
               </div>
             </div>
           )}
@@ -1047,7 +1100,7 @@ const Sidebar = () => {
             <button
               onClick={handleRefresh}
               disabled={isRefreshing}
-              className="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700 transition-colors disabled:opacity-50"
+              className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors disabled:opacity-50"
               title="Refresh data"
             >
               <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -1056,7 +1109,7 @@ const Sidebar = () => {
             {/* Toggle sidebar */}
             <button
               onClick={actions.toggleSidebar}
-              className="p-2 rounded-lg text-gray-300 hover:text-white hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-lg text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors"
             >
               {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -1065,7 +1118,7 @@ const Sidebar = () => {
 
         {/* Enhanced Search & Filter Section - Dark Theme */}
         {sidebarOpen && (
-          <div className="p-4 bg-gray-800 border-b border-gray-700">
+          <div className="p-4 bg-white border-b border-gray-200">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <input
@@ -1073,12 +1126,12 @@ const Sidebar = () => {
                 placeholder="Search navigation..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-white placeholder-gray-400"
+                className="w-full pl-10 pr-4 py-2 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm text-gray-900 placeholder-gray-500"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -1115,29 +1168,41 @@ const Sidebar = () => {
           </div>
         )}
 
+        {/* Role & Tenant Panel for Platform Admins */}
+        {sidebarOpen && user?.role === 'platform_admin' && (
+          <div className="p-4 bg-white border-b border-gray-200">
+            <RoleActivationPanel 
+              role={user?.role}
+              currentTenant={currentTenant}
+              tenants={localTenants}
+              onTenantSwitch={(tenant) => actions.setCurrentTenant(tenant)}
+            />
+          </div>
+        )}
+
         {/* Quick Stats (when expanded) - Dark Theme */}
         {sidebarOpen && (
-          <div className="p-4 bg-gradient-to-r from-gray-800 to-gray-700 border-b border-gray-600">
+          <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-gray-700 rounded-lg p-3 shadow-sm">
+              <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-200">
                 <div className="flex items-center">
-                  <div className="p-1 bg-green-900 rounded">
-                    <CheckCircle className="h-3 w-3 text-green-400" />
+                  <div className="p-1 bg-success-50 rounded">
+                    <CheckCircle className="h-3 w-3 text-success-600" />
                   </div>
                   <div className="ml-2">
-                    <p className="text-xs text-gray-300">Compliance</p>
-                    <p className="text-sm font-semibold text-white">94.2%</p>
+                    <p className="text-xs text-muted">Compliance</p>
+                    <p className="text-sm font-semibold text-title">94.2%</p>
                   </div>
                 </div>
               </div>
-              <div className="bg-gray-700 rounded-lg p-3 shadow-sm">
+              <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-200">
                 <div className="flex items-center">
-                  <div className="p-1 bg-blue-900 rounded">
-                    <Activity className="h-3 w-3 text-blue-400" />
+                  <div className="p-1 bg-info-50 rounded">
+                    <Activity className="h-3 w-3 text-info-600" />
                   </div>
                   <div className="ml-2">
-                    <p className="text-xs text-gray-300">Active</p>
-                    <p className="text-sm font-semibold text-white">{stats.assessments || 12}</p>
+                    <p className="text-xs text-muted">Active</p>
+                    <p className="text-sm font-semibold text-title">{stats.assessments || 12}</p>
                   </div>
                 </div>
               </div>
@@ -1147,13 +1212,13 @@ const Sidebar = () => {
 
         {/* Favorites Section - Dark Theme */}
         {sidebarOpen && favorites.length > 0 && (
-          <div className="p-4 bg-gray-800 border-b border-gray-600">
+          <div className="p-4 bg-white border-b border-gray-200">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-yellow-400 flex items-center">
+              <h3 className="text-sm font-semibold text-yellow-700 flex items-center">
                 <Star className="h-4 w-4 mr-2 fill-current" />
                 Favorites
               </h3>
-              <span className="text-xs text-yellow-300 bg-yellow-900 bg-opacity-30 px-2 py-1 rounded-full">
+              <span className="text-xs text-yellow-700 bg-yellow-100 px-2 py-1 rounded-full">
                 {favorites.length}
               </span>
             </div>
@@ -1166,7 +1231,7 @@ const Sidebar = () => {
                   <button
                     key={item.id}
                     onClick={() => handleNavigation(item.path, item.id)}
-                    className="w-full flex items-center px-2 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-yellow-300 rounded transition-colors"
+                    className="w-full flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-yellow-700 rounded transition-colors"
                   >
                     <item.icon className="h-4 w-4 mr-2 flex-shrink-0" />
                     <span className="truncate">{item.name}</span>
@@ -1179,15 +1244,15 @@ const Sidebar = () => {
 
         {/* Recent Items - Dark Theme */}
         {sidebarOpen && recentItems.length > 0 && (
-          <div className="p-4 bg-gray-800 border-b border-gray-600">
+          <div className="p-4 bg-white border-b border-gray-200">
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-blue-400 flex items-center">
+              <h3 className="text-sm font-semibold text-blue-700 flex items-center">
                 <Activity className="h-4 w-4 mr-2" />
                 Recent
               </h3>
               <button
                 onClick={() => setRecentItems([])}
-                className="text-xs text-blue-400 hover:text-blue-300"
+                className="text-xs text-blue-700 hover:text-blue-600"
                 title="Clear recent items"
               >
                 Clear
@@ -1205,11 +1270,11 @@ const Sidebar = () => {
                   <button
                     key={recent.id}
                     onClick={() => handleNavigation(item.path, item.id)}
-                    className="w-full flex items-center px-2 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-blue-300 rounded transition-colors"
+                    className="w-full flex items-center px-2 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-blue-700 rounded transition-colors"
                   >
                     <item.icon className="h-4 w-4 mr-2 flex-shrink-0" />
                     <span className="truncate">{item.name}</span>
-                    <span className="ml-auto text-xs text-blue-400">
+                    <span className="ml-auto text-xs text-blue-700">
                       {new Date(recent.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </button>
@@ -1220,38 +1285,37 @@ const Sidebar = () => {
         )}
 
         {/* Navigation Groups */}
-        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          {navigationGroups
-            .map(group => ({
-              ...group,
-              items: filterNavigation(group.items)
+        <nav className={`flex-1 ${sidebarOpen ? 'p-4' : 'p-1'} space-y-2 overflow-y-auto`}>
+          {getNavigationForRole(user?.role || 'team_member', state.currentTenant || { id: 1, name: 'Default' }, stats)
+            .map(section => ({
+              ...section,
+              items: filterNavigation(section.items || [])
             }))
-            .filter(group => group.items.length > 0)
-            .map(renderNavigationGroup)
+            .map((section, idx) => renderSection(section, idx))
           }
         </nav>
 
         {/* Enhanced Enterprise Footer - Dark Theme */}
-        <div className="p-4 border-t border-gray-700 bg-gray-800">
+        <div className="p-4 border-t border-gray-200 bg-white">
           {sidebarOpen ? (
             <div className="space-y-3">
               {/* User Info */}
               {isAuthenticated && user && (
-                <div className="flex items-center space-x-3 p-2 bg-gray-700 rounded-lg shadow-sm">
-                  <div className="p-2 bg-blue-900 rounded-full">
-                    <UserCheck className="h-4 w-4 text-blue-400" />
+                <div className="flex items-center space-x-3 p-2 bg-white rounded-lg shadow-sm border border-gray-200">
+                  <div className="p-2 bg-blue-100 rounded-full">
+                    <UserCheck className="h-4 w-4 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-white truncate">
+                    <p className="text-sm font-medium text-gray-900 truncate">
                       {user.name || user.email || 'User'}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-600">
                       {user.role || 'User'}
                     </p>
                   </div>
                   <button
                     onClick={actions.logout}
-                    className="p-1 text-gray-400 hover:text-red-400 transition-colors"
+                    className="p-1 text-gray-600 hover:text-red-600 transition-colors"
                     title="Logout"
                   >
                     <div className="h-3 w-3 bg-current rounded-full" />
@@ -1260,31 +1324,31 @@ const Sidebar = () => {
               )}
               
               {/* Connection Status */}
-              <div className="flex items-center space-x-3 p-2 bg-gray-700 rounded-lg shadow-sm">
+              <div className="flex items-center space-x-3 p-2 bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className={`p-1 rounded-full ${
                   state.apiConnectionStatus === 'connected' 
-                    ? 'bg-green-900' 
+                    ? 'bg-green-100' 
                     : state.isOffline 
-                    ? 'bg-orange-900' 
-                    : 'bg-gray-600'
+                    ? 'bg-orange-100' 
+                    : 'bg-gray-100'
                 }`}>
                   <div className={`h-2 w-2 rounded-full ${
                     state.apiConnectionStatus === 'connected' 
-                      ? 'bg-green-400' 
+                      ? 'bg-green-600' 
                       : state.isOffline 
-                      ? 'bg-orange-400' 
-                      : 'bg-gray-400'
+                      ? 'bg-orange-600' 
+                      : 'bg-gray-500'
                   }`}></div>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="text-sm font-medium text-gray-900 truncate">
                     {state.apiConnectionStatus === 'connected' 
                       ? 'API Connected' 
                       : state.isOffline 
                       ? 'Offline Mode' 
                       : 'Connecting...'}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-600">
                     {state.apiConnectionStatus === 'connected' 
                       ? 'Live data available' 
                       : state.isOffline 
@@ -1295,7 +1359,7 @@ const Sidebar = () => {
                 <button
                   onClick={handleRefresh}
                   disabled={isRefreshing}
-                  className="p-1 text-gray-400 hover:text-blue-400 transition-colors disabled:opacity-50"
+                  className="p-1 text-gray-600 hover:text-blue-600 transition-colors disabled:opacity-50"
                   title="Refresh connection"
                 >
                   <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
@@ -1325,6 +1389,14 @@ const Sidebar = () => {
               <div className="text-center">
                 <p className="text-xs text-gray-400">Shahin-AI KSA</p>
                 <p className="text-xs text-gray-500" dir="rtl">v2.1.0 منصة الحوكمة الذكية</p>
+                <a
+                  href="https://www.doganconsult.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-1 inline-block text-xs font-medium text-blue-600 hover:text-blue-700"
+                >
+                  Design & Engineering by DoganConsult
+                </a>
               </div>
             </div>
           ) : (

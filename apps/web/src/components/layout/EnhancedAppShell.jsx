@@ -6,10 +6,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { 
-  Home, Shield, Target, FileText, Building2, Users, BarChart3, Database, Settings, 
-  Menu, X, Search, Bell, MessageSquare, HelpCircle, ChevronLeft, ChevronRight, 
-  Bot, Eye, AlertTriangle, UserCheck, Archive, Activity, CheckCircle, Workflow, 
+import {
+  Home, Shield, Target, FileText, Building2, Users, BarChart3, Database, Settings,
+  Menu, X, Search, Bell, MessageSquare, HelpCircle, ChevronLeft, ChevronRight,
+  Bot, Eye, AlertTriangle, UserCheck, Archive, Activity, CheckCircle, Workflow,
   ShieldCheck, Sun, Moon, Globe, Palette, Info
 } from 'lucide-react';
 
@@ -30,13 +30,13 @@ const EnhancedAppShell = () => {
   const { user } = state;
   const { t, language, changeLanguage, isRTL } = useI18n();
   const { currentTheme, toggleTheme, isDark } = useTheme();
-  
+
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  
+
   // Multi-tenant navigation
   const userRole = user?.role || 'team_member'; // platform_admin, tenant_admin, team_member
   const tenantContext = user?.tenant || { id: 1, name: 'Default Organization', compliance: 85 };
@@ -77,9 +77,9 @@ const EnhancedAppShell = () => {
   return (
     <ErrorBoundary>
       <div className={`flex h-screen transition-colors duration-200 ${
-        isDark() ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-slate-100'
+        isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-slate-100'
       }`} dir={isRTL() ? 'rtl' : 'ltr'}>
-        
+
         {/* Mobile Menu Toggle */}
         {isMobile && (
           <Tooltip content={t('action.open')} position="bottom">
@@ -105,12 +105,12 @@ const EnhancedAppShell = () => {
               className={`${
                 isMobile ? 'fixed' : 'relative'
               } top-0 ${isRTL() ? 'right-0' : 'left-0'} h-full shadow-xl z-40 overflow-hidden ${
-                isDark() ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
+                isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
               } border-${isRTL() ? 'l' : 'r'}`}
             >
               <div className="flex flex-col h-full">
                 {/* Header */}
-                <div className={`p-4 border-b ${isDark() ? 'border-gray-700' : 'border-slate-200'}`}>
+                <div className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-slate-200'}`}>
                   <div className="flex items-center justify-between">
                     {!sidebarCollapsed && (
                       <motion.div
@@ -122,10 +122,10 @@ const EnhancedAppShell = () => {
                           <Shield className="h-5 w-5 text-white" />
                         </div>
                         <div>
-                          <h1 className={`text-lg font-bold ${isDark() ? 'text-white' : 'text-slate-900'}`}>
+                          <h1 className={`text-lg font-bold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                             {t('company.name')}
                           </h1>
-                          <p className={`text-xs ${isDark() ? 'text-gray-400' : 'text-slate-500'}`}>
+                          <p className={`text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
                             {t('company.tagline')}
                           </p>
                         </div>
@@ -139,8 +139,8 @@ const EnhancedAppShell = () => {
                             isDark() ? 'hover:bg-gray-700' : 'hover:bg-slate-100'
                           }`}
                         >
-                          {sidebarCollapsed ? 
-                            (isRTL() ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />) : 
+                          {sidebarCollapsed ?
+                            (isRTL() ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />) :
                             (isRTL() ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />)
                           }
                         </button>
@@ -151,16 +151,16 @@ const EnhancedAppShell = () => {
 
                 {/* User Info & Role Badge */}
                 {!sidebarCollapsed && user && (
-                  <div className={`p-4 border-b ${isDark() ? 'border-gray-700' : 'border-slate-200'} space-y-3`}>
+                  <div className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-slate-200'} space-y-3`}>
                     <div className="flex items-center space-x-3">
-                      <div className={`p-2 rounded-full ${isDark() ? 'bg-gray-700' : 'bg-slate-100'}`}>
-                        <UserCheck className={`h-4 w-4 ${isDark() ? 'text-gray-300' : 'text-slate-600'}`} />
+                      <div className={`p-2 rounded-full ${isDark ? 'bg-gray-700' : 'bg-slate-100'}`}>
+                        <UserCheck className={`h-4 w-4 ${isDark ? 'text-gray-300' : 'text-slate-600'}`} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className={`text-sm font-medium truncate ${isDark() ? 'text-white' : 'text-slate-900'}`}>
+                        <p className={`text-sm font-medium truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>
                           {user.first_name} {user.last_name}
                         </p>
-                        <p className={`text-xs truncate ${isDark() ? 'text-gray-400' : 'text-slate-500'}`}>
+                        <p className={`text-xs truncate ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>
                           {user.email}
                         </p>
                       </div>
@@ -176,7 +176,7 @@ const EnhancedAppShell = () => {
                     const Icon = section.icon;
                     const hasChildren = section.items && section.items.length > 0;
                     const isActive = section.path && (currentPath === section.path || currentPath.startsWith(section.path + '/'));
-                    
+
                     if (!hasChildren && section.path) {
                       // Simple navigation item
                       const navButton = (
@@ -190,7 +190,7 @@ const EnhancedAppShell = () => {
                           } px-3 py-2 rounded-lg transition-all duration-200 ${
                             isActive
                               ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
-                              : isDark()
+                              : isDark
                               ? 'hover:bg-gray-700 text-gray-300'
                               : 'hover:bg-slate-100 text-slate-700'
                           }`}
@@ -208,20 +208,20 @@ const EnhancedAppShell = () => {
                           )}
                         </motion.button>
                       );
-                      
+
                       return sidebarCollapsed ? (
                         <Tooltip key={section.id} content={section.name} position="right">
                           {navButton}
                         </Tooltip>
                       ) : navButton;
                     }
-                    
+
                     if (hasChildren && !sidebarCollapsed) {
                       // Section with children
                       return (
                         <div key={section.id} className="mb-4">
                           <div className={`flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider ${
-                            isDark() ? 'text-gray-400' : 'text-slate-500'
+                            isDark ? 'text-gray-400' : 'text-slate-500'
                           }`}>
                             <div className="flex items-center space-x-2">
                               <Icon className="h-4 w-4" />
@@ -232,7 +232,7 @@ const EnhancedAppShell = () => {
                             {section.items.map((child) => {
                               const ChildIcon = child.icon;
                               const isChildActive = child.path && (currentPath === child.path || currentPath.startsWith(child.path + '/'));
-                              
+
                               return (
                                 <motion.button
                                   key={child.id}
@@ -242,7 +242,7 @@ const EnhancedAppShell = () => {
                                   className={`w-full flex items-center justify-between pl-6 pr-3 py-2 rounded-lg transition-all duration-200 ${
                                     isChildActive
                                       ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
-                                      : isDark()
+                                      : isDark
                                       ? 'hover:bg-gray-700 text-gray-300'
                                       : 'hover:bg-slate-100 text-slate-700'
                                   }`}
@@ -265,27 +265,16 @@ const EnhancedAppShell = () => {
                         </div>
                       );
                     }
-                    
+
                     return null;
                   })}
                 </nav>
 
                 {/* Footer with Theme & Language Controls */}
-                <div className={`p-4 border-t ${isDark() ? 'border-gray-700' : 'border-slate-200'}`}>
+                <div className={`p-4 border-t ${isDark ? 'border-gray-700' : 'border-slate-200'}`}>
                   {!sidebarCollapsed ? (
                     <div className="space-y-3">
-                      {/* Theme Toggle */}
-                      <Tooltip content={isDark() ? t('action.switch_to_light') : t('action.switch_to_dark')} position="top">
-                        <button
-                          onClick={toggleTheme}
-                          className={`w-full flex items-center justify-center space-x-2 px-3 py-2 rounded-lg transition-colors ${
-                            isDark() ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-700'
-                          }`}
-                        >
-                          {isDark() ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                          <span className="text-sm">{isDark() ? 'Light' : 'Dark'}</span>
-                        </button>
-                      </Tooltip>
+
 
                       {/* Language Selector */}
                       <Select
@@ -298,7 +287,7 @@ const EnhancedAppShell = () => {
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
-                        className={`text-xs text-center ${isDark() ? 'text-gray-400' : 'text-slate-500'}`}
+                        className={`text-xs text-center ${isDark ? 'text-gray-400' : 'text-slate-500'}`}
                       >
                         <p>GRC Master Platform</p>
                         <p>Version 2.0.0</p>
@@ -306,21 +295,11 @@ const EnhancedAppShell = () => {
                     </div>
                   ) : (
                     <div className="flex flex-col space-y-2">
-                      <Tooltip content={isDark() ? 'Light Mode' : 'Dark Mode'} position="right">
-                        <button
-                          onClick={toggleTheme}
-                          className={`p-2 rounded-lg transition-colors ${
-                            isDark() ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-700'
-                          }`}
-                        >
-                          {isDark() ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-                        </button>
-                      </Tooltip>
                       <Tooltip content="Language" position="right">
                         <button
                           onClick={() => changeLanguage(language === 'en' ? 'ar' : 'en')}
                           className={`p-2 rounded-lg transition-colors ${
-                            isDark() ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-700'
+                            isDark ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-700'
                           }`}
                         >
                           <Globe className="h-4 w-4" />
@@ -340,19 +319,19 @@ const EnhancedAppShell = () => {
         }`}>
           {/* Enhanced Top Header */}
           <header className={`h-16 flex items-center justify-between px-6 border-b ${
-            isDark() ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
+            isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
           }`}>
             <div className="flex items-center space-x-4">
               <h2 className={`text-xl font-semibold ${isDark() ? 'text-white' : 'text-slate-900'}`}>
                 {navigationItems.find(item => currentPath === item.path || currentPath.startsWith(item.path + '/'))?.name || t('nav.dashboard')}
               </h2>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {/* Search */}
               <InfoTooltip content={t('action.search')} position="bottom">
                 <button className={`p-2 rounded-lg transition-colors ${
-                  isDark() ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-600'
+                  isDark ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-600'
                 }`}>
                   <Search className="h-4 w-4" />
                 </button>
@@ -362,7 +341,7 @@ const EnhancedAppShell = () => {
               <Dropdown
                 trigger={
                   <button className={`p-2 rounded-lg transition-colors relative ${
-                    isDark() ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-600'
+                    isDark ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-600'
                   }`}>
                     <Bell className="h-4 w-4" />
                     <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
@@ -391,10 +370,10 @@ const EnhancedAppShell = () => {
 
               {/* Settings */}
               <Tooltip content={t('nav.settings')} position="bottom">
-                <button 
+                <button
                   onClick={() => setShowSettingsModal(true)}
                   className={`p-2 rounded-lg transition-colors ${
-                    isDark() ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-600'
+                    isDark ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-600'
                   }`}
                 >
                   <Settings className="h-4 w-4" />
@@ -404,7 +383,7 @@ const EnhancedAppShell = () => {
               {/* Help */}
               <WarningTooltip content="Help & Support" position="bottom">
                 <button className={`p-2 rounded-lg transition-colors ${
-                  isDark() ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-600'
+                  isDark ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-600'
                 }`}>
                   <HelpCircle className="h-4 w-4" />
                 </button>
@@ -442,26 +421,9 @@ const EnhancedAppShell = () => {
             <Alert type="info" title="Settings Panel">
               This is a demonstration of the modal component with theme and i18n support.
             </Alert>
-            
+
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Theme Preference
-                </label>
-                <Select
-                  options={[
-                    { value: 'light', label: 'Light Mode' },
-                    { value: 'dark', label: 'Dark Mode' },
-                  ]}
-                  value={currentTheme}
-                  onChange={(theme) => {
-                    if (theme === 'light' || theme === 'dark') {
-                      toggleTheme();
-                    }
-                  }}
-                />
-              </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Language
@@ -473,7 +435,7 @@ const EnhancedAppShell = () => {
                 />
               </div>
             </div>
-            
+
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowSettingsModal(false)}

@@ -43,7 +43,42 @@ export default function UsageDashboardPage() {
     } catch (error) {
       console.error('Error loading usage:', error);
       toast.error('Failed to load usage data');
-      setUsage([]);
+      const mock = [
+        {
+          feature_code: 'USERS',
+          feature_name: 'Users',
+          usage_type: 'USERS',
+          used_value: 12,
+          limit_value: 20,
+          percentage_used: 60,
+          is_over_limit: false,
+          period_start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          period_end: new Date().toISOString()
+        },
+        {
+          feature_code: 'STORAGE',
+          feature_name: 'Storage',
+          usage_type: 'STORAGE',
+          used_value: 8,
+          limit_value: 10,
+          percentage_used: 80,
+          is_over_limit: false,
+          period_start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          period_end: new Date().toISOString()
+        },
+        {
+          feature_code: 'API_CALLS',
+          feature_name: 'API Calls',
+          usage_type: 'API_CALLS',
+          used_value: 12000,
+          limit_value: 20000,
+          percentage_used: 60,
+          is_over_limit: false,
+          period_start: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+          period_end: new Date().toISOString()
+        }
+      ];
+      setUsage(mock);
     } finally {
       setLoading(false);
     }

@@ -5,7 +5,7 @@
 
 import apiService from './apiService';
 
-const BASE_URL = '/api/licenses';
+const BASE_URL = '/licenses';
 
 export const licensesApi = {
   // License Catalog
@@ -26,6 +26,11 @@ export const licensesApi = {
 
   async updateLicense(id, data) {
     const response = await apiService.put(`${BASE_URL}/${id}`, data);
+    return response.data;
+  },
+
+  async deleteLicense(id) {
+    const response = await apiService.delete(`${BASE_URL}/${id}`);
     return response.data;
   },
 

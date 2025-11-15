@@ -9,6 +9,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { useTheme } from '../../components/theme/ThemeProvider.jsx';
 import { RefreshCw, Download, Filter as FilterIcon } from 'lucide-react';
 import EnterprisePageLayout from '../../components/layout/EnterprisePageLayout';
 import {
@@ -26,6 +27,7 @@ import { toast } from 'sonner';
 
 const EnhancedDashboardV2 = () => {
   const [loading, setLoading] = useState(true);
+  const { getColor } = useTheme();
   const [data, setData] = useState({});
   const [timeRange, setTimeRange] = useState('30d');
   const [selectedFramework, setSelectedFramework] = useState('all');
@@ -78,6 +80,16 @@ const EnhancedDashboardV2 = () => {
     // Export logic here
   };
 
+  const toolbarActions = [
+    { id: 'refresh', label: 'Refresh', icon: 'refresh', variant: 'secondary' },
+    { id: 'export', label: 'Export', icon: 'download', variant: 'primary' },
+  ];
+
+  const handleToolbarAction = (id) => {
+    if (id === 'refresh') fetchDashboardData();
+    if (id === 'export') handleExport();
+  };
+
   // Transform data for charts
   const complianceTrendData = [
     {
@@ -95,7 +107,12 @@ const EnhancedDashboardV2 = () => {
   const riskDistributionData = {
     labels: ['Critical', 'High', 'Medium', 'Low'],
     values: data.risks?.distribution || [12, 28, 45, 65],
-    colors: ['#ef4444', '#f59e0b', '#eab308', '#10b981'],
+    colors: [
+      getColor('error.500'),
+      getColor('warning.500'),
+      getColor('warning.300'),
+      getColor('success.500'),
+    ],
   };
 
   const assessmentStatusData = [
@@ -103,7 +120,12 @@ const EnhancedDashboardV2 = () => {
       name: 'Assessments',
       x: ['Completed', 'In Progress', 'Pending', 'Overdue'],
       y: data.assessments?.statusCounts || [25, 12, 8, 3],
-      color: ['#10b981', '#3b82f6', '#eab308', '#ef4444'],
+      color: [
+        getColor('success.500'),
+        getColor('primary.600'),
+        getColor('warning.500'),
+        getColor('error.500'),
+      ],
     },
   ];
 
@@ -175,22 +197,7 @@ const EnhancedDashboardV2 = () => {
             <option value="1y">Last Year</option>
           </select>
 
-          <button
-            onClick={fetchDashboardData}
-            disabled={loading}
-            className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </button>
-
-          <button
-            onClick={handleExport}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </button>
+          <QuickActionsToolbar actions={toolbarActions} onAction={handleToolbarAction} loading={loading} />
         </>
       }
       showHelp={true}
@@ -206,23 +213,23 @@ const EnhancedDashboardV2 = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="text-sm text-gray-500">Compliance Score</div>
-              <div className="text-3xl font-bold text-blue-600 mt-2">
+              <div className="text-3xl font-bold text-primary-600 mt-2">
                 {data.kpis?.complianceScore || 87}%
               </div>
-              <div className="text-sm text-green-600 mt-1">+5% from last month</div>
+              <div className="text-sm text-success-600 mt-1">+5% from last month</div>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="text-sm text-gray-500">Open Risks</div>
-              <div className="text-3xl font-bold text-red-600 mt-2">
+              <div className="text-3xl font-bold text-error-600 mt-2">
                 {data.kpis?.openRisks || 23}
               </div>
-              <div className="text-sm text-green-600 mt-1">-3 from last week</div>
+              <div className="text-sm text-success-600 mt-1">-3 from last week</div>
             </div>
 
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="text-sm text-gray-500">Active Assessments</div>
-              <div className="text-3xl font-bold text-purple-600 mt-2">
+              <div className="text-3xl font-bold text-primary-700 mt-2">
                 {data.kpis?.activeAssessments || 12}
               </div>
               <div className="text-sm text-gray-600 mt-1">3 due this week</div>
@@ -230,10 +237,10 @@ const EnhancedDashboardV2 = () => {
 
             <div className="bg-white p-6 rounded-lg shadow">
               <div className="text-sm text-gray-500">Control Coverage</div>
-              <div className="text-3xl font-bold text-green-600 mt-2">
+              <div className="text-3xl font-bold text-success-600 mt-2">
                 {data.kpis?.controlCoverage || 94}%
               </div>
-              <div className="text-sm text-green-600 mt-1">+2% from last month</div>
+              <div className="text-sm text-success-600 mt-1">+2% from last month</div>
             </div>
           </div>
 
@@ -358,3 +365,4 @@ const EnhancedDashboardV2 = () => {
 };
 
 export default EnhancedDashboardV2;
+import QuickActionsToolbar from '../../components/ui/QuickActionsToolbar.jsx';

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { 
   Shield, Home, FileText, Target, AlertTriangle, 
   CheckCircle, Users, Building2, BarChart3, Settings,
@@ -11,8 +12,11 @@ import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n';
 import { useTheme } from '../theme/ThemeProvider';
 import apiService from '../../services/apiEndpoints';
+import ProcessGuideBanner from '../guidance/ProcessGuideBanner';
+import { processGuides, resolveGuideKey } from '../../config/processGuides';
 
 const AdvancedShell = ({ children, activeSection, onNavigate }) => {
+  const location = useLocation();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { state } = useApp();
   const { language, changeLanguage } = useI18n();
@@ -358,43 +362,46 @@ const AdvancedShell = ({ children, activeSection, onNavigate }) => {
             </div>
           </div>
 
-          {/* Breadcrumb */}
-          <div className="px-6 py-2 border-t border-gray-100 dark:border-gray-700/50">
-            <div className="flex items-center gap-2 text-sm">
-              <Home className="w-4 h-4 text-gray-400" />
-              <ChevronRight className="w-4 h-4 text-gray-400" />
-              <span className="text-gray-600 dark:text-gray-300">
-                {language === 'ar' ? 'لوحة القيادة' : 'Dashboard'}
-              </span>
-              <ChevronRight className="w-4 h-4 text-gray-400" />
-              <span className="font-medium text-gray-900 dark:text-white">
-                {language === 'ar' ? 'نظرة عامة' : 'Overview'}
-              </span>
-            </div>
-          </div>
-        </header>
+      {/* Breadcrumb */}
+      <div className="px-6 py-2 border-t border-gray-100 dark:border-gray-700/50">
+        <div className="flex items-center gap-2 text-sm">
+          <Home className="w-4 h-4 text-gray-400" />
+          <ChevronRight className="w-4 h-4 text-gray-400" />
+          <span className="text-gray-600 dark:text-gray-300">
+            {language === 'ar' ? 'لوحة القيادة' : 'Dashboard'}
+          </span>
+          <ChevronRight className="w-4 h-4 text-gray-400" />
+          <span className="font-medium text-gray-900 dark:text-white">
+            {language === 'ar' ? 'نظرة عامة' : 'Overview'}
+          </span>
+        </div>
+      </div>
+    </header>
 
-        {/* Main Content Container */}
-        <main className="p-6">
-          <div className="max-w-[1600px] mx-auto">
-            {/* Page Title */}
-            <div className="mb-8">
-              <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2">
-                {language === 'ar' ? 'منصة الحوكمة الذكية' : 'Smart Governance Platform'}
-              </h1>
-              <p className="text-lg text-gray-600 dark:text-gray-400">
-                {language === 'ar' 
-                  ? 'نظام متقدم لإدارة الحوكمة والمخاطر والامتثال'
-                  : 'Advanced system for Governance, Risk, and Compliance management'}
-              </p>
-            </div>
+    {/* Main Content Container */}
+    <main className="p-6">
+      <div className="px-0 pt-0">
+        <ProcessGuideBanner guide={processGuides[resolveGuideKey(location.pathname)]} />
+      </div>
+      <div className="max-w-[1600px] mx-auto">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-2">
+            {language === 'ar' ? 'منصة الحوكمة الذكية' : 'Smart Governance Platform'}
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            {language === 'ar' 
+              ? 'نظام متقدم لإدارة الحوكمة والمخاطر والامتثال'
+              : 'Advanced system for Governance, Risk, and Compliance management'}
+          </p>
+        </div>
 
-            {/* Content Area */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6">
-              {children}
-            </div>
-          </div>
-        </main>
+        {/* Content Area */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6">
+          {children}
+        </div>
+      </div>
+    </main>
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ const tasksRoutes = require('./routes/tasks');
 
 // Create Express app
 const app = express();
-const PORT = process.env.PORT || 3005;
+const PORT = process.env.PORT || 3007;
 
 // ==========================================
 // MIDDLEWARE
@@ -47,11 +47,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const validateServiceToken = (req, res, next) => {
   const serviceToken = req.headers['x-service-token'];
   const expectedToken = process.env.SERVICE_TOKEN || 'default-token';
-  
+
   if (!serviceToken || serviceToken === expectedToken) {
     return next();
   }
-  
+
   if (req.path.startsWith('/api/') && serviceToken !== expectedToken) {
     return res.status(403).json({
       success: false,
@@ -59,7 +59,7 @@ const validateServiceToken = (req, res, next) => {
       message: 'Service-to-service authentication failed'
     });
   }
-  
+
   next();
 };
 
@@ -74,17 +74,17 @@ let aiScheduler, taskPrioritizer, workloadBalancer, predictiveAnalytics;
 const initializeAIServices = async () => {
   try {
     console.log('🤖 Initializing AI services...');
-    
+
     aiScheduler = new AIScheduler();
     taskPrioritizer = new TaskPrioritizer();
     workloadBalancer = new WorkloadBalancer();
     predictiveAnalytics = new PredictiveAnalytics();
-    
+
     await aiScheduler.initialize();
     await taskPrioritizer.initialize();
     await workloadBalancer.initialize();
     await predictiveAnalytics.initialize();
-    
+
     console.log('✅ AI services initialized successfully');
   } catch (error) {
     console.error('❌ Failed to initialize AI services:', error);
@@ -110,8 +110,8 @@ app.get('/readyz', async (req, res) => {
   try {
     const servicesReady = aiScheduler && taskPrioritizer && workloadBalancer && predictiveAnalytics;
     if (servicesReady) {
-      res.status(200).json({ 
-        status: 'ready', 
+      res.status(200).json({
+        status: 'ready',
         service: 'ai-scheduler-service',
         services: {
           aiScheduler: !!aiScheduler,
@@ -121,15 +121,15 @@ app.get('/readyz', async (req, res) => {
         }
       });
     } else {
-      res.status(503).json({ 
-        status: 'not ready', 
+      res.status(503).json({
+        status: 'not ready',
         service: 'ai-scheduler-service',
         message: 'AI services not initialized'
       });
     }
   } catch (error) {
-    res.status(503).json({ 
-      status: 'error', 
+    res.status(503).json({
+      status: 'error',
       service: 'ai-scheduler-service',
       error: error.message
     });

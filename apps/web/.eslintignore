@@ -3,3 +3,11 @@ node_modules/
 .vite/
 coverage/
 build/
+www.shahin.com/landing-page/**
+www.shahin.com/frontend/**
+www.shahin.com/backend/**
+tests/**
+src/tests/**
+src/services/**
+src/services/regulatory-intelligence-service-ksa/**
+src/services/websocket-service/**

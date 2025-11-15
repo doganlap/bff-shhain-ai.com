@@ -8,6 +8,9 @@ import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../theme/ThemeProvider';
 import ModernSlideNavigator from '../Navigation/ModernSlideNavigator';
+import { getNavigationForRole, RoleActivationPanel } from './MultiTenantNavigation';
+import ProcessGuideBanner from '../guidance/ProcessGuideBanner';
+import { processGuides, resolveGuideKey } from '../../config/processGuides';
 
 const AdvancedAppShell = () => {
   const navigate = useNavigate();
@@ -16,10 +19,17 @@ const AdvancedAppShell = () => {
   const { user } = state;
   const { language, isRTL, t } = useI18n();
   const { isDark } = useTheme();
+  const { themes, currentTheme, setTheme } = useTheme();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [navigatorOpen, setNavigatorOpen] = useState(false);
+  const [advancedUiEnabled, setAdvancedUiEnabled] = useState(() => {
+    try { return localStorage.getItem('enable_advanced_ui') === 'true'; } catch { return false; }
+  });
+  const [aiConnected, setAiConnected] = useState(false);
+  const [aiLatency, setAiLatency] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   // Mobile detection
   useEffect(() => {
@@ -31,20 +41,46 @@ const AdvancedAppShell = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Navigation items - filtered by available routes
-  const navigationItems = [
-    { id: 'dashboard', name: 'لوحة القيادة', nameEn: 'Dashboard', icon: Home, path: '/advanced' },
-    { id: 'assessments', name: 'التقييمات', nameEn: 'Assessments', icon: Shield, path: '/advanced/assessments' },
-    { id: 'workflow-simulator', name: 'تجربة سير عمل مباشر', nameEn: 'Try a Live Workflow', icon: Workflow, path: '/advanced/workflow-simulator' },
-    { id: 'frameworks', name: 'الأطر التنظيمية', nameEn: 'Frameworks', icon: Target, path: '/advanced/frameworks' },
-    { id: 'navigator', name: 'مستكشف الصفحات', nameEn: 'Page Navigator', icon: Grid3X3, path: '#navigator', special: true },
-    { id: 'controls', name: 'الضوابط', nameEn: 'Controls', icon: FileText, path: '/app/controls' },
-    { id: 'organizations', name: 'المؤسسات', nameEn: 'Organizations', icon: Building2, path: '/app/organizations' },
-    { id: 'regulators', name: 'الجهات التنظيمية', nameEn: 'Regulators', icon: Users, path: '/app/regulators' },
-    { id: 'reports', name: 'التقارير', nameEn: 'Reports', icon: BarChart3, path: '/app/reports' },
-    { id: 'database', name: 'قاعدة البيانات', nameEn: 'Database', icon: Database, path: '/app/database' },
-    { id: 'settings', name: 'الإعدادات', nameEn: 'Settings', icon: Settings, path: '/app/settings' }
-  ];
+  useEffect(() => {
+    try {
+      const pref = localStorage.getItem('enable_advanced_ui');
+      setAdvancedUiEnabled(pref === 'true');
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try {
+      const existing = localStorage.getItem('enable_advanced_ui');
+      if (existing === null) {
+        const r = String(user?.role || '').toLowerCase();
+        const isAdmin = ['platform_admin','admin','super_admin','tenant_admin','organization_admin','org_admin','owner','tenant_owner','organization_owner'].includes(r);
+        const defVal = isAdmin ? 'true' : 'false';
+        localStorage.setItem('enable_advanced_ui', defVal);
+        setAdvancedUiEnabled(defVal === 'true');
+      }
+    } catch {}
+  }, [user?.role]);
+
+  useEffect(() => {
+    const checkAi = async () => {
+      const start = performance.now();
+      try {
+        const res = await fetch('/api/ai/health');
+        setAiConnected(res.ok);
+        setAiLatency(Math.round(performance.now() - start));
+      } catch {
+        setAiConnected(false);
+        setAiLatency(null);
+      }
+    };
+    checkAi();
+    const id = setInterval(checkAi, 30000);
+    return () => clearInterval(id);
+  }, []);
+
+  const userRole = user?.role || 'team_member';
+  const tenantContext = user?.tenant || { id: 1, name: 'Default Organization' };
+  const navigationItems = getNavigationForRole(userRole, tenantContext, state.stats);
 
   const currentPath = location.pathname;
 
@@ -68,7 +104,7 @@ const AdvancedAppShell = () => {
     <ErrorBoundary>
       <div 
         className={`flex h-screen transition-colors duration-200 ${
-          isDark() ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-slate-100'
+          isDark ? 'bg-gray-900' : 'bg-gradient-to-br from-slate-50 to-slate-100'
         }`}
         dir={isRTL() ? 'rtl' : 'ltr'}
       >
@@ -148,40 +184,89 @@ const AdvancedAppShell = () => {
                   </div>
                 )}
 
+                <div className="px-4 pt-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    {['All','GRC','Team','Platform'].map(tab => (
+                      <button
+                        key={tab}
+                        onClick={() => setSelectedCategory(tab)}
+                        className={`px-3 py-1.5 rounded-lg text-sm ${selectedCategory===tab ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200'}`}
+                      >
+                        {tab}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 {/* Navigation */}
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                  {navigationItems.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
-                    
-                    return (
-                      <motion.button
-                        key={item.id}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleNavigation(item.path, item)}
-                        className={`w-full flex items-center ${
-                          sidebarCollapsed ? 'justify-center' : 'justify-start'
-                        } space-x-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                          isActive
-                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg transform scale-105'
-                            : item.special
-                              ? 'hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white text-purple-600 border border-purple-200'
-                              : 'hover:bg-white/50 hover:backdrop-blur-sm text-slate-700 hover:shadow-md'
-                        }`}
-                      >
-                        <Icon className="h-5 w-5 flex-shrink-0" />
-                        {!sidebarCollapsed && (
-                          <motion.span
-                            initial={{ opacity: 0, width: 0 }}
-                            animate={{ opacity: 1, width: 'auto' }}
-                            className="text-sm font-medium"
-                          >
-                            {getDisplayName(item)}
-                          </motion.span>
-                        )}
-                      </motion.button>
-                    );
+                  {(selectedCategory==='All' ? navigationItems : navigationItems.filter(s => s.category===selectedCategory)).map((section) => {
+                    const SectionIcon = section.icon;
+                    const hasChildren = Array.isArray(section.items) && section.items.length > 0;
+                    const sectionActive = section.path && (currentPath === section.path || currentPath.startsWith(section.path + '/'));
+
+                    if (!hasChildren && section.path) {
+                      return (
+                        <motion.button
+                          key={section.id}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleNavigation(section.path)}
+                          className={`w-full flex items-center ${sidebarCollapsed ? 'justify-center' : 'justify-between'} px-3 py-2 rounded-lg transition-all duration-200 ${
+                            sectionActive ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg' : 'hover:bg-white/50 text-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <SectionIcon className="h-5 w-5 flex-shrink-0" />
+                            {!sidebarCollapsed && (
+                              <span className="text-sm font-medium">{getDisplayName(section)}</span>
+                            )}
+                          </div>
+                          {!sidebarCollapsed && section.badge && (
+                            <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">{section.badge}</span>
+                          )}
+                        </motion.button>
+                      );
+                    }
+
+                    if (hasChildren && !sidebarCollapsed) {
+                      return (
+                        <div key={section.id} className="mb-4">
+                          <div className="flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider text-slate-500">
+                            <div className="flex items-center space-x-2">
+                              <SectionIcon className="h-4 w-4" />
+                              <span>{getDisplayName(section)}</span>
+                            </div>
+                          </div>
+                          <div className="space-y-1 mt-2">
+                            {section.items.map((child) => {
+                              const ChildIcon = child.icon;
+                              const childActive = child.path && (currentPath === child.path || currentPath.startsWith(child.path + '/'));
+                              return (
+                                <motion.button
+                                  key={child.id}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                  onClick={() => handleNavigation(child.path)}
+                                  className={`w-full flex items-center justify-between pl-6 pr-3 py-2 rounded-lg transition-all duration-200 ${
+                                    childActive ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg' : 'hover:bg-slate-100 text-slate-700'
+                                  }`}
+                                >
+                                  <div className="flex items-center space-x-3">
+                                    <ChildIcon className="h-4 w-4 flex-shrink-0" />
+                                    <span className="text-sm">{getDisplayName(child)}</span>
+                                  </div>
+                                  {child.badge && (
+                                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${childActive ? 'bg-white text-blue-600' : 'bg-blue-100 text-blue-800'}`}>{child.badge}</span>
+                                  )}
+                                </motion.button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return null;
                   })}
                 </nav>
 
@@ -208,26 +293,64 @@ const AdvancedAppShell = () => {
           {/* Top Header */}
           <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6">
             <div className="flex items-center space-x-4">
-              <h2 className={`text-xl font-semibold ${isDark() ? 'text-white' : 'text-slate-900'}`}>
+              <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 {(() => {
                   const currentItem = navigationItems.find(item => currentPath === item.path || currentPath.startsWith(item.path + '/'));
-                  return currentItem ? getDisplayName(currentItem) : (language === 'ar' ? 'لوحة القيادة' : 'Dashboard');
+                  const label = currentItem ? getDisplayName(currentItem) : (language === 'ar' ? 'لوحة القيادة' : 'Dashboard');
+                  return label;
                 })()}
               </h2>
             </div>
             <div className="flex items-center space-x-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-slate-600">Advanced UI</span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={advancedUiEnabled}
+                    onChange={(e) => {
+                      const next = e.target.checked;
+                      try { localStorage.setItem('enable_advanced_ui', String(next)); } catch {}
+                      setAdvancedUiEnabled(next);
+                    }}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+              </div>
+              <select
+                value={currentTheme}
+                onChange={(e) => setTheme(e.target.value)}
+                className="px-2 py-1 text-xs border rounded-lg"
+              >
+                {Object.keys(themes).map(k => (
+                  <option key={k} value={k}>{k}</option>
+                ))}
+              </select>
+              {userRole === 'platform_admin' && (
+                <div className="w-auto-responsive min-w-[12rem]">
+                  <RoleActivationPanel 
+                    role={userRole} 
+                    currentTenant={state.currentTenant} 
+                    tenants={[]} 
+                    onTenantSwitch={(tenant)=>{}}
+                  />
+                </div>
+              )}
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setNavigatorOpen(true)}
-                className="p-2 hover:bg-gradient-to-r hover:from-purple-500 hover:to-pink-500 hover:text-white rounded-lg transition-all duration-200 relative group"
+                type="button"
+                aria-label={language === 'ar' ? 'مستكشف الصفحات المتقدم' : 'Advanced Page Navigator'}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200 relative group focus:outline-none focus:ring-2 focus:ring-primary-600"
                 title={language === 'ar' ? 'مستكشف الصفحات المتقدم' : 'Advanced Page Navigator'}
               >
-                <Grid3X3 className="h-4 w-4 text-slate-600 group-hover:text-white" />
+                <Grid3X3 className="h-4 w-4 text-slate-600 group-hover:text-primary-600" />
                 <motion.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="absolute -top-1 -right-1 h-3 w-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
+                  className="absolute -top-1 -right-1 h-3 w-3 bg-primary-500 rounded-full flex items-center justify-center"
                 >
                   <Star className="h-2 w-2 text-white" />
                 </motion.span>
@@ -239,25 +362,33 @@ const AdvancedAppShell = () => {
                 <Bell className="h-4 w-4 text-slate-600" />
                 <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
               </button>
+              <div className="flex items-center gap-2 px-2 py-1 rounded-lg">
+                <span className={`h-2 w-2 rounded-full ${aiConnected ? 'bg-green-500' : 'bg-amber-500'}`}></span>
+                <span className="text-xs text-slate-600">AI{aiLatency!==null ? ` ${aiLatency}ms` : ''}</span>
+              </div>
               <button className="p-2 hover:bg-slate-100 rounded-lg transition-colors">
                 <HelpCircle className="h-4 w-4 text-slate-600" />
               </button>
             </div>
           </header>
 
-          {/* Global Offline Banner */}
-          {state.isOffline && (
-            <div className="bg-yellow-500 text-white text-center p-2 text-sm font-semibold">
-              You are in Offline Mode. Data may not be up to date.
-            </div>
-          )}
+        {/* Global Offline Banner */}
+        {state.isOffline && (
+          <div className="bg-yellow-500 text-white text-center p-2 text-sm font-semibold">
+            You are in Offline Mode. Data may not be up to date.
+          </div>
+        )}
 
-          {/* Page Content */}
-          <main className="flex-1 overflow-auto p-6">
-            <ErrorBoundary>
-              <Outlet />
-            </ErrorBoundary>
-          </main>
+        <div className="px-6 pt-3">
+          <ProcessGuideBanner guide={processGuides[resolveGuideKey(currentPath)]} />
+        </div>
+
+        {/* Page Content */}
+        <main className="flex-1 overflow-auto p-6">
+          <ErrorBoundary>
+            <Outlet />
+          </ErrorBoundary>
+        </main>
         </div>
 
         {/* Mobile Overlay */}
@@ -283,6 +414,10 @@ const AdvancedAppShell = () => {
           isOpen={navigatorOpen}
           onClose={() => setNavigatorOpen(false)}
         />
+        {/* Role Activation Panel */}
+        <div className="px-6 py-3 border-t border-slate-200">
+          <RoleActivationPanel role={userRole} currentTenant={state.currentTenant} tenants={[]} onTenantSwitch={(tenant)=>{}} />
+        </div>
       </div>
     </ErrorBoundary>
   );

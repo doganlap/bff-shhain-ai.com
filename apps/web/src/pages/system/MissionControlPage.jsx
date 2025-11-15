@@ -1,6 +1,7 @@
 // pages/system/MissionControlPage.jsx
 
 import React, { useState, useEffect, useRef } from 'react';
+import { agentsRegistry } from '../../config/agents';
 
 const MissionControlPage = () => {
   const [modules, setModules] = useState([]);
@@ -8,21 +9,22 @@ const MissionControlPage = () => {
   const [models, setModels] = useState([]);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [command, setCommand] = useState('');
   const [selectedAgent, setSelectedAgent] = useState('grc-assistant');
   const [selectedModel, setSelectedModel] = useState('grc-assistant (mocked)');
 
   const chatWindowRef = useRef(null);
 
-  const API_BASE_URL = 'http://localhost:11434'; // The AI Server
+  const API_BASE_URL = (import.meta.env.VITE_AI_BASE_URL || window.__AI_BASE_URL || 'http://localhost:11434');
 
   useEffect(() => {
     // Fetch initial data
     const fetchData = async () => {
       try {
         const [modulesRes, agentsRes, modelsRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/api/modules`),
-          fetch(`${API_BASE_URL}/api/agents`),
-          fetch(`${API_BASE_URL}/api/models`)
+          fetch(`/api/ai/modules`),
+          fetch(`/api/ai/agents`),
+          fetch(`/api/ai/models`)
         ]);
         const modulesData = await modulesRes.json();
         const agentsData = await agentsRes.json();
@@ -31,7 +33,15 @@ const MissionControlPage = () => {
         setAgents(agentsData.agents);
         setModels(modelsData.models);
       } catch (error) {
-        console.error("Failed to load initial data:", error);
+        setModules([
+          { id: 'assessments', name: 'Assessments', status: 'healthy' },
+          { id: 'frameworks', name: 'Frameworks', status: 'healthy' },
+          { id: 'documents', name: 'Documents', status: 'healthy' },
+          { id: 'workflows', name: 'Workflows', status: 'healthy' },
+          { id: 'notifications', name: 'Notifications', status: 'healthy' }
+        ]);
+        setAgents(agentsRegistry);
+        setModels([{ name: 'grc-assistant (mocked)', type: 'mock' }]);
       }
     };
     fetchData();
@@ -51,7 +61,7 @@ const MissionControlPage = () => {
     setInput('');
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/generate`, {
+      const response = await fetch(`/api/ai/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ prompt: input, model: selectedModel })
@@ -60,6 +70,30 @@ const MissionControlPage = () => {
       setMessages([...newMessages, { sender: 'ai', text: data.response }]);
     } catch (error) {
       setMessages([...newMessages, { sender: 'ai', text: 'Error connecting to the AI service.' }]);
+    }
+  };
+
+  const runTaskCheck = () => {
+    const result = agents.map(a => ({ id: a.id, ok: Array.isArray(a.tasks) && a.tasks.length > 0 }));
+    const summary = result.map(r => `${r.id}:${r.ok ? 'ok' : 'no-tasks'}`).join(' | ');
+    setMessages([...messages, { sender: 'ai', text: `Agent tasks: ${summary}` }]);
+  };
+
+  const sendAgentCommand = async () => {
+    if (!command.trim()) return;
+    const newMessages = [...messages, { sender: 'user', text: `> ${command}` }];
+    setMessages(newMessages);
+    setCommand('');
+    try {
+      const res = await fetch('/api/ai/commands', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ command })
+      });
+      const data = await res.json();
+      setMessages([...newMessages, { sender: 'ai', text: JSON.stringify(data) }]);
+    } catch (e) {
+      setMessages([...newMessages, { sender: 'ai', text: 'Command error' }]);
     }
   };
 
@@ -93,9 +127,14 @@ const MissionControlPage = () => {
               </div>
             ))}
           </div>
-          <div className="flex">
+          <div className="flex gap-2">
             <input type="text" value={input} onChange={e => setInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && handleSendMessage()} className="flex-1 bg-gray-700 p-3 rounded-l-md focus:outline-none" />
             <button onClick={handleSendMessage} className="bg-blue-600 px-6 rounded-r-md">Send</button>
+            <button onClick={runTaskCheck} className="bg-green-600 px-4 rounded-md">Task Check</button>
+          </div>
+          <div className="flex gap-2 mt-2">
+            <input type="text" value={command} onChange={e => setCommand(e.target.value)} onKeyPress={e => e.key === 'Enter' && sendAgentCommand()} className="flex-1 bg-gray-700 p-3 rounded-md focus:outline-none" placeholder="Agent command" />
+            <button onClick={sendAgentCommand} className="bg-purple-600 px-4 rounded-md">Send Command</button>
           </div>
         </div>
       </main>

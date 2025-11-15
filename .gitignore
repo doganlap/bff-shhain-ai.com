@@ -1,86 +1,34 @@
-# Dependencies  
-node_modules/  
-npm-debug.log*  
-yarn-debug.log*  
-yarn-error.log*  
-pnpm-debug.log*  
-  
-# Build outputs  
-dist/  
-build/  
-out/  
-  
-# Environment files - CRITICAL: Never commit sensitive data
+# Node & build artifacts
+node_modules/
+dist/
+build/
+.cache/
+.vite/
+.next/
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Env and secrets (do not commit)
 .env
 .env.*
-.env.local
-.env.development
-.env.development.local
-.env.test
-.env.test.local
-.env.production
-.env.production.local
+apps/**/.env*
+apps/web/src/services/**/.env*
+apps/infra/**/.env*
+*.pem
+*.key
 
-# App-specific environment files
-apps/bff/.env
-apps/bff/.env.*
-apps/web/.env
-apps/web/.env.*
-apps/infra/deployment/.env*
-apps/*/.env
-apps/*/.env.*
-
-# Environment templates (safe to commit)
-!.env.template
-!.env.example
-!**/.env.template
-!**/.env.example
-  
-# IDE files  
-.vscode/  
-.idea/  
-*.swp  
-*.swo  
-*~  
-  
-# OS generated files  
-.DS_Store  
-.DS_Store?  
-._*  
-.Spotlight-V100  
-.Trashes  
-ehthumbs.db  
-Thumbs.db  
+# Vercel and deployment
+.vercel/
+.deployment/
+apps/bff/test/results/
+test-results/
+tools/
+screenshots.zip
 nul
-  
-# Logs and Reports
-logs/  
-*.log
-log.html
-report.html
-lint_output.txt
-*.log.html
-.vercel
-
-# Generated Prisma
-/generated/prisma
-
-# Data Archives (moved to separate location)
-DB urgent/
-**/archive/
-**/unused-*/
-
-# Visual Studio artifacts
-.vs/
-*.vsidx
-*.db-shm
-*.db-wal
-slnx.sqlite
-workspaceFileList.bin
-
-# Deployment packages (use CI/CD instead)
-*.zip
-!node_modules.zip
-azure-deploy.zip
-deploy.zip
-shahin-ai-*.zip

@@ -11,8 +11,9 @@
 
 import axios from 'axios';
 
-// API Base URL from environment
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3005'; // Use backend server port
+// API Base URL from environment (normalize to include single /api)
+const RAW_API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3005';
+const API_BASE_URL = RAW_API_BASE.endsWith('/api') ? RAW_API_BASE : `${RAW_API_BASE}/api`;
 
 // Create axios instance with default config
 let api;
@@ -72,9 +73,8 @@ if (api && api.interceptors && api.interceptors.response) {
     (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Handle unauthorized - redirect to login
+      // Allow callers to handle unauthorized (e.g., demo fallback)
       localStorage.removeItem('auth_token');
-      window.location.href = '/';
     }
     return Promise.reject(error);
   }
@@ -449,6 +449,8 @@ export const workflowsAPI = {
   
   // GET /api/workflows/templates
   getTemplates: () => api.get('/workflows/templates'),
+  // PUT /api/workflows/templates/:id
+  updateTemplate: (id, data) => api.put(`/workflows/templates/${id}`, data),
   
   // GET /api/workflows/stats
   getStats: () => api.get('/workflows/stats'),

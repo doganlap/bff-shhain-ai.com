@@ -237,6 +237,39 @@ const themes = {
       xl: '0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4)',
     },
   },
+  corporate: {
+    name: 'corporate',
+    colors: {
+      primary: {
+        50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc', 400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 800: '#3730a3', 900: '#312e81'
+      },
+      secondary: {
+        50: '#fdf2f8', 100: '#fce7f3', 200: '#fbcfe8', 300: '#f9a8d4', 400: '#f472b6', 500: '#ec4899', 600: '#db2777', 700: '#be185d', 800: '#9d174d', 900: '#831843'
+      },
+      success: themes.light.colors.success,
+      warning: themes.light.colors.warning,
+      error: themes.light.colors.error,
+      info: themes.light.colors.info,
+      gray: themes.light.colors.gray,
+    },
+    background: {
+      primary: '#f8fafc',
+      secondary: '#eef2ff',
+      tertiary: '#e2e8f0',
+    },
+    text: {
+      primary: '#0f172a',
+      secondary: '#334155',
+      tertiary: '#64748b',
+      inverse: '#ffffff',
+    },
+    border: {
+      primary: '#e2e8f0',
+      secondary: '#cbd5e1',
+      focus: '#6366f1',
+    },
+    shadow: themes.light.shadow,
+  },
 };
 
 // Animation and transition settings
@@ -324,23 +357,15 @@ const ThemeContext = createContext();
 // Theme Provider Component
 export const ThemeProvider = ({ children, defaultTheme = 'light' }) => {
   const [currentTheme, setCurrentTheme] = useState(() => {
-    // Check localStorage first, then system preference, then default
-    const savedTheme = localStorage.getItem('grc-theme');
-    if (savedTheme && themes[savedTheme]) {
-      return savedTheme;
+    try {
+      return localStorage.getItem('grc-theme') || defaultTheme;
+    } catch {
+      return defaultTheme;
     }
-    
-    // Check system preference
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    
-    return defaultTheme;
   });
 
   // Update document class and localStorage when theme changes
   useEffect(() => {
-    // Update document class
     document.documentElement.classList.remove('light', 'dark');
     document.documentElement.classList.add(currentTheme);
     
@@ -377,35 +402,24 @@ export const ThemeProvider = ({ children, defaultTheme = 'light' }) => {
       root.style.setProperty(`--shadow-${key}`, value);
     });
     
-    // Save to localStorage
-    localStorage.setItem('grc-theme', currentTheme);
+    try {
+      localStorage.setItem('grc-theme', currentTheme);
+    } catch {}
   }, [currentTheme]);
-
-  // Listen for system theme changes
-  useEffect(() => {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    
-    const handleChange = (e) => {
-      // Only auto-switch if user hasn't manually set a theme
-      const savedTheme = localStorage.getItem('grc-theme');
-      if (!savedTheme) {
-        setCurrentTheme(e.matches ? 'dark' : 'light');
-      }
-    };
-    
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+  
+  
 
   // Theme utilities
   const toggleTheme = () => {
-    setCurrentTheme(prev => prev === 'light' ? 'dark' : 'light');
+    const keys = Object.keys(themes);
+    const idx = keys.indexOf(currentTheme);
+    const next = keys[(idx + 1) % keys.length];
+    setCurrentTheme(next);
   };
 
   const setTheme = (themeName) => {
-    if (themes[themeName]) {
-      setCurrentTheme(themeName);
-    }
+    const keys = Object.keys(themes);
+    setCurrentTheme(keys.includes(themeName) ? themeName : 'light');
   };
 
   const getTheme = () => themes[currentTheme];

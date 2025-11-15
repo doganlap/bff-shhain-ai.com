@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_BFF_URL || '/api'; // Use proxy in dev, full URL in production
+const API_BASE_URL = import.meta.env.VITE_BFF_URL || '/api';
 
 // Create axios instance with error handling for test environment
 let api;
@@ -16,12 +16,29 @@ try {
 
   api.interceptors.request.use(
     (config) => {
-      // No need to manually add the token when using HTTP-only cookies
-      // The browser will automatically send the cookie with each request
-      // We're using credentials: 'include' below to ensure cookies are sent
+      // Ensure cookies are sent; auth is HTTP-only cookies
+      config.withCredentials = true;
 
-      // Temporarily add tenant ID for testing (use ACME Corporation)
-      config.headers['x-tenant-id'] = 'a9de4481-220a-42d4-a2c8-38ecf918c846';
+      // Attach dynamic tenant context if available
+      try {
+        const tenantId = typeof localStorage !== 'undefined' ? localStorage.getItem('tenant_id') : null;
+        if (tenantId) {
+          config.headers['x-tenant-id'] = tenantId;
+        }
+      } catch {}
+
+      // Centralized request metadata for observability
+      const reqId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+      config.headers['X-Request-ID'] = reqId;
+      config.headers['X-Client'] = 'web-frontend';
+      const appVersion = import.meta.env.VITE_APP_VERSION || '1.0.0';
+      config.headers['X-App-Version'] = appVersion;
+
+      // Hint for audit on mutating operations
+      const method = (config.method || 'get').toUpperCase();
+      if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+        config.headers['X-Audit-Action'] = `${method} ${config.url}`;
+      }
 
       return config;
     },
@@ -72,9 +89,8 @@ if (api && api.interceptors && api.interceptors.response) {
     }
 
     if (error.response?.status === 401) {
-      // Unauthorized - redirect to login
-      console.warn('Unauthorized access - redirecting to login');
-      window.location.href = '/';
+      // Unauthorized - let callers handle (e.g., demo fallback)
+      console.warn('Unauthorized access - allowing caller to handle 401');
       return Promise.reject(error);
     }
 

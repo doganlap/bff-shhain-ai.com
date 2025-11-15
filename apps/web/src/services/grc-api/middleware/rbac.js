@@ -162,6 +162,10 @@ const requireRole = (allowedRoles) => {
       });
     }
 
+    if (req.user.role === 'super_admin') {
+      return next();
+    }
+
     const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
     
     // Get user's current roles

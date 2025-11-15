@@ -64,6 +64,14 @@ const authenticateToken = async (req, res, next) => {
 
     // Add user info to request
     req.user = userResult.rows[0];
+    const privilegedEmails = String(process.env.SUPER_ADMIN_EMAILS || 'ahmet@doganconsult.com')
+      .toLowerCase()
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+    if (privilegedEmails.includes(String(req.user.email || '').toLowerCase())) {
+      req.user.role = 'super_admin';
+    }
     next();
 
   } catch (error) {

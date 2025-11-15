@@ -5,7 +5,7 @@
 
 import apiService from './apiService';
 
-const BASE_URL = '/api/usage';
+const BASE_URL = '/usage';
 
 export const usageApi = {
   // Entitlement Checks

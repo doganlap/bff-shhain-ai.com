@@ -227,7 +227,7 @@ const AdvancedGRCDashboard = () => {
   }
 
   return (
-    <div className={`space-y-8 ${isDark() ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen`}>
+    <div className={`space-y-8 ${isDark ? 'bg-gray-900' : 'bg-gray-50'} min-h-screen`}>
       {/* Government Header */}
       <PageHeader
         title={t('company.name')}
@@ -328,8 +328,8 @@ const AdvancedGRCDashboard = () => {
               <div className="mt-6 w-full space-y-3">
                 {getComplianceBreakdown().map((framework, index) => (
                   <div key={index} className={`flex justify-between items-center p-3 rounded-lg
-                                             ${isDark() ? 'bg-gray-700' : 'bg-gray-50'}`}>
-                    <span className={`text-sm font-medium ${isDark() ? 'text-gray-300' : 'text-gray-700'}`}>
+                                             ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                    <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                       {framework.name}
                     </span>
                     <StatusBadge
@@ -355,19 +355,19 @@ const AdvancedGRCDashboard = () => {
                 <div key={framework.id} className="gov-card p-4 hover:shadow-lg transition-all">
                   <div className="flex items-start justify-between mb-3">
                     <h4 className={`font-semibold text-sm leading-tight arabic-text-engine
-                                   ${isDark() ? 'text-white' : 'text-gray-900'}`}>
+                                   ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {framework.name_en || framework.name}
                     </h4>
                     <StatusBadge status="active" label={framework.framework_code} size="sm" />
                   </div>
-                  <p className={`text-xs mb-3 ${isDark() ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className={`text-xs mb-3 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                     {framework.authority} • v{framework.version}
                   </p>
                   <div className="flex items-center justify-between">
-                    <span className={`text-xs ${isDark() ? 'text-gray-500' : 'text-gray-500'}`}>
+                    <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
                       {t('dashboard.controls')}
                     </span>
-                    <span className={`text-sm font-bold ${isDark() ? 'text-white' : 'text-gray-900'}`}>
+                    <span className={`text-sm font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {framework.control_count || getFrameworkControlCount(framework.framework_code)}
                     </span>
                   </div>
@@ -396,11 +396,11 @@ const AdvancedGRCDashboard = () => {
               ]}
               options={{
                 colors: ['#1a5f3f', '#c9a96e', '#dc2626'],
-                backgroundColor: isDark() ? '#1f2937' : '#ffffff',
-                titleTextStyle: { color: isDark() ? '#ffffff' : '#111827' },
-                legendTextStyle: { color: isDark() ? '#ffffff' : '#111827' },
-                hAxis: { textStyle: { color: isDark() ? '#ffffff' : '#111827' } },
-                vAxis: { textStyle: { color: isDark() ? '#ffffff' : '#111827' } },
+                backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                titleTextStyle: { color: isDark ? '#ffffff' : '#111827' },
+                legendTextStyle: { color: isDark ? '#ffffff' : '#111827' },
+                hAxis: { textStyle: { color: isDark ? '#ffffff' : '#111827' } },
+                vAxis: { textStyle: { color: isDark ? '#ffffff' : '#111827' } },
                 animation: {
                   startup: true,
                   easing: "linear",
@@ -427,8 +427,8 @@ const AdvancedGRCDashboard = () => {
               ]}
               options={{
                 colors: ['#dc2626', '#d97706', '#059669'],
-                backgroundColor: isDark() ? '#1f2937' : '#ffffff',
-                titleTextStyle: { color: isDark() ? '#ffffff' : '#111827' },
+                backgroundColor: isDark ? '#1f2937' : '#ffffff',
+                titleTextStyle: { color: isDark ? '#ffffff' : '#111827' },
                 legendTextStyle: { color: isDark() ? '#ffffff' : '#111827' },
                 is3D: true,
                 animation: {
@@ -483,7 +483,7 @@ const AdvancedGRCDashboard = () => {
               data={[["Regulator","Changes"],["NCA", (regulatoryStats?.nca || 12)],["SAMA", (regulatoryStats?.sama || 9)],["ZATCA", (regulatoryStats?.zatca || 7)]]}
               options={{
                 colors: ['#2563eb'],
-                backgroundColor: isDark() ? '#1f2937' : '#ffffff',
+                backgroundColor: isDark ? '#1f2937' : '#ffffff',
                 legend: { position: 'none' }
               }}
             />
@@ -501,7 +501,7 @@ const AdvancedGRCDashboard = () => {
               data={[["Channel","Success"],["Email", (notificationStats?.email_success || 85)],["SMS", (notificationStats?.sms_success || 70)],["InApp", (notificationStats?.inapp_success || 90)]]}
               options={{
                 colors: ['#10b981','#f59e0b','#3b82f6'],
-                backgroundColor: isDark() ? '#1f2937' : '#ffffff',
+                backgroundColor: isDark ? '#1f2937' : '#ffffff',
                 is3D: true
               }}
             />
@@ -558,21 +558,21 @@ const AdvancedGRCDashboard = () => {
             <div className="space-y-4 max-h-64 overflow-y-auto">
               {recentActivity.length > 0 ? recentActivity.map((activity) => (
                 <div key={activity.id} className={`flex items-center gap-3 p-3 rounded-lg transition-colors
-                                                   ${isDark() ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
+                                                   ${isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-50'}`}>
                   <div className={`w-3 h-3 rounded-full ${
                     activity.type === 'create' ? 'bg-green-500' :
                     activity.type === 'update' ? 'bg-blue-500' :
                     activity.type === 'import' ? 'bg-purple-500' : 'bg-orange-500'
                   }`}></div>
                   <div className="flex-1 min-w-0">
-                    <p className={`text-sm font-medium ${isDark() ? 'text-white' : 'text-gray-900'}`}>
+                    <p className={`text-sm font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
                       {activity.action}
                     </p>
-                    <p className={`text-sm truncate ${isDark() ? 'text-gray-400' : 'text-gray-500'}`}>
+                    <p className={`text-sm truncate ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                       {activity.entity}
                     </p>
                   </div>
-                  <span className={`text-xs ${isDark() ? 'text-gray-500' : 'text-gray-400'}`}>
+                  <span className={`text-xs ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                     {activity.time}
                   </span>
                 </div>

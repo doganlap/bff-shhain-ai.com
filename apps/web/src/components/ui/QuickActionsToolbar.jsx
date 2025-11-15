@@ -18,17 +18,17 @@ const QuickActionsToolbar = ({ actions = [], onAction, loading = false }) => {
   const getVariantStyles = (variant) => {
     switch (variant) {
       case 'primary':
-        return 'bg-blue-600 hover:bg-blue-700 text-white';
+        return 'bg-primary-600 hover:bg-primary-700 text-white';
       case 'secondary':
-        return 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200';
+        return 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-200';
       case 'success':
-        return 'bg-green-600 hover:bg-green-700 text-white';
+        return 'bg-success-600 hover:bg-success-700 text-white';
       case 'warning':
-        return 'bg-yellow-600 hover:bg-yellow-700 text-white';
+        return 'bg-warning-600 hover:bg-warning-600/90 text-white';
       case 'danger':
-        return 'bg-red-600 hover:bg-red-700 text-white';
+        return 'bg-error-600 hover:bg-error-600/90 text-white';
       default:
-        return 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200';
+        return 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-200';
     }
   };
 

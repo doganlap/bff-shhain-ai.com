@@ -60,6 +60,7 @@ const crossDatabaseRoutes = require('./routes/cross-database');
 
 // Import Advanced Analytics (Fixed)
 const advancedAnalyticsRoutes = require('./routes/analytics-fixed');
+const aiProxyRoutes = require('./routes/ai-proxy');
 
 // Import admin routes
 const supervisorRoutes = require('./routes/admin/supervisorRoutes');
@@ -72,7 +73,7 @@ const demoPlatformRoutes = require('./routes/demo/admin/platformRoutes');
 // Create Express app
 const app = express();
 // Trigger restart
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 3000;
 
 // ==========================================
 // CORS MIDDLEWARE (MUST BE FIRST!)
@@ -83,10 +84,10 @@ const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-    
+
     const allowedOrigins = [
       'http://localhost:3000',
-      'http://localhost:5001', 
+      'http://localhost:5001',
       'http://localhost:5173',
       'http://localhost:5174',
       'http://localhost:5175',
@@ -94,7 +95,7 @@ const corsOptions = {
       'http://127.0.0.1:5174',
       'http://127.0.0.1:5175'
     ];
-    
+
     const isAllowed = allowedOrigins.includes(origin) ||
       /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
 
@@ -334,6 +335,7 @@ app.use('/api/cross-db', crossDatabaseRoutes);
 
 // Advanced Analytics (15+ Holistic Charts)
 app.use('/api/analytics', advancedAnalyticsRoutes);
+app.use('/api/ai', aiProxyRoutes);
 
 // Regulatory Market Intelligence
 const regulatoryMarketRoutes = require('./routes/regulatory-market');
@@ -405,11 +407,11 @@ app.get('/api/dashboard/activity-simple', async (req, res) => {
   try {
     const { dbQueries } = require('./config/database');
     const limit = parseInt(req.query.limit) || 10;
-    
+
     // Get simple activities from all databases
     const [complianceActivity, financeActivity, authActivity] = await Promise.all([
       dbQueries.compliance.query(`
-        SELECT 
+        SELECT
           'assessment' as type,
           id as entity_id,
           'Assessment created' as title,
@@ -420,9 +422,9 @@ app.get('/api/dashboard/activity-simple', async (req, res) => {
         ORDER BY created_at DESC
         LIMIT $1
       `, [Math.ceil(limit / 3)]),
-      
+
       dbQueries.finance.query(`
-        SELECT 
+        SELECT
           'tenant' as type,
           id as entity_id,
           name as title,
@@ -433,9 +435,9 @@ app.get('/api/dashboard/activity-simple', async (req, res) => {
         ORDER BY created_at DESC
         LIMIT $1
       `, [Math.ceil(limit / 3)]),
-      
+
       dbQueries.auth.query(`
-        SELECT 
+        SELECT
           'user' as type,
           id as entity_id,
           email as title,
@@ -475,11 +477,11 @@ app.get('/api/dashboard/activity-simple', async (req, res) => {
   try {
     const { dbQueries } = require('./config/database');
     const limit = parseInt(req.query.limit) || 10;
-    
+
     // Get simple activities from all databases
     const [complianceActivity, financeActivity, authActivity] = await Promise.all([
       dbQueries.compliance.query(`
-        SELECT 
+        SELECT
           'assessment' as type,
           id as entity_id,
           'Assessment created' as title,
@@ -490,9 +492,9 @@ app.get('/api/dashboard/activity-simple', async (req, res) => {
         ORDER BY created_at DESC
         LIMIT $1
       `, [Math.ceil(limit / 3)]),
-      
+
       dbQueries.finance.query(`
-        SELECT 
+        SELECT
           'tenant' as type,
           id as entity_id,
           name as title,
@@ -503,9 +505,9 @@ app.get('/api/dashboard/activity-simple', async (req, res) => {
         ORDER BY created_at DESC
         LIMIT $1
       `, [Math.ceil(limit / 3)]),
-      
+
       dbQueries.auth.query(`
-        SELECT 
+        SELECT
           'user' as type,
           id as entity_id,
           email as title,

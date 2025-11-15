@@ -109,6 +109,7 @@ import ProtectedRoute from './components/auth/ProtectedRoute';
 
 // Dashboard & Main Pages
 import AdvancedGRCDashboard from './components/AdvancedGRCDashboard';
+import MissionControlPage from './pages/system/MissionControlPage.jsx';
 import AdvancedAssessmentManager from './components/AdvancedAssessmentManager';
 import AdvancedFrameworkManager from './components/AdvancedFrameworkManager';
 
@@ -165,7 +166,7 @@ const AppContent = () => {
           element={isProd ? (
             <Navigate to="https://www.shahin-ai.com" replace />
           ) : (
-            <LoginPage />
+            <Navigate to="/app" replace />
           )}
         />
         <Route path="/welcome" element={<Navigate to="/" replace />} />
@@ -192,8 +193,8 @@ const AppContent = () => {
         <Route path="/poc/app/*" element={<PocAppLayout />} />
 
         {/* Authentication Routes */}
-        <Route path="/login" element={<Navigate to="/" replace />} />
-        <Route path="/login-glass" element={<Navigate to="/" replace />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login-glass" element={<LoginPage />} />
         <Route path="/register" element={<StoryDrivenRegistration />} />
 
         {/* External Landing Page Redirect */}
@@ -347,6 +348,8 @@ const AppContent = () => {
               {/* Notifications & Communications */}
               <Route path="notifications" element={<NotificationManagementPage />} />
               <Route path="notifications/settings" element={<NotificationManagementPage />} />
+              <Route path="mission-control" element={<MissionControlPage />} />
+              <Route path="chat" element={<MissionControlPage />} />
 
               {/* Regulatory Intelligence */}
               <Route path="regulatory" element={<RegulatoryIntelligencePage />} />

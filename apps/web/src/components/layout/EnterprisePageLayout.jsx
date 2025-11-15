@@ -1,6 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, HelpCircle, Settings, Bell } from 'lucide-react';
+import ProcessGuideBanner from '../guidance/ProcessGuideBanner';
+import { processGuides, resolveGuideKey } from '../../config/processGuides';
 
 /**
  * Enterprise Page Layout Component
@@ -38,8 +40,10 @@ const EnterprisePageLayout = ({
   showHelp = true,
   showSettings = false,
   showNotifications = false,
+  guideKey,
 }) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleBack = () => {
     if (backUrl) {
@@ -150,6 +154,9 @@ const EnterprisePageLayout = ({
 
       {/* Page Content */}
       <div className={`mx-auto ${padding ? `px-4 sm:px-6 lg:px-8 ${compact ? 'py-4' : 'py-6'}` : ''} ${maxWidthClasses[maxWidth]}`}>
+        {showHelp && (
+          <ProcessGuideBanner guide={processGuides[guideKey || resolveGuideKey(location.pathname)]} />
+        )}
         {children}
       </div>
     </div>

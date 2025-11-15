@@ -11,7 +11,8 @@ const OrganizationForm = () => {
     phone: ''
   });
 
-  const createMutation = useMutation(apiServices.organizations.create, {
+  const createMutation = useMutation({
+    mutationFn: apiServices.organizations.create,
     onSuccess: () => {
       alert('Organization created successfully!');
       window.location.href = '/organizations';

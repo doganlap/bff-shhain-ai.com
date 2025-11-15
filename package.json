@@ -28,7 +28,8 @@
     "test:auto-assessment": "node tests/test_auto_assessment_generator.js",
     "test:workflow": "node tests/test_workflow_engine.js",
     "test:features": "node tests/run_all_tests.js",
-    "test:quick": "node tests/quick_start.js"
+    "test:quick": "node tests/quick_start.js",
+    "prod:orchestrate": "node tools/production-orchestrator.js"
   },
   "workspaces": [
     "apps/*",

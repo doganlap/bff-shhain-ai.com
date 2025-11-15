@@ -32,6 +32,7 @@ const initialState = {
   organizations: [],
   assessments: [],
   templates: [],
+  tenants: [],
   
   // UI state
   loading: false,
@@ -72,6 +73,7 @@ const actionTypes = {
   SET_ORGANIZATIONS: 'SET_ORGANIZATIONS',
   SET_ASSESSMENTS: 'SET_ASSESSMENTS',
   SET_TEMPLATES: 'SET_TEMPLATES',
+  SET_TENANTS: 'SET_TENANTS',
   
   // UI
   SET_LOADING: 'SET_LOADING',
@@ -166,6 +168,9 @@ const appReducer = (state, action) => {
     case actionTypes.SET_TEMPLATES:
       return { ...state, templates: action.payload };
     
+    case actionTypes.SET_TENANTS:
+      return { ...state, tenants: action.payload };
+    
     case actionTypes.SET_LOADING:
       return { ...state, loading: action.payload };
     
@@ -198,6 +203,15 @@ const AppContext = createContext();
 // Provider component
 export const AppProvider = ({ children }) => {
   const [state, dispatch] = useReducer(appReducer, initialState);
+
+  useEffect(() => {
+    try {
+      const savedTenantId = typeof localStorage !== 'undefined' ? localStorage.getItem('tenant_id') : null;
+      if (savedTenantId) {
+        dispatch({ type: actionTypes.SET_CURRENT_TENANT, payload: { id: Number(savedTenantId) } });
+      }
+    } catch {}
+  }, []);
 
   // Initialize app data
   useEffect(() => {
@@ -734,12 +748,32 @@ export const AppProvider = ({ children }) => {
       }
     },
 
+    loadTenants: async () => {
+      try {
+        const response = await apiServices.tenants.getAll();
+        const tenants = response.data?.data || response.data || [];
+        dispatch({ type: actionTypes.SET_TENANTS, payload: tenants });
+        return tenants;
+      } catch (error) {
+        console.error('Error loading tenants:', error);
+        dispatch({ type: actionTypes.SET_TENANTS, payload: [] });
+        return [];
+      }
+    },
+
     // UI actions
     toggleSidebar: () => {
       dispatch({ type: actionTypes.TOGGLE_SIDEBAR });
     },
 
     setCurrentTenant: (tenant) => {
+      try {
+        if (tenant && tenant.id) {
+          localStorage.setItem('tenant_id', String(tenant.id));
+        } else {
+          localStorage.removeItem('tenant_id');
+        }
+      } catch {}
       dispatch({ type: actionTypes.SET_CURRENT_TENANT, payload: tenant });
     },
 

@@ -716,13 +716,13 @@ const FloatingAIAgent = () => {
       
       // Use backend API which handles routing to external LLM/Cloud AI
       const endpointMap = {
-        'chat': '/ai/chat',
-        'image': '/ai/analyze-image',
-        'voice': '/ai/process-voice',
-        'document': '/ai/analyze-document'
+        'chat': '/api/ai/chat',
+        'image': '/api/ai/analyze-image',
+        'voice': '/api/ai/process-voice',
+        'document': '/api/ai/analyze-document'
       }
 
-      const endpoint = `${import.meta.env.VITE_API_URL || 'https://api.shahin-ai.com/api'}${endpointMap[requestType] || '/ai/chat'}`
+      const endpoint = endpointMap[requestType] || '/api/ai/chat'
       
       const response = await fetch(endpoint, {
         method: 'POST',
