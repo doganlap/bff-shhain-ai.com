@@ -83,7 +83,7 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "https://grc-backend.shahin-ai.com/api",
+    "VITE_API_URL": "https://grc-backend.shahin-ai.com",
     "VITE_API_BASE_URL": "https://grc-backend.shahin-ai.com/api",
     "VITE_WS_URL": "wss://grc-backend.shahin-ai.com",
     "VITE_NODE_ENV": "production"

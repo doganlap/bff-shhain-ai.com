@@ -32,8 +32,8 @@ const LoginModal = ({ isOpen, onClose }) => {
         // Redirect to demo platform
         window.open('https://demo.shahin-ai.com', '_blank')
       } else {
-        // Redirect to main platform
-        window.open('https://app.shahin-ai.com', '_blank')
+        // Redirect to main platform (GRC app)
+        window.open('https://grc.shahin-ai.com/app', '_blank')
       }
       
       onClose()

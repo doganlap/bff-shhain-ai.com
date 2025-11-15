@@ -22,9 +22,9 @@ export default defineConfig({
     },
     include: ['src/**/*.{test,spec}.{js,jsx}'],
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
-  },  
-  server: {  
-    port: 5173,  
+  },
+  server: {
+    port: 5173,
     host: '0.0.0.0',
     proxy: {
       "/api": {
@@ -38,9 +38,9 @@ export default defineConfig({
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Tenant-Id']
     },
-  },  
-  preview: {  
-    port: 4173,  
+  },
+  preview: {
+    port: 4173,
     host: '0.0.0.0',
     cors: true
   },
@@ -68,4 +68,4 @@ export default defineConfig({
     sourcemap: false,
     minify: 'esbuild'
   }
-}) 
+})

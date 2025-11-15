@@ -413,8 +413,21 @@ app.use('/api/zakat', zakatRouter);
 
 // Authentication routes (no auth required)
 app.post('/api/auth/login', authLimiter, (req, res) => {
-  // Forward to auth service
-  // Implementation depends on your auth service
+  // Enforce origin in production: only allow canonical landing domain
+  if (process.env.NODE_ENV === 'production') {
+    const origin = req.headers.origin;
+    const allowedOrigin = 'https://www.shahin-ai.com';
+
+    if (origin !== allowedOrigin) {
+      return res.status(403).json({
+        success: false,
+        error: 'FORBIDDEN_ORIGIN',
+        message: 'Login is only allowed from the canonical domain https://www.shahin-ai.com',
+      });
+    }
+  }
+
+  // Forward to auth service (placeholder - implementation depends on your auth service)
   res.json({ message: 'Login endpoint - forward to auth-service' });
 });
 

@@ -74,7 +74,7 @@ if (api && api.interceptors && api.interceptors.response) {
     if (error.response?.status === 401) {
       // Unauthorized - redirect to login
       console.warn('Unauthorized access - redirecting to login');
-      window.location.href = '/login';
+      window.location.href = '/';
       return Promise.reject(error);
     }
 

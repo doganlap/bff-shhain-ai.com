@@ -80,7 +80,6 @@ import {
   DemoRegister,
   DemoAppLayout,
   PartnerLanding,
-  PartnerLogin,
   PartnerAppLayout,
   PocLanding,
   PocRequest,
@@ -113,6 +112,8 @@ import AdvancedGRCDashboard from './components/AdvancedGRCDashboard';
 import AdvancedAssessmentManager from './components/AdvancedAssessmentManager';
 import AdvancedFrameworkManager from './components/AdvancedFrameworkManager';
 
+const isProd = import.meta.env.PROD;
+
 const App = () => {
   return (
     <ErrorBoundary>
@@ -135,6 +136,22 @@ const AppContent = () => {
     document.documentElement.lang = language;
   }, [isRTL, language, isDark]);
 
+  // Enforce canonical domain in production
+  useEffect(() => {
+    if (!import.meta.env.PROD) return;
+    if (typeof window === 'undefined') return;
+
+    const canonicalHost = 'www.shahin-ai.com';
+    const currentHost = window.location.host;
+
+    if (currentHost !== canonicalHost) {
+      const url = new URL(window.location.href);
+      url.host = canonicalHost;
+      url.protocol = 'https:';
+      window.location.href = url.toString();
+    }
+  }, []);
+
   return (
     <div
       className={`arabic-text-engine min-h-screen transition-colors duration-200 ${
@@ -143,8 +160,15 @@ const AppContent = () => {
     >
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/welcome" element={<Navigate to="/login" replace />} />
+        <Route
+          path="/"
+          element={isProd ? (
+            <Navigate to="https://www.shahin-ai.com" replace />
+          ) : (
+            <LoginPage />
+          )}
+        />
+        <Route path="/welcome" element={<Navigate to="/" replace />} />
 
         {/* ==================================================================
             DEMO ACCESS PATH - /demo
@@ -157,7 +181,7 @@ const AppContent = () => {
             PARTNER ACCESS PATH - /partner
             ================================================================== */}
         <Route path="/partner" element={<PartnerLanding />} />
-        <Route path="/partner/login" element={<PartnerLogin />} />
+        <Route path="/partner/login" element={<Navigate to="/" replace />} />
         <Route path="/partner/app/*" element={<PartnerAppLayout />} />
 
         {/* ==================================================================
@@ -168,13 +192,13 @@ const AppContent = () => {
         <Route path="/poc/app/*" element={<PocAppLayout />} />
 
         {/* Authentication Routes */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/login-glass" element={<LoginPage />} />
+        <Route path="/login" element={<Navigate to="/" replace />} />
+        <Route path="/login-glass" element={<Navigate to="/" replace />} />
         <Route path="/register" element={<StoryDrivenRegistration />} />
 
         {/* External Landing Page Redirect */}
-        <Route path="/landing" element={<Navigate to="https://shahin-ai.com" replace />} />
-        <Route path="/home" element={<Navigate to="https://shahin-ai.com" replace />} />
+        <Route path="/landing" element={<Navigate to="https://www.shahin-ai.com" replace />} />
+        <Route path="/home" element={<Navigate to="https://www.shahin-ai.com" replace />} />
 
         {/* Advanced Dashboard Routes */}
         <Route path="/advanced" element={
@@ -370,7 +394,7 @@ const AppContent = () => {
             {/* Public Integration Endpoints */}
             <Route path="/integrations" element={<PartnerManagementPage publicView={true} />} />
             <Route path="/integrations/webhook" element={<NotificationManagementPage publicView={true} />} />
-            <Route path="/integrations/sso" element={<LoginPage ssoMode={true} />} />
+            <Route path="/integrations/sso" element={<Navigate to="/" replace />} />
 
             {/* Public Regulatory Intelligence */}
             <Route path="/regulatory" element={<RegulatoryIntelligencePage publicView={true} />} />
@@ -405,7 +429,7 @@ const AppContent = () => {
             <Route path="/services/analytics" element={<UsageDashboardPage serviceMode={true} />} />
             <Route path="/services/notification" element={<NotificationManagementPage serviceMode={true} />} />
             <Route path="/services/billing" element={<SettingsPage billingServiceMode={true} />} />
-            <Route path="/services/auth" element={<LoginPage serviceMode={true} />} />
+            <Route path="/services/auth" element={<Navigate to="/" replace />} />
             <Route path="/services/reporting" element={<ReportsPage serviceMode={true} />} />
             <Route path="/services/workflow" element={<WorkflowManagementPage serviceMode={true} />} />
 

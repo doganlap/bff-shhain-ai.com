@@ -218,6 +218,22 @@ When threats are detected:
 ### Detection
 - Automated threat detection
 - Real-time monitoring alerts
+
+## Canonical Domain & Login Flow
+
+- Canonical domain: `https://www.shahin-ai.com`
+- Frontend enforces canonical host in production; non-canonical hosts redirect to the canonical domain preserving path and query
+- Landing page `/` hosts the login form; `/login` redirects to `/`
+- Protected routes (`/app`, `/advanced`, tenant routes) require authentication and redirect unauthenticated users to `/`
+
+## BFF URL and CSP
+
+- Canonical BFF/backend URLs: `https://grc-backend.shahin-ai.com`, `https://bff-donganksa.vercel.app`
+- CSP `connect-src` allows: `self`, localhost for development, `https://grc-backend.shahin-ai.com`, `wss://grc-backend.shahin-ai.com`, `https://www.shahin-ai.com`, `wss://www.shahin-ai.com`, and `https://bff-donganksa.vercel.app` including `wss`
+
+## Backend Origin Enforcement
+
+- Login endpoints accept requests only when `Origin` is `https://www.shahin-ai.com` in production; others receive `403`
 - User-reported incidents
 - Security scan findings
 

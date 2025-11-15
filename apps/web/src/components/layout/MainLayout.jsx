@@ -67,7 +67,7 @@ const MainLayoutContent = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    window.location.href = '/login';
+    window.location.href = '/';
   };
 
   const toggleLanguage = () => {

@@ -74,7 +74,7 @@ if (api && api.interceptors && api.interceptors.response) {
     if (error.response?.status === 401) {
       // Handle unauthorized - redirect to login
       localStorage.removeItem('auth_token');
-      window.location.href = '/login';
+      window.location.href = '/';
     }
     return Promise.reject(error);
   }

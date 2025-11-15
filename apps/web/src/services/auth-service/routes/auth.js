@@ -192,6 +192,11 @@ router.post('/register', async (req, res) => {
  */
 router.post('/login', async (req, res) => {
   try {
+    const origin = req.headers.origin;
+    const allowed = 'https://www.shahin-ai.com';
+    if (process.env.NODE_ENV === 'production' && origin !== allowed) {
+      return res.status(403).json({ success: false, error: 'Forbidden origin' });
+    }
     const { email, password } = req.body;
 
     if (!email || !password) {

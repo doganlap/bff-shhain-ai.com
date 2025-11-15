@@ -144,7 +144,7 @@ api.interceptors.response.use(
           // Unauthorized - clear auth and redirect to login
           localStorage.removeItem('authToken');
           localStorage.removeItem('user');
-          window.location.href = '/login';
+          window.location.href = '/';
           return Promise.reject(new APIError('Unauthorized', 'UNAUTHORIZED', 401));
 
         case 403:
@@ -198,7 +198,7 @@ api.interceptors.response.use(
  * Cancel all active requests
  */
 export function cancelAllRequests(reason = 'Component unmounted') {
-  activeRequests.forEach((cancelSource, requestId) => {
+  activeRequests.forEach((cancelSource) => {
     cancelSource.cancel(reason);
   });
   activeRequests.clear();
