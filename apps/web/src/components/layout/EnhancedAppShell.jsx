@@ -21,6 +21,7 @@ import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../theme/ThemeProvider';
 import { Tooltip, InfoTooltip, WarningTooltip } from '../ui/Tooltip';
 import { Modal, Dropdown, Select, Alert, LoadingSpinner } from '../ui/InteractiveComponents';
+import { getNavigationForRole, TenantSelector, RoleBadge } from './MultiTenantNavigation';
 
 const EnhancedAppShell = () => {
   const navigate = useNavigate();
@@ -35,6 +36,11 @@ const EnhancedAppShell = () => {
   const [isMobile, setIsMobile] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  
+  // Multi-tenant navigation
+  const userRole = user?.role || 'team_member'; // platform_admin, tenant_admin, team_member
+  const tenantContext = user?.tenant || { id: 1, name: 'Default Organization', compliance: 85 };
+  const navigationItems = getNavigationForRole(userRole, tenantContext);
 
   // Mobile detection
   useEffect(() => {
@@ -45,19 +51,6 @@ const EnhancedAppShell = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  // Navigation items with i18n support
-  const navigationItems = [
-    { id: 'dashboard', name: t('nav.dashboard'), icon: Home, path: '/advanced', tooltip: t('nav.dashboard') },
-    { id: 'assessments', name: t('nav.assessments'), icon: Shield, path: '/advanced/assessments', tooltip: t('nav.assessments') },
-    { id: 'frameworks', name: t('nav.frameworks'), icon: Target, path: '/advanced/frameworks', tooltip: t('nav.frameworks') },
-    { id: 'controls', name: t('nav.controls'), icon: FileText, path: '/app/controls', tooltip: t('nav.controls') },
-    { id: 'organizations', name: t('nav.organizations'), icon: Building2, path: '/app/organizations', tooltip: t('nav.organizations') },
-    { id: 'regulators', name: t('nav.regulators'), icon: Users, path: '/app/regulators', tooltip: t('nav.regulators') },
-    { id: 'reports', name: t('nav.reports'), icon: BarChart3, path: '/app/reports', tooltip: t('nav.reports') },
-    { id: 'database', name: t('nav.database'), icon: Database, path: '/app/database', tooltip: t('nav.database') },
-    { id: 'settings', name: t('nav.settings'), icon: Settings, path: '/app/settings', tooltip: t('nav.settings') }
-  ];
 
   const currentPath = location.pathname;
 
@@ -156,9 +149,9 @@ const EnhancedAppShell = () => {
                   </div>
                 </div>
 
-                {/* User Info */}
+                {/* User Info & Role Badge */}
                 {!sidebarCollapsed && user && (
-                  <div className={`p-4 border-b ${isDark() ? 'border-gray-700' : 'border-slate-200'}`}>
+                  <div className={`p-4 border-b ${isDark() ? 'border-gray-700' : 'border-slate-200'} space-y-3`}>
                     <div className="flex items-center space-x-3">
                       <div className={`p-2 rounded-full ${isDark() ? 'bg-gray-700' : 'bg-slate-100'}`}>
                         <UserCheck className={`h-4 w-4 ${isDark() ? 'text-gray-300' : 'text-slate-600'}`} />
@@ -172,49 +165,108 @@ const EnhancedAppShell = () => {
                         </p>
                       </div>
                     </div>
+                    <RoleBadge role={userRole} />
+                    {userRole === 'platform_admin' && <TenantSelector />}
                   </div>
                 )}
 
-                {/* Navigation */}
+                {/* Navigation - Multi-Tenant with Collapsible Sections */}
                 <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                  {navigationItems.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = currentPath === item.path || currentPath.startsWith(item.path + '/');
+                  {navigationItems.map((section) => {
+                    const Icon = section.icon;
+                    const hasChildren = section.items && section.items.length > 0;
+                    const isActive = section.path && (currentPath === section.path || currentPath.startsWith(section.path + '/'));
                     
-                    const navButton = (
-                      <motion.button
-                        key={item.id}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => handleNavigation(item.path)}
-                        className={`w-full flex items-center ${
-                          sidebarCollapsed ? 'justify-center' : 'justify-start'
-                        } space-x-3 px-3 py-2 rounded-lg transition-all duration-200 ${
-                          isActive
-                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
-                            : isDark()
-                            ? 'hover:bg-gray-700 text-gray-300'
-                            : 'hover:bg-slate-100 text-slate-700'
-                        }`}
-                      >
-                        <Icon className="h-5 w-5 flex-shrink-0" />
-                        {!sidebarCollapsed && (
-                          <motion.span
-                            initial={{ opacity: 0, width: 0 }}
-                            animate={{ opacity: 1, width: 'auto' }}
-                            className="text-sm font-medium"
-                          >
-                            {item.name}
-                          </motion.span>
-                        )}
-                      </motion.button>
-                    );
-
-                    return sidebarCollapsed ? (
-                      <Tooltip key={item.id} content={item.tooltip} position="right">
-                        {navButton}
-                      </Tooltip>
-                    ) : navButton;
+                    if (!hasChildren && section.path) {
+                      // Simple navigation item
+                      const navButton = (
+                        <motion.button
+                          key={section.id}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleNavigation(section.path)}
+                          className={`w-full flex items-center ${
+                            sidebarCollapsed ? 'justify-center' : 'justify-between'
+                          } px-3 py-2 rounded-lg transition-all duration-200 ${
+                            isActive
+                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
+                              : isDark()
+                              ? 'hover:bg-gray-700 text-gray-300'
+                              : 'hover:bg-slate-100 text-slate-700'
+                          }`}
+                        >
+                          <div className="flex items-center space-x-3">
+                            <Icon className="h-5 w-5 flex-shrink-0" />
+                            {!sidebarCollapsed && (
+                              <span className="text-sm font-medium">{section.name}</span>
+                            )}
+                          </div>
+                          {!sidebarCollapsed && section.badge && (
+                            <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                              {section.badge}
+                            </span>
+                          )}
+                        </motion.button>
+                      );
+                      
+                      return sidebarCollapsed ? (
+                        <Tooltip key={section.id} content={section.name} position="right">
+                          {navButton}
+                        </Tooltip>
+                      ) : navButton;
+                    }
+                    
+                    if (hasChildren && !sidebarCollapsed) {
+                      // Section with children
+                      return (
+                        <div key={section.id} className="mb-4">
+                          <div className={`flex items-center justify-between px-3 py-2 text-xs font-semibold uppercase tracking-wider ${
+                            isDark() ? 'text-gray-400' : 'text-slate-500'
+                          }`}>
+                            <div className="flex items-center space-x-2">
+                              <Icon className="h-4 w-4" />
+                              <span>{section.name}</span>
+                            </div>
+                          </div>
+                          <div className="space-y-1 mt-2">
+                            {section.items.map((child) => {
+                              const ChildIcon = child.icon;
+                              const isChildActive = child.path && (currentPath === child.path || currentPath.startsWith(child.path + '/'));
+                              
+                              return (
+                                <motion.button
+                                  key={child.id}
+                                  whileHover={{ scale: 1.02 }}
+                                  whileTap={{ scale: 0.98 }}
+                                  onClick={() => handleNavigation(child.path)}
+                                  className={`w-full flex items-center justify-between pl-6 pr-3 py-2 rounded-lg transition-all duration-200 ${
+                                    isChildActive
+                                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg'
+                                      : isDark()
+                                      ? 'hover:bg-gray-700 text-gray-300'
+                                      : 'hover:bg-slate-100 text-slate-700'
+                                  }`}
+                                >
+                                  <div className="flex items-center space-x-3">
+                                    <ChildIcon className="h-4 w-4 flex-shrink-0" />
+                                    <span className="text-sm">{child.name}</span>
+                                  </div>
+                                  {child.badge && (
+                                    <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
+                                      isChildActive ? 'bg-white text-blue-600' : 'bg-blue-100 text-blue-800'
+                                    }`}>
+                                      {child.badge}
+                                    </span>
+                                  )}
+                                </motion.button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    }
+                    
+                    return null;
                   })}
                 </nav>
 
