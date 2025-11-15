@@ -1,31 +1,32 @@
-<!DOCTYPE html>  
-<html lang="en">  
-  <head>  
+<!DOCTYPE html>
+<html lang="en">
+  <head>
     <!-- Charset must be first for performance -->
-    <meta charset="UTF-8" />  
-    
+    <meta charset="UTF-8" />
+
     <!-- Security and compatibility headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="X-XSS-Protection" content="1; mode=block">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <!-- X-Frame-Options removed - must be set via HTTP headers (server/Vercel config), not <meta> -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://grc-backend.shahin-ai.com wss://grc-backend.shahin-ai.com https://bff-seven-beige.vercel.app wss://bff-seven-beige.vercel.app https://bff-donganksa.vercel.app wss://bff-donganksa.vercel.app https://www.shahin-ai.com wss://www.shahin-ai.com https://shahin-ai.com http://localhost:* ws://localhost:* wss://localhost:* http://127.0.0.1:* ws://127.0.0.1:* wss://127.0.0.1:*;">
-    
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />  
+    <!-- CSP will be set via environment-driven VITE_BFF_URL when deploying to fresh account -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://bff-seven-beige.vercel.app wss://bff-seven-beige.vercel.app https://www.shahin-ai.com wss://www.shahin-ai.com https://shahin-ai.com;">
+
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+
     <!-- Preload critical resources -->
     <link rel="modulepreload" href="/src/main.jsx" crossorigin>
-    
+
     <title>Shahin-AI KSA | شاهين الذكي السعودية - منصة الحوكمة الذكية</title>
-    
+
     <!-- Prevent blank page flash and optimize performance -->
     <style>
       /* Compatibility fixes */
       * {
         box-sizing: border-box;
       }
-      
+
       #root {
         min-height: 100vh;
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -33,7 +34,7 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
       }
-      
+
       .loading-screen {
         position: fixed;
         top: 0;
@@ -49,7 +50,7 @@
         -webkit-transition: opacity 0.3s ease-out;
         transition: opacity 0.3s ease-out;
       }
-      
+
       .loading-spinner {
         width: 50px;
         height: 50px;
@@ -60,43 +61,43 @@
         animation: spin 1s linear infinite;
         will-change: transform;
       }
-      
+
       @keyframes spin {
         to {
           transform: rotate(360deg);
         }
       }
-      
+
       @-webkit-keyframes spin {
         to {
           -webkit-transform: rotate(360deg);
         }
       }
-      
+
       /* Performance optimizations */
       .sidebar-transition {
         will-change: width;
         -webkit-transform: translateZ(0);
         transform: translateZ(0);
       }
-      
+
       .nav-item {
         will-change: background-color, transform;
         -webkit-transform: translateZ(0);
         transform: translateZ(0);
       }
     </style>
-  </head>  
-  <body>  
+  </head>
+  <body>
     <!-- Loading screen to prevent blank page -->
     <div id="loading-screen" class="loading-screen">
       <div class="loading-spinner"></div>
     </div>
-    
-    <div id="root"></div>  
-    
+
+    <div id="root"></div>
+
     <script type="module" src="/src/main.jsx"></script>
-    
+
     <!-- Remove loading screen once React loads -->
     <script>
       window.addEventListener('DOMContentLoaded', function() {
@@ -109,5 +110,5 @@
         }, 1000);
       });
     </script>
-  </body>  
+  </body>
 </html>

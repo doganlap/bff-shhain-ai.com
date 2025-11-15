@@ -4,6 +4,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 require('dotenv').config();
+const { ENV } = require('./config/env');
 
 // Import custom middleware and utilities
 const { logger } = require('./utils/logger');
@@ -25,7 +26,7 @@ const { auditMiddleware, auditAuthEvent, AuditEventType } = require('./middlewar
 const { checkLoginAttempts } = require('./middleware/loginAttemptLimiter');
 
 const app = express();
-const PORT = process.env.PORT || 3005;
+const PORT = ENV.PORT;
 
 // Initialize Sentry (must be first)
 initSentry(app);
@@ -106,13 +107,9 @@ app.use(helmet({
   xssFilter: true
 }));
 
-// CORS
+// CORS - Using environment-driven origins
 app.use(cors({
-  origin: [
-    process.env.FRONTEND_URL || 'http://localhost:5173',
-    'http://localhost:5001', // For production build container
-    'http://localhost:5174'  // For dev container
-  ],
+  origin: ENV.FRONTEND_ORIGINS,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant-ID', 'X-Request-ID']
@@ -386,6 +383,36 @@ app.use('/api/onboarding', onboardingRouter);
 
 const tasksRouter = require('./src/routes/tasks.routes.js');
 app.use('/api/tasks', tasksRouter);
+
+// ✅ AI Health Check endpoint with database connectivity test
+app.get('/api/ai/health', async (req, res) => {
+  try {
+    const startTime = Date.now();
+    await prisma.$queryRaw`SELECT 1`;
+    const dbLatency = Date.now() - startTime;
+
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      database: {
+        connected: true,
+        latency: `${dbLatency}ms`
+      },
+      service: 'BFF AI Services',
+      environment: ENV.NODE_ENV
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      database: {
+        connected: false,
+        error: error.message
+      },
+      service: 'BFF AI Services'
+    });
+  }
+});
 
 // ✅ NEW: Agent management routes
 const agentsRouter = require('./routes/agents');

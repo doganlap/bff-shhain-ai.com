@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  Building, 
-  ClipboardCheck, 
-  BarChart3, 
-  Settings, 
+import {
+  Home,
+  Building,
+  ClipboardCheck,
+  BarChart3,
+  Settings,
   LogOut,
   Shield,
   Globe,
@@ -22,45 +22,45 @@ const MainLayoutContent = () => {
   const { hasFeature, currentPlan } = useSubscription();
 
   const navigation = [
-    { 
-      name: 'Dashboard', 
+    {
+      name: 'Dashboard',
       nameAr: 'لوحة التحكم',
-      href: '/app/dashboard', 
+      href: '/app/dashboard',
       icon: Home,
       feature: null
     },
-    { 
-      name: 'Regulators', 
+    {
+      name: 'Regulators',
       nameAr: 'الجهات التنظيمية',
-      href: '/app/regulators', 
+      href: '/app/regulators',
       icon: Shield,
       feature: null
     },
-    { 
-      name: 'Organizations', 
+    {
+      name: 'Organizations',
       nameAr: 'المؤسسات',
-      href: '/app/organizations', 
+      href: '/app/organizations',
       icon: Building,
       feature: null
     },
-    { 
-      name: 'Assessments', 
+    {
+      name: 'Assessments',
       nameAr: 'التقييمات',
-      href: '/app/assessments', 
+      href: '/app/assessments',
       icon: ClipboardCheck,
       feature: 'basicAssessments'
     },
-    { 
-      name: 'Reports', 
+    {
+      name: 'Reports',
       nameAr: 'التقارير',
-      href: '/app/reports', 
+      href: '/app/reports',
       icon: BarChart3,
       feature: 'basicReports'
     },
-    { 
-      name: 'Settings', 
+    {
+      name: 'Settings',
       nameAr: 'الإعدادات',
-      href: '/app/settings', 
+      href: '/app/settings',
       icon: Settings,
       feature: null
     },
@@ -84,7 +84,7 @@ const MainLayoutContent = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <div className="flex-shrink-0">
-                <ArabicTextEngine 
+                <ArabicTextEngine
                   animated={true}
                   personalityType="professional"
                   style={{ fontSize: '20px', fontWeight: 'bold', color: 'white' }}
@@ -92,27 +92,27 @@ const MainLayoutContent = () => {
                   {language === 'ar' ? 'نظام الحوكمة والمخاطر والامتثال' : 'GRC Platform'}
                 </ArabicTextEngine>
               </div>
-              
+
               {/* Subscription Badge */}
               <div className="ml-4 px-3 py-1 bg-white bg-opacity-20 rounded-full">
                 <span className="text-white text-xs font-medium">
-                  {currentPlan === 'free' ? (language === 'ar' ? 'مجاني' : 'Free') : 
-                   currentPlan === 'professional' ? (language === 'ar' ? 'احترافي' : 'Pro') : 
+                  {currentPlan === 'free' ? (language === 'ar' ? 'مجاني' : 'Free') :
+                   currentPlan === 'professional' ? (language === 'ar' ? 'احترافي' : 'Pro') :
                    (language === 'ar' ? 'مؤسسي' : 'Enterprise')}
                 </span>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               {/* Language Toggle */}
               <AnimatedButton
                 variant="outline"
                 size="small"
                 onClick={toggleLanguage}
-                style={{ 
-                  backgroundColor: 'rgba(255,255,255,0.1)', 
-                  color: 'white', 
-                  border: '1px solid rgba(255,255,255,0.3)' 
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  color: 'white',
+                  border: '1px solid rgba(255,255,255,0.3)'
                 }}
               >
                 <Globe className="h-4 w-4 mr-2" />
@@ -124,10 +124,10 @@ const MainLayoutContent = () => {
                 <AnimatedButton
                   variant="outline"
                   size="small"
-                  style={{ 
-                    backgroundColor: 'rgba(255,255,255,0.1)', 
-                    color: 'white', 
-                    border: '1px solid rgba(255,255,255,0.3)' 
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    color: 'white',
+                    border: '1px solid rgba(255,255,255,0.3)'
                   }}
                 >
                   <CreditCard className="h-4 w-4 mr-2" />
@@ -140,10 +140,10 @@ const MainLayoutContent = () => {
                 variant="outline"
                 size="small"
                 onClick={handleLogout}
-                style={{ 
-                  backgroundColor: 'rgba(255,255,255,0.1)', 
-                  color: 'white', 
-                  border: '1px solid rgba(255,255,255,0.3)' 
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  color: 'white',
+                  border: '1px solid rgba(255,255,255,0.3)'
                 }}
               >
                 <LogOut className="h-4 w-4 mr-2" />
@@ -156,9 +156,9 @@ const MainLayoutContent = () => {
 
       <div className="flex min-h-screen">
         {/* Sidebar */}
-        <aside 
+        <aside
           className={`bg-white shadow-sm transition-all duration-300 flex-shrink-0 ${sidebarCollapsed ? 'w-16' : 'w-64'}`}
-          style={{ 
+          style={{
             background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
             borderRight: '1px solid #e2e8f0'
           }}
@@ -169,10 +169,10 @@ const MainLayoutContent = () => {
             className="w-full p-2 hover:bg-gray-100 transition-colors flex items-center justify-center border-b border-gray-200"
             aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            <svg 
+            <svg
               className={`h-5 w-5 text-gray-600 transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''}`}
-              fill="none" 
-              viewBox="0 0 24 24" 
+              fill="none"
+              viewBox="0 0 24 24"
               stroke="currentColor"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -184,7 +184,7 @@ const MainLayoutContent = () => {
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
                 const hasAccess = !item.feature || hasFeature(item.feature);
-                
+
                 return (
                   <div key={item.name}>
                     {hasAccess ? (
@@ -204,8 +204,8 @@ const MainLayoutContent = () => {
                         </div>
                       </Link>
                     ) : (
-                      <FeatureGate 
-                        feature={item.feature} 
+                      <FeatureGate
+                        feature={item.feature}
                         showUpgrade={false}
                         fallback={
                           <div className="relative">
@@ -221,7 +221,7 @@ const MainLayoutContent = () => {
                               }}
                             >
                               <item.icon className="h-5 w-5 mr-3" />
-                              <ArabicTextEngine 
+                              <ArabicTextEngine
                                 personalityType="casual"
                                 style={{ fontSize: '14px' }}
                               >
