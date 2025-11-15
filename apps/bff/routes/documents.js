@@ -5,10 +5,11 @@ const documentService = require('../src/services/document.service');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
-// Ensure uploads directory exists
-const uploadDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadDir)) {
+// Use temp directory for Vercel serverless (read-only filesystem)
+const uploadDir = process.env.VERCEL ? os.tmpdir() : path.join(__dirname, '..', 'uploads');
+if (!process.env.VERCEL && !fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
