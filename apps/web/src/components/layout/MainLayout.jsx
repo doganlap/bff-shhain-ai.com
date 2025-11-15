@@ -18,6 +18,7 @@ import { SubscriptionProvider, useSubscription, FeatureGate } from '../Subscript
 const MainLayoutContent = () => {
   const location = useLocation();
   const [language, setLanguage] = useState('en');
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const { hasFeature, currentPlan } = useSubscription();
 
   const navigation = [
@@ -153,13 +154,32 @@ const MainLayoutContent = () => {
         </div>
       </nav>
 
-      <div className="flex">
+      <div className="flex min-h-screen">
         {/* Sidebar */}
-        <div className="w-64 bg-white shadow-lg min-h-screen" style={{ 
-          background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
-          borderRight: '1px solid #e2e8f0'
-        }}>
-          <nav className="mt-5 px-3">
+        <aside 
+          className={`bg-white shadow-sm transition-all duration-300 flex-shrink-0 ${sidebarCollapsed ? 'w-16' : 'w-64'}`}
+          style={{ 
+            background: 'linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)',
+            borderRight: '1px solid #e2e8f0'
+          }}
+        >
+          {/* Toggle Button */}
+          <button
+            onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className="w-full p-2 hover:bg-gray-100 transition-colors flex items-center justify-center border-b border-gray-200"
+            aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <svg 
+              className={`h-5 w-5 text-gray-600 transition-transform duration-300 ${sidebarCollapsed ? 'rotate-180' : ''}`}
+              fill="none" 
+              viewBox="0 0 24 24" 
+              stroke="currentColor"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <nav className="py-4 px-2">
             <div className="space-y-2">
               {navigation.map((item) => {
                 const isActive = location.pathname === item.href;
@@ -169,27 +189,19 @@ const MainLayoutContent = () => {
                   <div key={item.name}>
                     {hasAccess ? (
                       <Link to={item.href}>
-                        <AnimatedButton
-                          variant={isActive ? 'primary' : 'outline'}
-                          size="medium"
-                          culturalStyle="modern"
-                          style={{
-                            width: '100%',
-                            justifyContent: 'flex-start',
-                            backgroundColor: isActive ? '#667eea' : 'transparent',
-                            color: isActive ? 'white' : '#4a5568',
-                            border: isActive ? 'none' : '1px solid #e2e8f0',
-                            marginBottom: '4px'
-                          }}
+                        <div
+                          className={`flex items-center w-full px-3 py-2 rounded-md transition-colors cursor-pointer mb-1 ${
+                            isActive ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'
+                          }`}
+                          title={sidebarCollapsed ? (language === 'ar' ? item.nameAr : item.name) : ''}
                         >
-                          <item.icon className="h-5 w-5 mr-3" />
-                          <ArabicTextEngine 
-                            personalityType="casual"
-                            style={{ fontSize: '14px' }}
-                          >
-                            {language === 'ar' ? item.nameAr : item.name}
-                          </ArabicTextEngine>
-                        </AnimatedButton>
+                          <item.icon className={`h-5 w-5 flex-shrink-0 ${!sidebarCollapsed && 'mr-3'}`} />
+                          {!sidebarCollapsed && (
+                            <span className="text-sm font-medium">
+                              {language === 'ar' ? item.nameAr : item.name}
+                            </span>
+                          )}
+                        </div>
                       </Link>
                     ) : (
                       <FeatureGate 
@@ -221,27 +233,19 @@ const MainLayoutContent = () => {
                         }
                       >
                         <Link to={item.href}>
-                          <AnimatedButton
-                            variant={isActive ? 'primary' : 'outline'}
-                            size="medium"
-                            culturalStyle="modern"
-                            style={{
-                              width: '100%',
-                              justifyContent: 'flex-start',
-                              backgroundColor: isActive ? '#667eea' : 'transparent',
-                              color: isActive ? 'white' : '#4a5568',
-                              border: isActive ? 'none' : '1px solid #e2e8f0',
-                              marginBottom: '4px'
-                            }}
+                          <div
+                            className={`flex items-center w-full px-3 py-2 rounded-md transition-colors cursor-pointer mb-1 ${
+                              isActive ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100'
+                            }`}
+                            title={sidebarCollapsed ? (language === 'ar' ? item.nameAr : item.name) : ''}
                           >
-                            <item.icon className="h-5 w-5 mr-3" />
-                            <ArabicTextEngine 
-                              personalityType="casual"
-                              style={{ fontSize: '14px' }}
-                            >
-                              {language === 'ar' ? item.nameAr : item.name}
-                            </ArabicTextEngine>
-                          </AnimatedButton>
+                            <item.icon className={`h-5 w-5 flex-shrink-0 ${!sidebarCollapsed && 'mr-3'}`} />
+                            {!sidebarCollapsed && (
+                              <span className="text-sm font-medium">
+                                {language === 'ar' ? item.nameAr : item.name}
+                              </span>
+                            )}
+                          </div>
                         </Link>
                       </FeatureGate>
                     )}
@@ -251,38 +255,30 @@ const MainLayoutContent = () => {
             </div>
 
             {/* Upgrade Prompt for Free Users */}
-            {currentPlan === 'free' && (
-              <div className="mt-8 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                <ArabicTextEngine 
-                  personalityType="friendly"
-                  style={{ fontSize: '14px', fontWeight: 'bold', marginBottom: '8px' }}
-                >
-                  {language === 'ar' ? 'ترقية للميزات المتقدمة' : 'Upgrade for Advanced Features'}
-                </ArabicTextEngine>
-                <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '12px' }}>
-                  {language === 'ar' ? 'احصل على الذكاء الاصطناعي والميزات المتقدمة' : 'Get AI features and advanced capabilities'}
+            {currentPlan === 'free' && !sidebarCollapsed && (
+              <div className="mx-2 mt-4 p-3 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg border border-indigo-200">
+                <p className="text-xs font-semibold text-gray-800 mb-1">
+                  {language === 'ar' ? 'ترقية للميزات المتقدمة' : 'Upgrade'}
+                </p>
+                <p className="text-xs text-gray-600 mb-2">
+                  {language === 'ar' ? 'الذكاء الاصطناعي' : 'AI Features'}
                 </p>
                 <Link to="/app/subscription">
-                  <AnimatedButton
-                    variant="primary"
-                    size="small"
-                    culturalStyle="modern"
-                    style={{ width: '100%', fontSize: '12px' }}
-                  >
-                    {language === 'ar' ? 'ترقية الآن' : 'Upgrade Now'}
-                  </AnimatedButton>
+                  <button className="w-full px-3 py-1.5 bg-indigo-600 text-white text-xs rounded-md hover:bg-indigo-700 transition-colors">
+                    {language === 'ar' ? 'ترقية' : 'Upgrade'}
+                  </button>
                 </Link>
               </div>
             )}
           </nav>
-        </div>
+        </aside>
 
-        {/* Main content */}
-        <div className="flex-1">
-          <main className="py-6 px-4 sm:px-6 lg:px-8">
+        {/* Main content - takes full remaining width with no gap */}
+        <main className="flex-1 overflow-x-hidden">
+          <div className="h-full p-6">
             <Outlet />
-          </main>
-        </div>
+          </div>
+        </main>
       </div>
     </div>
   );
