@@ -848,8 +848,6 @@ process.on('SIGTERM', () => {
     process.exit(1);
   }, 30000);
 });
-
-  });
 }
 
 process.on('SIGINT', () => {

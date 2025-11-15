@@ -12,7 +12,6 @@ import {
   CreditCard
 } from 'lucide-react';
 import ArabicTextEngine from '../Arabic/ArabicTextEngine';
-import { AnimatedButton } from '../Animation/InteractiveAnimationToolkit';
 import { SubscriptionProvider, useSubscription, FeatureGate } from '../Subscription/SubscriptionManager';
 
 const MainLayoutContent = () => {
@@ -105,50 +104,30 @@ const MainLayoutContent = () => {
 
             <div className="flex items-center space-x-4">
               {/* Language Toggle */}
-              <AnimatedButton
-                variant="outline"
-                size="small"
+              <button
                 onClick={toggleLanguage}
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.1)',
-                  color: 'white',
-                  border: '1px solid rgba(255,255,255,0.3)'
-                }}
+                className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors border border-white border-opacity-30"
               >
                 <Globe className="h-4 w-4 mr-2" />
                 {language === 'ar' ? 'English' : 'العربية'}
-              </AnimatedButton>
+              </button>
 
               {/* Subscription Link */}
               <Link to="/app/subscription">
-                <AnimatedButton
-                  variant="outline"
-                  size="small"
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    color: 'white',
-                    border: '1px solid rgba(255,255,255,0.3)'
-                  }}
-                >
+                <button className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors border border-white border-opacity-30">
                   <CreditCard className="h-4 w-4 mr-2" />
                   {language === 'ar' ? 'الاشتراك' : 'Subscription'}
-                </AnimatedButton>
+                </button>
               </Link>
 
               {/* Logout */}
-              <AnimatedButton
-                variant="outline"
-                size="small"
+              <button
                 onClick={handleLogout}
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.1)',
-                  color: 'white',
-                  border: '1px solid rgba(255,255,255,0.3)'
-                }}
+                className="flex items-center px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white hover:bg-opacity-20 transition-colors border border-white border-opacity-30"
               >
                 <LogOut className="h-4 w-4 mr-2" />
                 {language === 'ar' ? 'خروج' : 'Logout'}
-              </AnimatedButton>
+              </button>
             </div>
           </div>
         </div>
