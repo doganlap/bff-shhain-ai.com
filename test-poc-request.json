@@ -1,0 +1,10 @@
+{
+  "fullName": "POC Manager",
+  "email": "poc@bigcorp.com",
+  "companyName": "Big Corporation KSA",
+  "sector": "BFSI",
+  "useCases": ["enterprise-grc", "risk-register", "audit-management"],
+  "environmentPreference": "azure-cloud",
+  "preferredStartDate": "2025-12-01",
+  "notes": "Need alignment with SAMA regulations"
+}

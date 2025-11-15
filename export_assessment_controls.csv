@@ -1,0 +1,2 @@
+id,assessment_id,control_id,status,implementation_status,compliance_status,risk_rating,score,assigned_to,implementation_notes,evidence_provided,evidence_files,remediation_plan,remediation_due_date,last_reviewed_date,reviewed_by,is_demo,metadata,created_at,updated_at
+1,1,1,in_progress,partially_implemented,partially_compliant,medium,,4,,,[],,,,,f,{},2025-11-03 17:58:27.153552,2025-11-03 17:58:27.153552

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "940e2272-731d-4271-98f5-f00e0e9786a6",
+    "slug": "gulf-financial",
+    "display_name": "Gulf Financial Services",
+    "type": "customer",
+    "status": "active",
+    "country": "Saudi Arabia",
+    "sector": "banking",
+    "metadata": {},
+    "created_at": "2025-11-14T12:31:40.925Z",
+    "updated_at": "2025-11-14T12:31:40.925Z",
+    "expires_at": null
+  },
+  {
+    "id": "90dfd67d-d785-41ca-a75c-f700ace96b42",
+    "slug": "saudi-advanced-tech",
+    "display_name": "Saudi Advanced Technology Company",
+    "type": "customer",
+    "status": "active",
+    "country": "Saudi Arabia",
+    "sector": "technology",
+    "metadata": {},
+    "created_at": "2025-11-14T12:31:40.950Z",
+    "updated_at": "2025-11-14T12:31:40.950Z",
+    "expires_at": null
+  }
+]

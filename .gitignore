@@ -1,0 +1,22 @@
+# Node & build artifacts
+node_modules/
+dist/
+build/
+.cache/
+coverage/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Env and secrets (do not commit)
+.env
+.env.*
+
+# Vercel and deployment
+.vercel/
+.deployment/

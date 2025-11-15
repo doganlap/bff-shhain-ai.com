@@ -1,0 +1,4 @@
+id,name,sector,industry,contact_email,contact_phone,status,subscription_tier,created_at,updated_at,deleted_at
+951e5f64-59e3-4411-bfb2-5aee4d14b621,Saudi Banking Corp,Financial Services,Banking,admin@sabc.sa,+966112345678,active,enterprise,2025-11-14 02:36:52.894092,2025-11-14 02:36:52.894092,
+38216077-6380-489c-9ad1-4a541358144e,Gulf Oil & Gas Ltd,Energy,Oil & Gas,admin@gulfog.sa,+966133456789,active,professional,2025-11-14 02:36:52.894092,2025-11-14 02:36:52.894092,
+953342ff-e54e-4fc4-97fb-06e87707d581,Kingdom Healthcare,Healthcare,Hospital,admin@khealth.sa,+966122345678,active,professional,2025-11-14 02:36:52.894092,2025-11-14 02:36:52.894092,

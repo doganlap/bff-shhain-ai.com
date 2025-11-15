@@ -1,0 +1,44 @@
+[
+  {
+    "id": "3e280cc7-1f70-453d-804e-59c5564d54b6",
+    "email": "compliance@shahin.ai",
+    "password_hash": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeXt6Uq.iR8JQPGGm",
+    "full_name": "Compliance Officer",
+    "role": "compliance_officer",
+    "created_at": "2025-11-14T12:31:41.293Z",
+    "updated_at": "2025-11-14T12:31:41.293Z",
+    "last_login_at": null,
+    "is_partner": false,
+    "is_super_admin": false,
+    "metadata": {},
+    "tenant_id": "90dfd67d-d785-41ca-a75c-f700ace96b42"
+  },
+  {
+    "id": "64ee982b-70e3-4eeb-b3ba-ba4bce30723f",
+    "email": "admin@shahin.ai",
+    "password_hash": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeXt6Uq.iR8JQPGGm",
+    "full_name": "System Administrator",
+    "role": "super_admin",
+    "created_at": "2025-11-14T12:31:41.302Z",
+    "updated_at": "2025-11-14T12:31:41.302Z",
+    "last_login_at": null,
+    "is_partner": false,
+    "is_super_admin": true,
+    "metadata": {},
+    "tenant_id": "90dfd67d-d785-41ca-a75c-f700ace96b42"
+  },
+  {
+    "id": "de3d17b5-0d60-40c9-945e-a98638edc678",
+    "email": "admin@gfs.sa",
+    "password_hash": "$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeXt6Uq.iR8JQPGGm",
+    "full_name": "Banking Administrator",
+    "role": "admin",
+    "created_at": "2025-11-14T12:31:41.482Z",
+    "updated_at": "2025-11-14T12:31:41.482Z",
+    "last_login_at": null,
+    "is_partner": false,
+    "is_super_admin": false,
+    "metadata": {},
+    "tenant_id": "940e2272-731d-4271-98f5-f00e0e9786a6"
+  }
+]

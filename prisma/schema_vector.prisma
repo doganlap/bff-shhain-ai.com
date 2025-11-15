@@ -1,0 +1,117 @@
+// ============================================================================
+// VECTOR DATABASE SCHEMA - AI/ML Embeddings & Semantic Search
+// ============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("VECTOR_DATABASE_URL")
+  extensions = [vector]
+}
+
+model DocumentEmbeddings {
+  id            String   @id @default(uuid())
+  document_id   String
+  chunk_id      String
+  content       String
+  embedding     Unsupported("vector(1536)") // OpenAI text-embedding-ada-002
+  metadata      Json     @default("{}")
+
+  // Search and filtering
+  document_type String?  // assessment, policy, evidence, etc.
+  category      String?
+  tags          String[]
+  language      String   @default("ar")
+
+  // Similarity search indexes
+  @@index([document_type])
+  @@index([embedding], type: Unsupported("vector_cosine_ops"))
+  @@index([tags])
+}
+
+model ConversationEmbeddings {
+  id            String   @id @default(uuid())
+  conversation_id String
+  message_id    String
+  user_message  String
+  ai_response   String
+  embedding     Unsupported("vector(1536)")
+  metadata      Json     @default("{}")
+
+  // Context and memory
+  intent        String?
+  confidence    Float?
+  created_at    DateTime @default(now())
+
+  @@index([conversation_id])
+  @@index([embedding], type: Unsupported("vector_cosine_ops"))
+}
+
+model UserBehaviorEmbeddings {
+  id            String   @id @default(uuid())
+  user_id       String
+  action_type   String   // view, search, assessment, etc.
+  action_data   Json
+  embedding     Unsupported("vector(768)") // Smaller for behavior patterns
+  timestamp     DateTime @default(now())
+
+  @@index([user_id])
+  @@index([action_type])
+  @@index([embedding], type: Unsupported("vector_cosine_ops"))
+}
+
+model AssessmentPatterns {
+  id            String   @id @default(uuid())
+  pattern_name  String   @unique
+  description   String
+  pattern_vector Unsupported("vector(1536)")
+  confidence    Float
+  usage_count   Int      @default(0)
+
+  // Pattern metadata
+  framework     String?
+  risk_level    String?
+  industry      String?
+
+  @@index([pattern_name])
+  @@index([pattern_vector], type: Unsupported("vector_cosine_ops"))
+}
+
+model RegulatoryIntelligence {
+  id            String   @id @default(uuid())
+  title         String
+  content       String
+  embedding     Unsupported("vector(1536)")
+  source        String   // SAMA, CMA, NCA, etc.
+  category      String   // banking, insurance, etc.
+  country       String   @default("SA")
+  language      String   @default("ar")
+
+  // Metadata
+  published_at  DateTime?
+  effective_date DateTime?
+  tags          String[]
+  risk_level    String?
+
+  @@index([source])
+  @@index([category])
+  @@index([country])
+  @@index([embedding], type: Unsupported("vector_cosine_ops"))
+}
+
+model ComplianceEmbeddings {
+  id            String   @id @default(uuid())
+  control_id    String
+  framework     String
+  description   String
+  requirements  String
+  embedding     Unsupported("vector(1536)")
+  evidence_types String[]
+
+  @@index([control_id])
+  @@index([framework])
+  @@index([embedding], type: Unsupported("vector_cosine_ops"))
+}

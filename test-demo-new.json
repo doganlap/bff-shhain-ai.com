@@ -1,0 +1,8 @@
+{
+  "fullName": "Ahmed Test User",
+  "email": "ahmed.newtest@demo.com",
+  "companyName": "Test Demo Company",
+  "sector": "technology",
+  "orgSize": "50-200",
+  "useCases": ["compliance", "risk-management"]
+}

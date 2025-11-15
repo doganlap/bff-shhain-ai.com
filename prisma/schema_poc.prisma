@@ -1,0 +1,129 @@
+// POC (Proof of Concept) Database Schema
+// Tables for demonstration and testing environments
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+// POC Organizations (Demo companies)
+model poc_organizations {
+  id                String   @id @default(uuid())
+  name              String
+  industry          String
+  size              String   @default("small")
+  country           String   @default("Saudi Arabia")
+  demo_status       String   @default("active") // active, expired, converted
+  expires_at        DateTime?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  poc_users poc_users[]
+
+  @@index([demo_status])
+  @@index([expires_at])
+}
+
+// POC Users (Demo users)
+model poc_users {
+  id                String   @id @default(uuid())
+  organization_id   String
+  email             String   @unique
+  full_name         String
+  role              String   @default("user")
+  demo_access_level String   @default("read") // read, write, admin
+  last_login        DateTime?
+  created_at        DateTime @default(now())
+
+  organization      poc_organizations @relation(fields: [organization_id], references: [id], onDelete: Cascade)
+
+  @@index([organization_id])
+  @@index([email])
+  @@index([demo_access_level])
+}
+
+// POC Assessments (Demo assessments)
+model poc_assessments {
+  id                String   @id @default(uuid())
+  organization_id   String
+  title             String
+  framework         String   @default("ISO27001")
+  status            String   @default("draft")
+  score             Decimal? @db.Decimal(5, 2)
+  created_by        String
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  poc_controls      poc_assessment_controls[]
+
+  @@index([organization_id])
+  @@index([status])
+}
+
+// POC Assessment Controls (Demo controls)
+model poc_assessment_controls {
+  id                String   @id @default(uuid())
+  assessment_id     String
+  control_id        String
+  control_title     String
+  status            String   @default("not_assessed") // not_assessed, compliant, non_compliant, not_applicable
+  notes             String?
+  created_at        DateTime @default(now())
+
+  assessment        poc_assessments @relation(fields: [assessment_id], references: [id], onDelete: Cascade)
+
+  @@unique([assessment_id, control_id])
+  @@index([assessment_id])
+  @@index([status])
+}
+
+// POC Evidence (Demo evidence)
+model poc_evidence {
+  id                String   @id @default(uuid())
+  assessment_id     String?
+  control_id        String?
+  title             String
+  file_type         String   @default("document")
+  file_size         Int?
+  uploaded_by       String
+  created_at        DateTime @default(now())
+
+  @@index([assessment_id])
+  @@index([control_id])
+  @@index([uploaded_by])
+}
+
+// POC Dashboard Stats
+model poc_dashboard_stats {
+  id                String   @id @default(uuid())
+  organization_id   String
+  total_assessments Int      @default(0)
+  completed_assessments Int @default(0)
+  total_controls    Int      @default(0)
+  compliant_controls Int    @default(0)
+  last_updated      DateTime @default(now())
+
+  @@unique([organization_id])
+  @@index([organization_id])
+}
+
+// POC Activity Log
+model poc_activity_log {
+  id                String   @id @default(uuid())
+  organization_id   String
+  user_id           String
+  action            String   // created_assessment, uploaded_evidence, etc.
+  resource_type     String   // assessment, evidence, control
+  resource_id       String
+  details           Json?
+  created_at        DateTime @default(now())
+
+  @@index([organization_id])
+  @@index([user_id])
+  @@index([action])
+  @@index([created_at])
+}
