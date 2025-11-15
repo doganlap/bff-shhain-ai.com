@@ -8,226 +8,77 @@ datasource db {
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
-// ============================================================================
-// MULTI-TENANT ARCHITECTURE - Three Access Paths (Demo, Partner, POC)
-// ============================================================================
-
-model tenants {
-  id           String @id @default(uuid())
-  slug         String @unique
-  display_name String
-
-  // Type: demo | poc | partner | customer
-  type   String
-  // Status: active | suspended | pending | expired
-  status String @default("active")
-
-  country  String?
-  sector   String?
-  metadata Json    @default("{}")
-
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  expires_at DateTime? // For demo/POC expiration
-
-  // Relations
-  users               users[]
-  demo_requests       demo_requests[]
-  poc_requests        poc_requests[]
-  partner_invitations partner_invitations[]
-
-  @@index([type])
-  @@index([status])
+model Assessment {
+  id        String     @id
+  status    String     @default("Pending")
+  result    String?
+  controlId String
+  riskId    String?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime
+  Control   Control    @relation(fields: [controlId], references: [id])
+  Risk      Risk?      @relation(fields: [riskId], references: [id])
+  Evidence  Evidence[]
 }
 
-model users {
-  id        String @id @default(uuid())
-  tenant_id String
-
-  email         String
-  password_hash String?
-  full_name     String?
-
-  role           String  @default("user") // demo-admin, partner-admin, poc-admin, etc.
-  is_partner     Boolean @default(false)
-  is_super_admin Boolean @default(false)
-
-  metadata Json @default("{}")
-
-  created_at    DateTime  @default(now())
-  updated_at    DateTime  @updatedAt
-  last_login_at DateTime?
-
-  // Relations
-  tenant tenants @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
-
-  demo_requests_created        demo_requests[]       @relation("demo_reviewer")
-  poc_requests_owned           poc_requests[]        @relation("poc_owner")
-  partner_invitations_sent     partner_invitations[] @relation("invitation_sender")
-  partner_invitations_accepted partner_invitations[] @relation("invitation_acceptor")
-
-  @@unique([tenant_id, email])
-  @@index([email])
-  @@index([tenant_id])
-}
-
-model demo_requests {
-  id String @id @default(uuid())
-
-  email        String
-  full_name    String
-  company_name String?
-  sector       String?
-  org_size     String?
-  use_cases    String[]
-  notes        String?
-
-  // Status: pending | approved_auto | approved_manual | rejected
-  status    String  @default("pending")
-  tenant_id String?
-  user_id   String?
-
-  created_at  DateTime  @default(now())
-  reviewed_at DateTime?
-  reviewer_id String?
-
-  metadata Json @default("{}")
-
-  // Relations
-  tenant   tenants? @relation(fields: [tenant_id], references: [id], onDelete: SetNull)
-  reviewer users?   @relation("demo_reviewer", fields: [reviewer_id], references: [id], onDelete: SetNull)
-
-  @@index([email])
-  @@index([status])
-  @@index([created_at])
-}
-
-model poc_requests {
-  id String @id @default(uuid())
-
-  email                  String
-  full_name              String
-  company_name           String
-  sector                 String?
-  use_cases              String[]
-  environment_preference String? // azure-cloud | aws-cloud | on-prem | hybrid
-  preferred_start_date   DateTime?
-  notes                  String?
-
-  // Status: new | pending_review | approved | rejected | in_progress | completed
-  status                 String  @default("new")
-  tenant_id              String?
-  owner_internal_user_id String?
-
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
-  approved_at  DateTime?
-  completed_at DateTime?
-
-  metadata Json @default("{}")
-
-  // Relations
-  tenant tenants? @relation(fields: [tenant_id], references: [id], onDelete: SetNull)
-  owner  users?   @relation("poc_owner", fields: [owner_internal_user_id], references: [id], onDelete: SetNull)
-
-  @@index([status])
-  @@index([company_name])
-  @@index([created_at])
-}
-
-model partner_invitations {
-  id String @id @default(uuid())
-
-  partner_tenant_id String
-
-  email        String
-  invite_token String @unique
-  // Status: pending | accepted | revoked | expired
-  status       String @default("pending")
-
-  invited_by_user_id String?
-  accepted_user_id   String?
-
-  created_at  DateTime  @default(now())
-  expires_at  DateTime
-  accepted_at DateTime?
-
-  metadata Json @default("{}")
-
-  // Relations
-  partner_tenant tenants @relation(fields: [partner_tenant_id], references: [id], onDelete: Cascade)
-  invited_by     users?  @relation("invitation_sender", fields: [invited_by_user_id], references: [id], onDelete: SetNull)
-  accepted_by    users?  @relation("invitation_acceptor", fields: [accepted_user_id], references: [id], onDelete: SetNull)
-
-  @@index([email])
-  @@index([status])
-  @@index([partner_tenant_id])
-}
-
-// ============================================================================
-// LEGACY MODELS (Keep for backward compatibility)
-// ============================================================================
-
-model User {
-  id             String        @id @default(cuid())
-  email          String        @unique
-  name           String?
-  password       String
-  role           Role          @default(USER)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  organizationId String?
-  auditLogs      AuditLog[]
-  sessions       Session[]
-  organization   Organization? @relation(fields: [organizationId], references: [id])
-}
-
-model Session {
-  id        String   @id @default(cuid())
-  sid       String   @unique
-  data      String
-  expiresAt DateTime
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
-}
-
-model Organization {
-  id         String      @id @default(cuid())
-  name       String
-  tenantId   String      @unique
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  frameworks Framework[]
-  risks      Risk[]
-  users      User[]
-}
-
-model Framework {
-  id             String        @id @default(cuid())
-  name           String
-  description    String?
-  category       String?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  organizationId String?
-  controls       Control[]
-  organization   Organization? @relation(fields: [organizationId], references: [id])
+model AuditLog {
+  id        String   @id
+  action    String
+  resource  String
+  details   Json?
+  userId    String
+  createdAt DateTime @default(now())
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 model Control {
-  id          String       @id @default(cuid())
+  id          String       @id
   controlId   String
   description String
   family      String?
   frameworkId String
   createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  assessments Assessment[]
-  framework   Framework    @relation(fields: [frameworkId], references: [id])
+  updatedAt   DateTime
+  Assessment  Assessment[]
+  Framework   Framework    @relation(fields: [frameworkId], references: [id])
+}
+
+model Evidence {
+  id           String     @id
+  name         String
+  fileUrl      String
+  fileType     String
+  assessmentId String
+  uploadedBy   String
+  createdAt    DateTime   @default(now())
+  Assessment   Assessment @relation(fields: [assessmentId], references: [id])
+}
+
+model Framework {
+  id             String        @id
+  name           String
+  description    String?
+  category       String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime
+  organizationId String?
+  Control        Control[]
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
+}
+
+model Organization {
+  id        String      @id
+  name      String
+  tenantId  String      @unique
+  createdAt DateTime    @default(now())
+  updatedAt DateTime
+  Framework Framework[]
+  Risk      Risk[]
+  User      User[]
 }
 
 model Risk {
-  id             String       @id @default(cuid())
+  id             String       @id
   title          String
   description    String?
   category       String?
@@ -236,210 +87,276 @@ model Risk {
   impact         Int
   organizationId String
   createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  assessments    Assessment[]
-  organization   Organization @relation(fields: [organizationId], references: [id])
+  updatedAt      DateTime
+  Assessment     Assessment[]
+  Organization   Organization @relation(fields: [organizationId], references: [id])
 }
 
-model Assessment {
-  id        String     @id @default(cuid())
-  status    String     @default("Pending")
-  result    String?
-  controlId String
-  riskId    String?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  control   Control    @relation(fields: [controlId], references: [id])
-  risk      Risk?      @relation(fields: [riskId], references: [id])
-  evidence  Evidence[]
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+  userId    String?
+  User      User?    @relation(fields: [userId], references: [id])
 }
 
-model Evidence {
-  id           String     @id @default(cuid())
-  name         String
-  fileUrl      String
-  fileType     String
-  assessmentId String
-  uploadedBy   String
-  createdAt    DateTime   @default(now())
-  assessment   Assessment @relation(fields: [assessmentId], references: [id])
+model User {
+  id             String        @id
+  email          String        @unique
+  name           String?
+  password       String
+  role           Role          @default(USER)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime
+  organizationId String?
+  AuditLog       AuditLog[]
+  Session        Session[]
+  Organization   Organization? @relation(fields: [organizationId], references: [id])
 }
 
-model AuditLog {
-  id        String   @id @default(cuid())
-  action    String
-  resource  String
-  details   Json?
-  userId    String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-}
+model activity_logs {
+  id         String   @id
+  tenant_id  String
+  user_id    String?
+  activity   String
+  module     String?
+  details    Json?
+  created_at DateTime @default(now())
 
-enum Role {
-  USER
-  ADMIN
-  AUDITOR
-  MANAGER
-}
-
-// ============================================================================
-// GRC COMPLIANCE TABLES (5500+ Controls & Frameworks)
-// ============================================================================
-
-model grc_frameworks {
-  id               String    @id @default(uuid())
-  name             String
-  name_ar          String?
-  description      String?
-  description_ar   String?
-  version          String?
-  effective_date   DateTime?
-  authority        String?
-  authority_ar     String?
-  scope            String?
-  jurisdiction     String?
-  mandatory        Boolean   @default(false)
-  industry_sector  String?
-  compliance_level String?
-  total_controls   Int       @default(0)
-  tenant_id        String?
-  created_at       DateTime  @default(now())
-  updated_at       DateTime  @updatedAt
-
-  // Relations
-  controls grc_controls[]
-
+  @@index([created_at])
+  @@index([module])
   @@index([tenant_id])
-  @@index([jurisdiction])
+  @@index([user_id])
 }
 
-model grc_controls {
-  id                         String   @id @default(uuid())
-  framework_id               String?
-  control_id                 String
-  title                      String
-  title_ar                   String?
-  description                String?
-  description_ar             String?
-  category                   String?
-  subcategory                String?
-  risk_level                 String?
-  control_type               String?
-  implementation_status      String   @default("not_implemented")
-  maturity_level             Int      @default(0)
-  evidence_required          Boolean  @default(false)
-  testing_frequency          String?
-  implementation_guidance    String?
-  implementation_guidance_ar String?
-  related_regulations        Json     @default("[]")
-  tenant_id                  String?
-  created_at                 DateTime @default(now())
-  updated_at                 DateTime @updatedAt
+model applicable_frameworks_matrix {
+  id                   String    @id
+  organization_id      String
+  framework_id         String
+  tenant_id            String
+  is_applicable        Boolean   @default(false)
+  is_mandatory         Boolean   @default(false)
+  applicability_score  Float?
+  applicability_reason String?
+  matching_factors     Json?
+  rule_ids             Json?
+  total_controls       Int       @default(0)
+  applicable_controls  Int       @default(0)
+  mandatory_controls   Int       @default(0)
+  optional_controls    Int       @default(0)
+  priority_level       String?
+  recommended_timeline String?
+  compliance_deadline  DateTime?
+  calculated_at        DateTime  @default(now())
+  calculated_by        String?
+  calculation_version  String?
+  tenant_id_fk         String?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime
 
-  // Relations
-  framework grc_frameworks? @relation(fields: [framework_id], references: [id], onDelete: Cascade)
-
+  @@unique([organization_id, framework_id])
   @@index([framework_id])
+  @@index([is_applicable])
+  @@index([is_mandatory])
+  @@index([organization_id])
+  @@index([tenant_id])
+}
+
+model assessment_controls {
+  id                    String           @id
+  assessment_id         String
+  control_id            String
+  status                String           @default("not_started")
+  implementation_status String?
+  compliance_status     String?
+  score                 Float?
+  evidence_submitted    Boolean          @default(false)
+  notes                 String?
+  assigned_to           String?
+  reviewed_by           String?
+  reviewed_at           DateTime?
+  tenant_id             String
+  created_at            DateTime         @default(now())
+  updated_at            DateTime
+  control_scores        control_scores[]
+
+  @@unique([assessment_id, control_id])
+  @@index([assessment_id])
   @@index([control_id])
   @@index([tenant_id])
-  @@index([risk_level])
-  @@index([category])
 }
 
-model grc_risks {
-  risk_id          String   @id @default(uuid())
-  risk_title       String
-  risk_description String?
-  likelihood_level String?
-  impact_level     String?
-  risk_status      String   @default("identified")
-  risk_category    String?
-  owner            String?
-  mitigation_plan  String?
-  residual_risk    String?
-  tenant_id        String?
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+model assessment_evidence {
+  id                   String    @id
+  assessment_id        String
+  control_id           String
+  tenant_id            String
+  evidence_type        String
+  evidence_name        String
+  evidence_description String?
+  file_path            String?
+  file_url             String?
+  file_size            Int?
+  file_type            String?
+  storage_location     String?
+  collected_date       DateTime?
+  valid_from           DateTime?
+  valid_until          DateTime?
+  is_expired           Boolean   @default(false)
+  validation_status    String    @default("pending")
+  validation_score     Float?
+  validation_notes     String?
+  validated_by         String?
+  validated_at         DateTime?
+  meets_requirement    Boolean   @default(false)
+  confidence_level     String?
+  weight               Float     @default(1.0)
+  uploaded_by          String?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime
 
+  @@index([assessment_id])
+  @@index([control_id])
   @@index([tenant_id])
-  @@index([risk_status])
-  @@index([likelihood_level])
-  @@index([impact_level])
+  @@index([validation_status])
 }
 
-model grc_assessments {
-  assessment_id    String    @id @default(uuid())
-  assessment_title String
-  framework_id     String?
-  organization_id  String?
-  status           String    @default("draft")
-  progress         Float     @default(0)
-  score            Float?
-  start_date       DateTime?
-  due_date         DateTime?
-  completed_date   DateTime?
-  assigned_to      String?
-  tenant_id        String?
-  created_at       DateTime  @default(now())
-  updated_at       DateTime  @updatedAt
+model assessment_findings {
+  id                   String    @id
+  assessment_id        String
+  control_id           String
+  tenant_id            String
+  finding_type         String
+  severity             String
+  title                String
+  description          String?
+  root_cause           String?
+  contributing_factors Json?
+  business_impact      String?
+  technical_impact     String?
+  risk_rating          String?
+  likelihood           String?
+  impact               String?
+  risk_score           Float?
+  recommendation       String?
+  recommended_actions  Json?
+  estimated_effort     String?
+  estimated_cost       Float?
+  status               String    @default("open")
+  assigned_to          String?
+  due_date             DateTime?
+  resolved_date        DateTime?
+  resolution_notes     String?
+  created_by           String?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime
 
-  @@index([tenant_id])
+  @@index([assessment_id])
+  @@index([control_id])
+  @@index([finding_type])
+  @@index([severity])
   @@index([status])
+  @@index([tenant_id])
+}
+
+model assessments {
+  id                String    @id
+  title             String
+  title_ar          String?
+  framework_id      String
+  organization_id   String
+  assessment_type   String?
+  status            String    @default("draft")
+  progress          Float     @default(0)
+  score             Float?
+  section_1_score   Float?
+  section_2_score   Float?
+  section_3_score   Float?
+  section_4_score   Float?
+  section_5_score   Float?
+  section_6_score   Float?
+  section_7_score   Float?
+  section_8_score   Float?
+  section_9_score   Float?
+  section_10_score  Float?
+  section_11_score  Float?
+  section_12_score  Float?
+  section_1_status  String    @default("not_started")
+  section_2_status  String    @default("not_started")
+  section_3_status  String    @default("not_started")
+  section_4_status  String    @default("not_started")
+  section_5_status  String    @default("not_started")
+  section_6_status  String    @default("not_started")
+  section_7_status  String    @default("not_started")
+  section_8_status  String    @default("not_started")
+  section_9_status  String    @default("not_started")
+  section_10_status String    @default("not_started")
+  section_11_status String    @default("not_started")
+  section_12_status String    @default("not_started")
+  start_date        DateTime?
+  due_date          DateTime?
+  completed_date    DateTime?
+  assigned_to       String?
+  tenant_id         String
+  created_at        DateTime  @default(now())
+  updated_at        DateTime
+
   @@index([framework_id])
   @@index([organization_id])
-}
-
-model grc_compliance {
-  compliance_id     String    @id @default(uuid())
-  requirement_name  String
-  framework_id      String?
-  status            String    @default("pending")
-  compliance_level  String?
-  last_review_date  DateTime?
-  next_review_date  DateTime?
-  responsible_party String?
-  tenant_id         String?
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
-
-  @@index([tenant_id])
   @@index([status])
-  @@index([framework_id])
-}
-
-model framework_controls {
-  id           String   @id @default(uuid())
-  framework_id String
-  control_id   String
-  sequence     Int?
-  mandatory    Boolean  @default(true)
-  tenant_id    String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  @@unique([framework_id, control_id])
-  @@index([framework_id])
   @@index([tenant_id])
 }
 
-model sector_controls {
-  id              String   @id @default(uuid())
-  sector          String
-  control_id      String
-  applicability   String?
-  risk_multiplier Float    @default(1.0)
-  mandatory       Boolean  @default(false)
-  tenant_id       String?
-  created_at      DateTime @default(now())
-  updated_at      DateTime @updatedAt
+model audit_logs {
+  id          String   @id
+  tenant_id   String
+  user_id     String?
+  action      String
+  resource    String
+  resource_id String?
+  details     Json?
+  ip_address  String?
+  user_agent  String?
+  created_at  DateTime @default(now())
 
-  @@unique([sector, control_id])
-  @@index([sector])
+  @@index([action])
+  @@index([created_at])
+  @@index([tenant_id])
+  @@index([user_id])
+}
+
+model control_applicability_logic {
+  id                   String   @id
+  control_id           String
+  tenant_id            String?
+  applicable_sectors   Json     @default("[]")
+  excluded_sectors     Json     @default("[]")
+  min_employee_count   Int?
+  min_revenue_sar      Float?
+  company_size_filter  Json     @default("[]")
+  required_activities  Json     @default("[]")
+  any_of_activities    Json     @default("[]")
+  requires_online      Boolean  @default(false)
+  requires_mobile      Boolean  @default(false)
+  requires_cloud       Boolean  @default(false)
+  requires_payment     Boolean  @default(false)
+  requires_pii         Boolean  @default(false)
+  min_data_records     Int?
+  data_sensitivity_min String?
+  custom_logic         Json?
+  dependencies         Json?
+  weight_multiplier    Float    @default(1.0)
+  risk_multiplier      Float    @default(1.0)
+  created_at           DateTime @default(now())
+  updated_at           DateTime
+
+  @@index([control_id])
   @@index([tenant_id])
 }
 
 model control_evidence_requirements {
-  id                  String   @id @default(uuid())
+  id                  String   @id
   control_id          String
   evidence_type       String
   evidence_name       String
@@ -451,298 +368,262 @@ model control_evidence_requirements {
   validation_criteria Json?
   tenant_id           String?
   created_at          DateTime @default(now())
-  updated_at          DateTime @updatedAt
+  updated_at          DateTime
 
   @@index([control_id])
   @@index([tenant_id])
 }
 
-model organizations {
-  id                  String   @id @default(uuid())
-  name                String
-  name_ar             String?
-  registration_number String?
-  sector              String?
-  country             String?
-  city                String?
-  address             String?
-  contact_email       String?
-  contact_phone       String?
-  license_type        String?
-  tenant_id           String
-  created_at          DateTime @default(now())
-  updated_at          DateTime @updatedAt
+model control_scores {
+  id                     String               @id
+  assessment_control_id  String               @unique
+  assessment_id          String
+  control_id             String
+  tenant_id              String
+  evidence_delivered     Boolean              @default(false)
+  evidence_count         Int                  @default(0)
+  evidence_quality_avg   Float?
+  maturity_level         Int                  @default(0)
+  percentage_score       Float                @default(0.0)
+  max_achievable_level   Int?
+  pass_status            String               @default("not_assessed")
+  is_mandatory           Boolean              @default(false)
+  minimum_required_score Float?
+  gap_type               String?
+  gap_severity           String?
+  gap_description        String?
+  recommendation         String?
+  remediation_priority   String?
+  estimated_effort       String?
+  estimated_cost_sar     Float?
+  scored_by              String?
+  scored_at              DateTime?
+  scoring_confidence     Float?
+  scoring_rationale      String?
+  validated              Boolean              @default(false)
+  validated_by           String?
+  validated_at           DateTime?
+  validation_notes       String?
+  created_at             DateTime             @default(now())
+  updated_at             DateTime
+  assessment_controlsId  String?
+  assessment_controls    assessment_controls? @relation(fields: [assessment_controlsId], references: [id])
 
-  // Relations
-  profiles organization_profiles[]
-
+  @@index([assessment_id])
+  @@index([control_id])
+  @@index([evidence_delivered])
+  @@index([maturity_level])
+  @@index([pass_status])
   @@index([tenant_id])
-  @@index([sector])
 }
 
-// ============================================
-// ORGANIZATION PROFILES - AI-POWERED APPLICABILITY
-// ============================================
-// This model contains 50+ attributes used for intelligent
-// framework applicability analysis and assessment template generation
+model demo_requests {
+  id           String    @id
+  email        String
+  full_name    String
+  company_name String?
+  sector       String?
+  org_size     String?
+  use_cases    String[]
+  notes        String?
+  status       String    @default("pending")
+  tenant_id    String?
+  user_id      String?
+  created_at   DateTime  @default(now())
+  reviewed_at  DateTime?
+  reviewer_id  String?
+  metadata     Json      @default("{}")
+  users        users?    @relation(fields: [reviewer_id], references: [id])
+  tenants      tenants?  @relation(fields: [tenant_id], references: [id])
 
-model organization_profiles {
-  id              String @id @default(uuid())
-  organization_id String @unique
-  tenant_id       String
-
-  // ===== ORGANIZATION SIZE & STRUCTURE =====
-  employee_count           Int?
-  annual_revenue_sar       Float?
-  market_cap_sar           Float?
-  organizational_structure String? // "single_entity", "group_holding", "branch", "subsidiary"
-  number_of_branches       Int?
-  international_presence   Boolean @default(false)
-  countries_operating_in   Json? // ["SA", "UAE", "KW"]
-
-  // ===== BUSINESS OPERATIONS =====
-  primary_business_activities Json? // ["banking", "insurance", "healthcare", "ecommerce"]
-  secondary_activities        Json?
-  business_model              String? // "b2b", "b2c", "b2g", "hybrid"
-  customer_segments           Json? // ["retail", "corporate", "government"]
-
-  // ===== LEGAL & REGULATORY =====
-  legal_entity_type       String? // "LLC", "PLC", "Branch", "Non-Profit", "Government"
-  commercial_registration String?
-  license_type            String? // "full_banking", "payment_service", "insurance_broker"
-  licensing_authority     String? // "SAMA", "CMA", "MOH", "CITC"
-  regulated_activities    Json? // ["fund_management", "payment_processing"]
-
-  // ===== DATA & INFORMATION MANAGEMENT =====
-  data_classification_level   String? // "top_secret", "secret", "confidential", "public"
-  processes_pii               Boolean @default(false)
-  pii_volume                  String? // "high" (>1M records), "medium" (10K-1M), "low" (<10K)
-  processes_financial_data    Boolean @default(false)
-  processes_health_data       Boolean @default(false)
-  data_residency_requirements Json? // ["saudi_only", "gcc_allowed", "international_allowed"]
-  cross_border_data_transfer  Boolean @default(false)
-
-  // ===== TECHNOLOGY & DIGITAL SERVICES =====
-  has_online_services           Boolean @default(false)
-  has_mobile_app                Boolean @default(false)
-  has_api_integrations          Boolean @default(false)
-  cloud_usage                   String? // "none", "hybrid", "full_cloud"
-  cloud_providers               Json? // ["aws", "azure", "google_cloud"]
-  hosts_critical_infrastructure Boolean @default(false)
-
-  // ===== FINANCIAL OPERATIONS =====
-  processes_payments             Boolean @default(false)
-  payment_volume_daily           Int?
-  payment_methods                Json? // ["card", "bank_transfer", "wallet", "cryptocurrency"]
-  accepts_international_payments Boolean @default(false)
-  currency_operations            Json? // ["SAR", "USD", "EUR"]
-
-  // ===== SECURITY & COMPLIANCE MATURITY =====
-  current_security_maturity    String? // "initial", "developing", "defined", "managed", "optimized"
-  existing_certifications      Json? // ["ISO27001", "PCI-DSS", "SOC2"]
-  security_team_size           Int?
-  dedicated_compliance_officer Boolean   @default(false)
-  incident_response_plan       Boolean   @default(false)
-  last_security_audit_date     DateTime?
-
-  // ===== RISK PROFILE =====
-  risk_appetite        String? // "low", "moderate", "high"
-  cyber_insurance      Boolean @default(false)
-  previous_incidents   Int     @default(0)
-  high_risk_activities Json? // ["cryptocurrency", "cross_border_transfers"]
-
-  // ===== THIRD-PARTY ECOSYSTEM =====
-  number_of_vendors     Int?
-  critical_vendors      Int?
-  outsourced_services   Json? // ["cloud_hosting", "payment_processing", "hr_systems"]
-  third_party_risk_mgmt Boolean @default(false)
-
-  // ===== CUSTOMER BASE =====
-  total_customers        Int?
-  active_users_monthly   Int?
-  customer_types         Json? // ["individual", "sme", "enterprise", "government"]
-  high_net_worth_clients Boolean @default(false)
-  government_contracts   Boolean @default(false)
-
-  // ===== COMPLIANCE DRIVERS =====
-  mandatory_frameworks   Json? // Auto-populated during onboarding
-  recommended_frameworks Json? // AI-suggested based on profile
-  voluntary_frameworks   Json? // User-selected optional frameworks
-
-  // ===== AI ANALYSIS RESULTS =====
-  ai_analysis_completed Boolean   @default(false)
-  ai_analysis_date      DateTime?
-  ai_confidence_score   Float? // 0.0-100.0
-  ai_recommendations    Json? // Structured AI insights
-
-  // ===== METADATA =====
-  profile_completeness Float     @default(0.0) // 0.0-100.0
-  last_reviewed_date   DateTime?
-  reviewed_by          String?
-
-  created_at      DateTime       @default(now())
-  updated_at      DateTime       @updatedAt
-  organizations   organizations? @relation(fields: [organizationsId], references: [id])
-  organizationsId String?
-
-  @@index([organization_id])
-  @@index([tenant_id])
-  @@index([employee_count])
-  @@index([data_classification_level])
-}
-
-model assessments {
-  id              String  @id @default(uuid())
-  title           String
-  title_ar        String?
-  framework_id    String
-  organization_id String
-  assessment_type String?
-  status          String  @default("draft")
-  progress        Float   @default(0)
-  score           Float?
-
-  // 12 MANDATORY SECTIONS - Each assessment MUST have all 12
-  section_1_score  Float? // Section 1: Governance & Strategy
-  section_2_score  Float? // Section 2: Risk Management
-  section_3_score  Float? // Section 3: Asset Management
-  section_4_score  Float? // Section 4: Access Control
-  section_5_score  Float? // Section 5: Cryptography
-  section_6_score  Float? // Section 6: Physical Security
-  section_7_score  Float? // Section 7: Operations Security
-  section_8_score  Float? // Section 8: Communications Security
-  section_9_score  Float? // Section 9: System Acquisition
-  section_10_score Float? // Section 10: Incident Management
-  section_11_score Float? // Section 11: Business Continuity
-  section_12_score Float? // Section 12: Compliance
-
-  section_1_status  String @default("not_started")
-  section_2_status  String @default("not_started")
-  section_3_status  String @default("not_started")
-  section_4_status  String @default("not_started")
-  section_5_status  String @default("not_started")
-  section_6_status  String @default("not_started")
-  section_7_status  String @default("not_started")
-  section_8_status  String @default("not_started")
-  section_9_status  String @default("not_started")
-  section_10_status String @default("not_started")
-  section_11_status String @default("not_started")
-  section_12_status String @default("not_started")
-
-  start_date     DateTime?
-  due_date       DateTime?
-  completed_date DateTime?
-  assigned_to    String?
-  tenant_id      String
-  created_at     DateTime  @default(now())
-  updated_at     DateTime  @updatedAt
-
-  @@index([framework_id])
-  @@index([organization_id])
-  @@index([tenant_id])
+  @@index([created_at])
+  @@index([email])
   @@index([status])
 }
 
-model assessment_controls {
-  id                    String    @id @default(uuid())
-  assessment_id         String
-  control_id            String
-  status                String    @default("not_started")
-  implementation_status String?
-  compliance_status     String?
-  score                 Float?
-  evidence_submitted    Boolean   @default(false)
-  notes                 String?
-  assigned_to           String?
-  reviewed_by           String?
-  reviewed_at           DateTime?
-  tenant_id             String
-  created_at            DateTime  @default(now())
-  updated_at            DateTime  @updatedAt
+model evidence_validation {
+  id                   String    @id
+  evidence_id          String
+  tenant_id            String
+  criteria_name        String
+  criteria_description String?
+  expected_value       String?
+  actual_value         String?
+  is_met               Boolean   @default(false)
+  score                Float?
+  weight               Float     @default(1.0)
+  ai_validated         Boolean   @default(false)
+  ai_confidence        Float?
+  ai_reasoning         String?
+  manual_override      Boolean   @default(false)
+  override_reason      String?
+  override_by          String?
+  override_at          DateTime?
+  validated_by         String?
+  validated_at         DateTime?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime
 
-  // Relations
-  control_scores control_scores[]
-
-  @@unique([assessment_id, control_id])
-  @@index([assessment_id])
-  @@index([control_id])
+  @@index([evidence_id])
   @@index([tenant_id])
 }
 
-// ============================================
-// CONTROL SCORING - EVIDENCE-BASED MATURITY
-// ============================================
-// Implements the scoring engine with CRITICAL RULE:
-// NO EVIDENCE = 0% | EVIDENCE DELIVERED = 20-100% (maturity-based)
+model follow_up_schedule {
+  id                  String    @id
+  assessment_id       String?
+  remediation_plan_id String?
+  remediation_task_id String?
+  tenant_id           String
+  follow_up_type      String
+  title               String
+  description         String?
+  scheduled_date      DateTime
+  completed_date      DateTime?
+  is_completed        Boolean   @default(false)
+  is_recurring        Boolean   @default(false)
+  recurrence_pattern  String?
+  next_occurrence     DateTime?
+  responsible_person  String?
+  participants        Json?
+  notify_users        Json?
+  status              String    @default("scheduled")
+  outcome             String?
+  findings            Json?
+  action_items        Json?
+  reminder_sent       Boolean   @default(false)
+  reminder_date       DateTime?
+  created_by          String?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime
 
-model control_scores {
-  id                    String @id @default(uuid())
-  assessment_control_id String
-  assessment_id         String
-  control_id            String
-  tenant_id             String
-
-  // ===== EVIDENCE STATUS =====
-  evidence_delivered   Boolean @default(false) // CRITICAL: false = 0% score guaranteed
-  evidence_count       Int     @default(0)
-  evidence_quality_avg Float? // Average quality of all evidence (0-100)
-
-  // ===== MATURITY SCORING =====
-  // Level 0: Not Implemented (0%) - NO evidence
-  // Level 1: Ad-hoc (20%) - 1 piece of evidence, poor quality
-  // Level 2: Developing (40%) - 2 pieces, acceptable quality
-  // Level 3: Defined (60%) - 3+ pieces, good quality, passes minimum
-  // Level 4: Managed (80%) - 3+ pieces, excellent quality, comprehensive
-  // Level 5: Optimized (100%) - 3+ pieces, perfect quality, continuous improvement
-
-  maturity_level       Int   @default(0) // 0-5
-  percentage_score     Float @default(0.0) // 0.0-100.0
-  max_achievable_level Int? // Calculated based on evidence quantity/quality
-
-  // ===== PASS/FAIL STATUS =====
-  pass_status            String  @default("not_assessed") // "pass", "fail", "not_assessed"
-  is_mandatory           Boolean @default(false)
-  minimum_required_score Float? // Mandatory controls need 60%+
-
-  // ===== GAP ANALYSIS =====
-  gap_type        String? // "no_evidence", "insufficient_evidence", "quality_issues"
-  gap_severity    String? // "critical", "high", "medium", "low"
-  gap_description String?
-
-  // ===== RECOMMENDATIONS =====
-  recommendation       String?
-  remediation_priority String? // "immediate", "short_term", "medium_term", "long_term"
-  estimated_effort     String? // "low", "medium", "high"
-  estimated_cost_sar   Float?
-
-  // ===== SCORING METADATA =====
-  scored_by          String? // "ai_engine", "manual_review", "hybrid"
-  scored_at          DateTime?
-  scoring_confidence Float? // AI confidence (0-100)
-  scoring_rationale  String?
-
-  // ===== VALIDATION =====
-  validated        Boolean   @default(false)
-  validated_by     String?
-  validated_at     DateTime?
-  validation_notes String?
-
-  created_at            DateTime             @default(now())
-  updated_at            DateTime             @updatedAt
-  assessmentControls    assessment_controls? @relation(fields: [assessment_controlsId], references: [id])
-  assessment_controlsId String?
-
-  @@unique([assessment_control_id])
   @@index([assessment_id])
-  @@index([control_id])
+  @@index([remediation_plan_id])
+  @@index([remediation_task_id])
+  @@index([scheduled_date])
+  @@index([status])
   @@index([tenant_id])
-  @@index([maturity_level])
-  @@index([pass_status])
-  @@index([evidence_delivered])
+}
+
+model framework_controls {
+  id           String   @id
+  framework_id String
+  control_id   String
+  sequence     Int?
+  mandatory    Boolean  @default(true)
+  tenant_id    String?
+  created_at   DateTime @default(now())
+  updated_at   DateTime
+
+  @@unique([framework_id, control_id])
+  @@index([framework_id])
+  @@index([tenant_id])
+}
+
+model gap_analysis {
+  id                       String   @id
+  assessment_id            String
+  framework_id             String
+  tenant_id                String
+  total_controls           Int      @default(0)
+  compliant_controls       Int      @default(0)
+  partial_controls         Int      @default(0)
+  non_compliant_controls   Int      @default(0)
+  not_applicable_controls  Int      @default(0)
+  overall_compliance_score Float    @default(0.0)
+  target_compliance_score  Float?
+  gap_percentage           Float    @default(0.0)
+  category_scores          Json?
+  domain_scores            Json?
+  risk_level_scores        Json?
+  critical_gaps            Int      @default(0)
+  high_priority_gaps       Int      @default(0)
+  medium_priority_gaps     Int      @default(0)
+  low_priority_gaps        Int      @default(0)
+  improvement_trend        String?
+  previous_score           Float?
+  score_change             Float?
+  estimated_closure_months Int?
+  estimated_effort_days    Int?
+  estimated_cost_sar       Float?
+  executive_summary        String?
+  key_findings             Json?
+  recommendations          Json?
+  analyzed_by              String?
+  analyzed_at              DateTime @default(now())
+  created_at               DateTime @default(now())
+  updated_at               DateTime
+
+  @@unique([assessment_id, framework_id])
+  @@index([assessment_id])
+  @@index([framework_id])
+  @@index([tenant_id])
+}
+
+model grc_controls {
+  id                         String          @id
+  framework_id               String
+  framework_version          String          @default("v1.0")
+  control_id                 String
+  title                      String
+  title_ar                   String?
+  description                String?
+  description_ar             String?
+  category                   String          @default("general")
+  subcategory                String?
+  risk_level                 String          @default("medium")
+  control_type               String?
+  implementation_status      String          @default("not_implemented")
+  maturity_level             Int             @default(0)
+  evidence_required          Boolean         @default(true)
+  testing_frequency          String?
+  implementation_guidance    String?
+  implementation_guidance_ar String?
+  related_regulations        Json            @default("[]")
+  sector                     String          @default("general")
+  regulator                  String?
+  impact                     String          @default("medium")
+  priority                   String          @default("medium")
+  scope                      String          @default("organization")
+  target                     String?
+  tenant_id                  String?
+  created_at                 DateTime        @default(now())
+  updated_at                 DateTime        @updatedAt
+  grc_frameworks             grc_frameworks  @relation(fields: [framework_id], references: [id], onDelete: Cascade)
+
+  @@index([category])
+  @@index([control_id])
+  @@index([framework_id])
+  @@index([risk_level])
+  @@index([tenant_id])
+}
+
+model grc_frameworks {
+  id               String         @id
+  name             String
+  name_ar          String?
+  description      String?
+  description_ar   String?
+  version          String?
+  effective_date   DateTime?
+  authority        String?
+  authority_ar     String?
+  scope            String?
+  jurisdiction     String?
+  mandatory        Boolean        @default(false)
+  industry_sector  String?
+  compliance_level String?
+  total_controls   Int            @default(0)
+  tenant_id        String?
+  created_at       DateTime       @default(now())
+  updated_at       DateTime       @updatedAt
+  grc_controls     grc_controls[]
+
+  @@index([jurisdiction])
+  @@index([tenant_id])
 }
 
 model licenses {
-  id          String   @id @default(uuid())
+  id          String   @id
   tenant_id   String
   license_key String   @unique
   plan_type   String
@@ -752,14 +633,383 @@ model licenses {
   expiry_date DateTime
   features    Json     @default("{}")
   created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  updated_at  DateTime
 
+  @@index([status])
   @@index([tenant_id])
+}
+
+model notifications {
+  id                String    @id
+  tenant_id         String
+  notification_type String
+  title             String
+  title_ar          String?
+  message           String
+  message_ar        String?
+  user_id           String
+  user_email        String?
+  user_name         String?
+  priority          String    @default("normal")
+  channels          Json?
+  status            String    @default("pending")
+  read_at           DateTime?
+  sent_at           DateTime?
+  delivered_at      DateTime?
+  organization_id   String?
+  assessment_id     String?
+  task_id           String?
+  control_id        String?
+  action_url        String?
+  action_label      String?
+  action_label_ar   String?
+  requires_action   Boolean   @default(false)
+  action_taken      Boolean   @default(false)
+  action_taken_at   DateTime?
+  metadata          Json?
+  retry_count       Int       @default(0)
+  last_error        String?
+  created_at        DateTime  @default(now())
+  updated_at        DateTime
+  expires_at        DateTime?
+
+  @@index([created_at])
+  @@index([notification_type])
+  @@index([priority])
+  @@index([read_at])
+  @@index([status])
+  @@index([tenant_id])
+  @@index([user_id])
+}
+
+model organization_profile_factors {
+  id                      String    @id
+  organization_id         String    @unique
+  tenant_id               String
+  sector                  String
+  sub_sector              String?
+  legal_type              String
+  company_size            String
+  employee_count          Int?
+  annual_revenue_sar      Float?
+  total_assets_sar        Float?
+  market_cap_sar          Float?
+  business_activities     Json      @default("[]")
+  service_types           Json      @default("[]")
+  product_categories      Json      @default("[]")
+  operates_regions        Json      @default("[]")
+  has_international       Boolean   @default(false)
+  target_markets          Json      @default("[]")
+  data_sensitivity_level  String?
+  customer_data_records   Int?
+  stores_pii              Boolean   @default(false)
+  processes_payments      Boolean   @default(false)
+  has_online_platform     Boolean   @default(false)
+  has_mobile_app          Boolean   @default(false)
+  uses_cloud_services     Boolean   @default(false)
+  existing_certifications Json      @default("[]")
+  previous_audits         Json      @default("[]")
+  compliance_maturity     String?
+  risk_appetite           String?
+  critical_infrastructure Boolean   @default(false)
+  handles_govt_data       Boolean   @default(false)
+  applicable_frameworks   Json?
+  last_calculated         DateTime?
+  created_at              DateTime  @default(now())
+  updated_at              DateTime
+
+  @@index([company_size])
+  @@index([organization_id])
+  @@index([sector])
+  @@index([tenant_id])
+}
+
+model organization_profiles {
+  id                             String         @id
+  organization_id                String         @unique
+  tenant_id                      String
+  employee_count                 Int?
+  annual_revenue_sar             Float?
+  market_cap_sar                 Float?
+  organizational_structure       String?
+  number_of_branches             Int?
+  international_presence         Boolean        @default(false)
+  countries_operating_in         Json?
+  primary_business_activities    Json?
+  secondary_activities           Json?
+  business_model                 String?
+  customer_segments              Json?
+  legal_entity_type              String?
+  commercial_registration        String?
+  license_type                   String?
+  licensing_authority            String?
+  regulated_activities           Json?
+  data_classification_level      String?
+  processes_pii                  Boolean        @default(false)
+  pii_volume                     String?
+  processes_financial_data       Boolean        @default(false)
+  processes_health_data          Boolean        @default(false)
+  data_residency_requirements    Json?
+  cross_border_data_transfer     Boolean        @default(false)
+  has_online_services            Boolean        @default(false)
+  has_mobile_app                 Boolean        @default(false)
+  has_api_integrations           Boolean        @default(false)
+  cloud_usage                    String?
+  cloud_providers                Json?
+  hosts_critical_infrastructure  Boolean        @default(false)
+  processes_payments             Boolean        @default(false)
+  payment_volume_daily           Int?
+  payment_methods                Json?
+  accepts_international_payments Boolean        @default(false)
+  currency_operations            Json?
+  current_security_maturity      String?
+  existing_certifications        Json?
+  security_team_size             Int?
+  dedicated_compliance_officer   Boolean        @default(false)
+  incident_response_plan         Boolean        @default(false)
+  last_security_audit_date       DateTime?
+  risk_appetite                  String?
+  cyber_insurance                Boolean        @default(false)
+  previous_incidents             Int            @default(0)
+  high_risk_activities           Json?
+  number_of_vendors              Int?
+  critical_vendors               Int?
+  outsourced_services            Json?
+  third_party_risk_mgmt          Boolean        @default(false)
+  total_customers                Int?
+  active_users_monthly           Int?
+  customer_types                 Json?
+  high_net_worth_clients         Boolean        @default(false)
+  government_contracts           Boolean        @default(false)
+  mandatory_frameworks           Json?
+  recommended_frameworks         Json?
+  voluntary_frameworks           Json?
+  ai_analysis_completed          Boolean        @default(false)
+  ai_analysis_date               DateTime?
+  ai_confidence_score            Float?
+  ai_recommendations             Json?
+  profile_completeness           Float          @default(0.0)
+  last_reviewed_date             DateTime?
+  reviewed_by                    String?
+  created_at                     DateTime       @default(now())
+  updated_at                     DateTime
+  organizationsId                String?
+  organizations                  organizations? @relation(fields: [organizationsId], references: [id])
+
+  @@index([data_classification_level])
+  @@index([employee_count])
+  @@index([organization_id])
+  @@index([tenant_id])
+}
+
+model organizations {
+  id                    String                  @id
+  name                  String
+  name_ar               String?
+  registration_number   String?
+  sector                String?
+  country               String?
+  city                  String?
+  address               String?
+  contact_email         String?
+  contact_phone         String?
+  license_type          String?
+  tenant_id             String
+  created_at            DateTime                @default(now())
+  updated_at            DateTime
+  organization_profiles organization_profiles[]
+
+  @@index([sector])
+  @@index([tenant_id])
+}
+
+model partner_invitations {
+  id                                                  String    @id
+  partner_tenant_id                                   String
+  email                                               String
+  invite_token                                        String    @unique
+  status                                              String    @default("pending")
+  invited_by_user_id                                  String?
+  accepted_user_id                                    String?
+  created_at                                          DateTime  @default(now())
+  expires_at                                          DateTime
+  accepted_at                                         DateTime?
+  metadata                                            Json      @default("{}")
+  users_partner_invitations_accepted_user_idTousers   users?    @relation("partner_invitations_accepted_user_idTousers", fields: [accepted_user_id], references: [id])
+  users_partner_invitations_invited_by_user_idTousers users?    @relation("partner_invitations_invited_by_user_idTousers", fields: [invited_by_user_id], references: [id])
+  tenants                                             tenants   @relation(fields: [partner_tenant_id], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([partner_tenant_id])
   @@index([status])
 }
 
+model poc_requests {
+  id                     String    @id
+  email                  String
+  full_name              String
+  company_name           String
+  sector                 String?
+  use_cases              String[]
+  environment_preference String?
+  preferred_start_date   DateTime?
+  notes                  String?
+  status                 String    @default("new")
+  tenant_id              String?
+  owner_internal_user_id String?
+  created_at             DateTime  @default(now())
+  updated_at             DateTime
+  approved_at            DateTime?
+  completed_at           DateTime?
+  metadata               Json      @default("{}")
+  users                  users?    @relation(fields: [owner_internal_user_id], references: [id])
+  tenants                tenants?  @relation(fields: [tenant_id], references: [id])
+
+  @@index([company_name])
+  @@index([created_at])
+  @@index([status])
+}
+
+model regulatory_applicability_rules {
+  id                      String    @id
+  framework_id            String
+  regulator_code          String
+  mandatory_sectors       Json      @default("[]")
+  optional_sectors        Json      @default("[]")
+  excluded_sectors        Json      @default("[]")
+  company_size_min        Int?
+  company_size_max        Int?
+  revenue_threshold_min   Float?
+  revenue_threshold_max   Float?
+  legal_types             Json      @default("[]")
+  business_activities     Json      @default("[]")
+  geographic_scope        String?
+  data_sensitivity        String?
+  customer_data_volume    String?
+  has_online_services     Boolean   @default(false)
+  processes_payments      Boolean   @default(false)
+  stores_pii              Boolean   @default(false)
+  critical_infrastructure Boolean   @default(false)
+  rule_logic              Json?
+  effective_date          DateTime?
+  expiry_date             DateTime?
+  priority                Int       @default(0)
+  weight                  Float     @default(1.0)
+  tenant_id               String?
+  created_at              DateTime  @default(now())
+  updated_at              DateTime
+
+  @@index([framework_id])
+  @@index([regulator_code])
+  @@index([tenant_id])
+}
+
+model remediation_plans {
+  id                              String    @id
+  assessment_id                   String
+  gap_analysis_id                 String?
+  tenant_id                       String
+  plan_name                       String
+  plan_description                String?
+  plan_type                       String?
+  target_frameworks               Json?
+  target_controls                 Json?
+  addresses_findings              Json?
+  start_date                      DateTime?
+  target_completion               DateTime?
+  actual_completion               DateTime?
+  estimated_budget_sar            Float?
+  actual_budget_sar               Float?
+  estimated_effort_days           Int?
+  actual_effort_days              Int?
+  required_resources              Json?
+  priority_level                  String    @default("medium")
+  phase                           String?
+  status                          String    @default("draft")
+  progress_percentage             Float     @default(0.0)
+  total_tasks                     Int       @default(0)
+  completed_tasks                 Int       @default(0)
+  overdue_tasks                   Int       @default(0)
+  plan_owner                      String?
+  approved_by                     String?
+  approved_at                     DateTime?
+  expected_risk_reduction         Float?
+  expected_compliance_improvement Float?
+  business_benefits               Json?
+  created_by                      String?
+  created_at                      DateTime  @default(now())
+  updated_at                      DateTime
+
+  @@index([assessment_id])
+  @@index([gap_analysis_id])
+  @@index([status])
+  @@index([tenant_id])
+}
+
+model remediation_tasks {
+  id                  String    @id
+  remediation_plan_id String
+  finding_id          String?
+  control_id          String?
+  tenant_id           String
+  task_title          String
+  task_description    String?
+  task_type           String?
+  priority            String    @default("medium")
+  sequence_number     Int?
+  depends_on_tasks    Json?
+  planned_start       DateTime?
+  planned_end         DateTime?
+  actual_start        DateTime?
+  actual_end          DateTime?
+  due_date            DateTime?
+  estimated_hours     Float?
+  actual_hours        Float?
+  estimated_cost      Float?
+  actual_cost         Float?
+  assigned_to         String?
+  assigned_team       String?
+  collaborators       Json?
+  status              String    @default("pending")
+  progress_percentage Float     @default(0.0)
+  is_blocked          Boolean   @default(false)
+  blocker_reason      String?
+  is_overdue          Boolean   @default(false)
+  completion_evidence String?
+  verified_by         String?
+  verified_at         DateTime?
+  notes               String?
+  updates             Json?
+  created_by          String?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime
+
+  @@index([assigned_to])
+  @@index([control_id])
+  @@index([finding_id])
+  @@index([remediation_plan_id])
+  @@index([status])
+  @@index([tenant_id])
+}
+
+model sector_controls {
+  id              String   @id
+  sector          String
+  control_id      String
+  applicability   String?
+  risk_multiplier Float    @default(1.0)
+  mandatory       Boolean  @default(false)
+  tenant_id       String?
+  created_at      DateTime @default(now())
+  updated_at      DateTime
+
+  @@unique([sector, control_id])
+  @@index([sector])
+  @@index([tenant_id])
+}
+
 model subscriptions {
-  id             String    @id @default(uuid())
+  id             String    @id
   tenant_id      String
   plan_id        String
   status         String    @default("active")
@@ -771,730 +1021,107 @@ model subscriptions {
   auto_renew     Boolean   @default(true)
   payment_method String?
   created_at     DateTime  @default(now())
-  updated_at     DateTime  @updatedAt
+  updated_at     DateTime
 
-  @@index([tenant_id])
   @@index([status])
-}
-
-model audit_logs {
-  id          String   @id @default(uuid())
-  tenant_id   String
-  user_id     String?
-  action      String
-  resource    String
-  resource_id String?
-  details     Json?
-  ip_address  String?
-  user_agent  String?
-  created_at  DateTime @default(now())
-
-  @@index([tenant_id])
-  @@index([user_id])
-  @@index([action])
-  @@index([created_at])
-}
-
-model activity_logs {
-  id         String   @id @default(uuid())
-  tenant_id  String
-  user_id    String?
-  activity   String
-  module     String?
-  details    Json?
-  created_at DateTime @default(now())
-
-  @@index([tenant_id])
-  @@index([user_id])
-  @@index([module])
-  @@index([created_at])
-}
-
-// ============================================
-// APPLICABILITY & INTELLIGENCE MODELS
-// ============================================
-
-model regulatory_applicability_rules {
-  id             String @id @default(uuid())
-  framework_id   String
-  regulator_code String // NCA, SAMA, MOH, CMA, CITC, etc.
-
-  // Applicability Criteria
-  mandatory_sectors Json @default("[]") // ["banking", "insurance", "healthcare"]
-  optional_sectors  Json @default("[]")
-  excluded_sectors  Json @default("[]")
-
-  company_size_min      Int? // Minimum number of employees
-  company_size_max      Int? // Maximum number of employees
-  revenue_threshold_min Float? // Minimum annual revenue (SAR)
-  revenue_threshold_max Float? // Maximum annual revenue (SAR)
-
-  legal_types         Json @default("[]") // ["LLC", "PLC", "Branch", "Sole Proprietorship"]
-  business_activities Json @default("[]") // ["data_processing", "financial_services", "healthcare"]
-
-  geographic_scope     String? // "national", "regional", "international"
-  data_sensitivity     String? // "high", "medium", "low"
-  customer_data_volume String? // "large", "medium", "small"
-
-  // Additional Factors
-  has_online_services     Boolean @default(false)
-  processes_payments      Boolean @default(false)
-  stores_pii              Boolean @default(false)
-  critical_infrastructure Boolean @default(false)
-
-  // Rule Logic
-  rule_logic     Json? // Complex AND/OR conditions
-  effective_date DateTime?
-  expiry_date    DateTime?
-
-  priority Int   @default(0)
-  weight   Float @default(1.0)
-
-  tenant_id  String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([framework_id])
-  @@index([regulator_code])
   @@index([tenant_id])
 }
-
-model organization_profile_factors {
-  id              String @id @default(uuid())
-  organization_id String @unique
-  tenant_id       String
-
-  // Basic Profile
-  sector       String // "banking", "insurance", "healthcare", "telecom", "retail"
-  sub_sector   String? // "life_insurance", "health_insurance"
-  legal_type   String // "LLC", "PLC", "Branch", "Government", "NGO"
-  company_size String // "micro", "small", "medium", "large", "enterprise"
-
-  // Size Metrics
-  employee_count     Int?
-  annual_revenue_sar Float?
-  total_assets_sar   Float?
-  market_cap_sar     Float?
-
-  // Business Activities
-  business_activities Json @default("[]")
-  service_types       Json @default("[]")
-  product_categories  Json @default("[]")
-
-  // Geographic & Market
-  operates_regions  Json    @default("[]") // ["riyadh", "eastern", "western"]
-  has_international Boolean @default(false)
-  target_markets    Json    @default("[]")
-
-  // Data & Technology
-  data_sensitivity_level String? // "critical", "high", "medium", "low"
-  customer_data_records  Int?
-  stores_pii             Boolean @default(false)
-  processes_payments     Boolean @default(false)
-  has_online_platform    Boolean @default(false)
-  has_mobile_app         Boolean @default(false)
-  uses_cloud_services    Boolean @default(false)
-
-  // Compliance Status
-  existing_certifications Json    @default("[]") // ["ISO27001", "PCI-DSS"]
-  previous_audits         Json    @default("[]")
-  compliance_maturity     String? // "initial", "developing", "defined", "managed", "optimizing"
-
-  // Risk Profile
-  risk_appetite           String? // "low", "moderate", "high"
-  critical_infrastructure Boolean @default(false)
-  handles_govt_data       Boolean @default(false)
-
-  // Calculation Cache
-  applicable_frameworks Json? // Cached list of applicable framework IDs
-  last_calculated       DateTime?
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([organization_id])
-  @@index([tenant_id])
-  @@index([sector])
-  @@index([company_size])
-}
-
-model applicable_frameworks_matrix {
-  id              String @id @default(uuid())
-  organization_id String
-  framework_id    String
-  tenant_id       String
-
-  // Applicability Status
-  is_applicable       Boolean @default(false)
-  is_mandatory        Boolean @default(false)
-  applicability_score Float? // 0.0 to 1.0
-
-  // Reason & Factors
-  applicability_reason String? // Why this framework applies
-  matching_factors     Json? // Which factors triggered applicability
-  rule_ids             Json? // Which rules were evaluated
-
-  // Control Filtering
-  total_controls      Int @default(0)
-  applicable_controls Int @default(0)
-  mandatory_controls  Int @default(0)
-  optional_controls   Int @default(0)
-
-  // Priority & Timeline
-  priority_level       String? // "critical", "high", "medium", "low"
-  recommended_timeline String? // "immediate", "3_months", "6_months", "12_months"
-  compliance_deadline  DateTime?
-
-  // Calculation Metadata
-  calculated_at       DateTime @default(now())
-  calculated_by       String? // User or "system"
-  calculation_version String? // Version of applicability engine
-
-  tenant_id_fk String?
-  created_at   DateTime @default(now())
-  updated_at   DateTime @updatedAt
-
-  @@unique([organization_id, framework_id])
-  @@index([organization_id])
-  @@index([framework_id])
-  @@index([tenant_id])
-  @@index([is_applicable])
-  @@index([is_mandatory])
-}
-
-model control_applicability_logic {
-  id         String  @id @default(uuid())
-  control_id String
-  tenant_id  String?
-
-  // Sector-Specific Applicability
-  applicable_sectors Json @default("[]")
-  excluded_sectors   Json @default("[]")
-
-  // Size-Based Applicability
-  min_employee_count  Int?
-  min_revenue_sar     Float?
-  company_size_filter Json   @default("[]") // ["medium", "large", "enterprise"]
-
-  // Activity-Based
-  required_activities Json @default("[]") // Must have ALL these activities
-  any_of_activities   Json @default("[]") // Must have ANY of these
-
-  // Technology-Based
-  requires_online  Boolean @default(false)
-  requires_mobile  Boolean @default(false)
-  requires_cloud   Boolean @default(false)
-  requires_payment Boolean @default(false)
-
-  // Data-Based
-  requires_pii         Boolean @default(false)
-  min_data_records     Int?
-  data_sensitivity_min String? // "medium", "high", "critical"
-
-  // Complex Logic
-  custom_logic Json? // JavaScript expression or rule DSL
-  dependencies Json? // Other control IDs this depends on
-
-  // Scoring Impact
-  weight_multiplier Float @default(1.0)
-  risk_multiplier   Float @default(1.0)
-
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([control_id])
-  @@index([tenant_id])
-}
-
-// ============================================
-// ASSESSMENT EVIDENCE & FINDINGS MODELS
-// ============================================
-
-model assessment_evidence {
-  id            String @id @default(uuid())
-  assessment_id String
-  control_id    String
-  tenant_id     String
-
-  // Evidence Details
-  evidence_type        String // "document", "screenshot", "policy", "procedure", "log", "certificate"
-  evidence_name        String
-  evidence_description String?
-
-  // File Information
-  file_path        String?
-  file_url         String?
-  file_size        Int?
-  file_type        String?
-  storage_location String? // "local", "s3", "azure_blob", "sharepoint"
-
-  // Evidence Metadata
-  collected_date DateTime?
-  valid_from     DateTime?
-  valid_until    DateTime?
-  is_expired     Boolean   @default(false)
-
-  // Validation Status
-  validation_status String    @default("pending") // "pending", "approved", "rejected", "needs_review"
-  validation_score  Float? // 0.0 to 100.0
-  validation_notes  String?
-  validated_by      String?
-  validated_at      DateTime?
-
-  // Compliance Mapping
-  meets_requirement Boolean @default(false)
-  confidence_level  String? // "high", "medium", "low"
-  weight            Float   @default(1.0)
-
-  uploaded_by String?
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  @@index([assessment_id])
-  @@index([control_id])
-  @@index([tenant_id])
-  @@index([validation_status])
-}
-
-model evidence_validation {
-  id          String @id @default(uuid())
-  evidence_id String
-  tenant_id   String
-
-  // Validation Criteria
-  criteria_name        String
-  criteria_description String?
-  expected_value       String?
-  actual_value         String?
-
-  // Validation Result
-  is_met Boolean @default(false)
-  score  Float?
-  weight Float   @default(1.0)
-
-  // AI/Automated Validation
-  ai_validated  Boolean @default(false)
-  ai_confidence Float?
-  ai_reasoning  String?
-
-  // Manual Override
-  manual_override Boolean   @default(false)
-  override_reason String?
-  override_by     String?
-  override_at     DateTime?
-
-  validated_by String?
-  validated_at DateTime?
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
-
-  @@index([evidence_id])
-  @@index([tenant_id])
-}
-
-model assessment_findings {
-  id            String @id @default(uuid())
-  assessment_id String
-  control_id    String
-  tenant_id     String
-
-  // Finding Details
-  finding_type String // "gap", "partial_compliance", "full_compliance", "not_applicable", "observation"
-  severity     String // "critical", "high", "medium", "low", "info"
-  title        String
-  description  String?
-
-  // Root Cause Analysis
-  root_cause           String?
-  contributing_factors Json?
-  business_impact      String?
-  technical_impact     String?
-
-  // Risk Assessment
-  risk_rating String? // "critical", "high", "medium", "low"
-  likelihood  String? // "very_likely", "likely", "possible", "unlikely"
-  impact      String? // "severe", "major", "moderate", "minor"
-  risk_score  Float? // Calculated risk score
-
-  // Recommendations
-  recommendation      String?
-  recommended_actions Json?
-  estimated_effort    String? // "low", "medium", "high"
-  estimated_cost      Float?
-
-  // Status Tracking
-  status           String    @default("open") // "open", "in_progress", "resolved", "accepted_risk", "closed"
-  assigned_to      String?
-  due_date         DateTime?
-  resolved_date    DateTime?
-  resolution_notes String?
-
-  created_by String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([assessment_id])
-  @@index([control_id])
-  @@index([tenant_id])
-  @@index([finding_type])
-  @@index([severity])
-  @@index([status])
-}
-
-model gap_analysis {
-  id            String @id @default(uuid())
-  assessment_id String
-  framework_id  String
-  tenant_id     String
-
-  // Overall Gap Statistics
-  total_controls          Int @default(0)
-  compliant_controls      Int @default(0)
-  partial_controls        Int @default(0)
-  non_compliant_controls  Int @default(0)
-  not_applicable_controls Int @default(0)
-
-  // Gap Scores
-  overall_compliance_score Float  @default(0.0) // 0-100
-  target_compliance_score  Float?
-  gap_percentage           Float  @default(0.0)
-
-  // Category Breakdown
-  category_scores   Json? // { "access_control": 75.5, "network_security": 60.0 }
-  domain_scores     Json?
-  risk_level_scores Json?
-
-  // Gap Analysis
-  critical_gaps        Int @default(0)
-  high_priority_gaps   Int @default(0)
-  medium_priority_gaps Int @default(0)
-  low_priority_gaps    Int @default(0)
-
-  // Trend Analysis
-  improvement_trend String? // "improving", "stable", "declining"
-  previous_score    Float?
-  score_change      Float?
-
-  // Timeline Projection
-  estimated_closure_months Int?
-  estimated_effort_days    Int?
-  estimated_cost_sar       Float?
-
-  // Analysis Details
-  executive_summary String?
-  key_findings      Json?
-  recommendations   Json?
-
-  analyzed_by String?
-  analyzed_at DateTime @default(now())
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
-
-  @@unique([assessment_id, framework_id])
-  @@index([assessment_id])
-  @@index([framework_id])
-  @@index([tenant_id])
-}
-
-model remediation_plans {
-  id              String  @id @default(uuid())
-  assessment_id   String
-  gap_analysis_id String?
-  tenant_id       String
-
-  // Plan Details
-  plan_name        String
-  plan_description String?
-  plan_type        String? // "quick_wins", "comprehensive", "risk_based"
-
-  // Scope
-  target_frameworks  Json?
-  target_controls    Json?
-  addresses_findings Json? // Finding IDs
-
-  // Timeline
-  start_date        DateTime?
-  target_completion DateTime?
-  actual_completion DateTime?
-
-  // Resources
-  estimated_budget_sar  Float?
-  actual_budget_sar     Float?
-  estimated_effort_days Int?
-  actual_effort_days    Int?
-  required_resources    Json?
-
-  // Priorities
-  priority_level String  @default("medium") // "critical", "high", "medium", "low"
-  phase          String? // "phase_1", "phase_2", "phase_3"
-
-  // Status & Progress
-  status              String @default("draft") // "draft", "approved", "in_progress", "on_hold", "completed", "cancelled"
-  progress_percentage Float  @default(0.0)
-
-  // Tracking
-  total_tasks     Int @default(0)
-  completed_tasks Int @default(0)
-  overdue_tasks   Int @default(0)
-
-  // Stakeholders
-  plan_owner  String?
-  approved_by String?
-  approved_at DateTime?
-
-  // ROI & Benefits
-  expected_risk_reduction         Float?
-  expected_compliance_improvement Float?
-  business_benefits               Json?
-
-  created_by String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([assessment_id])
-  @@index([gap_analysis_id])
-  @@index([tenant_id])
-  @@index([status])
-}
-
-model remediation_tasks {
-  id                  String  @id @default(uuid())
-  remediation_plan_id String
-  finding_id          String?
-  control_id          String?
-  tenant_id           String
-
-  // Task Details
-  task_title       String
-  task_description String?
-  task_type        String? // "policy", "technical", "process", "training"
-
-  // Priority & Scheduling
-  priority         String @default("medium")
-  sequence_number  Int?
-  depends_on_tasks Json? // Task IDs this depends on
-
-  // Timeline
-  planned_start DateTime?
-  planned_end   DateTime?
-  actual_start  DateTime?
-  actual_end    DateTime?
-  due_date      DateTime?
-
-  // Effort & Cost
-  estimated_hours Float?
-  actual_hours    Float?
-  estimated_cost  Float?
-  actual_cost     Float?
-
-  // Assignment
-  assigned_to   String?
-  assigned_team String?
-  collaborators Json?
-
-  // Status Tracking
-  status              String @default("pending") // "pending", "in_progress", "blocked", "completed", "cancelled"
-  progress_percentage Float  @default(0.0)
-
-  // Blockers & Issues
-  is_blocked     Boolean @default(false)
-  blocker_reason String?
-  is_overdue     Boolean @default(false)
-
-  // Evidence & Verification
-  completion_evidence String?
-  verified_by         String?
-  verified_at         DateTime?
-
-  // Notes & Updates
-  notes   String?
-  updates Json? // Timeline of status updates
-
-  created_by String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([remediation_plan_id])
-  @@index([finding_id])
-  @@index([control_id])
-  @@index([tenant_id])
-  @@index([status])
-  @@index([assigned_to])
-}
-
-model follow_up_schedule {
-  id                  String  @id @default(uuid())
-  assessment_id       String?
-  remediation_plan_id String?
-  remediation_task_id String?
-  tenant_id           String
-
-  // Follow-up Details
-  follow_up_type String // "progress_review", "milestone_check", "status_update", "compliance_retest"
-  title          String
-  description    String?
-
-  // Scheduling
-  scheduled_date DateTime
-  completed_date DateTime?
-  is_completed   Boolean   @default(false)
-
-  // Recurrence
-  is_recurring       Boolean   @default(false)
-  recurrence_pattern String? // "weekly", "monthly", "quarterly"
-  next_occurrence    DateTime?
-
-  // Participants
-  responsible_person String?
-  participants       Json?
-  notify_users       Json?
-
-  // Status
-  status String @default("scheduled") // "scheduled", "in_progress", "completed", "cancelled", "rescheduled"
-
-  // Results
-  outcome      String?
-  findings     Json?
-  action_items Json?
-
-  // Reminders
-  reminder_sent Boolean   @default(false)
-  reminder_date DateTime?
-
-  created_by String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([assessment_id])
-  @@index([remediation_plan_id])
-  @@index([remediation_task_id])
-  @@index([tenant_id])
-  @@index([scheduled_date])
-  @@index([status])
-}
-
-// ============================================
-// WORKFLOW MANAGEMENT
-// ============================================
 
 model tasks {
-  id        String @id @default(uuid())
-  tenant_id String
-
-  // Task Identity
-  task_type      String // "onboarding", "assessment", "evidence_review", "remediation", "follow_up"
-  title          String
-  title_ar       String?
-  description    String?
-  description_ar String?
-
-  // Context References
+  id                  String    @id
+  tenant_id           String
+  task_type           String
+  title               String
+  title_ar            String?
+  description         String?
+  description_ar      String?
   organization_id     String?
   assessment_id       String?
   control_id          String?
   finding_id          String?
   remediation_plan_id String?
-
-  // Priority & Status
-  priority            String @default("medium") // "critical", "high", "medium", "low"
-  status              String @default("pending") // "pending", "in_progress", "completed", "cancelled", "blocked"
-  progress_percentage Float  @default(0.0)
-
-  // Assignment
-  assigned_to       String? // user_id
-  assigned_to_email String?
-  assigned_to_name  String?
-  assigned_team     String?
-  collaborators     Json? // [user_ids]
-
-  // Timeline
-  due_date        DateTime?
-  start_date      DateTime?
-  completed_date  DateTime?
-  estimated_hours Float?
-  actual_hours    Float?
-
-  // Dependencies
-  depends_on_tasks Json? // [task_ids]
-  is_blocked       Boolean @default(false)
-  blocker_reason   String?
-
-  // Notifications
-  notify_on_due      Boolean   @default(true)
-  notify_on_complete Boolean   @default(true)
-  last_reminder_sent DateTime?
-
-  // Results
+  priority            String    @default("medium")
+  status              String    @default("pending")
+  progress_percentage Float     @default(0.0)
+  assigned_to         String?
+  assigned_to_email   String?
+  assigned_to_name    String?
+  assigned_team       String?
+  collaborators       Json?
+  due_date            DateTime?
+  start_date          DateTime?
+  completed_date      DateTime?
+  estimated_hours     Float?
+  actual_hours        Float?
+  depends_on_tasks    Json?
+  is_blocked          Boolean   @default(false)
+  blocker_reason      String?
+  notify_on_due       Boolean   @default(true)
+  notify_on_complete  Boolean   @default(true)
+  last_reminder_sent  DateTime?
   completion_notes    String?
   completion_evidence String?
+  created_by          String?
+  created_at          DateTime  @default(now())
+  updated_at          DateTime
 
-  created_by String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
-
-  @@index([tenant_id])
-  @@index([task_type])
-  @@index([status])
-  @@index([assigned_to])
-  @@index([organization_id])
   @@index([assessment_id])
+  @@index([assigned_to])
   @@index([due_date])
+  @@index([organization_id])
+  @@index([status])
+  @@index([task_type])
+  @@index([tenant_id])
 }
 
-model notifications {
-  id        String @id @default(uuid())
-  tenant_id String
+model tenants {
+  id                  String                @id
+  slug                String                @unique
+  display_name        String
+  type                String
+  status              String                @default("active")
+  country             String?
+  sector              String?
+  metadata            Json                  @default("{}")
+  created_at          DateTime              @default(now())
+  updated_at          DateTime
+  expires_at          DateTime?
+  demo_requests       demo_requests[]
+  partner_invitations partner_invitations[]
+  poc_requests        poc_requests[]
+  users               users[]
 
-  // Notification Identity
-  notification_type String // "welcome", "task_assigned", "assessment_due", "evidence_approved", "gap_critical"
-  title             String
-  title_ar          String?
-  message           String
-  message_ar        String?
-
-  // Recipient
-  user_id    String
-  user_email String?
-  user_name  String?
-
-  // Priority & Channel
-  priority String @default("normal") // "critical", "high", "normal", "low"
-  channels Json? // ["email", "in_app", "sms", "webhook"]
-
-  // Status
-  status       String    @default("pending") // "pending", "sent", "delivered", "read", "failed"
-  read_at      DateTime?
-  sent_at      DateTime?
-  delivered_at DateTime?
-
-  // Context References
-  organization_id String?
-  assessment_id   String?
-  task_id         String?
-  control_id      String?
-
-  // Action
-  action_url      String? // Deep link to relevant page
-  action_label    String?
-  action_label_ar String?
-  requires_action Boolean   @default(false)
-  action_taken    Boolean   @default(false)
-  action_taken_at DateTime?
-
-  // Metadata
-  metadata    Json? // Additional context
-  retry_count Int     @default(0)
-  last_error  String?
-
-  created_at DateTime  @default(now())
-  updated_at DateTime  @updatedAt
-  expires_at DateTime?
-
-  @@index([tenant_id])
-  @@index([user_id])
-  @@index([notification_type])
   @@index([status])
-  @@index([priority])
-  @@index([created_at])
-  @@index([read_at])
+  @@index([type])
+}
+
+model users {
+  id                                                                String                @id
+  tenant_id                                                         String
+  email                                                             String
+  password_hash                                                     String?
+  full_name                                                         String?
+  role                                                              String                @default("user")
+  is_partner                                                        Boolean               @default(false)
+  is_super_admin                                                    Boolean               @default(false)
+  metadata                                                          Json                  @default("{}")
+  created_at                                                        DateTime              @default(now())
+  updated_at                                                        DateTime
+  last_login_at                                                     DateTime?
+  demo_requests                                                     demo_requests[]
+  partner_invitations_partner_invitations_accepted_user_idTousers   partner_invitations[] @relation("partner_invitations_accepted_user_idTousers")
+  partner_invitations_partner_invitations_invited_by_user_idTousers partner_invitations[] @relation("partner_invitations_invited_by_user_idTousers")
+  poc_requests                                                      poc_requests[]
+  tenants                                                           tenants               @relation(fields: [tenant_id], references: [id], onDelete: Cascade)
+
+  @@unique([tenant_id, email])
+  @@index([email])
+  @@index([tenant_id])
+}
+
+enum Role {
+  USER
+  ADMIN
+  AUDITOR
+  MANAGER
 }

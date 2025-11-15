@@ -440,21 +440,36 @@ app.use('/api/zakat', zakatRouter);
 
 // Authentication routes (no auth required)
 app.post('/api/auth/login', authLimiter, (req, res) => {
-  // Enforce origin in production: only allow canonical landing domain
   if (process.env.NODE_ENV === 'production') {
     const origin = req.headers.origin;
-    const allowedOrigin = 'https://www.shahin-ai.com';
+    const allowed = Array.isArray(ENV.FRONTEND_ORIGINS)
+      ? ENV.FRONTEND_ORIGINS.includes(origin)
+      : origin === ENV.FRONTEND_ORIGINS;
 
-    if (origin !== allowedOrigin) {
+    if (!allowed) {
       return res.status(403).json({
         success: false,
         error: 'FORBIDDEN_ORIGIN',
-        message: 'Login is only allowed from the canonical domain https://www.shahin-ai.com',
+        message: 'Origin not allowed',
       });
     }
   }
 
-  // Forward to auth service (placeholder - implementation depends on your auth service)
+  res.json({ message: 'Login endpoint - forward to auth-service' });
+});
+
+// Alias routes for clients calling without /api prefix
+app.post('/auth/login', authLimiter, (req, res, next) => {
+  req.headers.origin = req.headers.origin || req.get('Origin');
+  if (process.env.NODE_ENV === 'production') {
+    const origin = req.headers.origin;
+    const allowed = Array.isArray(ENV.FRONTEND_ORIGINS)
+      ? ENV.FRONTEND_ORIGINS.includes(origin)
+      : origin === ENV.FRONTEND_ORIGINS;
+    if (!allowed) {
+      return res.status(403).json({ success: false, error: 'FORBIDDEN_ORIGIN', message: 'Origin not allowed' });
+    }
+  }
   res.json({ message: 'Login endpoint - forward to auth-service' });
 });
 
@@ -695,9 +710,20 @@ app.get('/', (req, res) => {
 // HEALTH CHECKS
 // ==========================================
 
-app.get('/healthz', (req, res) => {
-  res.status(200).send('ok');
-});
+// Basic health check - accessible at /healthz and /api/health
+const basicHealthCheck = (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    service: 'BFF',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV || 'development',
+    version: process.env.npm_package_version || '1.0.0'
+  });
+};
+
+app.get('/healthz', basicHealthCheck);
+app.get('/api/health', basicHealthCheck);
 
 app.get('/readyz', async (req, res) => {
   try {

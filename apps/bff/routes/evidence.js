@@ -4,10 +4,15 @@ const prisma = require('../db/prisma');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
-// Ensure uploads directory exists
-const uploadDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadDir)) {
+// Use temp directory for serverless environments (e.g., Vercel) which have read-only /var/task
+const isServerless = process.env.VERCEL_ENV || process.env.VERCEL || process.env.LAMBDA_TASK_ROOT;
+const localUploadRoot = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads');
+const uploadDir = isServerless ? os.tmpdir() : localUploadRoot;
+
+// Only create local uploads directory when not in serverless environment
+if (!isServerless && !fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
