@@ -43,16 +43,27 @@ const ImpactAssessmentModal = ({ change, onClose }) => {
     return costs[cost] || costs.Medium;
   };
 
+  const idRef = React.useRef(`impact-modal-${Math.random().toString(36).slice(2, 9)}`);
+  const titleId = `${idRef.current}-title`;
+  const descriptionId = `${idRef.current}-description`;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" dir="rtl">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+      dir="rtl"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
+    >
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-start justify-between">
           <div className="flex-1">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+            <h2 id={titleId} className="text-2xl font-bold text-gray-900 mb-2">
               تقييم التأثير - Impact Assessment
             </h2>
-            <p className="text-sm text-gray-600">{change.regulator_name}</p>
+            <p id={descriptionId} className="text-sm text-gray-600">{change.regulator_name}</p>
             <h3 className="text-lg font-semibold text-gray-800 mt-2">
               {change.title}
             </h3>

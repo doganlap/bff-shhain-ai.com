@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { 
-  Building2, Shield, CheckCircle, ArrowRight, ArrowLeft, 
-  FileText, Mail, TrendingUp 
+import {
+  Building2, Shield, CheckCircle, ArrowRight, ArrowLeft,
+  FileText, Mail, TrendingUp
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -92,7 +92,7 @@ const VendorOnboarding = ({ onComplete, onSkip }) => {
 
   const renderStepContent = () => {
     const step = steps[currentStep];
-    
+
     switch (step.id) {
       case 'welcome':
         return (
@@ -237,7 +237,7 @@ const VendorOnboarding = ({ onComplete, onSkip }) => {
             <div className="bg-yellow-50 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 mb-2">Initial Risk Assessment</h3>
               <p className="text-sm text-gray-600 mb-4">
-                Based on the information provided, we\'ll set up initial risk parameters. You can refine these later.
+                Based on the information provided, we&apos;ll set up initial risk parameters. You can refine these later.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -289,12 +289,20 @@ const VendorOnboarding = ({ onComplete, onSkip }) => {
     }
   };
 
+  const idRef = React.useRef(`vendor-onboard-modal-${Math.random().toString(36).slice(2,9)}`);
+  const ariaLabel = `Vendor onboarding${steps[currentStep]?.title ? ` - ${steps[currentStep].title}` : ''}`;
+
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      role="dialog"
+      aria-modal="true"
+      aria-label={ariaLabel}
+    >
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
         {/* Progress Bar */}
         <div className="bg-gray-200 h-2">
-          <div 
+          <div
             className="bg-blue-600 h-2 transition-all duration-300"
             style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
           />

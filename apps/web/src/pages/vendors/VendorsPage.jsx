@@ -1,9 +1,8 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
-  Building2, Users, Mail, Phone, Globe, MapPin, Calendar, Plus, Search,
-  Edit, Trash2, Eye, CheckCircle, XCircle, AlertCircle, Star,
-  TrendingUp, Shield, FileText, DollarSign, Briefcase, Award,
-  Filter, MoreVertical, Download, Upload, RefreshCw
+  Building2, Plus, Search,
+  Edit, Trash2, Eye, CheckCircle, AlertCircle, Star,
+  Shield, X
 } from 'lucide-react';
 import { useCRUD } from '../../hooks/useCRUD';
 import apiService from '../../services/apiEndpoints';
@@ -20,6 +19,10 @@ const VendorsPage = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterRiskLevel, setFilterRiskLevel] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
+  const modalFormId = useRef(`vendor-form-modal-${Math.random().toString(36).slice(2,9)}`);
+  const modalFormTitleId = `${modalFormId.current}-title`;
+  const viewModalId = useRef(`vendor-view-modal-${Math.random().toString(36).slice(2,9)}`);
+  const viewModalTitleId = `${viewModalId.current}-title`;
 
   // Use the CRUD hook for vendors
   const {
@@ -115,9 +118,9 @@ const VendorsPage = () => {
   // Handle risk assessment
   const handleRiskAssessment = async (vendorId) => {
     try {
-      const response = await apiService.vendors.assess(vendorId);
+      await apiService.vendors.assess(vendorId);
       toast.success('Risk assessment completed successfully');
-      fetchAll(); // Refresh the list
+      fetchAll();
     } catch (error) {
       console.error('Error conducting risk assessment:', error);
       toast.error('Failed to conduct risk assessment');
@@ -159,8 +162,8 @@ const VendorsPage = () => {
     const total = vendors.length;
     const active = vendors.filter(v => v.status === 'active').length;
     const highRisk = vendors.filter(v => v.riskLevel === 'high').length;
-    const avgRating = total > 0 
-      ? vendors.reduce((sum, v) => sum + (v.rating || 0), 0) / total 
+    const avgRating = total > 0
+      ? vendors.reduce((sum, v) => sum + (v.rating || 0), 0) / total
       : 0;
 
     return { total, active, highRisk, avgRating };
@@ -188,7 +191,7 @@ const VendorsPage = () => {
             Manage your vendor relationships, assessments, and risk profiles
           </p>
         </div>
-        
+
         <button
           onClick={() => {
             setSelectedItem(null);
@@ -213,7 +216,7 @@ const VendorsPage = () => {
             <Building2 className="h-8 w-8 text-blue-600" />
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
@@ -223,7 +226,7 @@ const VendorsPage = () => {
             <CheckCircle className="h-8 w-8 text-green-600" />
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
@@ -233,7 +236,7 @@ const VendorsPage = () => {
             <AlertCircle className="h-8 w-8 text-red-600" />
           </div>
         </div>
-        
+
         <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
@@ -258,7 +261,7 @@ const VendorsPage = () => {
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
-          
+
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
@@ -270,7 +273,7 @@ const VendorsPage = () => {
             <option value="pending">Pending</option>
             <option value="suspended">Suspended</option>
           </select>
-          
+
           <select
             value={filterRiskLevel}
             onChange={(e) => setFilterRiskLevel(e.target.value)}
@@ -281,7 +284,7 @@ const VendorsPage = () => {
             <option value="medium">Medium Risk</option>
             <option value="high">High Risk</option>
           </select>
-          
+
           <select
             value={filterCategory}
             onChange={(e) => setFilterCategory(e.target.value)}
@@ -448,10 +451,15 @@ const VendorsPage = () => {
 
       {/* Vendor Form Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={modalFormTitleId}
+        >
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h2 id={modalFormTitleId} className="text-xl font-semibold text-gray-900 dark:text-white">
                 {selectedItem ? 'Edit Vendor' : 'Add New Vendor'}
               </h2>
               <button
@@ -465,7 +473,7 @@ const VendorsPage = () => {
                 <X className="h-6 w-6" />
               </button>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -480,7 +488,7 @@ const VendorsPage = () => {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Industry
@@ -492,7 +500,7 @@ const VendorsPage = () => {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Category
@@ -510,7 +518,7 @@ const VendorsPage = () => {
                     <option value="financial">Financial</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Status
@@ -526,7 +534,7 @@ const VendorsPage = () => {
                     <option value="suspended">Suspended</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Contact Email *
@@ -539,7 +547,7 @@ const VendorsPage = () => {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Contact Phone
@@ -551,7 +559,7 @@ const VendorsPage = () => {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Website
@@ -563,7 +571,7 @@ const VendorsPage = () => {
                     className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   />
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Rating (1-5)
@@ -579,7 +587,7 @@ const VendorsPage = () => {
                   />
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Address
@@ -591,7 +599,7 @@ const VendorsPage = () => {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Description
@@ -603,7 +611,7 @@ const VendorsPage = () => {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
-              
+
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
@@ -630,10 +638,15 @@ const VendorsPage = () => {
 
       {/* Vendor Details Modal */}
       {isViewModalOpen && selectedVendor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={viewModalTitleId}
+        >
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              <h2 id={viewModalTitleId} className="text-xl font-semibold text-gray-900 dark:text-white">
                 Vendor Details
               </h2>
               <button
@@ -646,7 +659,7 @@ const VendorsPage = () => {
                 <X className="h-6 w-6" />
               </button>
             </div>
-            
+
             <div className="space-y-6">
               {/* Basic Info */}
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
@@ -680,7 +693,7 @@ const VendorsPage = () => {
                   </div>
                 )}
               </div>
-              
+
               {/* Contact Info */}
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
@@ -698,9 +711,9 @@ const VendorsPage = () => {
                   {selectedVendor.website && (
                     <div className="md:col-span-2">
                       <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Website</p>
-                      <a 
-                        href={selectedVendor.website} 
-                        target="_blank" 
+                      <a
+                        href={selectedVendor.website}
+                        target="_blank"
                         rel="noopener noreferrer"
                         className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400"
                       >
@@ -716,7 +729,7 @@ const VendorsPage = () => {
                   )}
                 </div>
               </div>
-              
+
               {/* Risk & Performance */}
               <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
                 <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">
@@ -762,7 +775,7 @@ const VendorsPage = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="flex justify-end space-x-3 pt-6">
               <button
                 onClick={() => {

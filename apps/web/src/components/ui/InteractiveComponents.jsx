@@ -17,6 +17,7 @@ export const Modal = ({
   onClose,
   title,
   children,
+  description,
   size = 'md',
   closeOnOverlayClick = true,
   closeOnEscape = true,
@@ -26,6 +27,9 @@ export const Modal = ({
   contentClassName = '',
 }) => {
   const modalRef = useRef(null);
+  const idRef = useRef(`modal-${Math.random().toString(36).slice(2, 9)}`);
+  const titleId = `${idRef.current}-title`;
+  const descriptionId = `${idRef.current}-description`;
 
   // Handle escape key
   useEffect(() => {
@@ -80,7 +84,7 @@ export const Modal = ({
         style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
         onClick={handleOverlayClick}
       >
-        <motion.div
+          <motion.div
           ref={modalRef}
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -91,13 +95,17 @@ export const Modal = ({
             max-h-[90vh] overflow-hidden flex flex-col
             ${className}
           `}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={title ? titleId : undefined}
+          aria-describedby={description ? descriptionId : undefined}
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
           {(title || showCloseButton) && (
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               {title && (
-                <h2 className="text-xl font-semibold text-gray-900">{title}</h2>
+                <h2 id={titleId} className="text-xl font-semibold text-gray-900">{title}</h2>
               )}
               {showCloseButton && (
                 <button
@@ -114,6 +122,11 @@ export const Modal = ({
 
           {/* Content */}
           <div className={`flex-1 overflow-auto ${contentClassName}`}>
+            {description && (
+              <p id={descriptionId} className="sr-only">
+                {description}
+              </p>
+            )}
             {children}
           </div>
         </motion.div>
@@ -143,12 +156,12 @@ export const Dropdown = ({
   const contentRef = useRef(null);
 
   // Calculate dropdown position
-  const updatePosition = () => {
+  const updatePosition = React.useCallback(() => {
     if (!triggerRef.current || !contentRef.current) return;
 
     const triggerRect = triggerRef.current.getBoundingClientRect();
     const contentRect = contentRef.current.getBoundingClientRect();
-    
+
     const positions = {
       'bottom-start': {
         x: triggerRect.left,
@@ -169,7 +182,7 @@ export const Dropdown = ({
     };
 
     const basePosition = positions[position] || positions['bottom-start'];
-    
+
     // Adjust for viewport
     const viewport = {
       width: window.innerWidth,
@@ -191,7 +204,7 @@ export const Dropdown = ({
     }
 
     setDropdownPosition(adjustedPosition);
-  };
+  }, [position, offset]);
 
   // Handle outside click
   useEffect(() => {
@@ -213,20 +226,22 @@ export const Dropdown = ({
   }, [isOpen]);
 
   // Update position when opened
+  const updatePositionCb = React.useCallback(() => {
+    updatePosition();
+  }, [updatePosition]);
+
   useEffect(() => {
     if (isOpen) {
-      updatePosition();
-      
-      const handleUpdate = () => updatePosition();
+      updatePositionCb();
+      const handleUpdate = () => updatePositionCb();
       window.addEventListener('scroll', handleUpdate, true);
       window.addEventListener('resize', handleUpdate);
-      
       return () => {
         window.removeEventListener('scroll', handleUpdate, true);
         window.removeEventListener('resize', handleUpdate);
       };
     }
-  }, [isOpen, position, offset]);
+  }, [isOpen, position, offset, updatePositionCb]);
 
   const handleTriggerClick = () => {
     setIsOpen(!isOpen);
@@ -267,7 +282,7 @@ export const Dropdown = ({
       <div ref={triggerRef} onClick={handleTriggerClick}>
         {trigger}
       </div>
-      
+
       {createPortal(dropdownContent, document.body)}
     </div>
   );
@@ -303,14 +318,14 @@ export const Select = ({
   // Get display value
   const getDisplayValue = () => {
     if (multiple) {
-      const selectedOptions = options.filter(option => 
+      const selectedOptions = options.filter(option =>
         Array.isArray(value) && value.includes(option.value)
       );
-      return selectedOptions.length > 0 
+      return selectedOptions.length > 0
         ? `${selectedOptions.length} selected`
         : placeholder;
     }
-    
+
     const selectedOption = options.find(option => option.value === value);
     return selectedOption ? selectedOption.label : placeholder;
   };
@@ -353,10 +368,10 @@ export const Select = ({
       <span className={value ? 'text-gray-900' : 'text-gray-500'}>
         {getDisplayValue()}
       </span>
-      <ChevronDown 
+      <ChevronDown
         className={`w-4 h-4 text-gray-400 transition-transform ${
           isOpen ? 'rotate-180' : ''
-        }`} 
+        }`}
       />
     </button>
   );
@@ -378,7 +393,7 @@ export const Select = ({
           </div>
         </div>
       )}
-      
+
       <div className="max-h-64 sm:max-h-80 overflow-auto">
         {filteredOptions.length === 0 ? (
           <div className="px-3 py-2 text-sm text-gray-500">
@@ -523,10 +538,10 @@ export const Alert = ({
 // LOADING SPINNER
 // ============================================
 
-export const LoadingSpinner = ({ 
-  size = 'md', 
+export const LoadingSpinner = ({
+  size = 'md',
   color = 'blue',
-  className = '' 
+  className = ''
 }) => {
   const sizes = {
     sm: 'w-4 h-4',

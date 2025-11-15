@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { Users, UserPlus, Edit, Trash2, Shield, Mail, Phone, Building, UserCheck, UserX, RefreshCw, Grid, List, Search } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Users, UserPlus, Edit, Trash2, Shield, Mail, Building, UserCheck, UserX, RefreshCw, Grid, List, Search } from 'lucide-react';
 import EnterprisePageLayout from '../../components/layout/EnterprisePageLayout';
 import apiService from '../../services/apiEndpoints';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+
 
 const UserManagementPage = () => {
   // State
@@ -14,6 +14,8 @@ const UserManagementPage = () => {
   const [viewMode, setViewMode] = useState('grid');
   const [sortField, setSortField] = useState('created_at');
   const [sortDirection, setSortDirection] = useState('desc');
+  const addUserModalId = useRef(`add-user-modal-${Math.random().toString(36).slice(2,9)}`);
+  const addUserModalTitleId = `${addUserModalId.current}-title`;
   const [stats, setStats] = useState({});
   const [showAddUser, setShowAddUser] = useState(false);
   const [formData, setFormData] = useState({
@@ -439,11 +441,12 @@ const UserManagementPage = () => {
       </div>
 
       {/* Add User Modal */}
+
       {showAddUser && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" role="dialog" aria-modal="true" aria-labelledby={addUserModalTitleId}>
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Add New User</h2>
+              <h2 id={addUserModalTitleId} className="text-lg font-semibold text-gray-900 dark:text-white">Add New User</h2>
               <button
                 onClick={() => setShowAddUser(false)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
