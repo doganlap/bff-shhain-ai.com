@@ -1,27 +1,23 @@
 {
   "version": 2,
   "installCommand": "pnpm install --no-frozen-lockfile",
-  "builds": [
-    {
-      "src": "apps/web/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    },
-    {
-      "src": "apps/bff/index.js",
-      "use": "@vercel/node"
+  "framework": "vite",
+  "buildCommand": "cd apps/web && pnpm run build",
+  "outputDirectory": "apps/web/dist",
+  "functions": {
+    "apps/bff/index.js": {
+      "runtime": "nodejs20.x",
+      "maxDuration": 30
     }
-  ],
-  "routes": [
+  },
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "apps/bff/index.js"
+      "source": "/api/(.*)",
+      "destination": "/apps/bff/index.js"
     },
     {
-      "src": "/(.*)",
-      "dest": "apps/web/dist/index.html"
+      "source": "/(.*)",
+      "destination": "/apps/web/dist/index.html"
     }
   ]
 }
