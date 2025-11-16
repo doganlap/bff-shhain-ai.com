@@ -5,7 +5,7 @@ import { useI18n } from '../../hooks/useI18n';
 import { useTheme } from '../theme/ThemeProvider';
 
 const RealTimeMonitor = ({ data, enabled = true, loading = false }) => {
-  const { t, language, isRTL } = useI18n();
+  const { t, language } = useI18n();
   const { isDark } = useTheme();
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [realtimeData, setRealtimeData] = useState(data);

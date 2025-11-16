@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Shield, FileText, Target, CheckCircle, Activity, BarChart3,
-  Globe, Building2, Users, Calendar, Search, Filter, Download,
-  Eye, Edit, Plus, RefreshCw, AlertCircle, TrendingUp, Award
+  Shield, FileText, Target, CheckCircle, Activity,
+  Globe, Building2, RefreshCw, Award, Search
 } from 'lucide-react';
-import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
+ 
 import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner } from '../../components/Animation/InteractiveAnimationToolkit';
 import apiService from '../../services/apiEndpoints';
 import { toast } from 'sonner';
@@ -25,14 +24,7 @@ const KSAGRCPage = () => {
     evidenceRequirements: 0
   });
 
-  useEffect(() => {
-    fetchTabData(activeTab);
-    fetchKSAStats();
-    const savedLanguage = localStorage.getItem('language') || 'ar';
-    setLanguage(savedLanguage);
-  }, [activeTab, searchTerm, filterBy]);
-
-  const fetchTabData = async (tab) => {
+  const fetchTabData = useCallback(async (tab) => {
     try {
       setLoading(true);
       const response = await apiService.regulatory.getKSAData(tab, {
@@ -48,9 +40,9 @@ const KSAGRCPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, filterBy]);
 
-  const fetchKSAStats = async () => {
+  const fetchKSAStats = useCallback(async () => {
     try {
       const response = await apiService.regulatory.getKSAStats();
       if (response?.data?.success && response.data.data) {
@@ -59,7 +51,16 @@ const KSAGRCPage = () => {
     } catch (error) {
       console.error('Error fetching KSA stats:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchTabData(activeTab);
+    fetchKSAStats();
+    const savedLanguage = localStorage.getItem('language') || 'ar';
+    setLanguage(savedLanguage);
+  }, [activeTab, fetchTabData, fetchKSAStats]);
+
+  
 
   const tabs = [
     { id: 'regulator-rules', name: language === 'ar' ? 'القوانين التنظيمية' : 'Regulator Rules', icon: Shield },
@@ -242,7 +243,7 @@ const KSAGRCPage = () => {
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
                     {data[activeTab].map((item, index) => (
                       <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                        {Object.entries(item).map(([key, value], cellIndex) => (
+                        {Object.values(item).map((value, cellIndex) => (
                           <td key={cellIndex} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                             {typeof value === 'object' ? JSON.stringify(value) : String(value)}
                           </td>

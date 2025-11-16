@@ -25,6 +25,8 @@ export const Modal = ({
   className = '',
   overlayClassName = '',
   contentClassName = '',
+  disablePortal = false,
+  portalTarget = (typeof document !== 'undefined') ? document.body : null,
 }) => {
   const modalRef = useRef(null);
   const idRef = useRef(`modal-${Math.random().toString(36).slice(2, 9)}`);
@@ -55,6 +57,70 @@ export const Modal = ({
 
     return () => {
       document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
+  // Focus trap: ensure focus stays within modal when open
+  useEffect(() => {
+    if (!isOpen || !modalRef.current) return;
+
+    const prevActive = document.activeElement;
+    const modalNode = modalRef.current;
+    const focusableSelectors = [
+      'a[href]',
+      'area[href]',
+      'input:not([disabled]):not([type=hidden])',
+      'select:not([disabled])',
+      'textarea:not([disabled])',
+      'button:not([disabled])',
+      'iframe',
+      'object',
+      'embed',
+      '[tabindex]:not([tabindex="-1"])',
+      '[contenteditable]'
+    ].join(',');
+
+    const nodeList = modalNode.querySelectorAll(focusableSelectors);
+    const focusables = Array.prototype.slice.call(nodeList);
+    const firstFocusable = focusables[0];
+    const lastFocusable = focusables[focusables.length - 1];
+
+    if (firstFocusable) {
+      firstFocusable.focus();
+    } else {
+      modalNode.setAttribute('tabindex', '-1');
+      modalNode.focus();
+    }
+
+    function handleKeydown(e) {
+      if (e.key === 'Tab') {
+        if (focusables.length === 0) {
+          e.preventDefault();
+          return;
+        }
+        const focused = document.activeElement;
+        if (e.shiftKey) {
+          if (focused === firstFocusable || focused === modalNode) {
+            e.preventDefault();
+            lastFocusable.focus();
+          }
+        } else {
+          if (focused === lastFocusable) {
+            e.preventDefault();
+            firstFocusable.focus();
+          }
+        }
+      }
+    }
+
+    document.addEventListener('keydown', handleKeydown);
+    return () => {
+      document.removeEventListener('keydown', handleKeydown);
+      try {
+        if (prevActive && prevActive.focus) prevActive.focus();
+      } catch (err) {
+        // ignore
+      }
     };
   }, [isOpen]);
 
@@ -134,7 +200,11 @@ export const Modal = ({
     </AnimatePresence>
   );
 
-  return createPortal(modalContent, document.body);
+  if (disablePortal || !portalTarget) {
+    return modalContent;
+  }
+
+  return createPortal(modalContent, portalTarget);
 };
 
 // ============================================

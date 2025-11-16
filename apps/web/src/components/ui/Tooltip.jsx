@@ -95,7 +95,7 @@ export const Tooltip = ({
   const timeoutRef = useRef(null);
 
   // Calculate tooltip position
-  const updatePosition = () => {
+  const updatePosition = React.useCallback(() => {
     if (!triggerRef.current || !tooltipRef.current) return;
 
     const triggerRect = triggerRef.current.getBoundingClientRect();
@@ -105,7 +105,7 @@ export const Tooltip = ({
     const adjustedPosition = adjustPositionForViewport(basePosition, tooltipRect);
     
     setTooltipPosition(adjustedPosition);
-  };
+  }, [position, offset]);
 
   // Show tooltip with delay
   const showTooltip = () => {
@@ -140,21 +140,22 @@ export const Tooltip = ({
   };
 
   // Update position when tooltip becomes visible
+  const updatePositionCb = React.useCallback(() => {
+    updatePosition();
+  }, [updatePosition]);
+
   useEffect(() => {
     if (isVisible) {
-      updatePosition();
-      
-      // Update position on scroll/resize
-      const handleUpdate = () => updatePosition();
+      updatePositionCb();
+      const handleUpdate = () => updatePositionCb();
       window.addEventListener('scroll', handleUpdate, true);
       window.addEventListener('resize', handleUpdate);
-      
       return () => {
         window.removeEventListener('scroll', handleUpdate, true);
         window.removeEventListener('resize', handleUpdate);
       };
     }
-  }, [isVisible, position, offset]);
+  }, [isVisible, position, offset, updatePositionCb]);
 
   // Cleanup timeout on unmount
   useEffect(() => {

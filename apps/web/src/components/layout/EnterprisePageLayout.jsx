@@ -121,7 +121,7 @@ const EnterprisePageLayout = ({
                     aria-label="Notifications"
                   >
                     <Bell className="h-5 w-5" />
-                    <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500"></span>
+                    <span className="absolute top-1 right-1 block h-2 w-2 rounded-full bg-red-500" data-testid="notification-badge"></span>
                   </button>
                 )}
 

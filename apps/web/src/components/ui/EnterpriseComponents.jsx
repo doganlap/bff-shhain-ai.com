@@ -6,8 +6,8 @@
 
 import React, { useState } from 'react';
 import { 
-  Search, Download, Plus, TrendingUp, TrendingDown, 
-  Shield, AlertTriangle, CheckCircle, Activity, FileText
+  Search, Download, Plus, TrendingUp, TrendingDown,
+  AlertTriangle, CheckCircle, Activity, FileText
 } from 'lucide-react';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../theme/ThemeProvider';

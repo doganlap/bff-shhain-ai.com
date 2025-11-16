@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Play, Pause, CheckCircle, XCircle, Clock, Users, Settings, Filter, Search,
-  Edit, Eye, Trash2, Plus, ArrowRight, ArrowDown, User, Calendar, FileText,
-  BarChart3, Workflow, AlertCircle, Activity, Target, HelpCircle
+  Play, CheckCircle, Clock, Users, Settings, Search,
+  Eye, Trash2, Plus, ArrowRight, User, Calendar, FileText,
+  BarChart3, Workflow, AlertCircle, Activity, Target, HelpCircle, Zap
 } from 'lucide-react';
 import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
 import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner, AnimatedProgress } from '../../components/Animation/InteractiveAnimationToolkit';
@@ -10,22 +10,19 @@ import apiService from '../../services/apiEndpoints';
 import { useI18n } from '../../hooks/useI18n';
 
 const WorkflowManagementPage = () => {
-  const { t, language, isRTL, changeLanguage } = useI18n();
+  const { language, changeLanguage } = useI18n();
   const [workflows, setWorkflows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedWorkflow, setSelectedWorkflow] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [error, setError] = useState(null);
+  
   const [filterBy, setFilterBy] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('workflows');
-  const [workflowTemplates, setWorkflowTemplates] = useState([]);
+  
   const [editableTemplates, setEditableTemplates] = useState([]);
   const [showGuidanceToolkit, setShowGuidanceToolkit] = useState(false);
+  
   const [guidanceTab, setGuidanceTab] = useState('getting-started');
-  const [workflowInstances, setWorkflowInstances] = useState([]);
-  const [selectedInstance, setSelectedInstance] = useState(null);
-  const [showInstanceModal, setShowInstanceModal] = useState(false);
+  
   const [defaultApprovalTimeoutDays, setDefaultApprovalTimeoutDays] = useState(3);
   const [automationEnabled, setAutomationEnabled] = useState(false);
   const [automationRules, setAutomationRules] = useState({ autoApproveLowPriority: false });
@@ -44,13 +41,13 @@ const WorkflowManagementPage = () => {
     loadWorkflows();
     loadWorkflowStats();
     loadWorkflowTemplates();
-  }, [filterBy, searchTerm]);
+  }, [filterBy, searchTerm, loadWorkflows, loadWorkflowTemplates, loadWorkflowStats]);
 
-  const loadWorkflowTemplates = async () => {
+  const loadWorkflowTemplates = useCallback(async () => {
     try {
       const response = await apiService.workflows.getTemplates();
       const templatesData = response.data || response || [];
-      setWorkflowTemplates(templatesData);
+      
       setEditableTemplates(templatesData.map(t => ({
         ...t,
         steps: (t.steps || []).map(s => (
@@ -103,7 +100,7 @@ const WorkflowManagementPage = () => {
           steps: ['Risk Identification', 'Impact Analysis', 'Mitigation Planning', 'Implementation']
         }
       ];
-      setWorkflowTemplates(fallback);
+      
       setEditableTemplates(fallback.map(t => ({
         ...t,
         steps: t.steps.map(s => ({ 
@@ -112,11 +109,30 @@ const WorkflowManagementPage = () => {
         }))
       })));
     }
+  }, [defaultApprovalTimeoutDays]);
+
+  const saveTemplateSLA = async (templateId) => {
+    try {
+      const template = editableTemplates.find(t => t.id === templateId);
+      if (!template) return;
+      const payloadSteps = template.steps.map(s => ({
+        label: s.label,
+        slaDays: s.slaDays,
+        escalationTo: s.escalationTo,
+        rules: s.rules
+      }));
+      const response = await apiService.workflows.updateTemplate(templateId, { steps: payloadSteps });
+      if (response?.data) {
+        alert(language === 'ar' ? 'تم حفظ إعدادات SLA بنجاح' : 'SLA settings saved successfully');
+      }
+    } catch (error) {
+      console.error('Error saving template SLA:', error);
+      alert(language === 'ar' ? 'فشل حفظ إعدادات SLA' : 'Failed to save SLA settings');
+    }
   };
 
-  const loadWorkflows = async () => {
+  const loadWorkflows = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
       const response = await apiService.workflows.getAll({ 
         status: filterBy === 'all' ? undefined : filterBy,
@@ -151,14 +167,13 @@ const WorkflowManagementPage = () => {
       setWorkflows(processedWorkflows);
     } catch (error) {
       console.error('Error loading workflows:', error);
-      setError(error.message || 'Failed to load workflows');
       setWorkflows([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterBy, searchTerm]);
 
-  const loadWorkflowStats = async () => {
+  const loadWorkflowStats = useCallback(async () => {
     try {
       const response = await apiService.workflows.getStats();
       if (response?.data) {
@@ -167,24 +182,13 @@ const WorkflowManagementPage = () => {
     } catch (error) {
       console.error('Error loading workflow stats:', error);
     }
-  };
+  }, []);
 
   // Create new workflow
-  const handleCreateWorkflow = async (workflowData) => {
-    try {
-      const response = await apiService.workflows.create(workflowData);
-      if (response?.data) {
-        setShowCreateModal(false);
-        loadWorkflows();
-        loadWorkflowStats();
-      }
-    } catch (error) {
-      console.error('Error creating workflow:', error);
-    }
-  };
+  
 
   // Update workflow status
-  const handleUpdateWorkflowStatus = async (id, status) => {
+  const handleUpdateWorkflowStatus = useCallback(async (id, status) => {
     try {
       await apiService.workflows.update(id, { status });
       loadWorkflows();
@@ -192,9 +196,9 @@ const WorkflowManagementPage = () => {
     } catch (error) {
       console.error('Error updating workflow status:', error);
     }
-  };
+  }, [loadWorkflows, loadWorkflowStats]);
 
-  const handleDeleteWorkflow = async (id) => {
+  const handleDeleteWorkflow = useCallback(async (id) => {
     try {
       await apiService.workflows.delete(id);
       loadWorkflows();
@@ -202,9 +206,9 @@ const WorkflowManagementPage = () => {
     } catch (error) {
       console.error('Error deleting workflow:', error);
     }
-  };
+  }, [loadWorkflows, loadWorkflowStats]);
 
-  const approveStep = async (workflowId, index) => {
+  const approveStep = useCallback(async (workflowId, index) => {
     try {
       setWorkflows(prev => prev.map(w => {
         if (w.id !== workflowId) return w;
@@ -216,15 +220,15 @@ const WorkflowManagementPage = () => {
     } catch (error) {
       console.error('Error approving step:', error);
     }
-  };
+  }, []);
 
-  const escalateWorkflow = async (workflowId) => {
+  const escalateWorkflow = useCallback(async (workflowId) => {
     try {
       await handleUpdateWorkflowStatus(workflowId, 'overdue');
     } catch (error) {
       console.error('Error escalating workflow:', error);
     }
-  };
+  }, [handleUpdateWorkflowStatus]);
 
   useEffect(() => {
     if (!automationEnabled) return;
@@ -246,7 +250,7 @@ const WorkflowManagementPage = () => {
       } catch {}
     }, 30000);
     return () => clearInterval(interval);
-  }, [automationEnabled, workflows, defaultApprovalTimeoutDays, automationRules]);
+  }, [automationEnabled, workflows, defaultApprovalTimeoutDays, automationRules, escalateWorkflow, approveStep]);
 
 
   const getStatusIcon = (status) => {
@@ -312,13 +316,7 @@ const WorkflowManagementPage = () => {
           {language === 'ar' ? 'English' : 'العربية'}
         </AnimatedButton>
 
-        <AnimatedButton
-          variant="primary"
-          onClick={() => setShowCreateModal(true)}
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          {language === 'ar' ? 'إنشاء سير عمل جديد' : 'Create New Workflow'}
-        </AnimatedButton>
+        
 
         <AnimatedButton
           variant="ghost"
@@ -476,9 +474,7 @@ const WorkflowManagementPage = () => {
                       <AnimatedButton variant="ghost" size="sm">
                         <Eye className="h-4 w-4" />
                       </AnimatedButton>
-                      <AnimatedButton variant="ghost" size="sm" onClick={() => setSelectedWorkflow(workflow)}>
-                        <Edit className="h-4 w-4" />
-                      </AnimatedButton>
+                      
                       <AnimatedButton variant="ghost" size="sm" onClick={() => handleUpdateWorkflowStatus(workflow.id, 'completed')}>
                         <CheckCircle className="h-4 w-4" />
                       </AnimatedButton>
@@ -578,11 +574,11 @@ const WorkflowManagementPage = () => {
             ))}
           </div>
         </div>
-      )}
+  )}
 
-      {/* Templates Tab */}
-      {activeTab === 'templates' && (
-        <div className="space-y-4">
+  {/* Templates Tab */}
+  {activeTab === 'templates' && (
+    <div className="space-y-4">
           <AnimatedCard hover3D={false} culturalPattern={true}>
             <div className="p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -593,8 +589,8 @@ const WorkflowManagementPage = () => {
                 <li>{language === 'ar' ? 'حدّد جهة التصعيد لكل خطوة' : 'Specify escalation contact per step'}</li>
                 <li>{language === 'ar' ? 'احفظ الإعدادات ثم استخدم القالب' : 'Save settings, then use the template'}</li>
               </ul>
-            </div>
-          </AnimatedCard>
+        </div>
+      </AnimatedCard>
 
           {editableTemplates.map((template, tIdx) => (
             <AnimatedCard key={template.id} hover3D={true} culturalPattern={true}>
@@ -755,9 +751,68 @@ const WorkflowManagementPage = () => {
               </div>
             </AnimatedCard>
           ))}
-        </div>
-      )}
+      </div>
+    )}
 
+    {showGuidanceToolkit && (
+      <AnimatedCard hover3D={false} culturalPattern={true}>
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">
+              {language === 'ar' ? 'مجموعة أدوات الإرشاد' : 'Guidance Toolkit'}
+            </h3>
+            <div className="flex gap-2">
+              {[
+                { id: 'getting-started', name: language === 'ar' ? 'البدء' : 'Getting Started' },
+                { id: 'automation', name: language === 'ar' ? 'الأتمتة' : 'Automation' },
+                { id: 'sla-escalation', name: language === 'ar' ? 'SLA والتصعيد' : 'SLA & Escalation' },
+                { id: 'templates', name: language === 'ar' ? 'القوالب' : 'Templates' }
+              ].map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => setGuidanceTab(t.id)}
+                  className={`px-3 py-2 text-sm rounded-md ${guidanceTab === t.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
+                >
+                  {t.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {guidanceTab === 'getting-started' && (
+            <div className="space-y-2 text-sm text-gray-700">
+              <p>{language === 'ar' ? '1) أنشئ سير عمل من القوالب أو من الصفر.' : '1) Create a workflow from templates or from scratch.'}</p>
+              <p>{language === 'ar' ? '2) حدّد الخطوات والموافقات.' : '2) Define steps and approvals.'}</p>
+              <p>{language === 'ar' ? '3) عيّن المُعيّنين وتواريخ الاستحقاق.' : '3) Assign assignees and due dates.'}</p>
+              <p>{language === 'ar' ? '4) راقب التقدّم والاعتمادات.' : '4) Monitor progress and approvals.'}</p>
+            </div>
+          )}
+
+          {guidanceTab === 'automation' && (
+            <div className="space-y-2 text-sm text-gray-700">
+              <p>{language === 'ar' ? 'فعّل التشغيل الآلي في الإعدادات.' : 'Enable Automation in Settings.'}</p>
+              <p>{language === 'ar' ? 'التصعيد التلقائي عند تجاوز SLA.' : 'Auto escalate when SLA is exceeded.'}</p>
+              <p>{language === 'ar' ? 'اعتماد تلقائي للمهام منخفضة الأولوية.' : 'Auto-approve low-priority workflows.'}</p>
+            </div>
+          )}
+
+          {guidanceTab === 'sla-escalation' && (
+            <div className="space-y-2 text-sm text-gray-700">
+              <p>{language === 'ar' ? 'اضبط SLA لكل خطوة في القوالب.' : 'Set SLA per step in Templates.'}</p>
+              <p>{language === 'ar' ? 'حدّد جهة التصعيد لكل خطوة.' : 'Specify escalation target per step.'}</p>
+              <p>{language === 'ar' ? 'يعرض الشريط سلسلة الموافقات والحالات المتأخرة.' : 'Approval chain shows overdue states with escalate option.'}</p>
+            </div>
+          )}
+
+          {guidanceTab === 'templates' && (
+            <div className="space-y-2 text-sm text-gray-700">
+              <p>{language === 'ar' ? 'حرّر القواعد لكل خطوة (المخاطر/الأدوار/الإشعارات).' : 'Edit rules per step (risk/roles/notifications).'} </p>
+              <p>{language === 'ar' ? 'احفظ إعدادات SLA والقواعد ثم استخدم القالب.' : 'Save SLA and rules, then use the template.'}</p>
+            </div>
+          )}
+        </div>
+      </AnimatedCard>
+    )}
       {/* Analytics Tab */}
       {activeTab === 'analytics' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -884,81 +939,3 @@ const WorkflowManagementPage = () => {
 };
 
 export default WorkflowManagementPage;
-  const saveTemplateSLA = async (templateId) => {
-    try {
-      const template = editableTemplates.find(t => t.id === templateId);
-      if (!template) return;
-      const payloadSteps = template.steps.map(s => ({
-        label: s.label,
-        slaDays: s.slaDays,
-        escalationTo: s.escalationTo,
-        rules: s.rules
-      }));
-      const response = await apiService.workflows.updateTemplate(templateId, { steps: payloadSteps });
-      if (response?.data) {
-        alert(language === 'ar' ? 'تم حفظ إعدادات SLA بنجاح' : 'SLA settings saved successfully');
-      }
-    } catch (error) {
-      console.error('Error saving template SLA:', error);
-      alert(language === 'ar' ? 'فشل حفظ إعدادات SLA' : 'Failed to save SLA settings');
-    }
-  };
-      {showGuidanceToolkit && (
-        <AnimatedCard hover3D={false} culturalPattern={true}>
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                {language === 'ar' ? 'مجموعة أدوات الإرشاد' : 'Guidance Toolkit'}
-              </h3>
-              <div className="flex gap-2">
-                {[
-                  { id: 'getting-started', name: language === 'ar' ? 'البدء' : 'Getting Started' },
-                  { id: 'automation', name: language === 'ar' ? 'الأتمتة' : 'Automation' },
-                  { id: 'sla-escalation', name: language === 'ar' ? 'SLA والتصعيد' : 'SLA & Escalation' },
-                  { id: 'templates', name: language === 'ar' ? 'القوالب' : 'Templates' }
-                ].map(t => (
-                  <button
-                    key={t.id}
-                    onClick={() => setGuidanceTab(t.id)}
-                    className={`px-3 py-2 text-sm rounded-md ${guidanceTab === t.id ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}
-                  >
-                    {t.name}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {guidanceTab === 'getting-started' && (
-              <div className="space-y-2 text-sm text-gray-700">
-                <p>{language === 'ar' ? '1) أنشئ سير عمل من القوالب أو من الصفر.' : '1) Create a workflow from templates or from scratch.'}</p>
-                <p>{language === 'ar' ? '2) حدّد الخطوات والموافقات.' : '2) Define steps and approvals.'}</p>
-                <p>{language === 'ar' ? '3) عيّن المُعيّنين وتواريخ الاستحقاق.' : '3) Assign assignees and due dates.'}</p>
-                <p>{language === 'ar' ? '4) راقب التقدّم والاعتمادات.' : '4) Monitor progress and approvals.'}</p>
-              </div>
-            )}
-
-            {guidanceTab === 'automation' && (
-              <div className="space-y-2 text-sm text-gray-700">
-                <p>{language === 'ar' ? 'فعّل التشغيل الآلي في الإعدادات.' : 'Enable Automation in Settings.'}</p>
-                <p>{language === 'ar' ? 'التصعيد التلقائي عند تجاوز SLA.' : 'Auto escalate when SLA is exceeded.'}</p>
-                <p>{language === 'ar' ? 'اعتماد تلقائي للمهام منخفضة الأولوية.' : 'Auto-approve low-priority workflows.'}</p>
-              </div>
-            )}
-
-            {guidanceTab === 'sla-escalation' && (
-              <div className="space-y-2 text-sm text-gray-700">
-                <p>{language === 'ar' ? 'اضبط SLA لكل خطوة في القوالب.' : 'Set SLA per step in Templates.'}</p>
-                <p>{language === 'ar' ? 'حدّد جهة التصعيد لكل خطوة.' : 'Specify escalation target per step.'}</p>
-                <p>{language === 'ar' ? 'يعرض الشريط سلسلة الموافقات والحالات المتأخرة.' : 'Approval chain shows overdue states with escalate option.'}</p>
-              </div>
-            )}
-
-            {guidanceTab === 'templates' && (
-              <div className="space-y-2 text-sm text-gray-700">
-                <p>{language === 'ar' ? 'حرّر القواعد لكل خطوة (المخاطر/الأدوار/الإشعارات).' : 'Edit rules per step (risk/roles/notifications).'} </p>
-                <p>{language === 'ar' ? 'احفظ إعدادات SLA والقواعد ثم استخدم القالب.' : 'Save SLA and rules, then use the template.'}</p>
-              </div>
-            )}
-          </div>
-        </AnimatedCard>
-      )}

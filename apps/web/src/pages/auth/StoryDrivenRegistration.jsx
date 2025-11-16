@@ -2,17 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
-  Shield, Crown, Zap, Globe, Users, Building, ArrowRight, 
-  CheckCircle, Star, Sparkles, Heart, Target, Award,
+  Shield, Crown, Users, Building, ArrowRight,
+  CheckCircle, Star, Target, Award,
   Mail, Lock, Eye, EyeOff, Phone, MapPin, BarChart3,
   TrendingUp, Briefcase, Settings, Database, Network
 } from 'lucide-react';
-import { emailService } from '../../services/emailService';
+import { useApp } from '../../context/AppContext';
 import SaudiLandmarks from '../../components/landmarks/SaudiLandmarks';
 import ExitIntentPopup from '../../components/popups/ExitIntentPopup';
 
 const StoryDrivenRegistration = () => {
   const navigate = useNavigate();
+  const { actions } = useApp();
   const [currentStory, setCurrentStory] = useState(0);
   const [showRegistration, setShowRegistration] = useState(false);
   const [formData, setFormData] = useState({
@@ -102,7 +103,7 @@ const StoryDrivenRegistration = () => {
     }
   ];
 
-  const registrationTabs = [
+  const registrationTabs = React.useMemo(() => ([
     {
       id: 0,
       titleAr: 'المعلومات الشخصية',
@@ -131,7 +132,7 @@ const StoryDrivenRegistration = () => {
       icon: CheckCircle,
       fields: ['agreeToTerms']
     }
-  ];
+  ]), []);
 
   // Dropdown options
   const countryCodes = [
@@ -194,19 +195,6 @@ const StoryDrivenRegistration = () => {
     { value: 'Other', label: 'Other | أخرى', flag: '🌍' }
   ];
 
-  const organizationTypes = [
-    { value: 'bank', label: 'Bank | بنك' },
-    { value: 'insurance', label: 'Insurance Company | شركة تأمين' },
-    { value: 'fintech', label: 'Fintech | تقنية مالية' },
-    { value: 'government', label: 'Government Entity | جهة حكومية' },
-    { value: 'healthcare', label: 'Healthcare | رعاية صحية' },
-    { value: 'telecom', label: 'Telecommunications | اتصالات' },
-    { value: 'energy', label: 'Energy & Utilities | طاقة ومرافق' },
-    { value: 'manufacturing', label: 'Manufacturing | تصنيع' },
-    { value: 'retail', label: 'Retail | تجارة تجزئة' },
-    { value: 'consulting', label: 'Consulting | استشارات' },
-    { value: 'other', label: 'Other | أخرى' }
-  ];
 
   const legalStructures = [
     { value: 'llc', label: 'Limited Liability Company | شركة ذات مسؤولية محدودة' },
@@ -257,19 +245,6 @@ const StoryDrivenRegistration = () => {
     { value: 'consultation', label: 'Consultation Services | خدمات استشارية' }
   ];
 
-  const roles = [
-    { value: 'ceo', label: 'CEO / Managing Director | الرئيس التنفيذي' },
-    { value: 'cfo', label: 'CFO / Finance Director | المدير المالي' },
-    { value: 'cro', label: 'CRO / Risk Director | مدير المخاطر' },
-    { value: 'cco', label: 'CCO / Compliance Director | مدير الامتثال' },
-    { value: 'cto', label: 'CTO / Technology Director | مدير التقنية' },
-    { value: 'head_dept', label: 'Department Head | رئيس قسم' },
-    { value: 'manager', label: 'Manager | مدير' },
-    { value: 'senior_analyst', label: 'Senior Analyst | محلل أول' },
-    { value: 'analyst', label: 'Analyst | محلل' },
-    { value: 'consultant', label: 'Consultant | استشاري' },
-    { value: 'other', label: 'Other | أخرى' }
-  ];
 
   const saudiCities = [
     { value: 'riyadh', label: 'Riyadh | الرياض' },
@@ -288,9 +263,9 @@ const StoryDrivenRegistration = () => {
   ];
 
   // Validation functions
-  const validateTab = (tabIndex) => {
+  const validateTab = React.useCallback((tabIndex) => {
     const tab = registrationTabs[tabIndex];
-    const requiredFields = tab.fields;
+    //
     
     switch (tabIndex) {
       case 0: // Personal Info
@@ -323,7 +298,7 @@ const StoryDrivenRegistration = () => {
       default:
         return false;
     }
-  };
+  }, [formData]);
 
   useEffect(() => {
     // Update tab validation status
@@ -332,7 +307,7 @@ const StoryDrivenRegistration = () => {
       newValidation[tab.id] = validateTab(tab.id);
     });
     setTabValidation(newValidation);
-  }, [formData]);
+  }, [formData, registrationTabs, validateTab]);
 
   useEffect(() => {
     if (!showRegistration) {
@@ -705,7 +680,7 @@ const StoryDrivenRegistration = () => {
                       <p dir="rtl">1️⃣ تحقق من بريدك الإلكتروني للحصول على رابط تفعيل الحساب</p>
                       <p>2️⃣ <strong>Our team will review</strong> your application</p>
                       <p dir="rtl">2️⃣ سيقوم فريقنا بمراجعة طلبك</p>
-                      <p>3️⃣ <strong>We'll contact you</strong> to schedule a demo</p>
+                      <p>3️⃣ <strong>We&apos;ll contact you</strong> to schedule a demo</p>
                       <p dir="rtl">3️⃣ سنتواصل معك لتحديد موعد العرض التوضيحي</p>
                       <p>4️⃣ <strong>Get started</strong> with Shahin-AI KSA platform</p>
                       <p dir="rtl">4️⃣ ابدأ استخدام منصة شاهين الذكي السعودية</p>

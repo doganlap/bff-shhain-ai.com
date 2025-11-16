@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Calendar, Clock, Bot, Zap, Target, Users, Settings, Search, Filter,
-  Plus, Edit, Trash2, Play, Pause, CheckCircle, AlertTriangle, Info,
-  BarChart3, TrendingUp, Activity, Brain, Workflow, Timer, Bell,
-  RefreshCw, Eye, Download, Share2, MessageSquare, Star, ArrowRight
+  Calendar, Bot, Target,
+  Plus, Trash2, CheckCircle, Activity, Brain, Workflow, Timer,
+  ArrowRight, Search, Eye, Edit, Pause, Play, TrendingUp, Star, MessageSquare, BarChart3, RefreshCw
 } from 'lucide-react';
 import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
 import { useCRUD } from '../../hooks/useCRUD';
@@ -13,27 +12,17 @@ import apiService from '../../services/apiEndpoints';
 import { useI18n } from '../../hooks/useI18n';
 
 const AISchedulerPage = () => {
-  const { t, language, isRTL } = useI18n();
-  const {
-    data: jobList,
-    loading: crudLoading,
-    create,
-    update,
-    remove,
-    fetchAll,
-    formData,
-    setFormData,
-    resetForm,
-    selectedItem,
-    setSelectedItem
-  } = useCRUD(apiService.scheduler, 'Job');
+  const { language, changeLanguage } = useI18n();
+  const { remove } = useCRUD(apiService.scheduler, 'Job');
   const [loading, setLoading] = useState(true);
   const [tasks, setTasks] = useState([]);
   const [automationRules, setAutomationRules] = useState([]);
   const [aiSuggestions, setAiSuggestions] = useState([]);
-  const [selectedTask, setSelectedTask] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [error, setError] = useState(null);
+  
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterBy, setFilterBy] = useState('all');
+  const [, setShowCreateTask] = useState(false);
 
   // AI Scheduler statistics
   const [schedulerStats, setSchedulerStats] = useState({
@@ -45,13 +34,11 @@ const AISchedulerPage = () => {
     avgCompletionTime: '0 hours'
   });
 
-  const loadSchedulerData = async () => {
+  const loadSchedulerData = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
-      const [jobsRes, runsRes, statsRes] = await Promise.all([
+      const [jobsRes, statsRes] = await Promise.all([
         apiService.scheduler.getAll({ status: 'all', limit: 50 }),
-        apiService.scheduler.getRuns({ limit: 50 }),
         apiService.scheduler.getStats ? apiService.scheduler.getStats() : Promise.resolve({ data: { data: {} } })
       ]);
 
@@ -114,7 +101,6 @@ const AISchedulerPage = () => {
       setAiSuggestions([]);
     } catch (error) {
       console.error('Error loading scheduler data:', error);
-      setError(error.message || 'Failed to load scheduler data');
       setTasks([]);
       setAutomationRules([]);
       setAiSuggestions([]);
@@ -129,11 +115,11 @@ const AISchedulerPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadSchedulerData();
-  }, []);
+  }, [loadSchedulerData]);
 
   const getStatusColor = (status) => {
     const colors = {
@@ -147,33 +133,16 @@ const AISchedulerPage = () => {
   };
 
   // Task creation handler
-  const createTask = async (taskData) => {
-    try {
-      await create({
-        name: taskData.title,
-        description: taskData.description,
-        type: taskData.type,
-        schedule: taskData.schedule,
-        priority: taskData.priority,
-        framework: taskData.framework
-      });
-      loadSchedulerData();
-    } catch (error) {}
-  };
+  
 
-  const updateTask = async (id, taskData) => {
-    try {
-      await update(id, taskData);
-      loadSchedulerData();
-    } catch (error) {}
-  };
+  
 
-  const handleDelete = async (id) => {
+  const handleDelete = useCallback(async (id) => {
     try {
       await remove(id);
       loadSchedulerData();
     } catch (error) {}
-  };
+  }, [remove, loadSchedulerData]);
 
   const getPriorityColor = (priority) => {
     const colors = {
@@ -185,14 +154,7 @@ const AISchedulerPage = () => {
     return colors[priority] || colors.medium;
   };
 
-  const filteredTasks = tasks.filter(task => {
-    const matchesFilter = filterBy === 'all' || task.type === filterBy || task.status === filterBy;
-    const matchesSearch = !searchTerm ||
-      task.title.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.title.ar.includes(searchTerm) ||
-      task.assignedTo.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesFilter && matchesSearch;
-  });
+  const filteredTasks = tasks;
 
   const renderDashboardTab = () => (
     <div className="space-y-6">
@@ -736,7 +698,7 @@ const AISchedulerPage = () => {
             </div>
             <div className="flex items-center gap-4">
               <button
-                onClick={() => setLanguage(language === 'en' ? 'ar' : 'en')}
+                onClick={() => changeLanguage(language === 'en' ? 'ar' : 'en')}
                 className="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
               >
                 <Bot className="h-4 w-4" />

@@ -5,12 +5,11 @@ import {
   FrameworkCard,
   ControlCard,
   ScoreCard,
-  AssessmentSummaryCard,
-  MaturityBadge
+  AssessmentSummaryCard
 } from '../../components/cards/AssessmentCards';
 import {
   Shield, CheckCircle2, AlertTriangle, TrendingUp, FileText,
-  Clock, Users, Target, Activity, ChevronRight, Download, Share2
+  Clock, Users, Target, ChevronRight, Download
 } from 'lucide-react';
 
 /**
@@ -30,55 +29,46 @@ const OrganizationDashboard = () => {
   const [recentControls, setRecentControls] = useState([]);
   const [criticalGaps, setCriticalGaps] = useState([]);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, [id]);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = React.useCallback(async () => {
     try {
       setLoading(true);
-
-      // Fetch organization details
       const orgResponse = await fetch(`/api/organizations/${id}`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const orgData = await orgResponse.json();
       setOrganization(orgData);
-
-      // Fetch dashboard stats
       const statsResponse = await fetch(`/api/organizations/${id}/stats`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const statsData = await statsResponse.json();
       setStats(statsData);
-
-      // Fetch assessments
       const assessmentsResponse = await fetch(`/api/organizations/${id}/assessments`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const assessmentsData = await assessmentsResponse.json();
       setAssessments(assessmentsData);
-
-      // Fetch recent controls
       const controlsResponse = await fetch(`/api/organizations/${id}/controls/recent`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const controlsData = await controlsResponse.json();
       setRecentControls(controlsData);
-
-      // Fetch critical gaps
       const gapsResponse = await fetch(`/api/organizations/${id}/gaps?severity=critical`, {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
       });
       const gapsData = await gapsResponse.json();
       setCriticalGaps(gapsData);
-
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [id, fetchDashboardData]);
+
+  
 
   if (loading) {
     return (

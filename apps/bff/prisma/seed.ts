@@ -190,6 +190,125 @@ async function main() {
 
   console.log('✅ Created NCA compliance tracking')
 
+  // Seed Sample Controls for NCA-ESSENTIAL Framework
+  console.log('🎛️ Seeding sample controls...')
+  
+  const controls = await Promise.all([
+    prisma.control.upsert({
+      where: { id: 'ctrl-nca-gov-01' },
+      update: {},
+      create: {
+        id: 'ctrl-nca-gov-01',
+        controlId: 'GOV-1',
+        description: 'Cybersecurity governance structure and accountability',
+        family: 'Governance',
+        frameworkId: frameworks[0].id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    }),
+    prisma.control.upsert({
+      where: { id: 'ctrl-nca-prot-01' },
+      update: {},
+      create: {
+        id: 'ctrl-nca-prot-01',
+        controlId: 'PROT-1',
+        description: 'Asset management and data classification',
+        family: 'Protection',
+        frameworkId: frameworks[0].id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    }),
+    prisma.control.upsert({
+      where: { id: 'ctrl-iso-ac-01' },
+      update: {},
+      create: {
+        id: 'ctrl-iso-ac-01',
+        controlId: 'A.9.1.1',
+        description: 'Access control policy',
+        family: 'Access Control',
+        frameworkId: frameworks[2].id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
+  ])
+
+  console.log(`✅ Created ${controls.length} sample controls`)
+
+  // Seed Sample Risks
+  console.log('⚠️ Seeding sample risks...')
+  
+  const risks = await Promise.all([
+    prisma.risk.upsert({
+      where: { id: 'risk-001' },
+      update: {},
+      create: {
+        id: 'risk-001',
+        title: 'Unauthorized Data Access',
+        description: 'Risk of unauthorized personnel accessing sensitive customer data',
+        category: 'Information Security',
+        status: 'Active',
+        likelihood: 3,
+        impact: 4,
+        organizationId: 'sample-org-1',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    }),
+    prisma.risk.upsert({
+      where: { id: 'risk-002' },
+      update: {},
+      create: {
+        id: 'risk-002',
+        title: 'Ransomware Attack',
+        description: 'Potential ransomware attack targeting critical systems',
+        category: 'Cybersecurity',
+        status: 'Active',
+        likelihood: 2,
+        impact: 5,
+        organizationId: 'sample-org-1',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+    })
+  ])
+
+  console.log(`✅ Created ${risks.length} sample risks`)
+
+  // Seed Sample Assessments
+  console.log('📝 Seeding sample assessments...')
+  
+  const assessments = await Promise.all([
+    prisma.assessment.upsert({
+      where: { id: 'assess-001' },
+      update: {},
+      create: {
+        id: 'assess-001',
+        status: 'Completed',
+        result: 'Compliant',
+        controlId: 'ctrl-nca-gov-01',
+        riskId: 'risk-001',
+        updatedAt: new Date()
+      }
+    }),
+    prisma.assessment.upsert({
+      where: { id: 'assess-002' },
+      update: {},
+      create: {
+        id: 'assess-002',
+        status: 'In Progress',
+        result: null,
+        controlId: 'ctrl-nca-prot-01',
+        riskId: 'risk-002',
+        updatedAt: new Date()
+      }
+    })
+  ])
+
+  console.log(`✅ Created ${assessments.length} sample assessments`)
+
   console.log('')
   console.log('🎉 Database seeding completed successfully!')
   console.log('')
@@ -197,8 +316,15 @@ async function main() {
   console.log(`   • ${frameworks.length} compliance frameworks`)
   console.log(`   • ${organizations.length} sample organizations`)
   console.log(`   • ${users.length} sample users`)
+  console.log(`   • ${controls.length} sample controls`)
+  console.log(`   • ${risks.length} sample risks`)
+  console.log(`   • ${assessments.length} sample assessments`)
   console.log('   • SAMA compliance tracking')
   console.log('   • NCA compliance tracking')
+  console.log('')
+  console.log('🔐 Default Login Credentials:')
+  console.log('   Email: admin@shahin.ai')
+  console.log('   Password: Admin@123')
   console.log('')
   console.log('📝 Note: For full 5000+ controls, run:')
   console.log('   psql $RAW_DATABASE_URL < apps/web/src/enterprise/populate-complete-controls.sql')

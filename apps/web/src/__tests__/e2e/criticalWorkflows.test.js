@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
+import { renderWithProviders } from '../TestWrapper';
 
 // Import pages for E2E testing
 import GlassmorphismLoginPage from '../../pages/auth/GlassmorphismLoginPage';
@@ -197,7 +198,7 @@ describe('End-to-End Critical Workflows', () => {
       const user = userEvent.setup();
 
       // Step 1: Render registration page
-      render(
+      renderWithProviders(
         <MemoryRouter initialEntries={['/register']}>
           <Routes>
             <Route path="/register" element={<StoryDrivenRegistration />} />
@@ -294,7 +295,7 @@ describe('End-to-End Critical Workflows', () => {
       const user = userEvent.setup();
 
       // Step 1: Start from dashboard
-      render(
+      renderWithProviders(
         <MemoryRouter initialEntries={['/dashboard']}>
           <Routes>
             <Route path="/dashboard" element={<EnhancedDashboard />} />
@@ -388,7 +389,7 @@ describe('End-to-End Critical Workflows', () => {
       const user = userEvent.setup();
 
       // Step 1: Navigate to risk management
-      render(
+      renderWithProviders(
         <MemoryRouter initialEntries={['/risks']}>
           <Routes>
             <Route path="/risks" element={<RiskManagementPage />} />
@@ -467,7 +468,7 @@ describe('End-to-End Critical Workflows', () => {
       const user = userEvent.setup();
 
       // Step 1: Navigate to frameworks
-      render(
+      renderWithProviders(
         <MemoryRouter initialEntries={['/frameworks']}>
           <Routes>
             <Route path="/frameworks" element={<FrameworksManagementPage />} />
@@ -541,7 +542,7 @@ describe('End-to-End Critical Workflows', () => {
       const user = userEvent.setup();
 
       // Step 1: Navigate to evidence management
-      render(
+      renderWithProviders(
         <MemoryRouter initialEntries={['/evidence']}>
           <Routes>
             <Route path="/evidence" element={<EvidenceManagementPage />} />
@@ -604,7 +605,7 @@ describe('End-to-End Critical Workflows', () => {
       const user = userEvent.setup();
 
       // Step 1: Admin assigns assessment to analyst
-      render(
+      renderWithProviders(
         <MemoryRouter initialEntries={['/assessments']}>
           <Routes>
             <Route path="/assessments" element={<AdvancedAssessmentManager />} />
@@ -676,7 +677,7 @@ describe('End-to-End Critical Workflows', () => {
       const user = userEvent.setup();
 
       // Step 1: Navigate to reports section
-      render(
+      renderWithProviders(
         <MemoryRouter initialEntries={['/dashboard']}>
           <Routes>
             <Route path="/dashboard" element={<EnhancedDashboard />} />

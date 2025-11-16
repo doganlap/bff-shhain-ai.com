@@ -19,7 +19,6 @@ const AdvancedAppShell = () => {
   const { user } = state;
   const { language, isRTL, t } = useI18n();
   const { isDark } = useTheme();
-  const { themes, currentTheme, setTheme } = useTheme();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);

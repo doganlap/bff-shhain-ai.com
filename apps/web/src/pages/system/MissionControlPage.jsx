@@ -15,7 +15,7 @@ const MissionControlPage = () => {
 
   const chatWindowRef = useRef(null);
 
-  const API_BASE_URL = (import.meta.env.VITE_AI_BASE_URL || window.__AI_BASE_URL || 'http://localhost:11434');
+  
 
   useEffect(() => {
     // Fetch initial data

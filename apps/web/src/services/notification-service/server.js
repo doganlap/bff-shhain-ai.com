@@ -73,6 +73,14 @@ app.get('/healthz', (req, res) => {
   res.status(200).send('ok');
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    service: 'notification-service',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get('/readyz', async (req, res) => {
   const smtpConnected = await verifyConnection();
   if (smtpConnected) {

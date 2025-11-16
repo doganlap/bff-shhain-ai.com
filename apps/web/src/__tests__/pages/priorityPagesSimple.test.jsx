@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
-import { simpleRender as render } from '../SimpleTestWrapper';
+import { renderWithProviders } from '../TestWrapper';
 
 // Mock the API service
 vi.mock('../../services/apiEndpoints', () => ({
@@ -141,7 +141,7 @@ describe('Priority Pages Basic Tests', () => {
 
       const PerformanceMonitorPage = (await import('../../pages/system/PerformanceMonitorPage')).default;
       
-      render(<PerformanceMonitorPage />);
+      renderWithProviders(<PerformanceMonitorPage />);
       
       await waitFor(() => {
         expect(document.body).toBeInTheDocument();
@@ -161,7 +161,7 @@ describe('Priority Pages Basic Tests', () => {
 
       const FrameworksManagementPage = (await import('../../pages/grc-modules/FrameworksManagementPage')).default;
       
-      render(<FrameworksManagementPage />);
+      renderWithProviders(<FrameworksManagementPage />);
       
       await waitFor(() => {
         expect(document.body).toBeInTheDocument();
@@ -181,7 +181,7 @@ describe('Priority Pages Basic Tests', () => {
 
       const EvidenceManagementPage = (await import('../../pages/grc-modules/EvidenceManagementPage')).default;
       
-      render(<EvidenceManagementPage />);
+      renderWithProviders(<EvidenceManagementPage />);
       
       await waitFor(() => {
         expect(document.body).toBeInTheDocument();
@@ -201,7 +201,7 @@ describe('Priority Pages Basic Tests', () => {
 
       const DatabasePage = (await import('../../pages/system/DatabasePage')).default;
       
-      render(<DatabasePage />);
+      renderWithProviders(<DatabasePage />);
       
       await waitFor(() => {
         expect(document.body).toBeInTheDocument();
@@ -221,7 +221,7 @@ describe('Priority Pages Basic Tests', () => {
 
       const RiskManagementPage = (await import('../../pages/grc-modules/RiskManagementPage')).default;
       
-      render(<RiskManagementPage />);
+      renderWithProviders(<RiskManagementPage />);
       
       await waitFor(() => {
         expect(document.body).toBeInTheDocument();

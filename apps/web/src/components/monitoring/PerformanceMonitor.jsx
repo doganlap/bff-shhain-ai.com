@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 import {
-  Activity, Zap, Clock, TrendingUp, Server, Database, Wifi,
-  AlertTriangle, CheckCircle, BarChart3, Cpu, HardDrive, MemoryStick
+  Activity, Zap, Clock, TrendingUp, Wifi,
+  AlertTriangle, CheckCircle, BarChart3, Cpu, MemoryStick
 } from 'lucide-react';
 import ArabicTextEngine from '../Arabic/ArabicTextEngine';
 
-const PerformanceMonitor = ({ data, loading, onRefresh, language = 'ar' }) => {
+const PerformanceMonitor = ({ data, loading, language = 'ar' }) => {
   const [metrics, setMetrics] = useState({
     responseTime: 2.8,
     throughput: 1234,
@@ -113,7 +113,7 @@ const PerformanceMonitor = ({ data, loading, onRefresh, language = 'ar' }) => {
     );
   }
 
-  if (!isVisible) return null;
+  
 
   const performanceMetrics = [
     {

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import apiService from '../../services/apiEndpoints';
 import { toast } from 'sonner';
@@ -10,13 +10,7 @@ const OrganizationDetails = () => {
   const [loading, setLoading] = useState(true);
   const [language, setLanguage] = useState('en');
 
-  useEffect(() => {
-    fetchOrganizationDetails();
-    const savedLanguage = localStorage.getItem('language') || 'en';
-    setLanguage(savedLanguage);
-  }, [id]);
-
-  const fetchOrganizationDetails = async () => {
+  const fetchOrganizationDetails = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiService.organizations.getById(id);
@@ -31,7 +25,13 @@ const OrganizationDetails = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchOrganizationDetails();
+    const savedLanguage = localStorage.getItem('language') || 'en';
+    setLanguage(savedLanguage);
+  }, [id, fetchOrganizationDetails]);
 
   if (loading) {
     return (

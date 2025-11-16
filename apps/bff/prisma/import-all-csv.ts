@@ -50,7 +50,7 @@ async function main() {
 
       await prisma.grc_frameworks.upsert({
         where: { id: frameworkId },
-        update: {},
+        update: { updated_at: new Date() },
         create: {
           id: frameworkId,
           name: row.framework_name || row.name || 'Unknown Framework',
@@ -63,7 +63,8 @@ async function main() {
           jurisdiction: row.jurisdiction || 'Saudi Arabia',
           mandatory: row.mandatory === 'true' || row.mandatory === '1' || row.is_mandatory === 'true',
           industry_sector: row.industry_sector || row.sector,
-          total_controls: parseInt(row.total_controls || '0')
+          total_controls: parseInt(row.total_controls || '0'),
+          updated_at: new Date()
         }
       })
       fwCount++
@@ -92,7 +93,7 @@ async function main() {
 
       await prisma.grc_controls.upsert({
         where: { id: uniqueId },
-        update: {},
+        update: { updated_at: new Date() },
         create: {
           id: uniqueId,
           framework_id: finalFrameworkId,
@@ -108,7 +109,8 @@ async function main() {
             (row.risk_level || 'medium'),
           evidence_required: row.evidence_requirements ? true : (row.evidence_required === 'true' || row.evidence_required === '1'),
           implementation_guidance: row.implementation_guidance_en || row.implementation_guidance || undefined,
-          implementation_guidance_ar: row.implementation_guidance_ar || undefined
+          implementation_guidance_ar: row.implementation_guidance_ar || undefined,
+          updated_at: new Date()
         }
       })
       ctrlCount++

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Play, Pause, Square, RefreshCw, Clock, CheckCircle, XCircle, AlertTriangle,
-  Plus, Search, Filter, Calendar, User, Settings, BarChart3, Activity,
+  Play, Pause, Square, RefreshCw, Clock, CheckCircle, XCircle,
+  Plus, Search, Calendar, User, Settings, BarChart3, Activity,
   Zap, Database, FileText, Target, TrendingUp, Eye, Edit, Trash2
 } from 'lucide-react';
 import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
@@ -52,7 +52,7 @@ const SchedulerConsolePage = () => {
       loadSchedulerStats();
     }, 30000);
     return () => clearInterval(interval);
-  }, [searchTerm, filterBy]);
+  }, [searchTerm, filterBy, loadJobs, loadSchedulerStats]);
 
   const loadJobs = async () => {
     try {

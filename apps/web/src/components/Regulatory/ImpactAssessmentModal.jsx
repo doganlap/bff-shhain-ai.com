@@ -54,7 +54,7 @@ const ImpactAssessmentModal = ({ change, onClose }) => {
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
-      aria-describedby={descriptionId}
+      aria-describedby={change?.regulator_name ? descriptionId : undefined}
     >
       <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
@@ -63,7 +63,9 @@ const ImpactAssessmentModal = ({ change, onClose }) => {
             <h2 id={titleId} className="text-2xl font-bold text-gray-900 mb-2">
               تقييم التأثير - Impact Assessment
             </h2>
-            <p id={descriptionId} className="text-sm text-gray-600">{change.regulator_name}</p>
+            {change?.regulator_name && (
+              <p id={descriptionId} className="text-sm text-gray-600">{change.regulator_name}</p>
+            )}
             <h3 className="text-lg font-semibold text-gray-800 mt-2">
               {change.title}
             </h3>

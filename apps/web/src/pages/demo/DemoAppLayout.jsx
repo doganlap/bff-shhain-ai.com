@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import AdvancedAppShell from '../../components/layout/AdvancedAppShell';
@@ -20,11 +20,7 @@ const DemoAppLayout = () => {
   const [isValidating, setIsValidating] = useState(true);
   const [sessionInfo, setSessionInfo] = useState(null);
 
-  useEffect(() => {
-    validateDemoSession();
-  }, []);
-
-  const validateDemoSession = async () => {
+  const validateDemoSession = useCallback(async () => {
     try {
       const token = localStorage.getItem('accessToken');
       
@@ -62,7 +58,11 @@ const DemoAppLayout = () => {
       localStorage.removeItem('accessToken');
       navigate('/demo/register');
     }
-  };
+  }, [navigate]);
+
+  useEffect(() => {
+    validateDemoSession();
+  }, [validateDemoSession]);
 
   if (isValidating) {
     return (

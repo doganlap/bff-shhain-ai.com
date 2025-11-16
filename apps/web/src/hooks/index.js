@@ -70,12 +70,10 @@ export const useKeyboardShortcuts = (callbacks = {}) => {
         e.preventDefault();  
         callbacks.onCommandPalette?.();  
       }  
-ECHO is on.
       // Escape key  
       if (e.key === 'Escape') {  
         callbacks.onEscape?.();  
       }  
-ECHO is on.
       // Sidebar toggle: Ctrl/Cmd + \\  
       if ((e.ctrlKey || e.metaKey) && e.key === '\\') {  
         e.preventDefault();  
@@ -97,4 +95,4 @@ export const useToast = () => {
   }, []);  
   
   return { showToast };  
-}; 
+};

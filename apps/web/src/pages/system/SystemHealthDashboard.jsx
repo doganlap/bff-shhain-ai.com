@@ -3,10 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Server, GitBranch, Database, Cloud } from 'lucide-react';
 import apiService from '../../services/apiEndpoints';
-import { useI18n } from '../../hooks/useI18n';
 
 const SystemHealthDashboard = () => {
-  const { t } = useI18n();
+  
   const [statuses, setStatuses] = useState({ vercel: null, git: null, db: null, apis: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -42,7 +41,7 @@ const SystemHealthDashboard = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const StatusCard = ({ title, data, icon, statusKey }) => {
+  const StatusCard = ({ title, data, icon }) => {
     const isHealthy = data && data.status === 'healthy';
     return (
       <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6">

@@ -4,8 +4,8 @@ const { Pool } = require('pg');
 const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
   host: process.env.DB_HOST || 'localhost',
-  database: process.env.DB_NAME || 'grc_db',
-  password: process.env.DB_PASSWORD || 'password',
+  database: process.env.DB_NAME || 'postgres',
+  password: process.env.DB_PASSWORD || 'sk_ziZoE_g62VBpHvM3Nv6C7',
   port: process.env.DB_PORT || 5432,
   max: 20,
   idleTimeoutMillis: 30000,

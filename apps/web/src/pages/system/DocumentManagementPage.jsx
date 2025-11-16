@@ -1,11 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  FileText, Upload, Download, Eye, Edit, Trash2, Plus, Search, Filter, Tag, Calendar,
-  Scan, Zap, Brain, Settings, FileImage, FileCheck, Clock, AlertCircle,
-  BarChart3, PieChart, TrendingUp, Database, Layers, RefreshCw
+  FileText, Upload, Download, Eye, Trash2, Search,
+  Scan, Brain, FileCheck
 } from 'lucide-react';
-import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
-import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner, AnimatedProgress } from '../../components/Animation/InteractiveAnimationToolkit';
+import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner } from '../../components/Animation/InteractiveAnimationToolkit';
 import apiService from '../../services/apiEndpoints';
 import { toast } from 'sonner';
 
@@ -15,12 +13,9 @@ const DocumentManagementPage = () => {
   const [language, setLanguage] = useState('en');
   const [filterBy, setFilterBy] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('documents');
   const [isUploading, setIsUploading] = useState(false);
-  const [processingQueue, setProcessingQueue] = useState([]);
-  const [ocrEnabled, setOcrEnabled] = useState(true);
-  const [autoCategorizationEnabled, setAutoCategorizationEnabled] = useState(true);
-  const [selectedFiles, setSelectedFiles] = useState([]);
+  const ocrEnabled = true;
+  const autoCategorizationEnabled = true;
   const fileInputRef = useRef(null);
 
   // Real processing statistics from API
@@ -39,9 +34,9 @@ const DocumentManagementPage = () => {
     loadProcessingStats();
     const savedLanguage = localStorage.getItem('language') || 'en';
     setLanguage(savedLanguage);
-  }, [searchTerm, filterBy]);
+  }, [loadDocuments, loadProcessingStats]);
 
-  const loadDocuments = async () => {
+  const loadDocuments = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiService.documents.getAll({
@@ -60,9 +55,9 @@ const DocumentManagementPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, filterBy]);
 
-  const loadProcessingStats = async () => {
+  const loadProcessingStats = useCallback(async () => {
     try {
       const response = await apiService.documents.getStats();
       if (response?.data?.success && response.data.data) {
@@ -71,7 +66,7 @@ const DocumentManagementPage = () => {
     } catch (error) {
       console.error('Error loading processing stats:', error);
     }
-  };
+  }, []);
 
   // Upload document to API
   const handleFileUpload = async (files) => {

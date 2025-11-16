@@ -31,7 +31,7 @@ function logSection(title) {
 function runTest(testName, testCommand) {
   try {
     log(`\n🧪 Running ${testName}...`, COLORS.YELLOW);
-    const output = execSync(testCommand, {
+    execSync(testCommand, {
       encoding: 'utf8',
       cwd: path.resolve(__dirname, '..')
     });

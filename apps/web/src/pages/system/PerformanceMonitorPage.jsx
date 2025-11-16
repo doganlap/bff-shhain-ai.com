@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PerformanceMonitor from '../../components/monitoring/PerformanceMonitor';
-import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
+ 
 import apiService from '../../services/apiEndpoints';
 import { toast } from 'sonner';
 import { useRBAC } from '../../hooks/useRBAC';
 import { PermissionBasedCard, PermissionBasedButton } from '../../components/common/PermissionBasedCard';
 import { motion } from 'framer-motion';
-import { RefreshCw, Download, Settings, AlertTriangle, Activity, BarChart3 } from 'lucide-react';
+import { RefreshCw, Download, AlertTriangle, Activity, BarChart3 } from 'lucide-react';
 
 const PerformanceMonitorPage = () => {
   const [performanceData, setPerformanceData] = useState(null);
@@ -16,27 +16,23 @@ const PerformanceMonitorPage = () => {
   const [historicalData, setHistoricalData] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
   
-  const { hasPermission, userRole, isSuperAdmin } = useRBAC();
+  const { userRole } = useRBAC();
 
   // Load performance data from API
   useEffect(() => {
     loadPerformanceData();
     loadAlerts();
     loadHistoricalData();
-    
-    // Set up real-time updates every 30 seconds
     const interval = setInterval(() => {
       loadPerformanceData();
       loadAlerts();
     }, 30000);
-    
     const savedLanguage = localStorage.getItem('language') || 'ar';
     setLanguage(savedLanguage);
-    
     return () => clearInterval(interval);
-  }, []);
+  }, [loadPerformanceData, loadAlerts, loadHistoricalData]);
 
-  const loadPerformanceData = async () => {
+  const loadPerformanceData = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiService.monitoring.getPerformanceMetrics();
@@ -80,9 +76,9 @@ const PerformanceMonitorPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [language]);
 
-  const loadAlerts = async () => {
+  const loadAlerts = useCallback(async () => {
     try {
       const response = await apiService.monitoring.getAlertHistory(10);
       if (response?.data?.success && response.data.data) {
@@ -91,9 +87,9 @@ const PerformanceMonitorPage = () => {
     } catch (error) {
       console.error('Error loading alerts:', error);
     }
-  };
+  }, []);
 
-  const loadHistoricalData = async () => {
+  const loadHistoricalData = useCallback(async () => {
     try {
       const endDate = new Date();
       const startDate = new Date();
@@ -109,7 +105,7 @@ const PerformanceMonitorPage = () => {
     } catch (error) {
       console.error('Error loading historical data:', error);
     }
-  };
+  }, []);
 
   const handleExportData = async () => {
     try {
@@ -235,7 +231,6 @@ const PerformanceMonitorPage = () => {
       <PerformanceMonitor 
         data={performanceData} 
         loading={loading} 
-        onRefresh={handleRefresh}
         language={language}
       />
 

@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { Settings, User, Bell, Shield, Globe, Palette, Save, Eye, EyeOff, Key, Mail, Phone } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Settings, User, Bell, Shield, Palette, Save, Key, Mail, Phone } from 'lucide-react';
 import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
 import { AnimatedCard, AnimatedButton } from '../../components/Animation/InteractiveAnimationToolkit';
-import { FeatureGate, useSubscription } from '../../components/Subscription/SubscriptionManager';
+ 
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../../components/theme/ThemeProvider';
@@ -10,25 +10,20 @@ import apiService from '../../services/apiEndpoints';
 import { toast } from 'sonner';
 
 const SettingsPage = () => {
-  const { hasFeature, currentPlan } = useSubscription();
   const { state } = useApp();
-  const { t, language, changeLanguage } = useI18n();
+  const { language, changeLanguage } = useI18n();
   const { isDark, toggleTheme } = useTheme();
   
   const [activeTab, setActiveTab] = useState('profile');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({});
   
   // Fetch real settings from API
   useEffect(() => {
     fetchSettings();
-  }, []);
+  }, [fetchSettings]);
   
-  const fetchSettings = async () => {
+  const fetchSettings = useCallback(async () => {
     try {
-      setLoading(true);
       const response = await apiService.settings.get();
       if (response?.data?.success && response.data.data) {
         setSettings(response.data.data);
@@ -70,15 +65,12 @@ const SettingsPage = () => {
     } catch (error) {
       console.error('Error fetching settings:', error);
       toast.error('Failed to load settings');
-    } finally {
-      setLoading(false);
     }
-  };
+  }, [isDark, language, state?.user]);
   
   // Save settings to API
   const handleSaveSettings = async () => {
     try {
-      setSaving(true);
       const response = await apiService.settings.update(settings);
       if (response?.data?.success) {
         toast.success('Settings saved successfully');
@@ -94,32 +86,27 @@ const SettingsPage = () => {
     } catch (error) {
       console.error('Error saving settings:', error);
       toast.error('Failed to save settings');
-    } finally {
-      setSaving(false);
     }
   };
 
   useEffect(() => {
     const savedLanguage = localStorage.getItem('language') || 'en';
-    setLanguage(savedLanguage);
+    changeLanguage(savedLanguage);
     setSettings(prev => ({ ...prev, language: savedLanguage }));
-  }, []);
+  }, [changeLanguage]);
 
   const handleSettingChange = (key, value) => {
     setSettings(prev => ({ ...prev, [key]: value }));
   };
 
   const handleLanguageChange = (newLanguage) => {
-    setLanguage(newLanguage);
+    changeLanguage(newLanguage);
     localStorage.setItem('language', newLanguage);
     document.documentElement.setAttribute('dir', newLanguage === 'ar' ? 'rtl' : 'ltr');
     handleSettingChange('language', newLanguage);
   };
 
-  const handleSave = () => {
-    // Save settings logic here
-    console.log('Saving settings:', settings);
-  };
+  
 
   const tabs = [
     { id: 'profile', label: 'Profile', labelAr: 'الملف الشخصي', icon: User },
@@ -153,7 +140,7 @@ const SettingsPage = () => {
           variant="primary"
           culturalStyle="modern"
           style={{ backgroundColor: '#667eea' }}
-          onClick={handleSave}
+          onClick={handleSaveSettings}
         >
           <Save className="h-4 w-4 mr-2" />
           <ArabicTextEngine personalityType="casual">
@@ -360,17 +347,15 @@ const SettingsPage = () => {
                           {language === 'ar' ? 'إضافة طبقة حماية إضافية لحسابك' : 'Add an extra layer of security to your account'}
                         </p>
                       </div>
-                      <FeatureGate feature="advancedSecurity">
-                        <label className="relative inline-flex items-center cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={settings.twoFactorAuth}
-                            onChange={(e) => handleSettingChange('twoFactorAuth', e.target.checked)}
-                            className="sr-only peer"
-                          />
-                          <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
-                      </FeatureGate>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={settings.twoFactorAuth}
+                          onChange={(e) => handleSettingChange('twoFactorAuth', e.target.checked)}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                      </label>
                     </div>
 
                     {/* Session Timeout */}

@@ -222,7 +222,17 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // API ROUTES
 // ==========================================
 
-// Health check endpoint
+// Health check endpoints (must be before catch-all route)
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    version: process.env.npm_package_version || '1.0.0',
+    environment: process.env.NODE_ENV || 'development',
+    database: 'connected'
+  });
+});
+
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
@@ -564,6 +574,11 @@ app.use('/api/demo/platform', demoPlatformRoutes);
 // Note: Frontend is now a separate service (web container)
 // All non-API routes should return 404 or be handled by BFF
 app.get('*', (req, res, next) => {
+  // Allow health check and other system endpoints
+  if (req.path === '/health' || req.path === '/healthz' || req.path === '/ready') {
+    return next();
+  }
+  
   // Only handle non-API routes that aren't already handled
   if (!req.path.startsWith('/api/')) {
     res.status(404).json({

@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, Clock, User, Filter, Search, Eye, Download, AlertCircle, CheckCircle, XCircle, Shield } from 'lucide-react';
-import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FileText, Clock, User, Search, Eye, Download, AlertCircle, CheckCircle, XCircle, Shield } from 'lucide-react';
 import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner } from '../../components/Animation/InteractiveAnimationToolkit';
 import apiService from '../../services/apiEndpoints';
 import { toast } from 'sonner';
@@ -17,9 +16,9 @@ const AuditLogsPage = () => {
     loadAuditLogs();
     const savedLanguage = localStorage.getItem('language') || 'en';
     setLanguage(savedLanguage);
-  }, [searchTerm, filterBy]);
+  }, [searchTerm, filterBy, loadAuditLogs]);
 
-  const loadAuditLogs = async () => {
+  const loadAuditLogs = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiService.auditLogs.getAll({
@@ -40,7 +39,7 @@ const AuditLogsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, filterBy]);
 
   // Export audit logs
   const handleExportLogs = async () => {

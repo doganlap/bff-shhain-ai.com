@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Search, FileText, Brain, Upload, Download, MessageSquare, Sparkles, Database, Filter, Settings, Trash2 } from 'lucide-react';
+import { Search, FileText, Brain, Upload, Sparkles, Database, Settings, Trash2 } from 'lucide-react';
 import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
 import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner, AnimatedProgress } from '../../components/Animation/InteractiveAnimationToolkit';
-import { PermissionBasedCard, PermissionBasedButton } from '../../components/common/PermissionBasedCard';
+ 
 import { useRBAC } from '../../hooks/useRBAC';
 import apiService from '../../services/apiEndpoints';
 
 const RAGServicePage = () => {
-  const { user, hasPermission } = useRBAC();
+  const { hasPermission } = useRBAC();
   const [language, setLanguage] = useState('en');
   const [activeTab, setActiveTab] = useState('query');
   const [query, setQuery] = useState('');
@@ -414,7 +414,7 @@ const RAGServicePage = () => {
 
                       <div className="bg-gray-50 rounded-lg p-4 mb-4">
                         <p className="text-gray-800 leading-relaxed" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                          "{result.chunk}"
+                          &quot;{result.chunk}&quot;
                         </p>
                       </div>
 

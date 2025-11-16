@@ -1,7 +1,24 @@
-node_modules
-# Keep environment variables out of version control
-.env
+# Node & build artifacts
+node_modules/
+dist/
+build/
+.cache/
+coverage/
 
-/generated/prisma
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Env and secrets (do not commit)
+.env
+.env.*
+
+# Vercel and deployment
+.vercel/
+.deployment/
 
 .vercel

@@ -3,12 +3,19 @@
  * Uses OpenAI GPT-4 to analyze regulatory changes and assess impact on organizations
  */
 
-const OpenAI = require('openai');
 const logger = require('../../utils/logger');
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
-});
+let openai;
+try {
+  const OpenAI = require('openai');
+  if (process.env.OPENAI_API_KEY) {
+    openai = new OpenAI({
+      apiKey: process.env.OPENAI_API_KEY
+    });
+  }
+} catch (error) {
+  logger.warn('OpenAI not available for impact analysis');
+}
 
 /**
  * Analyze impact of regulatory change using AI
@@ -16,6 +23,21 @@ const openai = new OpenAI({
 async function analyzeImpact(regulatoryChange) {
   try {
     logger.info(`🤖 Analyzing impact for: ${regulatoryChange.title.substring(0, 50)}...`);
+
+    // If OpenAI is not available, return fallback analysis
+    if (!openai) {
+      logger.warn('OpenAI not available, using fallback analysis');
+      return {
+        impactScore: 5,
+        keyChanges: ['Regulatory change requires review'],
+        affectedOrganizations: regulatoryChange.affected_sectors || [],
+        requiredActions: ['Review regulatory change', 'Assess compliance gaps', 'Plan implementation'],
+        timeline: '3-6 months',
+        estimatedCost: 'Medium',
+        responsibleDepartment: 'Compliance',
+        aiAnalysis: { error: 'AI analysis unavailable' }
+      };
+    }
 
     const prompt = `
 As a Saudi regulatory compliance expert, analyze the following regulatory change and provide a detailed impact assessment:

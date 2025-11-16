@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Database, Users, Bell, Calendar, CreditCard, Play, CheckCircle,
+  Play, CheckCircle,
   AlertTriangle, RefreshCw, Server, Wifi, WifiOff, Activity, BarChart3,
-  Clock, Shield, Zap, Globe, Eye, Settings
+  Clock
 } from 'lucide-react';
-import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
 import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner } from '../../components/Animation/InteractiveAnimationToolkit';
 import apiService from '../../services/apiEndpoints';
 import { toast } from 'sonner';
@@ -27,9 +26,9 @@ const APIManagementPage = () => {
     loadApiMetrics();
     const savedLanguage = localStorage.getItem('language') || 'en';
     setLanguage(savedLanguage);
-  }, []);
+  }, [checkAPIStatus, loadApiEndpoints, loadApiMetrics]);
 
-  const checkAPIStatus = async () => {
+  const checkAPIStatus = useCallback(async () => {
     try {
       const response = await apiService.system.health();
       setApiStatus(response?.data?.success ? 'connected' : 'disconnected');
@@ -37,9 +36,9 @@ const APIManagementPage = () => {
       console.error('API health check failed:', error);
       setApiStatus('disconnected');
     }
-  };
+  }, []);
 
-  const loadApiEndpoints = async () => {
+  const loadApiEndpoints = useCallback(async () => {
     try {
       const response = await apiService.system.getEndpoints();
       if (response?.data?.success && response.data.data) {
@@ -49,9 +48,9 @@ const APIManagementPage = () => {
       console.error('Error loading API endpoints:', error);
       toast.error('Failed to load API endpoints');
     }
-  };
+  }, []);
 
-  const loadApiMetrics = async () => {
+  const loadApiMetrics = useCallback(async () => {
     try {
       const response = await apiService.system.getMetrics();
       if (response?.data?.success && response.data.data) {
@@ -61,7 +60,7 @@ const APIManagementPage = () => {
       console.error('Error loading API metrics:', error);
       toast.error('Failed to load API metrics');
     }
-  };
+  }, []);
 
   const testApiEndpoint = async (endpoint) => {
     setLoading(true);

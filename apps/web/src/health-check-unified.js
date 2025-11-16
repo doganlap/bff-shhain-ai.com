@@ -7,6 +7,7 @@
 
 const { createServiceRouter, initializeServiceCommunication } = require('../config/serviceRouter');
 const { loadConfig, displayConfigSummary } = require('../config/loader');
+const fs = require('fs');
 
 /**
  * Main health check function
@@ -21,9 +22,6 @@ async function performHealthCheck() {
     
     console.log(`📋 Environment: ${environment}\n`);
 
-    // Load configuration
-    const config = loadConfig(environment);
-    
     // Display configuration summary
     displayConfigSummary(environment);
     
@@ -197,7 +195,7 @@ async function testAuthenticationSystem(environment) {
     // Test JWT token generation and validation
     const testPayload = { test: 'health-check', timestamp: Date.now() };
     const token = jwt.sign(testPayload, config.auth.jwt.secret, { expiresIn: '1h' });
-    const decoded = jwt.verify(token, config.auth.jwt.secret);
+  jwt.verify(token, config.auth.jwt.secret);
     
     console.log('✅ JWT token generation and validation successful');
     console.log(`   Token expires in: ${config.auth.jwt.expiresIn}`);

@@ -75,7 +75,7 @@ const PartnerLogin = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="partner-email" className="block text-sm font-medium text-gray-700 mb-2">
                 البريد الإلكتروني
               </label>
               <div className="relative">
@@ -87,6 +87,7 @@ const PartnerLogin = () => {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  id="partner-email"
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="partner@company.com"
                 />
@@ -95,7 +96,7 @@ const PartnerLogin = () => {
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="partner-password" className="block text-sm font-medium text-gray-700 mb-2">
                 كلمة المرور
               </label>
               <div className="relative">
@@ -107,6 +108,7 @@ const PartnerLogin = () => {
                   required
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  id="partner-password"
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="••••••••"
                 />

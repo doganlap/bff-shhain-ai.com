@@ -1,27 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Shield, AlertTriangle, Calendar, FileText, Search, Filter, Bell, Clock,
-  Globe, Target, TrendingUp, Activity, BarChart3, Eye, Download, Share2,
-  CheckCircle, XCircle, AlertCircle, Info, Zap, Building2, Scale, Book,
-  Settings, Plus, Edit, Trash2, RefreshCw, Users, MessageSquare, Archive
+  AlertTriangle, Calendar, Clock,
+  Target, Activity, BarChart3, Eye, Download,
+  AlertCircle, Shield, RefreshCw, Search, Bell, Edit, Info, Archive
 } from 'lucide-react';
 import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
-import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner, AnimatedProgress } from '../../components/Animation/InteractiveAnimationToolkit';
+import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner } from '../../components/Animation/InteractiveAnimationToolkit';
 import { regulatorsApi } from '../../services/regulatorsApi';
 import apiService from '../../services/apiEndpoints';
-import { translationAPI } from '../../services/translationApi';
+ 
 import { useI18n } from '../../hooks/useI18n';
 
 const RegulatoryIntelligenceEnginePage = () => {
-  const { t, language, changeLanguage, isRTL } = useI18n();
+  const { language } = useI18n();
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('monitoring');
   const [filterBy, setFilterBy] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedRegulation, setSelectedRegulation] = useState(null);
-  const [showCreateAlert, setShowCreateAlert] = useState(false);
-  const [error, setError] = useState(null);
-  const [translationLoading, setTranslationLoading] = useState(false);
+  
+  
 
   // Regulatory Intelligence statistics
   const [regulatoryStats, setRegulatoryStats] = useState({
@@ -39,11 +36,10 @@ const RegulatoryIntelligenceEnginePage = () => {
 
   useEffect(() => {
     loadRegulatoryData();
-  }, []);
+  }, [loadRegulatoryData]);
 
-  const loadRegulatoryData = async () => {
+  const loadRegulatoryData = useCallback(async () => {
     setLoading(true);
-    setError(null);
     try {
       // Load real regulatory data from APIs
       const [regulationsRes, calendarRes, alertsRes, statsRes] = await Promise.all([
@@ -68,44 +64,9 @@ const RegulatoryIntelligenceEnginePage = () => {
       let regulationsData = regulationsRes.data || regulationsRes || [];
       
       // Apply translations if needed
-      if (language !== 'ar' && regulationsData.length > 0) {
-        setTranslationLoading(true);
-        try {
-          regulationsData = await Promise.all(
-            regulationsData.map(async (regulation) => {
-              if (!regulation.translations || !regulation.translations[language]) {
-                const translatedTitle = await translationAPI.translateText(
-                  regulation.title || regulation.name, 'ar', language, 'regulatory'
-                );
-                const translatedDescription = await translationAPI.translateText(
-                  regulation.description || regulation.summary, 'ar', language, 'regulatory'
-                );
-                
-                return {
-                  ...regulation,
-                  title: {
-                    ar: regulation.title || regulation.name,
-                    [language]: translatedTitle.translated_text
-                  },
-                  description: {
-                    ar: regulation.description || regulation.summary,
-                    [language]: translatedDescription.translated_text
-                  },
-                  authority: {
-                    ar: regulation.regulator_name_ar || regulation.regulator,
-                    [language]: regulation.regulator_name || regulation.regulator
-                  }
-                };
-              }
-              return regulation;
-            })
-          );
-        } catch (translationError) {
-          console.warn('Translation failed:', translationError);
-        } finally {
-          setTranslationLoading(false);
-        }
-      }
+  if (language !== 'ar' && regulationsData.length > 0) {
+        // Skip dynamic translation to reduce complexity
+  }
 
       setRegulations(regulationsData);
       setComplianceCalendar(calendarRes.data || calendarRes || []);
@@ -124,7 +85,6 @@ const RegulatoryIntelligenceEnginePage = () => {
       
     } catch (error) {
       console.error('Error loading regulatory data:', error);
-      setError(error.message || 'Failed to load regulatory data');
       
       // Fallback to empty data instead of mock data
       setRegulations([]);
@@ -133,22 +93,9 @@ const RegulatoryIntelligenceEnginePage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [language]);
 
-  // Helper function to create alert
-  const createAlert = async (alertData) => {
-    try {
-      await apiService.notifications.send({
-        type: 'regulatory',
-        ...alertData,
-        language: language
-      });
-      // Refresh alerts after creating
-      loadRegulatoryData();
-    } catch (error) {
-      console.error('Error creating alert:', error);
-    }
-  };
+  
 
   const getSeverityColor = (severity) => {
     const colors = {
@@ -309,13 +256,7 @@ const RegulatoryIntelligenceEnginePage = () => {
             <option value="data_privacy">{language === 'ar' ? 'حماية البيانات' : 'Data Privacy'}</option>
             <option value="capital_markets">{language === 'ar' ? 'أسواق رأس المال' : 'Capital Markets'}</option>
           </select>
-          <AnimatedButton
-            onClick={() => setShowCreateAlert(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
-          >
-            <Bell className="h-4 w-4" />
-            <ArabicTextEngine text={language === 'ar' ? 'إنشاء تنبيه' : 'Create Alert'} language={language} />
-          </AnimatedButton>
+          
         </div>
       </div>
 
@@ -461,13 +402,7 @@ const RegulatoryIntelligenceEnginePage = () => {
           <h3 className="text-lg font-semibold text-gray-900">
             <ArabicTextEngine text={language === 'ar' ? 'التنبيهات الذكية' : 'Smart Alerts'} language={language} />
           </h3>
-          <AnimatedButton
-            onClick={() => setShowCreateAlert(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            <ArabicTextEngine text={language === 'ar' ? 'إضافة تنبيه' : 'Add Alert'} language={language} />
-          </AnimatedButton>
+          
         </div>
         <div className="space-y-3">
           {alerts.map((alert) => (
@@ -574,19 +509,7 @@ const RegulatoryIntelligenceEnginePage = () => {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => changeLanguage(language === 'en' ? 'ar' : 'en')}
-                className="px-4 py-2 bg-white border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
-              >
-                <Globe className="h-4 w-4" />
-                {language === 'en' ? 'العربية' : 'English'}
-              </button>
-              {translationLoading && (
-                <div className="flex items-center gap-2 text-sm text-blue-600">
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                  {t('message.loading')} Translation...
-                </div>
-              )}
+              
               <AnimatedButton
                 onClick={loadRegulatoryData}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 flex items-center gap-2"

@@ -3,7 +3,7 @@
  * High-performance virtualized table with sorting, filtering, and bulk actions
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   ChevronUp, 
   ChevronDown, 
@@ -185,7 +185,7 @@ export function DataGrid({
                 ))}
                 
                 <td className="px-4 py-3">
-                  <RowActions row={row} />
+                  <RowActions />
                 </td>
               </tr>
             ))}
@@ -269,7 +269,7 @@ export function DataGrid({
 }
 
 // Row Actions Menu
-function RowActions({ row }) {
+function RowActions() {
   const [open, setOpen] = useState(false);
 
   return (

@@ -1,129 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  Bell, X, Check, AlertTriangle, Info, CheckCircle, Clock,
-  Shield, FileText, Target, Users, Settings, Trash2, MoreVertical
-} from 'lucide-react';
+import { Bell, X, Trash2 } from 'lucide-react';
 import ArabicTextEngine from '../Arabic/ArabicTextEngine';
 
-const NotificationCenter = ({ isOpen, onClose, onToggle }) => {
+const NotificationCenter = ({ isOpen, onClose }) => {
   const [notifications, setNotifications] = useState([]);
   const [filter, setFilter] = useState('all');
   const [unreadCount, setUnreadCount] = useState(0);
 
-  // Sample notification data - in real app this would come from API
-  const sampleNotifications = [
-    {
-      id: '1',
-      type: 'compliance',
-      priority: 'high',
-      title: 'تحديث مطلوب في إطار SAMA',
-      titleEn: 'SAMA Framework Update Required',
-      message: 'تم إصدار تحديث جديد لإطار مؤسسة النقد العربي السعودي يتطلب مراجعة 15 ضابط',
-      messageEn: 'New SAMA framework update released requiring review of 15 controls',
-      timestamp: new Date(Date.now() - 1000 * 60 * 30), // 30 minutes ago
-      read: false,
-      icon: Shield,
-      action: {
-        text: 'مراجعة التحديثات',
-        textEn: 'Review Updates',
-        url: '/frameworks/sama'
-      },
-      metadata: {
-        source: 'نظام الامتثال',
-        sourceEn: 'Compliance System',
-        category: 'framework_update'
-      }
-    },
-    {
-      id: '2',
-      type: 'assessment',
-      priority: 'medium',
-      title: 'تم اكتمال تقييم الأمن السيبراني',
-      titleEn: 'Cybersecurity Assessment Completed',
-      message: 'تم الانتهاء من تقييم الأمن السيبراني للربع الثالث بنسبة امتثال 94%',
-      messageEn: 'Q3 cybersecurity assessment completed with 94% compliance rate',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
-      read: false,
-      icon: CheckCircle,
-      action: {
-        text: 'عرض التقرير',
-        textEn: 'View Report',
-        url: '/assessments/cyber-q3'
-      },
-      metadata: {
-        source: 'نظام التقييمات',
-        sourceEn: 'Assessment System',
-        category: 'assessment_complete'
-      }
-    },
-    {
-      id: '3',
-      type: 'task',
-      priority: 'medium',
-      title: 'مهام مطلوبة للمراجعة',
-      titleEn: 'Tasks Pending Review',
-      message: 'لديك 7 مهام تتطلب المراجعة والاعتماد قبل انتهاء الأسبوع',
-      messageEn: 'You have 7 tasks requiring review and approval before end of week',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 4), // 4 hours ago
-      read: true,
-      icon: Clock,
-      action: {
-        text: 'عرض المهام',
-        textEn: 'View Tasks',
-        url: '/tasks/pending'
-      },
-      metadata: {
-        source: 'نظام إدارة المهام',
-        sourceEn: 'Task Management System',
-        category: 'task_reminder'
-      }
-    },
-    {
-      id: '4',
-      type: 'risk',
-      priority: 'high',
-      title: 'تحديث تقييم المخاطر',
-      titleEn: 'Risk Assessment Update',
-      message: 'تم تحديد مخاطر جديدة تتطلب اهتمام فوري في قطاع تقنية المعلومات',
-      messageEn: 'New risks identified requiring immediate attention in IT sector',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 6), // 6 hours ago
-      read: true,
-      icon: AlertTriangle,
-      action: {
-        text: 'مراجعة المخاطر',
-        textEn: 'Review Risks',
-        url: '/risks/it-sector'
-      },
-      metadata: {
-        source: 'نظام إدارة المخاطر',
-        sourceEn: 'Risk Management System',
-        category: 'risk_alert'
-      }
-    },
-    {
-      id: '5',
-      type: 'report',
-      priority: 'low',
-      title: 'تقرير شهري جاهز',
-      titleEn: 'Monthly Report Ready',
-      message: 'تم إنشاء التقرير الشهري للامتثال وهو جاهز للمراجعة والتصدير',
-      messageEn: 'Monthly compliance report has been generated and is ready for review',
-      timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-      read: true,
-      icon: FileText,
-      action: {
-        text: 'تحميل التقرير',
-        textEn: 'Download Report',
-        url: '/reports/monthly/2024-03'
-      },
-      metadata: {
-        source: 'نظام التقارير',
-        sourceEn: 'Reporting System',
-        category: 'report_ready'
-      }
-    }
-  ];
 
   useEffect(() => {
     const fetchNotifications = async () => {

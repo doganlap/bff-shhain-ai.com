@@ -6,7 +6,6 @@
 
 const { execSync } = require('child_process');
 const fs = require('fs');
-const path = require('path');
 
 // Configuration
 const CONFIG = {
@@ -72,16 +71,8 @@ async function waitForDeployment(deploymentName, timeout = CONFIG.healthCheckTim
 async function runHealthChecks(environment) {
   log('INFO', `Running health checks for ${environment} environment`);
 
-  // Get the service URL based on environment
-  let baseUrl;
-  if (environment === 'blue') {
-    baseUrl = 'http://grc-platform-blue';
-  } else {
-    baseUrl = 'http://grc-platform-green';
-  }
-
   // Port forward for health checks
-  const portForwardProcess = execCommand(
+  execCommand(
     `kubectl port-forward service/grc-platform-${environment} 8080:80 &`,
     { silent: true }
   );
@@ -305,9 +296,11 @@ if (require.main === module) {
       deploy();
       break;
     case 'rollback':
-      const fromEnv = process.argv[3] || getCurrentEnvironment();
-      const toEnv = fromEnv === 'blue' ? 'green' : 'blue';
-      rollback(fromEnv, toEnv);
+      {
+        const fromEnv = process.argv[3] || getCurrentEnvironment();
+        const toEnv = fromEnv === 'blue' ? 'green' : 'blue';
+        rollback(fromEnv, toEnv);
+      }
       break;
     case 'status':
       getCurrentEnvironment();

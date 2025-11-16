@@ -170,17 +170,18 @@ const AdvancedAssessmentManager = () => {
   };
 
   const getStatusBadge = (status) => {
-    switch (status) {
-      case 'Completed':
-        return <span className="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">Completed</span>;
-      case 'In Progress':
-        return <span className="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">In Progress</span>;
-      case 'Pending':
-        return <span className="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded-full dark:bg-yellow-900 dark:text-yellow-300">Pending</span>;
-      case 'Cancelled':
-        return <span className="px-2 py-1 text-xs font-medium text-red-800 bg-red-100 rounded-full dark:bg-red-900 dark:text-red-300">Cancelled</span>;
+    const s = String(status || '').toLowerCase();
+    switch (s) {
+      case 'completed':
+        return <span className="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded-full dark:bg-green-900 dark:text-green-300">completed</span>;
+      case 'in_progress':
+        return <span className="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">in_progress</span>;
+      case 'pending':
+        return <span className="px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded-full dark:bg-yellow-900 dark:text-yellow-300">pending</span>;
+      case 'active':
+        return <span className="px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded-full dark:bg-blue-900 dark:text-blue-300">active</span>;
       default:
-        return <span className="px-2 py-1 text-xs font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">Unknown</span>;
+        return <span className="px-2 py-1 text-xs font-medium text-gray-800 bg-gray-100 rounded-full dark:bg-gray-700 dark:text-gray-300">unknown</span>;
     }
   };
 
@@ -189,7 +190,7 @@ const AdvancedAssessmentManager = () => {
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl transform transition-all">
         <div className="px-8 py-6">
           <div className="flex items-center justify-between">
-            <h3 className="text-2xl font-bold text-gray-800">Create New Assessment</h3>
+            <h3 className="text-2xl font-bold text-gray-800">Create Assessment</h3>
             <button
               onClick={() => { setShowCreateModal(false); resetForm(); }}
               className="text-gray-400 hover:text-gray-600 rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -474,7 +475,7 @@ const AdvancedAssessmentManager = () => {
               onClick={handleDeleteAssessment}
               className="px-6 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
             >
-              Delete Assessment
+              Confirm
             </button>
           </div>
         </div>
@@ -610,7 +611,7 @@ const AdvancedAssessmentManager = () => {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" data-testid="loading-spinner"></div>
           <p className="mt-4 text-gray-600">Loading Assessment Manager...</p>
         </div>
       </div>
@@ -622,7 +623,7 @@ const AdvancedAssessmentManager = () => {
       <header className="mb-8">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-gray-800">Assessment Dashboard</h1>
+            <h1 className="text-3xl font-bold text-gray-800">Assessments</h1>
             <p className="text-gray-500 mt-1">
               Track, manage, and analyze compliance assessments.
             </p>
@@ -635,9 +636,10 @@ const AdvancedAssessmentManager = () => {
             <button
               onClick={() => setShowCreateModal(true)}
               className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+              aria-label="Create New Assessment"
             >
               <Plus className="h-4 w-4 mr-2" />
-              New Assessment
+              Create New
             </button>
           </div>
         </div>
@@ -758,12 +760,12 @@ const AdvancedAssessmentManager = () => {
               <div className="mt-6">
                 <div className="flex justify-between text-sm text-gray-600 mb-1">
                   <span>Progress</span>
-                  <span className="font-semibold">{assessment.completion_percentage || 0}%</span>
+                  <span className="font-semibold">{(assessment.progress ?? assessment.completion_percentage ?? 0)}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2.5">
                   <div
                     className="bg-blue-600 h-2.5 rounded-full"
-                    style={{ width: `${assessment.completion_percentage || 0}%` }}
+                    style={{ width: `${(assessment.progress ?? assessment.completion_percentage ?? 0)}%` }}
                   ></div>
                 </div>
               </div>

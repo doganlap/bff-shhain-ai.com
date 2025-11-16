@@ -4,17 +4,16 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
-import { useI18n } from '../../hooks/useI18n.jsx';
+ 
 import { useTheme } from '../theme/ThemeProvider';
 import { 
-  Building2, Shield, Users, DollarSign, Settings, 
+  Building2, Shield, Users, DollarSign, 
   Crown, BarChart3, Home, Target, FileText, AlertTriangle,
   CheckCircle, Activity, Bell, Bot, TrendingUp, Globe,
-  Briefcase, Database, Code, ChevronDown, ChevronRight, Zap,
-  Workflow, Calendar, Brain, Search, FolderOpen,
-  Scale, BarChart2, Building, ShieldCheck, MessageSquare
+  Briefcase, ChevronDown, Zap,
+  Calendar, Brain, Search, FolderOpen,
+  BarChart2
 } from 'lucide-react';
 
 /**
@@ -58,10 +57,10 @@ export const getNavigationForRole = (userRole, tenantContext, stats = {}) => {
         category: 'Platform'
       },
       {
-        id: 'users-access', name: 'Users & Access', icon: ShieldCheck, collapsed: true,
+        id: 'users-access', name: 'Users & Access', icon: Shield, collapsed: true,
         items: [
           { id: 'users', name: 'Users', path: '/app/users', icon: Users },
-          { id: 'roles-permissions', name: 'Roles & Permissions', path: '/app/settings/security', icon: ShieldCheck }
+          { id: 'roles-permissions', name: 'Roles & Permissions', path: '/app/settings/security', icon: Shield }
         ],
         category: 'Platform'
       },
@@ -96,7 +95,7 @@ export const getNavigationForRole = (userRole, tenantContext, stats = {}) => {
         id: 'platform-automation', name: 'Platform Automation', icon: Bot, collapsed: true,
         items: [
           { id: 'regulatory-engine', name: 'Regulatory Engine', path: '/app/regulatory', icon: Globe },
-          { id: 'platform-workflows', name: 'Global Workflows', path: '/app/workflows', icon: Workflow },
+          { id: 'platform-workflows', name: 'Global Workflows', path: '/app/workflows', icon: Zap },
           { id: 'ai-scheduler', name: 'AI Scheduler', path: '/app/ai/scheduler', icon: Calendar }
         ],
         category: 'Platform'
@@ -138,13 +137,13 @@ export const getNavigationForRole = (userRole, tenantContext, stats = {}) => {
         items: [
           { id: 'teams-users', name: 'Teams & Users', path: '/app/users', icon: Users, badge: stats.users || 0 },
           { id: 'departments', name: 'Departments', path: '/app/organizations', icon: Building2 },
-          { id: 'roles-permissions', name: 'Roles & Permissions', path: '/app/settings/security', icon: ShieldCheck }
+          { id: 'roles-permissions', name: 'Roles & Permissions', path: '/app/settings/security', icon: Shield }
         ]
       },
       { id: 'reports-analytics', name: 'Reports & Analytics', icon: BarChart3, path: `/tenant/${tenantContext?.id}/reports`, items: [], category: 'GRC' },
       { id: 'vendors-partners', name: 'Vendors & Partners', icon: Briefcase, path: `/tenant/${tenantContext?.id}/partners`, items: [], category: 'Team' },
       { id: 'documents-evidence', name: 'Documents & Evidence', icon: FileText, path: `/tenant/${tenantContext?.id}/documents`, items: [], category: 'Team' },
-      { id: 'workflows', name: 'Workflows', icon: Workflow, path: `/tenant/${tenantContext?.id}/workflows`, items: [], category: 'Team' },
+      { id: 'workflows', name: 'Workflows', icon: Zap, path: `/tenant/${tenantContext?.id}/workflows`, items: [], category: 'Team' },
       { id: 'team-communication', name: 'Team Communication', icon: Users, collapsed: true, category: 'Team',
         items: [
           { id: 'announcements', name: 'Announcements', path: '/app/notifications', icon: Bell },
@@ -163,7 +162,7 @@ export const getNavigationForRole = (userRole, tenantContext, stats = {}) => {
         ],
         visible: advancedEnabled
       },
-      { id: 'team-communication', name: 'Team Communication', icon: MessageSquare, collapsed: true, category: 'Team',
+      { id: 'team-communication', name: 'Team Communication', icon: FileText, collapsed: true, category: 'Team',
         items: [
           { id: 'announcements', name: 'Announcements', path: '/app/notifications', icon: Bell },
           { id: 'collaborations', name: 'Collaborations', path: `/tenant/${tenantContext?.id}/partners`, icon: Users },
@@ -181,7 +180,7 @@ export const getNavigationForRole = (userRole, tenantContext, stats = {}) => {
       { id: 'reports-view', name: 'Reports', icon: BarChart3, path: '/app/reports', items: [], category: 'Team' },
       { id: 'team-tools', name: 'Team Tools', icon: Users, collapsed: true, category: 'Team',
         items: [
-          { id: 'chat', name: 'Real-Time Chat', path: '/app/mission-control', icon: MessageSquare },
+          { id: 'chat', name: 'Real-Time Chat', path: '/app/mission-control', icon: FileText },
           { id: 'announcements', name: 'Announcements', path: '/app/notifications', icon: Bell },
           { id: 'shared-docs', name: 'Shared Documents', path: '/app/documents', icon: FolderOpen }
         ]
@@ -317,26 +316,21 @@ export const RoleBadge = ({ role }) => {
 };
 
 export const RoleActivationPanel = ({ role, currentTenant, tenants = [], onTenantSwitch }) => {
-  const { isDark } = useTheme();
-  const { t } = useI18n();
   const { actions } = useApp();
   const [list, setList] = useState(tenants || []);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (role === 'platform_admin' && (!list || list.length === 0)) {
-      setLoading(true);
       import('../../services/api').then(({ apiServices }) => {
         apiServices.tenants.getAll()
           .then(res => {
             const data = res?.data?.data || res?.data || [];
             setList(Array.isArray(data) ? data : []);
           })
-          .catch(() => setList([]))
-          .finally(() => setLoading(false));
+          .catch(() => setList([]));
       });
     }
-  }, [role]);
+  }, [role, list]);
   return (
     <div className="auto-container w-full max-w-full">
       <div className="flex items-center justify-between gap-2 w-full">
@@ -366,5 +360,3 @@ export const RoleActivationPanel = ({ role, currentTenant, tenants = [], onTenan
     </div>
   );
 };
-
-export {};

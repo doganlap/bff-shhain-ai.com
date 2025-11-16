@@ -8,16 +8,24 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import EnterprisePageLayout from '../../components/layout/EnterprisePageLayout';
+import { renderWithProviders } from '../TestWrapper';
 
 const mockNavigate = vi.fn();
 
-vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
-  return {
-    ...actual,
-    useNavigate: () => mockNavigate,
-  };
-});
+vi.mock('react-router-dom', () => ({
+  ...vi.importActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
+  useLocation: () => ({ pathname: '/' }),
+}));
+
+vi.mock('../../components/guidance/ProcessGuideBanner', () => ({
+  default: () => null,
+}));
+
+vi.mock('../../config/processGuides', () => ({
+  processGuides: {},
+  resolveGuideKey: vi.fn(),
+}));
 
 describe('EnterprisePageLayout Component Tests', () => {
   beforeEach(() => {
@@ -30,7 +38,7 @@ describe('EnterprisePageLayout Component Tests', () => {
       children: <div>Test Content</div>,
     };
 
-    return render(
+    return renderWithProviders(
       <BrowserRouter>
         <EnterprisePageLayout {...defaultProps} {...props} />
       </BrowserRouter>
@@ -206,8 +214,8 @@ describe('EnterprisePageLayout Component Tests', () => {
     it('should have dark mode classes', () => {
       const { container } = renderLayout();
 
-      // Check for dark mode classes
-      const headerDiv = container.querySelector('.dark\\:bg-gray-800');
+      // Check for dark mode classes - using attribute selector as alternative
+      const headerDiv = container.querySelector('[class*="dark:bg-gray-800"]');
       expect(headerDiv).toBeInTheDocument();
     });
   });
@@ -246,9 +254,11 @@ describe('EnterprisePageLayout Component Tests', () => {
     it('should have responsive padding classes', () => {
       const { container } = renderLayout();
 
-      // Check for responsive padding
-      const contentDiv = container.querySelector('.px-4.sm\\:px-6.lg\\:px-8');
+      // Check for responsive padding - checking individual classes
+      const contentDiv = container.querySelector('.px-4');
       expect(contentDiv).toBeInTheDocument();
+      expect(contentDiv.className).toContain('sm:px-6');
+      expect(contentDiv.className).toContain('lg:px-8');
     });
   });
 });

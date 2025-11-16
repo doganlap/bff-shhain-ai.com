@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, MessageCircle, Star, Target, Users, ArrowRight } from 'lucide-react';
+import { X, MessageCircle, Star, ArrowRight } from 'lucide-react';
 
 const ExitIntentPopup = ({ isVisible, onClose, onSubmit }) => {
   const [currentQuestion, setCurrentQuestion] = useState(0);

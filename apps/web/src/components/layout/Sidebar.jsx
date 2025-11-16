@@ -1,37 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n.jsx';
-import { useTheme } from '../theme/ThemeProvider';
 import { getNavigationForRole } from './MultiTenantNavigation';
-import { 
-  Home, Shield, Target, FileText, Building2, Users, 
-  BarChart3, Database, Settings, Menu, X,
-  ChevronDown, ChevronRight, Archive, AlertTriangle, 
-  CheckCircle, Activity, Bell, Bot, ShieldCheck,
-  FolderOpen, Workflow, TrendingUp, Cpu, Globe,
-  UserCheck, GitBranch, Monitor, Code, Briefcase, BookOpen, Award,
-  Plus, Edit, Trash2, RefreshCw, Filter, Search, Download, Upload,
-  Play, Pause, Eye, EyeOff, Star, Heart, Share2, Copy
+import {
+  Home, Shield, Target, FileText, Building2, Users,
+  BarChart3, Settings, Menu, X,
+  ChevronDown, ChevronRight,
+  CheckCircle, Activity, Bell,
+  FolderOpen, TrendingUp, Cpu, Globe,
+  UserCheck, GitBranch, BookOpen, Award, Archive, AlertTriangle, ShieldCheck, Star, Heart, Copy, Bot,
+  Plus, Edit, RefreshCw, Search, Download
 } from 'lucide-react';
 import { RoleActivationPanel } from './MultiTenantNavigation';
-import { apiServices } from '../../services/api';
+
 
 const Sidebar = () => {
   const { state, actions } = useApp();
-  const { sidebarOpen, stats, user, isAuthenticated, tenants, currentTenant } = state;
+  const { sidebarOpen, stats, user, isAuthenticated, currentTenant, tenants } = state;
   const location = useLocation();
   const navigate = useNavigate();
   const { t, isRTL } = useI18n();
-  const { isDark } = useTheme();
-  
+
+
   // Enhanced state for interactive components
   const [searchTerm, setSearchTerm] = useState('');
   const [favorites, setFavorites] = useState([]);
   const [recentItems, setRecentItems] = useState([]);
-  const [notifications, setNotifications] = useState([]);
+
   const [isRefreshing, setIsRefreshing] = useState(false);
-  
+
   // State for collapsible groups (GRC business logic flow)
   const [collapsedGroups, setCollapsedGroups] = useState({
     'dashboard': true,
@@ -57,25 +56,25 @@ const Sidebar = () => {
   };
 
   // Enhanced action handlers
-  const handleNavigation = (path, itemId) => {
+  const handleNavigation = React.useCallback((path, itemId) => {
     // Add to recent items
     setRecentItems(prev => {
       const filtered = prev.filter(item => item.id !== itemId);
       return [{ id: itemId, path, timestamp: Date.now() }, ...filtered].slice(0, 10);
     });
-    
+
     navigate(path);
-  };
+  }, [navigate]);
 
   const toggleFavorite = (itemId) => {
-    setFavorites(prev => 
-      prev.includes(itemId) 
+    setFavorites(prev =>
+      prev.includes(itemId)
         ? prev.filter(id => id !== itemId)
         : [...prev, itemId]
     );
   };
 
-  const handleRefresh = async () => {
+  const handleRefresh = React.useCallback(async () => {
     setIsRefreshing(true);
     try {
       await actions.refreshData();
@@ -85,7 +84,7 @@ const Sidebar = () => {
     } finally {
       setIsRefreshing(false);
     }
-  };
+  }, [actions]);
 
   const handleQuickAction = (action, item) => {
     switch (action) {
@@ -109,8 +108,8 @@ const Sidebar = () => {
   // Filter navigation based on search
   const filterNavigation = (items) => {
     if (!searchTerm) return items;
-    
-    return items.filter(item => 
+
+    return items.filter(item =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -120,30 +119,31 @@ const Sidebar = () => {
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const sidebarRef = useRef(null);
 
   // Touch gesture handlers
   const handleTouchStart = (e) => {
     setTouchEnd(null);
     setTouchStart({
-      x: e.targetTouches[0].clientX,
-      y: e.targetTouches[0].clientY,
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
     });
   };
 
   const handleTouchMove = (e) => {
     setTouchEnd({
-      x: e.targetTouches[0].clientX,
-      y: e.targetTouches[0].clientY,
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY,
     });
   };
 
   const handleTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    
+
     const deltaX = touchStart.x - touchEnd.x;
     const deltaY = touchStart.y - touchEnd.y;
     const minSwipeDistance = 50;
-    
+
     // Horizontal swipe for sidebar toggle
     if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
       if (deltaX > 0) {
@@ -179,21 +179,21 @@ const Sidebar = () => {
             break;
         }
       }
-      
+
       // Arrow key navigation
       if (sidebarOpen) {
         const allItems = navigationGroups.flatMap(group => group.items);
-        
+
         switch (e.key) {
           case 'ArrowDown':
             e.preventDefault();
-            setSelectedIndex(prev => 
+            setSelectedIndex(prev =>
               prev < allItems.length - 1 ? prev + 1 : 0
             );
             break;
           case 'ArrowUp':
             e.preventDefault();
-            setSelectedIndex(prev => 
+            setSelectedIndex(prev =>
               prev > 0 ? prev - 1 : allItems.length - 1
             );
             break;
@@ -214,7 +214,7 @@ const Sidebar = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sidebarOpen, selectedIndex, searchTerm]);
+  }, [sidebarOpen, selectedIndex, searchTerm, navigationGroups, actions, handleRefresh, handleNavigation]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -225,7 +225,24 @@ const Sidebar = () => {
     window.addEventListener('resize', handleResize);
     handleResize();
     return () => window.removeEventListener('resize', handleResize);
-  }, [sidebarOpen]);
+  }, [sidebarOpen, actions]);
+
+  // Set up passive touch event listeners to improve scroll performance
+  useEffect(() => {
+    const sidebar = sidebarRef.current;
+    if (!sidebar) return;
+
+    // Add passive event listeners for touch events
+    sidebar.addEventListener('touchstart', handleTouchStart, { passive: true });
+    sidebar.addEventListener('touchmove', handleTouchMove, { passive: true });
+    sidebar.addEventListener('touchend', handleTouchEnd, { passive: true });
+
+    return () => {
+      sidebar.removeEventListener('touchstart', handleTouchStart);
+      sidebar.removeEventListener('touchmove', handleTouchMove);
+      sidebar.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, []);
 
   // Save user preferences
   useEffect(() => {
@@ -237,7 +254,7 @@ const Sidebar = () => {
   }, [recentItems]);
 
   // GRC Business Logic Flow - Organized by workflow stages
-  const navigationGroups = [
+  const navigationGroups = React.useMemo(() => ([
     // ============================================================================
     // 1. DASHBOARD - Overview & Starting Point
     // ============================================================================
@@ -246,19 +263,19 @@ const Sidebar = () => {
       name: t('nav.dashboard'),
       icon: Home,
       items: [
-        { 
-          id: 'dashboard', 
-          name: t('nav.dashboard'), 
-          path: '/app/dashboard/legacy', 
-          icon: Home, 
+        {
+          id: 'dashboard',
+          name: t('nav.dashboard'),
+          path: '/app/dashboard/legacy',
+          icon: Home,
           description: t('dashboard.overview'),
           badge: null
         },
-        { 
-          id: 'dashboard-detailed', 
-          name: t('nav.analytics'), 
-          path: '/app/dashboard', 
-          icon: BarChart3, 
+        {
+          id: 'dashboard-detailed',
+          name: t('nav.analytics'),
+          path: '/app/dashboard',
+          icon: BarChart3,
           description: t('dashboard.statistics'),
           badge: null
         },
@@ -304,7 +321,7 @@ const Sidebar = () => {
         }
       ]
     },
-    
+
     // ============================================================================
     // 2. GOVERNANCE SETUP - Define what to comply with & who is involved
     // ============================================================================
@@ -313,41 +330,41 @@ const Sidebar = () => {
       name: t('nav.governance'),
       icon: Shield,
       items: [
-        { 
-          id: 'frameworks', 
-          name: t('nav.frameworks'), 
-          path: '/app/frameworks', 
-          icon: Target, 
+        {
+          id: 'frameworks',
+          name: t('nav.frameworks'),
+          path: '/app/frameworks',
+          icon: Target,
           description: t('frameworks.description'),
           badge: stats.frameworks || 0
         },
-        { 
-          id: 'organizations', 
-          name: t('nav.organizations'), 
-          path: '/app/organizations', 
-          icon: Building2, 
+        {
+          id: 'organizations',
+          name: t('nav.organizations'),
+          path: '/app/organizations',
+          icon: Building2,
           description: t('organizations.description'),
           badge: stats.organizations || 0
         },
-        { 
-          id: 'users', 
-          name: t('nav.users'), 
-          path: '/app/users', 
-          icon: UserCheck, 
+        {
+          id: 'users',
+          name: t('nav.users'),
+          path: '/app/users',
+          icon: UserCheck,
           description: t('users.description'),
           badge: null
         },
-        { 
-          id: 'regulators', 
-          name: 'Regulators', 
-          path: '/app/regulators', 
-          icon: Award, 
+        {
+          id: 'regulators',
+          name: 'Regulators',
+          path: '/app/regulators',
+          icon: Award,
           description: 'Regulatory bodies',
           badge: stats.regulators || 0
         }
       ]
     },
-    
+
     // ============================================================================
     // 3. RISK MANAGEMENT - Identify, assess & mitigate risks
     // ============================================================================
@@ -356,33 +373,33 @@ const Sidebar = () => {
       name: 'Risk Management',
       icon: AlertTriangle,
       items: [
-        { 
-          id: 'risks', 
-          name: 'Risk Register', 
-          path: '/app/risks', 
-          icon: AlertTriangle, 
+        {
+          id: 'risks',
+          name: 'Risk Register',
+          path: '/app/risks',
+          icon: AlertTriangle,
           description: 'Identify & track risks',
           badge: null
         },
-        { 
-          id: 'risk-management', 
-          name: 'Risk Assessment', 
-          path: '/app/risk-management', 
-          icon: TrendingUp, 
+        {
+          id: 'risk-management',
+          name: 'Risk Assessment',
+          path: '/app/risk-management',
+          icon: TrendingUp,
           description: 'Assess & treat risks',
           badge: null
         },
-        { 
-          id: 'controls', 
-          name: 'Controls', 
-          path: '/app/controls', 
-          icon: ShieldCheck, 
+        {
+          id: 'controls',
+          name: 'Controls',
+          path: '/app/controls',
+          icon: ShieldCheck,
           description: 'Mitigating controls',
           badge: stats.controls || 0
         }
       ]
     },
-    
+
     // ============================================================================
     // 4. COMPLIANCE OPERATIONS - Assess, track & prove compliance
     // ============================================================================
@@ -391,41 +408,41 @@ const Sidebar = () => {
       name: 'Compliance Operations',
       icon: CheckCircle,
       items: [
-        { 
-          id: 'assessments', 
-          name: 'Assessments', 
-          path: '/app/assessments', 
-          icon: FileText, 
+        {
+          id: 'assessments',
+          name: 'Assessments',
+          path: '/app/assessments',
+          icon: FileText,
           description: 'Compliance assessments',
           badge: stats.assessments || 0
         },
-        { 
-          id: 'compliance', 
-          name: 'Compliance Tracking', 
-          path: '/app/compliance', 
-          icon: CheckCircle, 
+        {
+          id: 'compliance',
+          name: 'Compliance Tracking',
+          path: '/app/compliance',
+          icon: CheckCircle,
           description: 'Monitor compliance status',
           badge: null
         },
-        { 
-          id: 'evidence', 
-          name: 'Evidence', 
-          path: '/app/evidence', 
-          icon: Archive, 
+        {
+          id: 'evidence',
+          name: 'Evidence',
+          path: '/app/evidence',
+          icon: Archive,
           description: 'Collect & manage proof',
           badge: null
         },
-        { 
-          id: 'audit-logs', 
-          name: 'Audit Trail', 
-          path: '/app/audit-logs', 
-          icon: Activity, 
+        {
+          id: 'audit-logs',
+          name: 'Audit Trail',
+          path: '/app/audit-logs',
+          icon: Activity,
           description: 'System audit logs',
           badge: null
         }
       ]
     },
-    
+
     // ============================================================================
     // 5. REPORTING & INTELLIGENCE - Insights & regulatory updates
     // ============================================================================
@@ -434,27 +451,27 @@ const Sidebar = () => {
       name: 'Reporting & Intelligence',
       icon: BarChart3,
       items: [
-        { 
-          id: 'reports', 
-          name: 'Reports & Analytics', 
-          path: '/app/reports', 
-          icon: BarChart3, 
+        {
+          id: 'reports',
+          name: 'Reports & Analytics',
+          path: '/app/reports',
+          icon: BarChart3,
           description: 'Generate reports',
           badge: null
         },
-        { 
-          id: 'regulatory-intelligence', 
-          name: 'Regulatory Intelligence', 
-          path: '/app/regulatory-intelligence', 
-          icon: ShieldCheck, 
+        {
+          id: 'regulatory-intelligence',
+          name: 'Regulatory Intelligence',
+          path: '/app/regulatory-intelligence',
+          icon: ShieldCheck,
           description: 'Regulatory updates',
           badge: null
         },
-        { 
-          id: 'sector-intelligence', 
-          name: 'Sector Intelligence', 
-          path: '/app/sector-intelligence', 
-          icon: Globe, 
+        {
+          id: 'sector-intelligence',
+          name: 'Sector Intelligence',
+          path: '/app/sector-intelligence',
+          icon: Globe,
           description: 'Industry insights',
           badge: null
         },
@@ -476,7 +493,7 @@ const Sidebar = () => {
         }
       ]
     },
-    
+
     // ============================================================================
     // 6. AUTOMATION & AI - Intelligent automation & assistance
     // ============================================================================
@@ -485,41 +502,41 @@ const Sidebar = () => {
       name: 'Automation & AI',
       icon: Bot,
       items: [
-        { 
-          id: 'workflows', 
-          name: 'Workflows', 
-          path: '/app/workflows', 
-          icon: GitBranch, 
+        {
+          id: 'workflows',
+          name: 'Workflows',
+          path: '/app/workflows',
+          icon: GitBranch,
           description: 'Process automation',
           badge: null
         },
-        { 
-          id: 'ai-scheduler', 
-          name: 'AI Scheduler', 
-          path: '/app/ai-scheduler', 
-          icon: Bot, 
+        {
+          id: 'ai-scheduler',
+          name: 'AI Scheduler',
+          path: '/app/ai-scheduler',
+          icon: Bot,
           description: 'Intelligent scheduling',
           badge: null
         },
-        { 
-          id: 'rag-service', 
-          name: 'RAG AI Assistant', 
-          path: '/app/rag', 
-          icon: Cpu, 
+        {
+          id: 'rag-service',
+          name: 'RAG AI Assistant',
+          path: '/app/rag',
+          icon: Cpu,
           description: 'AI knowledge base',
           badge: null
         },
-        { 
-          id: 'regulatory-engine', 
-          name: 'Regulatory Engine', 
-          path: '/app/regulatory-engine', 
-          icon: Settings, 
+        {
+          id: 'regulatory-engine',
+          name: 'Regulatory Engine',
+          path: '/app/regulatory-engine',
+          icon: Settings,
           description: 'Intelligence engine',
           badge: null
         }
       ]
     },
-    
+
     // ============================================================================
     // 7. ADMINISTRATION - System management & configuration
     // ============================================================================
@@ -528,116 +545,116 @@ const Sidebar = () => {
       name: 'Administration',
       icon: Settings,
       items: [
-        { 
-          id: 'documents', 
-          name: 'Documents', 
-          path: '/app/documents', 
-          icon: FolderOpen, 
+        {
+          id: 'documents',
+          name: 'Documents',
+          path: '/app/documents',
+          icon: FolderOpen,
           description: 'Document repository',
           badge: null
         },
-        { 
-          id: 'partners', 
-          name: 'Partners', 
-          path: '/app/partners', 
-          icon: Briefcase, 
+        {
+          id: 'partners',
+          name: 'Partners',
+          path: '/app/partners',
+          icon: Award,
           description: 'Partner management',
           badge: null
         },
-        { 
-          id: 'notifications', 
-          name: 'Notifications', 
-          path: '/app/notifications', 
-          icon: Bell, 
+        {
+          id: 'notifications',
+          name: 'Notifications',
+          path: '/app/notifications',
+          icon: Bell,
           description: 'Alert management',
           badge: null
         },
-        { 
-          id: 'performance', 
-          name: 'Performance', 
-          path: '/app/performance', 
-          icon: Monitor, 
+        {
+          id: 'performance',
+          name: 'Performance',
+          path: '/app/performance',
+          icon: Activity,
           description: 'System monitoring',
           badge: null
         },
-        { 
-          id: 'database', 
-          name: 'Database', 
-          path: '/app/database', 
-          icon: Database, 
+        {
+          id: 'database',
+          name: 'Database',
+          path: '/app/database',
+          icon: FileText,
           description: 'Data management',
           badge: null
         },
-        { 
-          id: 'api-management', 
-          name: 'API Management', 
-          path: '/app/api-management', 
-          icon: Code, 
+        {
+          id: 'api-management',
+          name: 'API Management',
+          path: '/app/api-management',
+          icon: FileText,
           description: 'API configuration',
           badge: null
         },
-        { 
-          id: 'settings', 
-          name: 'Settings', 
-          path: '/app/settings', 
-          icon: Settings, 
+        {
+          id: 'settings',
+          name: 'Settings',
+          path: '/app/settings',
+          icon: Settings,
           description: 'System configuration',
           badge: null
         }
       ]
     },
-    
+
     // ============================================================================
     // 8. PLATFORM & MSP - Multi-tenant platform management
     // ============================================================================
     {
       id: 'platform',
       name: 'Platform & MSP',
-      icon: Briefcase,
+      icon: Award,
       items: [
-        { 
-          id: 'licenses', 
-          name: 'License Management', 
-          path: '/platform/licenses', 
-          icon: Award, 
+        {
+          id: 'licenses',
+          name: 'License Management',
+          path: '/platform/licenses',
+          icon: Award,
           description: 'License catalog & management',
           badge: null
         },
-        { 
-          id: 'renewals', 
-          name: 'Renewals Pipeline', 
-          path: '/platform/renewals', 
-          icon: GitBranch, 
+        {
+          id: 'renewals',
+          name: 'Renewals Pipeline',
+          path: '/platform/renewals',
+          icon: GitBranch,
           description: 'Renewal opportunities',
           badge: null
         },
-        { 
-          id: 'usage-dashboard', 
-          name: 'Usage Dashboard', 
-          path: '/platform/usage', 
-          icon: Activity, 
+        {
+          id: 'usage-dashboard',
+          name: 'Usage Dashboard',
+          path: '/platform/usage',
+          icon: Activity,
           description: 'Platform usage metrics',
           badge: null
         },
-        { 
-          id: 'auto-assessment', 
-          name: 'Auto Assessment Generator', 
-          path: '/platform/auto-assessment', 
-          icon: Bot, 
+        {
+          id: 'auto-assessment',
+          name: 'Auto Assessment Generator',
+          path: '/platform/auto-assessment',
+          icon: Bot,
           description: 'Automated assessment creation',
           badge: null
         },
-        { 
-          id: 'upgrade', 
-          name: 'Upgrade Management', 
-          path: '/platform/upgrade', 
-          icon: TrendingUp, 
+        {
+          id: 'upgrade',
+          name: 'Upgrade Management',
+          path: '/platform/upgrade',
+          icon: TrendingUp,
           description: 'Tenant upgrade management',
           badge: null
         }
       ]
     },
-    
+
     // ============================================================================
     // 9. SPECIALIZED & REGIONAL - KSA-specific and specialized features
     // ============================================================================
@@ -646,100 +663,100 @@ const Sidebar = () => {
       name: 'Specialized & Regional',
       icon: Globe,
       items: [
-        { 
-          id: 'ksa-grc', 
-          name: 'KSA GRC', 
-          path: '/app/ksa-grc', 
-          icon: Award, 
+        {
+          id: 'ksa-grc',
+          name: 'KSA GRC',
+          path: '/app/ksa-grc',
+          icon: Award,
           description: 'Saudi Arabia GRC',
           badge: null
         },
-        { 
-          id: 'components-demo', 
-          name: 'Components Demo', 
-          path: '/app/components-demo', 
-          icon: BookOpen, 
+        {
+          id: 'components-demo',
+          name: 'Components Demo',
+          path: '/app/components-demo',
+          icon: BookOpen,
           description: 'UI components',
           badge: null
         },
-        { 
-          id: 'modern-components-demo', 
-          name: 'Modern Components Demo', 
-          path: '/demo/modern-components', 
-          icon: Cpu, 
+        {
+          id: 'modern-components-demo',
+          name: 'Modern Components Demo',
+          path: '/demo/modern-components',
+          icon: Cpu,
           description: 'Modern UI showcase',
           badge: null
         },
-        { 
-          id: 'landing-page', 
-          name: 'Landing Page', 
-          path: '/landing', 
-          icon: Home, 
+        {
+          id: 'landing-page',
+          name: 'Landing Page',
+          path: '/landing',
+          icon: Home,
           description: 'Public landing page',
           badge: null
         },
-        { 
-          id: 'demo-page', 
-          name: 'Demo Page', 
-          path: '/demo', 
-          icon: Activity, 
+        {
+          id: 'demo-page',
+          name: 'Demo Page',
+          path: '/demo',
+          icon: Activity,
           description: 'Demo environment',
           badge: null
         }
       ]
     },
-    
+
     // ============================================================================
     // 10. ADVANCED & MODERN UI - Enhanced user interfaces
     // ============================================================================
     {
       id: 'advanced-ui',
       name: 'Advanced & Modern UI',
-      icon: Monitor,
+      icon: Cpu,
       items: [
-        { 
-          id: 'advanced-dashboard', 
-          name: 'Advanced Dashboard', 
-          path: '/advanced', 
-          icon: TrendingUp, 
+        {
+          id: 'advanced-dashboard',
+          name: 'Advanced Dashboard',
+          path: '/advanced',
+          icon: TrendingUp,
           description: 'Advanced GRC dashboard',
           badge: null
         },
-        { 
-          id: 'advanced-assessments', 
-          name: 'Advanced Assessments', 
-          path: '/advanced/assessments', 
-          icon: FileText, 
+        {
+          id: 'advanced-assessments',
+          name: 'Advanced Assessments',
+          path: '/advanced/assessments',
+          icon: FileText,
           description: 'Advanced assessment manager',
           badge: null
         },
-        { 
-          id: 'advanced-frameworks', 
-          name: 'Advanced Frameworks', 
-          path: '/advanced/frameworks', 
-          icon: Target, 
+        {
+          id: 'advanced-frameworks',
+          name: 'Advanced Frameworks',
+          path: '/advanced/frameworks',
+          icon: Target,
           description: 'Advanced framework manager',
           badge: null
         },
-        { 
-          id: 'enhanced-dashboard', 
-          name: 'Enhanced Dashboard', 
-          path: '/app/dashboard', 
-          icon: BarChart3, 
+        {
+          id: 'enhanced-dashboard',
+          name: 'Enhanced Dashboard',
+          path: '/app/dashboard',
+          icon: BarChart3,
           description: 'Enhanced dashboard with KPIs',
           badge: null
         },
-        { 
-          id: 'modern-advanced-dashboard', 
-          name: 'Modern Advanced Dashboard', 
-          path: '/platform/advanced-dashboard', 
-          icon: Cpu, 
+        {
+          id: 'modern-advanced-dashboard',
+          name: 'Modern Advanced Dashboard',
+          path: '/platform/advanced-dashboard',
+          icon: Cpu,
           description: 'Latest modern dashboard',
           badge: null
         }
       ]
     },
-    
+
     // ============================================================================
     // 11. TENANT & MULTI-TENANT - Tenant-specific features
     // ============================================================================
@@ -748,41 +765,41 @@ const Sidebar = () => {
       name: 'Tenant Management',
       icon: Building2,
       items: [
-        { 
-          id: 'tenant-dashboard', 
-          name: 'Tenant Dashboard', 
-          path: '/app/dashboard/tenant', 
-          icon: Building2, 
+        {
+          id: 'tenant-dashboard',
+          name: 'Tenant Dashboard',
+          path: '/app/dashboard/tenant',
+          icon: Building2,
           description: 'Tenant-specific metrics',
           badge: null
         },
-        { 
-          id: 'organization-details', 
-          name: 'Organization Details', 
-          path: '/app/organizations/:id', 
-          icon: Building2, 
+        {
+          id: 'organization-details',
+          name: 'Organization Details',
+          path: '/app/organizations/:id',
+          icon: Building2,
           description: 'Detailed organization view',
           badge: null
         },
-        { 
-          id: 'organization-form', 
-          name: 'Organization Form', 
-          path: '/app/organizations/new', 
-          icon: Building2, 
+        {
+          id: 'organization-form',
+          name: 'Organization Form',
+          path: '/app/organizations/new',
+          icon: Building2,
           description: 'Create/edit organizations',
           badge: null
         },
-        { 
-          id: 'organizations-list', 
-          name: 'Organizations List', 
-          path: '/app/organizations/list', 
-          icon: Building2, 
+        {
+          id: 'organizations-list',
+          name: 'Organizations List',
+          path: '/app/organizations/list',
+          icon: Building2,
           description: 'List all organizations',
           badge: null
         }
       ]
     },
-    
+
     // ============================================================================
     // 12. LEGACY & COMPATIBILITY - Legacy versions for compatibility
     // ============================================================================
@@ -791,41 +808,41 @@ const Sidebar = () => {
       name: 'Legacy & Compatibility',
       icon: Archive,
       items: [
-        { 
-          id: 'legacy-dashboard', 
-          name: 'Legacy Dashboard', 
-          path: '/app/dashboard/legacy', 
-          icon: Home, 
+        {
+          id: 'legacy-dashboard',
+          name: 'Legacy Dashboard',
+          path: '/app/dashboard/legacy',
+          icon: Home,
           description: 'Original dashboard version',
           badge: null
         },
-        { 
-          id: 'legacy-compliance', 
-          name: 'Legacy Compliance', 
-          path: '/app/compliance/legacy', 
-          icon: CheckCircle, 
+        {
+          id: 'legacy-compliance',
+          name: 'Legacy Compliance',
+          path: '/app/compliance/legacy',
+          icon: CheckCircle,
           description: 'Original compliance tracking',
           badge: null
         },
-        { 
-          id: 'legacy-risk', 
-          name: 'Legacy Risk Management', 
-          path: '/app/risks/legacy', 
-          icon: AlertTriangle, 
+        {
+          id: 'legacy-risk',
+          name: 'Legacy Risk Management',
+          path: '/app/risks/legacy',
+          icon: AlertTriangle,
           description: 'Original risk management',
           badge: null
         },
-        { 
-          id: 'risks-list', 
-          name: 'Risks List', 
-          path: '/app/risks/list', 
-          icon: AlertTriangle, 
+        {
+          id: 'risks-list',
+          name: 'Risks List',
+          path: '/app/risks/list',
+          icon: AlertTriangle,
           description: 'Simple risks listing',
           badge: null
         }
       ]
     },
-    
+
     // ============================================================================
     // 13. ASSESSMENT & COLLABORATION - Assessment-specific features
     // ============================================================================
@@ -834,26 +851,26 @@ const Sidebar = () => {
       name: 'Assessment & Collaboration',
       icon: Users,
       items: [
-        { 
-          id: 'assessment-collaborative', 
-          name: 'Collaborative Assessment', 
-          path: '/app/assessments/:id/collaborative', 
-          icon: Users, 
+        {
+          id: 'assessment-collaborative',
+          name: 'Collaborative Assessment',
+          path: '/app/assessments/:id/collaborative',
+          icon: Users,
           description: 'Real-time collaborative assessments',
           badge: null
         },
-        { 
-          id: 'assessment-details', 
-          name: 'Assessment Details', 
-          path: '/app/assessments/:id', 
-          icon: FileText, 
+        {
+          id: 'assessment-details',
+          name: 'Assessment Details',
+          path: '/app/assessments/:id',
+          icon: FileText,
           description: 'Detailed assessment view',
           badge: null
         }
       ]
     }
-    
-  ];
+
+  ]), [t, stats]);
 
   const isActive = (path) => {
     if (path === '/app') {
@@ -867,7 +884,7 @@ const Sidebar = () => {
     const isFavorite = favorites.includes(item.id);
     const isRecent = recentItems.some(recent => recent.id === item.id);
     const isSelected = selectedIndex === index;
-    
+
     return (
       <div key={item.id} className="group relative">
         <NavLink
@@ -885,7 +902,7 @@ const Sidebar = () => {
           <item.icon className={`flex-shrink-0 h-6 w-6 ${sidebarOpen ? 'mr-3' : 'mx-auto'} ${
             active ? 'text-primary-600' : 'text-gray-500 group-hover:text-primary-600'
           }`} />
-          
+
           {sidebarOpen && (
             <div className="flex-1 flex items-center justify-between min-w-0">
               <div className="flex-1 min-w-0">
@@ -908,7 +925,7 @@ const Sidebar = () => {
             </div>
           )}
         </NavLink>
-        
+
         {/* Action buttons (visible on hover) */}
         {sidebarOpen && (
           <div className="absolute right-2 top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex space-x-1">
@@ -924,7 +941,7 @@ const Sidebar = () => {
             >
               <Heart className={`h-3 w-3 ${isFavorite ? 'fill-current text-yellow-400' : ''}`} />
             </button>
-            
+
             <div className="relative group/action">
               <button
                 className={`p-1 rounded hover:bg-white hover:bg-opacity-20 ${
@@ -934,7 +951,7 @@ const Sidebar = () => {
               >
                 <div className="h-3 w-3 bg-current rounded-full" />
               </button>
-              
+
               {/* Quick actions dropdown */}
               <div className="absolute right-0 top-full mt-1 w-32 bg-gray-800 rounded-lg shadow-lg border border-gray-600 py-1 z-50 hidden group-hover/action:block">
                 <button
@@ -988,7 +1005,7 @@ const Sidebar = () => {
   const renderNavigationGroup = (group) => {
     const isCollapsed = collapsedGroups[group.id];
     const hasActiveItem = group.items.some(item => isActive(item.path));
-    
+
     return (
       <div key={group.id} className="mb-2 relative group">
         <button
@@ -1073,13 +1090,11 @@ const Sidebar = () => {
   };
 
   return (
-    <div 
+    <div
+      ref={sidebarRef}
       className={`enterprise-sidebar transition-all duration-300 sidebar-auto ${
         sidebarOpen ? 'sidebar-expanded w-72' : 'sidebar-collapsed w-16'
       }`}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
       <div className="flex flex-col h-full">
         {/* Enhanced Enterprise Header - Dark Theme */}
@@ -1105,7 +1120,7 @@ const Sidebar = () => {
             >
               <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             </button>
-            
+
             {/* Toggle sidebar */}
             <button
               onClick={actions.toggleSidebar}
@@ -1137,7 +1152,7 @@ const Sidebar = () => {
                 </button>
               )}
             </div>
-            
+
             {/* Quick filters */}
             <div className="flex flex-wrap gap-2 mt-3">
               <button
@@ -1171,10 +1186,10 @@ const Sidebar = () => {
         {/* Role & Tenant Panel for Platform Admins */}
         {sidebarOpen && user?.role === 'platform_admin' && (
           <div className="p-4 bg-white border-b border-gray-200">
-            <RoleActivationPanel 
+            <RoleActivationPanel
               role={user?.role}
               currentTenant={currentTenant}
-              tenants={localTenants}
+              tenants={tenants}
               onTenantSwitch={(tenant) => actions.setCurrentTenant(tenant)}
             />
           </div>
@@ -1263,9 +1278,9 @@ const Sidebar = () => {
                 const item = navigationGroups
                   .flatMap(group => group.items)
                   .find(i => i.id === recent.id);
-                
+
                 if (!item) return null;
-                
+
                 return (
                   <button
                     key={recent.id}
@@ -1322,37 +1337,37 @@ const Sidebar = () => {
                   </button>
                 </div>
               )}
-              
+
               {/* Connection Status */}
               <div className="flex items-center space-x-3 p-2 bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className={`p-1 rounded-full ${
-                  state.apiConnectionStatus === 'connected' 
-                    ? 'bg-green-100' 
-                    : state.isOffline 
-                    ? 'bg-orange-100' 
+                  state.apiConnectionStatus === 'connected'
+                    ? 'bg-green-100'
+                    : state.isOffline
+                    ? 'bg-orange-100'
                     : 'bg-gray-100'
                 }`}>
                   <div className={`h-2 w-2 rounded-full ${
-                    state.apiConnectionStatus === 'connected' 
-                      ? 'bg-green-600' 
-                      : state.isOffline 
-                      ? 'bg-orange-600' 
+                    state.apiConnectionStatus === 'connected'
+                      ? 'bg-green-600'
+                      : state.isOffline
+                      ? 'bg-orange-600'
                       : 'bg-gray-500'
                   }`}></div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
-                    {state.apiConnectionStatus === 'connected' 
-                      ? 'API Connected' 
-                      : state.isOffline 
-                      ? 'Offline Mode' 
+                    {state.apiConnectionStatus === 'connected'
+                      ? 'API Connected'
+                      : state.isOffline
+                      ? 'Offline Mode'
                       : 'Connecting...'}
                   </p>
                   <p className="text-xs text-gray-600">
-                    {state.apiConnectionStatus === 'connected' 
-                      ? 'Live data available' 
-                      : state.isOffline 
-                      ? 'Demo data loaded' 
+                    {state.apiConnectionStatus === 'connected'
+                      ? 'Live data available'
+                      : state.isOffline
+                      ? 'Demo data loaded'
                       : 'Checking connection'}
                   </p>
                 </div>
@@ -1365,7 +1380,7 @@ const Sidebar = () => {
                   <RefreshCw className={`h-3 w-3 ${isRefreshing ? 'animate-spin' : ''}`} />
                 </button>
               </div>
-              
+
               {/* Touch Controls for Mobile */}
               <div className="grid grid-cols-2 gap-2 md:hidden">
                 <button
@@ -1384,7 +1399,7 @@ const Sidebar = () => {
                   Search
                 </button>
               </div>
-              
+
               {/* Version Info */}
               <div className="text-center">
                 <p className="text-xs text-gray-400">Shahin-AI KSA</p>
@@ -1404,22 +1419,22 @@ const Sidebar = () => {
               {/* Compact connection status */}
               <div className="flex justify-center">
                 <div className={`p-1 rounded-full ${
-                  state.apiConnectionStatus === 'connected' 
-                    ? 'bg-green-900' 
-                    : state.isOffline 
-                    ? 'bg-orange-900' 
+                  state.apiConnectionStatus === 'connected'
+                    ? 'bg-green-900'
+                    : state.isOffline
+                    ? 'bg-orange-900'
                     : 'bg-gray-600'
                 }`}>
                   <div className={`h-2 w-2 rounded-full ${
-                    state.apiConnectionStatus === 'connected' 
-                      ? 'bg-green-400' 
-                      : state.isOffline 
-                      ? 'bg-orange-400' 
+                    state.apiConnectionStatus === 'connected'
+                      ? 'bg-green-400'
+                      : state.isOffline
+                      ? 'bg-orange-400'
                       : 'bg-gray-400'
                   }`}></div>
                 </div>
               </div>
-              
+
               {/* Compact refresh button */}
               <button
                 onClick={handleRefresh}

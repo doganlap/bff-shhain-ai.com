@@ -52,7 +52,7 @@ const AssessmentPage = () => {
 
   useEffect(() => {
     fetchAssessmentData();
-  }, [id]);
+  }, [id, fetchAssessmentData]);
 
   const fetchAssessmentData = async () => {
     try {

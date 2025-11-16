@@ -1,0 +1,13 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+# List of packages that are allowed to run build/install scripts during pnpm install.
+# This prevents pnpm from prompting about unknown build scripts during CI.
+onlyBuiltDependencies:
+  - '@prisma/client'
+  - '@prisma/engines'
+  - 'es5-ext'
+  - 'esbuild'
+  - 'msw'
+  - 'prisma'

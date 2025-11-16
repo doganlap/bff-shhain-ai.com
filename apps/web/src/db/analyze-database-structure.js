@@ -16,6 +16,7 @@ async function analyzeDatabaseStructure() {
     
     // Step 2: Get database statistics using our function
     console.log('\n2. Getting database statistics...');
+    let schemaTableCount = 0;
     try {
       const statsResponse = await axios.post('http://localhost:5001/api/health', {}, {
         headers: { 'Authorization': `Bearer ${token}` }
@@ -89,7 +90,7 @@ async function analyzeDatabaseStructure() {
       
       // Count CREATE TABLE statements
       const tableMatches = schemaContent.match(/CREATE TABLE[^(]*\(/gi);
-      const schemaTableCount = tableMatches ? tableMatches.length : 0;
+      schemaTableCount = tableMatches ? tableMatches.length : 0;
       
       console.log(`📊 Schema Analysis:`);
       console.log(`   Tables defined in base_schema.sql: ${schemaTableCount}`);
@@ -125,9 +126,10 @@ async function analyzeDatabaseStructure() {
     // Step 5: Migration Files Analysis
     console.log('\n5. Migration Files Analysis...\n');
     
+    let migrationFiles = [];
     try {
       const migrationsPath = path.join(__dirname, 'backend', 'migrations');
-      const migrationFiles = fs.readdirSync(migrationsPath).filter(f => f.endsWith('.sql'));
+      migrationFiles = fs.readdirSync(migrationsPath).filter(f => f.endsWith('.sql'));
       
       console.log(`📁 Migration Files: ${migrationFiles.length}`);
       migrationFiles.forEach((file, index) => {
@@ -143,8 +145,10 @@ async function analyzeDatabaseStructure() {
     console.log('==========================================');
     console.log(`🗄️  Active API Tables: ${totalTables}`);
     console.log(`📊 Total Records: ${totalRecords}`);
-    console.log(`📋 Schema Tables: ${schemaTableCount || 'Unknown'}`);
-    console.log(`🔄 Migration Files: ${migrationFiles?.length || 'Unknown'}`);
+    const schemaTableCountSafe = typeof schemaTableCount === 'number' ? schemaTableCount : 0;
+    const migrationFilesSafe = Array.isArray(migrationFiles) ? migrationFiles : [];
+    console.log(`📋 Schema Tables: ${schemaTableCountSafe}`);
+    console.log(`🔄 Migration Files: ${migrationFilesSafe.length}`);
     
     console.log('\n🎯 KEY TABLES:');
     console.log('- Users (Authentication & RBAC)');

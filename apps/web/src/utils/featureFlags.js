@@ -90,12 +90,14 @@ export const createSafeMockData = (mockFunction, context = 'Unknown') => {
  * Feature flag decorator for components
  */
 export const withFeatureFlag = (Component, flagName, fallbackComponent = null) => {
-  return (props) => {
+  const Wrapped = (props) => {
     if (!getFeatureFlag(flagName)) {
       return fallbackComponent;
     }
     return <Component {...props} />;
   };
+  Wrapped.displayName = `WithFeatureFlag(${Component.displayName || Component.name || 'Component'})`;
+  return Wrapped;
 };
 
 export default {

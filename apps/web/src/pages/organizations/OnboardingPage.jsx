@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Building2, Users, Globe, Shield, TrendingUp, FileText,
-  CheckCircle2, AlertCircle, Loader2, ChevronRight, ChevronLeft,
-  Database, Cloud, CreditCard, Lock, Server, Briefcase
+  Building2, Users, Shield,
+  CheckCircle2, AlertCircle, Loader2, ChevronRight, ChevronLeft
 } from 'lucide-react';
 
 /**
@@ -110,8 +109,8 @@ const OnboardingPage = () => {
   const steps = [
     { id: 1, title: 'Basic Info', titleAr: 'المعلومات الأساسية', icon: Building2 },
     { id: 2, title: 'Size & Structure', titleAr: 'الحجم والهيكل', icon: Users },
-    { id: 3, title: 'Operations', titleAr: 'العمليات', icon: Briefcase },
-    { id: 4, title: 'Technology', titleAr: 'التقنية', icon: Server },
+    { id: 3, title: 'Operations', titleAr: 'العمليات', icon: Shield },
+    { id: 4, title: 'Technology', titleAr: 'التقنية', icon: Shield },
     { id: 5, title: 'Security', titleAr: 'الأمن', icon: Shield }
   ];
 
@@ -535,8 +534,7 @@ const OnboardingPage = () => {
       case 3:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-              <Briefcase className="w-6 h-6 text-blue-600" />
+            <h3 className="text-xl font-semibold text-gray-900">
               Business Operations
             </h3>
 
@@ -595,8 +593,7 @@ const OnboardingPage = () => {
       case 4:
         return (
           <div className="space-y-6">
-            <h3 className="text-xl font-semibold text-gray-900 flex items-center gap-2">
-              <Server className="w-6 h-6 text-blue-600" />
+            <h3 className="text-xl font-semibold text-gray-900">
               Technology & Data Management
             </h3>
 

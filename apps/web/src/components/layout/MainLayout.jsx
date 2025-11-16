@@ -188,9 +188,7 @@ const MainLayoutContent = () => {
                         showUpgrade={false}
                         fallback={
                           <div className="relative">
-                            <AnimatedButton
-                              variant="outline"
-                              size="medium"
+                            <button
                               disabled={true}
                               style={{
                                 width: '100%',
@@ -207,7 +205,7 @@ const MainLayoutContent = () => {
                                 {language === 'ar' ? item.nameAr : item.name}
                               </ArabicTextEngine>
                               <span className="ml-auto text-xs">🔒</span>
-                            </AnimatedButton>
+                            </button>
                           </div>
                         }
                       >

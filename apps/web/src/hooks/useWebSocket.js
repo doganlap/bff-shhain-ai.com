@@ -81,6 +81,10 @@ export const useDocumentCollaboration = (documentId) => {
       setIsConnected(connected);
     });
 
+    const unsubscribeRoomStatus = webSocketService.on('room_status', ({ activeUsers }) => {
+      setCollaborators(activeUsers || []);
+    });
+
     const unsubscribeTyping = webSocketService.on('user_typing', ({ userId, action }) => {
       if (action === 'start') {
         setTypingUsers(prev => [...prev.filter(id => id !== userId), userId]);
@@ -113,13 +117,15 @@ export const useDocumentCollaboration = (documentId) => {
 
     unsubscribeRefs.current = [
       unsubscribeStatus,
+      unsubscribeRoomStatus,
       unsubscribeTyping,
       unsubscribeCursor
     ];
 
     return () => {
+      const timeouts = typingTimeouts.current;
       unsubscribeRefs.current.forEach(unsubscribe => unsubscribe());
-      Object.values(typingTimeouts.current).forEach(clearTimeout);
+      Object.values(timeouts).forEach(clearTimeout);
     };
   }, [documentId]);
 

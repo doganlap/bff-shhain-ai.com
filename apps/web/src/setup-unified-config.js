@@ -288,7 +288,7 @@ async function updateDockerConfiguration(environment) {
 async function updateDockerComposeFile(filePath, environment) {
   // This is a simplified implementation
   // In a real scenario, you would parse and update the YAML file
-  const config = loadConfig(environment);
+  loadConfig(environment);
   
   // For now, we'll just log the intended changes
   console.log(`  🔧 Docker configuration changes:`);

@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
-  Search, Filter, Download, RefreshCw, BarChart3, 
-  Building2, Shield, FileText, TrendingUp, Users,
-  Globe, Target, AlertCircle, CheckCircle
+  Search, Download,
+  Building2, Shield, FileText, TrendingUp,
+  AlertCircle, RefreshCw
 } from 'lucide-react';
 import apiService from '../../services/apiEndpoints';
 import { useApiData } from '../../hooks/useApiData';
-import { toast } from 'sonner';
+ 
 import ErrorFallback from '../../components/common/ErrorFallback';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { Chart } from "react-google-charts";
@@ -119,42 +119,7 @@ const SectorIntelligence = () => {
     return data;
   }, [statistics.controlsByFramework]);
 
-  // Prepare table columns
-  const tableColumns = [
-    { key: 'control_id', label: 'Control ID', sortable: true },
-    { key: 'title', label: 'Control Title', sortable: true },
-    { key: 'sector', label: 'Sector', sortable: true },
-    { key: 'framework_name', label: 'Framework', sortable: true },
-    { key: 'regulator_name', label: 'Regulator', sortable: true },
-    { 
-      key: 'risk_level', 
-      label: 'Risk Level', 
-      sortable: true,
-      render: (value) => (
-        <span className={`badge ${
-          value === 'high' ? 'badge-error' :
-          value === 'medium' ? 'badge-warning' :
-          'badge-success'
-        }`}>
-          {value?.toUpperCase() || 'LOW'}
-        </span>
-      )
-    },
-    { 
-      key: 'status', 
-      label: 'Status', 
-      sortable: true,
-      render: (value) => (
-        <span className={`badge ${
-          value === 'implemented' ? 'badge-success' :
-          value === 'in_progress' ? 'badge-info' :
-          'badge-gray'
-        }`}>
-          {value?.replace('_', ' ').toUpperCase() || 'NOT STARTED'}
-        </span>
-      )
-    }
-  ];
+  
 
   const handleExport = async (format = 'csv') => {
     try {
@@ -167,7 +132,7 @@ const SectorIntelligence = () => {
       };
 
       // This would need to be implemented in the backend
-      const response = await apiService.sectorControls.getAll(params);
+      await apiService.sectorControls.getAll(params);
       
       // For now, create a simple CSV export
       if (format === 'csv') {
@@ -399,7 +364,7 @@ const SectorIntelligence = () => {
               )},
             ]}
             pageSize={10}
-            onExport={(selected) => handleExport('csv')}
+            onExport={() => handleExport('csv')}
           />
         ) : (
           <div className="p-12 text-center">

@@ -8,7 +8,7 @@ const SimpleLoginPage = () => {
   const { actions } = useApp();
   const [formData, setFormData] = useState({
     email: 'demo@shahin-ai.com',
-    password: 'Shahin@2025'
+    password: 'demo123'
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -46,12 +46,13 @@ const SimpleLoginPage = () => {
             </div>
           )}
           <div>
-            <label className="block text-sm font-medium text-gray-700">Email Address</label>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
             <div className="mt-1 relative">
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="email"
                 name="email"
+                id="email"
                 value={formData.email}
                 onChange={handleChange}
                 className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
@@ -61,12 +62,13 @@ const SimpleLoginPage = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
             <div className="mt-1 relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="password"
                 name="password"
+                id="password"
                 value={formData.password}
                 onChange={handleChange}
                 className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"

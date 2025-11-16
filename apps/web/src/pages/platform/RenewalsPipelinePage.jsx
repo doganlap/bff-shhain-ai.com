@@ -5,16 +5,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { 
-  Calendar, TrendingUp, AlertTriangle, CheckCircle, Clock, 
-  DollarSign, Users, Filter, ArrowUp, ArrowDown, RefreshCw 
+  Calendar, Clock, DollarSign, RefreshCw, AlertTriangle 
 } from 'lucide-react';
 import { toast } from 'sonner';
 import renewalsApi from '../../services/renewalsApi';
-import { useI18n } from '../../hooks/useI18n';
+ 
 import { useTheme } from '../../components/theme/ThemeProvider';
 
 export default function RenewalsPipelinePage() {
-  const { t, isRTL } = useI18n();
   const { isDark } = useTheme();
   const [renewals, setRenewals] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -22,12 +20,7 @@ export default function RenewalsPipelinePage() {
   const [filter, setFilter] = useState('all');
   const [sortBy, setSortBy] = useState('days_until_expiry');
 
-  useEffect(() => {
-    loadRenewals();
-    loadSummary();
-  }, [filter]);
-
-  const loadRenewals = async () => {
+  const loadRenewals = React.useCallback(async () => {
     try {
       setLoading(true);
       const params = {};
@@ -42,7 +35,14 @@ export default function RenewalsPipelinePage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filter]);
+
+  useEffect(() => {
+    loadRenewals();
+    loadSummary();
+  }, [filter, loadRenewals]);
+
+  
 
   const loadSummary = async () => {
     try {
@@ -78,13 +78,7 @@ export default function RenewalsPipelinePage() {
     }).format(amount);
   };
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  
 
   const sortedRenewals = [...renewals].sort((a, b) => {
     if (sortBy === 'days_until_expiry') {

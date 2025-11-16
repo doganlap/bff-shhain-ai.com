@@ -59,7 +59,12 @@ const renderApp = () => {
             <I18nProvider defaultLanguage="ar">
               <CulturalAdaptationProvider>
                 <AppProvider>
-                  <Router>
+                  <Router
+                    future={{
+                      v7_startTransition: true,
+                      v7_relativeSplatPath: true
+                    }}
+                  >
                     <App />
                   </Router>
                 </AppProvider>

@@ -36,6 +36,14 @@ app.get('/healthz', (req, res) => {
   });
 });
 
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'healthy',
+    service: 'regulatory-intelligence-ksa',
+    timestamp: new Date().toISOString()
+  });
+});
+
 app.get('/readyz', async (req, res) => {
   try {
     // Check database connection

@@ -140,6 +140,8 @@
   backdrop-filter: blur(10px);
   overflow: hidden;
   perspective: 1000px;
+  /* Performance: Use transform for animations instead of pointer-events */
+  will-change: transform, opacity;
 }
 
 .animated-card.glow {

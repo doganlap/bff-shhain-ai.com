@@ -99,12 +99,11 @@ export const generateMockActivityFeed = () => {
   return activities;
 };
 
-export const generateMockKPIs = (complianceData = [], riskData = [], assessmentData = []) => {
+export const generateMockKPIs = (complianceData = [], _riskData = [], assessmentData = []) => {
   const complianceScore = complianceData.length > 0 ? 
     Math.floor(complianceData.reduce((sum, item) => sum + (item.score || 80), 0) / complianceData.length) :
     generateRandomValue(MOCK_DATA_CONFIG.KPI_RANGES.COMPLIANCE.min, MOCK_DATA_CONFIG.KPI_RANGES.COMPLIANCE.max);
   
-  const riskCount = riskData.length > 0 ? riskData.length : generateRandomValue(MOCK_DATA_CONFIG.KPI_RANGES.RISKS.min, MOCK_DATA_CONFIG.KPI_RANGES.RISKS.max);
   const assessmentCount = assessmentData.length > 0 ? assessmentData.length : generateRandomValue(MOCK_DATA_CONFIG.KPI_RANGES.ASSESSMENTS.min, MOCK_DATA_CONFIG.KPI_RANGES.ASSESSMENTS.max);
   const gapsCount = generateRandomValue(MOCK_DATA_CONFIG.KPI_RANGES.GAPS.min, MOCK_DATA_CONFIG.KPI_RANGES.GAPS.max);
   const hotspotsCount = generateRandomValue(MOCK_DATA_CONFIG.KPI_RANGES.HOTSPOTS.min, MOCK_DATA_CONFIG.KPI_RANGES.HOTSPOTS.max);

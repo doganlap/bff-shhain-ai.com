@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Bell, X, Check, AlertTriangle, Info, CheckCircle, Clock, Filter, Search,
-  Shield, FileText, Target, Users, Settings, Trash2, MoreVertical, Send,
-  Mail, MessageSquare, Smartphone, Calendar, BarChart3, TrendingUp,
-  Edit, Eye, Play, Pause, Archive, RefreshCw, Zap, Volume2, VolumeX
+  Bell, X, Check, AlertTriangle, CheckCircle, Clock, Search,
+  Mail, Smartphone, Zap, Shield, Target, Settings, Users, Info,
+  FileText, MessageSquare, BarChart3, Calendar, Archive, Eye,
+  MoreVertical, Edit, Send
 } from 'lucide-react';
 import ArabicTextEngine from '../../components/Arabic/ArabicTextEngine';
 import { AnimatedCard, AnimatedButton, CulturalLoadingSpinner, AnimatedProgress } from '../../components/Animation/InteractiveAnimationToolkit';
@@ -11,7 +11,7 @@ import apiService from '../../services/apiEndpoints';
 import { useI18n } from '../../hooks/useI18n';
 
 const NotificationManagementPage = () => {
-  const { t, language, changeLanguage, isRTL } = useI18n();
+  const { language, changeLanguage } = useI18n();
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('notifications');
@@ -32,9 +32,9 @@ const NotificationManagementPage = () => {
   useEffect(() => {
     loadNotifications();
     loadNotificationStats();
-  }, [searchTerm, filterBy]);
+  }, [loadNotifications, loadNotificationStats]);
 
-  const loadNotifications = async () => {
+  const loadNotifications = useCallback(async () => {
     setLoading(true);
     try {
       // Load notifications from API
@@ -56,9 +56,9 @@ const NotificationManagementPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, filterBy]);
 
-  const loadNotificationStats = async () => {
+  const loadNotificationStats = useCallback(async () => {
     try {
       const response = await apiService.notifications.getStats();
       if (response?.data?.success && response.data.data) {
@@ -67,7 +67,7 @@ const NotificationManagementPage = () => {
     } catch (error) {
       console.error('Error loading notification stats:', error);
     }
-  };
+  }, []);
 
 
   // Notification templates
@@ -169,14 +169,7 @@ const NotificationManagementPage = () => {
     }
   ];
 
-  const handleMarkAsRead = async (notificationIds) => {
-    try {
-      await apiService.notifications.markAsRead(notificationIds);
-      await loadNotifications();
-    } catch (error) {
-      console.error('Error marking notifications as read:', error);
-    }
-  };
+  
 
   const handleBulkAction = async (action, notificationIds) => {
     try {

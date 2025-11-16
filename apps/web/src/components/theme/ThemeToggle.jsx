@@ -1,11 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Sun, Moon, Monitor } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import ArabicTextEngine from '../Arabic/ArabicTextEngine';
 
 const ThemeToggle = ({ variant = 'button' }) => {
-  const { currentTheme, toggleTheme, isDark } = useTheme();
+  const { toggleTheme, isDark } = useTheme();
 
   if (variant === 'compact') {
     return (

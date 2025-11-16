@@ -6,8 +6,7 @@
  */
 
 const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+//
 
 // CRUD Matrix Configuration
 const CRUD_MATRIX = {
@@ -162,7 +161,7 @@ class CRUDMatrixAuditReport {
   collectEvidence() {
     const evidence = [];
     
-    Object.entries(CRUD_MATRIX).forEach(([moduleKey, module]) => {
+    Object.values(CRUD_MATRIX).forEach((module) => {
       Object.entries(module.operations).forEach(([operation, data]) => {
         if (data.tested && data.evidence) {
           evidence.push({
@@ -181,15 +180,15 @@ class CRUDMatrixAuditReport {
   generateRecommendations() {
     const recommendations = [];
     
-    Object.entries(CRUD_MATRIX).forEach(([moduleKey, module]) => {
+    Object.values(CRUD_MATRIX).forEach((module) => {
       const failedOperations = Object.entries(module.operations)
-        .filter(([_, data]) => !data.implemented || !data.tested);
+        .filter(([key, data]) => !data.implemented || !data.tested);
       
       if (failedOperations.length > 0) {
         recommendations.push({
           module: module.name,
           priority: module.priority,
-          issues: failedOperations.map(([op, _]) => op),
+          issues: failedOperations.map(([op]) => op),
           recommendation: `Complete ${failedOperations.length} missing CRUD operations for ${module.name}`
         });
       }
@@ -218,7 +217,7 @@ class CRUDMatrixAuditReport {
     // Detailed Module Breakdown
     markdown += '## Detailed Module Breakdown\n\n';
     
-    Object.entries(data.modules).forEach(([key, module]) => {
+    Object.values(data.modules).forEach((module) => {
       markdown += `### ${module.name} (${module.priority} priority)\n\n`;
       markdown += `**Score:** ${module.score}%\n\n`;
       
@@ -334,7 +333,7 @@ class CRUDMatrixAuditReport {
         <h2>Module Breakdown</h2>
 `;
 
-    Object.entries(data.modules).forEach(([key, module]) => {
+    Object.values(data.modules).forEach((module) => {
       html += `
         <div class="module">
             <h3>${module.name} (${module.priority} priority)</h3>

@@ -80,11 +80,10 @@ const useApiData = (endpoint, params = {}, options = {}) => {
     fetchData();
   }, [fetchData]);
 
-  const refetch = useCallback((newParams = {}) => {
-    const updatedParams = { ...params, ...newParams };
+  const refetch = useCallback(() => {
     setRetryCount(0);
     fetchData();
-  }, [fetchData, params]);
+  }, [fetchData]);
 
   useEffect(() => {
     if (immediate) {

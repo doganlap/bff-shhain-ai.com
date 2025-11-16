@@ -3,7 +3,7 @@
  * Provides unified configuration loading for all services
  */
 
-const path = require('path');
+ 
 const fs = require('fs');
 
 // Load the unified configuration

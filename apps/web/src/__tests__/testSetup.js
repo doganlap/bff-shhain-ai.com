@@ -113,9 +113,8 @@ vi.stubEnv('BYPASS_AUTH', 'true');
 vi.stubEnv('VITE_SUPABASE_URL', 'https://mock-supabase-url.supabase.co');
 vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'mock-anon-key');
 
-// Mock date for consistent testing
-vi.useFakeTimers();
-vi.setSystemTime(new Date('2024-01-01T00:00:00Z'));
+// Mock date for consistent testing (avoid global fake timers to prevent hangs)
+// If a test needs fake timers, it should enable them within the test itself.
 
 // Mock window.matchMedia properly
 const mockMatchMedia = vi.fn().mockImplementation(query => ({

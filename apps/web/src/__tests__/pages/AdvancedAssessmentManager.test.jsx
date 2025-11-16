@@ -9,6 +9,7 @@ import { BrowserRouter } from 'react-router-dom';
 import userEvent from '@testing-library/user-event';
 import AdvancedAssessmentManager from '../../components/AdvancedAssessmentManager';
 import apiService from '../../services/apiEndpoints';
+import { renderWithProviders } from '../TestWrapper';
 
 // Mock API service
 vi.mock('../../services/apiEndpoints', () => ({
@@ -76,7 +77,7 @@ describe('AdvancedAssessmentManager - Page Integration Tests', () => {
   });
 
   const renderAssessmentManager = () => {
-    return render(
+    return renderWithProviders(
       <BrowserRouter>
         <AdvancedAssessmentManager />
       </BrowserRouter>

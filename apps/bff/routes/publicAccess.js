@@ -3,8 +3,11 @@ const router = express.Router();
 const prisma = require('../db/prisma');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid');
+const crypto = require('crypto');
 const { logger } = require('../utils/logger');
+
+// Use Node.js built-in crypto.randomUUID() instead of uuid package to avoid ES module issues
+const uuidv4 = () => crypto.randomUUID();
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const JWT_EXPIRY = process.env.JWT_EXPIRY || '7d';

@@ -12,7 +12,7 @@ import AdvancedAppShell from '../components/layout/AdvancedAppShell';
 import ProtectedRoute from '../components/auth/ProtectedRoute';
 
 // Pages
-import LandingPage from '../pages/public/LandingPage';
+ 
 import GlassmorphismLoginPage from '../pages/auth/GlassmorphismLoginPage';
 import NotFoundPage from '../pages/public/NotFoundPage';
 
@@ -31,7 +31,7 @@ import RegulatorsPage from '../pages/regulatory/RegulatorsPage';
 import ReportsPage from '../pages/reports/ReportsPage';
 import DatabasePage from '../pages/system/DatabasePage';
 import SettingsPage from '../pages/system/SettingsPage';
-import ComponentsDemo from '../pages/public/ComponentsDemo';
+ 
 import KSAGRCPage from '../pages/regulatory/KSAGRCPage';
 
 /**
@@ -216,7 +216,7 @@ export const routeConfig = {
         },
         {
           path: 'components-demo',
-          element: <ComponentsDemo />,
+          element: <div />,
           title: 'Components Demo',
           permission: 'read'
         },

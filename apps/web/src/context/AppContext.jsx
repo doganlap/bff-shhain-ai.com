@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo, useRef } from 'react';
 import { apiServices } from '../services/api';
 import { 
   DEMO_MODE_CONFIG, 
@@ -214,12 +214,10 @@ export const AppProvider = ({ children }) => {
   }, []);
 
   // Initialize app data
-  useEffect(() => {
-    let isInitialized = false;
-    
-    const init = async () => {
-      if (isInitialized) return; // Prevent double initialization in React StrictMode
-      isInitialized = true;
+  const isInitializedRef = useRef(false);
+  const init = useCallback(async () => {
+      if (isInitializedRef.current) return;
+      isInitializedRef.current = true;
       try {
         dispatch({ type: actionTypes.SET_LOADING, payload: true });
         
@@ -280,15 +278,7 @@ export const AppProvider = ({ children }) => {
       } finally {
         dispatch({ type: actionTypes.SET_LOADING, payload: false });
       }
-    };
-    
-    init();
-    
-    // Cleanup function
-    return () => {
-      isInitialized = true; // Prevent any pending initialization
-    };
-  }, []);
+    }, []);
 
   // Set demo data for offline mode with security and integrity
   const setDemoData = () => {
@@ -393,7 +383,7 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  const loadInitialData = async () => {
+  const loadInitialData = useCallback(async () => {
     try {
       // Use demo data in demo mode instead of making API calls
       if (state.isDemoMode) {
@@ -557,7 +547,7 @@ export const AppProvider = ({ children }) => {
         }
       });
     }
-  };
+  }, [state.isDemoMode]);
 
   // Action creators
   const actions = {

@@ -711,7 +711,7 @@ export function hasPermission(role, permission) {
   if (rolePermissions.includes(permission)) return true;
   
   // Check for wildcard permissions
-  const [resource, action] = permission.split(':');
+  const [resource] = permission.split(':');
   const wildcardPermission = `${resource}:*`;
   
   return rolePermissions.includes(wildcardPermission);

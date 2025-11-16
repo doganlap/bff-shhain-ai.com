@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require('path');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -81,7 +82,7 @@ app.use((req, res, next) => {
   }
 });
 
-// Security Headers
+// Security Headers - Optimized for Chrome Android compatibility
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -93,7 +94,7 @@ app.use(helmet({
       fontSrc: ["'self'"],
       objectSrc: ["'none'"],
       mediaSrc: ["'self'"],
-      frameSrc: ["'none'"],
+      frameAncestors: ["'none'"], // Replaces X-Frame-Options with CSP
     },
   },
   crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -103,9 +104,24 @@ app.use(helmet({
     preload: true
   },
   noSniff: true,
-  frameguard: { action: 'deny' },
-  xssFilter: true
+  frameguard: false, // Disabled in favor of CSP frame-ancestors
+  xssFilter: false // Deprecated, removed for Chrome Android compatibility
 }));
+
+// Add custom cache-control and content-type headers
+app.use((req, res, next) => {
+  // Set UTF-8 charset for all responses
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+
+  // Cache control for static resources
+  if (req.path.match(/\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$/)) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  } else {
+    // API responses shouldn't be cached
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  }
+  next();
+});
 
 // CORS - Using environment-driven origins
 app.use(cors({
@@ -113,6 +129,26 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Tenant-ID', 'X-Request-ID']
+}));
+
+// Static assets middleware (before authentication)
+app.use('/assets', express.static(path.join(__dirname, 'public/assets'), {
+  setHeaders: (res, path, stat) => {
+    // Allow assets to be cached
+    res.setHeader('Cache-Control', 'public, max-age=86400'); // 1 day
+    // Ensure assets don't require authentication
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+  }
+}));
+
+// CSS and JS files should be publicly accessible
+app.use('/static', express.static(path.join(__dirname, 'public/static'), {
+  setHeaders: (res, path, stat) => {
+    if (path.endsWith('.css') || path.endsWith('.js')) {
+      res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year for versioned assets
+      res.setHeader('Access-Control-Allow-Origin', '*'); // Allow cross-origin for assets
+    }
+  }
 }));
 
 // Rate Limiting - Per-tenant with tier support

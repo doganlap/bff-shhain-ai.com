@@ -24,7 +24,7 @@ function collectSqlFiles(dir) {
 function parseTablesFromSql(filePath) {
   const tables = [];
   const sql = fs.readFileSync(filePath, 'utf8');
-  const tableRegex = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?("?[\w\.]+"?)\s*\(([\s\S]*?)\);/gi;
+  const tableRegex = /CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?("?[\w.]+"?)\s*\(([\s\S]*?)\);/gi;
 
   let match;
   while ((match = tableRegex.exec(sql)) !== null) {
@@ -59,7 +59,7 @@ function countColumns(tableBody) {
       return;
     }
 
-    if (/^[\)\(]$/.test(trimmed)) {
+    if (/^[)(]$/.test(trimmed)) {
       pendingDefinition = '';
       return;
     }
