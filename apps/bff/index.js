@@ -4,6 +4,9 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
+const jwt = require('jsonwebtoken');
+const validator = require('validator');
+const axios = require('axios');
 require('dotenv').config();
 const { ENV } = require('./config/env');
 
