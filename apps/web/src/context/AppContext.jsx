@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo, useRef } from 'react';
 import { apiServices } from '../services/api';
-import { 
-  DEMO_MODE_CONFIG, 
-  DEMO_DATA_CHECKSUMS, 
-  DemoSessionManager, 
-  validateDemoMode, 
-  demoSecurityUtils 
+import {
+  DEMO_MODE_CONFIG,
+  DEMO_DATA_CHECKSUMS,
+  DemoSessionManager,
+  validateDemoMode,
+  demoSecurityUtils
 } from '../config/demoMode.config';
 
 // Initial state
@@ -14,7 +14,7 @@ const initialState = {
   user: null,
   isAuthenticated: false,
   token: null,
-  
+
   // Demo mode state
   isDemoMode: false,
   demoSession: null,
@@ -24,7 +24,7 @@ const initialState = {
     startTime: null,
     isValid: false
   },
-  
+
   // Application data
   regulators: [],
   frameworks: [],
@@ -33,13 +33,13 @@ const initialState = {
   assessments: [],
   templates: [],
   tenants: [],
-  
+
   // UI state
   loading: false,
   error: null,
   sidebarOpen: true,
   currentTenant: null,
-  
+
   // Statistics
   stats: {
     regulators: 0,
@@ -58,14 +58,14 @@ const actionTypes = {
   SET_AUTHENTICATED: 'SET_AUTHENTICATED',
   SET_TOKEN: 'SET_TOKEN',
   LOGOUT: 'LOGOUT',
-  
+
   // Demo mode
   SET_DEMO_MODE: 'SET_DEMO_MODE',
   SET_DEMO_SESSION: 'SET_DEMO_SESSION',
   UPDATE_DEMO_TIME: 'UPDATE_DEMO_TIME',
   SET_DEMO_SECURITY: 'SET_DEMO_SECURITY',
   END_DEMO_SESSION: 'END_DEMO_SESSION',
-  
+
   // Data
   SET_REGULATORS: 'SET_REGULATORS',
   SET_FRAMEWORKS: 'SET_FRAMEWORKS',
@@ -74,14 +74,14 @@ const actionTypes = {
   SET_ASSESSMENTS: 'SET_ASSESSMENTS',
   SET_TEMPLATES: 'SET_TEMPLATES',
   SET_TENANTS: 'SET_TENANTS',
-  
+
   // UI
   SET_LOADING: 'SET_LOADING',
   SET_ERROR: 'SET_ERROR',
   CLEAR_ERROR: 'CLEAR_ERROR',
   TOGGLE_SIDEBAR: 'TOGGLE_SIDEBAR',
   SET_CURRENT_TENANT: 'SET_CURRENT_TENANT',
-  
+
   // Statistics
   SET_STATS: 'SET_STATS',
   UPDATE_STATS: 'UPDATE_STATS',
@@ -92,13 +92,13 @@ const appReducer = (state, action) => {
   switch (action.type) {
     case actionTypes.SET_USER:
       return { ...state, user: action.payload };
-    
+
     case actionTypes.SET_AUTHENTICATED:
       return { ...state, isAuthenticated: action.payload };
-    
+
     case actionTypes.SET_TOKEN:
       return { ...state, token: action.payload };
-    
+
     case actionTypes.LOGOUT:
       return {
         ...state,
@@ -114,14 +114,14 @@ const appReducer = (state, action) => {
           isValid: false
         }
       };
-    
+
     // Demo mode actions
     case actionTypes.SET_DEMO_MODE:
       return { ...state, isDemoMode: action.payload };
-    
+
     case actionTypes.SET_DEMO_SESSION:
-      return { 
-        ...state, 
+      return {
+        ...state,
         demoSession: action.payload,
         demoSecurity: {
           ...state.demoSecurity,
@@ -130,13 +130,13 @@ const appReducer = (state, action) => {
           isValid: true
         }
       };
-    
+
     case actionTypes.UPDATE_DEMO_TIME:
       return { ...state, demoTimeRemaining: action.payload };
-    
+
     case actionTypes.SET_DEMO_SECURITY:
       return { ...state, demoSecurity: action.payload };
-    
+
     case actionTypes.END_DEMO_SESSION:
       return {
         ...state,
@@ -149,49 +149,49 @@ const appReducer = (state, action) => {
           isValid: false
         }
       };
-    
+
     case actionTypes.SET_REGULATORS:
       return { ...state, regulators: action.payload };
-    
+
     case actionTypes.SET_FRAMEWORKS:
       return { ...state, frameworks: action.payload };
-    
+
     case actionTypes.SET_CONTROLS:
       return { ...state, controls: action.payload };
-    
+
     case actionTypes.SET_ORGANIZATIONS:
       return { ...state, organizations: action.payload };
-    
+
     case actionTypes.SET_ASSESSMENTS:
       return { ...state, assessments: action.payload };
-    
+
     case actionTypes.SET_TEMPLATES:
       return { ...state, templates: action.payload };
-    
+
     case actionTypes.SET_TENANTS:
       return { ...state, tenants: action.payload };
-    
+
     case actionTypes.SET_LOADING:
       return { ...state, loading: action.payload };
-    
+
     case actionTypes.SET_ERROR:
       return { ...state, error: action.payload };
-    
+
     case actionTypes.TOGGLE_SIDEBAR:
       return { ...state, sidebarOpen: !state.sidebarOpen };
-    
+
     case actionTypes.SET_CURRENT_TENANT:
       return { ...state, currentTenant: action.payload };
-    
+
     case actionTypes.SET_STATS:
       return { ...state, stats: action.payload };
-    
+
     case actionTypes.UPDATE_STATS:
-      return { 
-        ...state, 
+      return {
+        ...state,
         stats: { ...state.stats, ...action.payload }
       };
-    
+
     default:
       return state;
   }
@@ -210,6 +210,12 @@ export const AppProvider = ({ children }) => {
       if (savedTenantId) {
         dispatch({ type: actionTypes.SET_CURRENT_TENANT, payload: { id: Number(savedTenantId) } });
       }
+
+      // Check for super admin access and initialize
+      const appRole = localStorage.getItem('app_role');
+      if (appRole === 'SUPER_ADMIN') {
+        initializeApp();
+      }
     } catch {}
   }, []);
 
@@ -220,34 +226,34 @@ export const AppProvider = ({ children }) => {
       isInitializedRef.current = true;
       try {
         dispatch({ type: actionTypes.SET_LOADING, payload: true });
-        
+
         // Check API connection with timeout
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
-        
+
         try {
           const response = await apiServices.auth.me();
           clearTimeout(timeoutId);
-          
+
           console.log('🌐 API connected, loading live data');
-          
+
           if (response.data?.success && response.data?.data?.user) {
             const user = response.data.data.user;
             dispatch({ type: actionTypes.SET_USER, payload: user });
             dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: true });
           }
-          
+
           // Load initial data
           await loadInitialData();
-          
+
         } catch (error) {
           clearTimeout(timeoutId);
           console.error('🔌 API connection failed:', error);
           console.log('🎯 Switching to offline demo mode');
-          
+
           // Load demo data for offline mode
           setDemoData();
-          
+
           // Set a demo user for offline mode and auto-login
           const demoUser = {
             id: 'demo-user',
@@ -257,21 +263,21 @@ export const AppProvider = ({ children }) => {
             role: 'admin',
             organization: 'Shahin-AI Demo'
           };
-          
+
           dispatch({ type: actionTypes.SET_USER, payload: demoUser });
           dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: true });
-          
+
           console.log('🔓 Auto-login successful: Demo user automatically logged in');
           console.log('📋 Demo credentials for manual login: demo@shahin-ai.com / demo123');
-          
+
           // Set offline mode flag
           dispatch({ type: actionTypes.SET_ERROR, payload: 'Offline Demo Mode - Using sample data' });
         }
-        
+
       } catch (error) {
         console.error('App initialization error:', error);
         dispatch({ type: actionTypes.SET_ERROR, payload: error.message });
-        
+
         // Fallback to demo data even if initialization fails
         console.log('🎯 Fallback: Loading demo data');
         setDemoData();
@@ -283,11 +289,11 @@ export const AppProvider = ({ children }) => {
   // Set demo data for offline mode with security and integrity
   const setDemoData = () => {
     console.log('🔐 Initializing secure demo mode...');
-    
+
     // Start demo session
     const demoSession = new DemoSessionManager();
     const sessionId = demoSession.startSession();
-    
+
     // Set demo mode state
     dispatch({ type: actionTypes.SET_DEMO_MODE, payload: true });
     dispatch({ type: actionTypes.SET_DEMO_SESSION, payload: {
@@ -295,7 +301,7 @@ export const AppProvider = ({ children }) => {
       start: demoSession.sessionStart,
       expires: demoSession.sessionStart + DEMO_MODE_CONFIG.security.maxDemoDuration
     }});
-    
+
     // Add security watermark to demo data
     const demoStats = demoSecurityUtils.addDemoWatermark({
       regulators: 12,
@@ -305,19 +311,19 @@ export const AppProvider = ({ children }) => {
       organizations: 5,
       compliance_score: 94.2
     });
-    
+
     const demoRegulators = demoSecurityUtils.addDemoWatermark([
       { id: 1, name: 'SAMA', nameAr: 'البنك المركزي السعودي', type: 'Banking' },
       { id: 2, name: 'CMA', nameAr: 'هيئة السوق المالية', type: 'Capital Markets' },
       { id: 3, name: 'CITC', nameAr: 'هيئة الاتصالات وتقنية المعلومات', type: 'Telecommunications' }
     ]);
-    
+
     const demoFrameworks = demoSecurityUtils.addDemoWatermark([
       { id: 1, name: 'ISO 27001', description: 'Information Security Management' },
       { id: 2, name: 'NIST Framework', description: 'Cybersecurity Framework' },
       { id: 3, name: 'SAMA Cyber Security', description: 'SAMA Cybersecurity Framework' }
     ]);
-    
+
     const demoOrganizations = demoSecurityUtils.addDemoWatermark([
       { id: 1, name: 'Demo Bank', type: 'Financial Institution', status: 'Active' },
       { id: 2, name: 'Tech Corp', type: 'Technology', status: 'Active' }
@@ -338,16 +344,16 @@ export const AppProvider = ({ children }) => {
       user: { id: 'demo-user' },
       isAuthenticated: true
     });
-    
+
     if (!validation.isValid) {
       console.error('❌ Demo mode validation failed:', validation.errors);
-      dispatch({ 
-        type: actionTypes.SET_ERROR, 
+      dispatch({
+        type: actionTypes.SET_ERROR,
         payload: 'Demo mode validation failed: ' + validation.errors.join(', ')
       });
       return;
     }
-    
+
     console.log('✅ Secure demo data loaded with integrity validation');
     console.log('🔒 Demo session started:', sessionId);
     console.log('⏰ Demo session expires in:', Math.round(DEMO_MODE_CONFIG.security.maxDemoDuration / (1000 * 60 * 60)), 'hours');
@@ -356,7 +362,28 @@ export const AppProvider = ({ children }) => {
   const initializeApp = async () => {
     try {
       dispatch({ type: actionTypes.SET_LOADING, payload: true });
-      
+
+      // Check for Super Admin Access first
+      const appUser = localStorage.getItem('app_user');
+      const appToken = localStorage.getItem('app_token');
+      const appRole = localStorage.getItem('app_role');
+
+      if (appUser && appToken && appRole === 'SUPER_ADMIN') {
+        try {
+          const superAdminUser = JSON.parse(appUser);
+          console.log('🔓 Super Admin access detected - initializing with full privileges');
+          dispatch({ type: actionTypes.SET_USER, payload: superAdminUser });
+          dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: true });
+          await loadInitialData();
+          return;
+        } catch (error) {
+          console.error('Super Admin session corrupted, clearing:', error);
+          localStorage.removeItem('app_user');
+          localStorage.removeItem('app_token');
+          localStorage.removeItem('app_role');
+        }
+      }
+
       // Check if user is already authenticated by making a request to /auth/me
       // Skip this in demo mode since user is already set up
       if (!state.isDemoMode) {
@@ -371,10 +398,10 @@ export const AppProvider = ({ children }) => {
           // User is not authenticated, no action needed
         }
       }
-      
+
       // Load initial data (this will handle demo mode internally)
       await loadInitialData();
-      
+
     } catch (error) {
       console.error('App initialization error:', error);
       dispatch({ type: actionTypes.SET_ERROR, payload: error.message });
@@ -388,44 +415,44 @@ export const AppProvider = ({ children }) => {
       // Use demo data in demo mode instead of making API calls
       if (state.isDemoMode) {
         console.log('🎯 Demo mode: Loading demo data without API calls');
-        
+
         // Set demo data directly
-        dispatch({ 
-          type: actionTypes.SET_REGULATORS, 
+        dispatch({
+          type: actionTypes.SET_REGULATORS,
           payload: [
             { id: 1, name: 'SAMA', nameAr: 'البنك المركزي السعودي', type: 'Banking', _demoMode: true },
             { id: 2, name: 'CMA', nameAr: 'هيئة السوق المالية', type: 'Capital Markets', _demoMode: true },
             { id: 3, name: 'CITC', nameAr: 'هيئة الاتصالات وتقنية المعلومات', type: 'Telecommunications', _demoMode: true }
           ]
         });
-        
-        dispatch({ 
-          type: actionTypes.SET_FRAMEWORKS, 
+
+        dispatch({
+          type: actionTypes.SET_FRAMEWORKS,
           payload: [
             { id: 1, name: 'ISO 27001', description: 'Information Security Management', _demoMode: true },
             { id: 2, name: 'NIST Framework', description: 'Cybersecurity Framework', _demoMode: true },
             { id: 3, name: 'SAMA Cyber Security', description: 'SAMA Cybersecurity Framework', _demoMode: true }
           ]
         });
-        
-        dispatch({ 
-          type: actionTypes.SET_ORGANIZATIONS, 
+
+        dispatch({
+          type: actionTypes.SET_ORGANIZATIONS,
           payload: [
             { id: 1, name: 'Demo Bank', type: 'Financial Institution', status: 'Active', _demoMode: true },
             { id: 2, name: 'Tech Corp', type: 'Technology', status: 'Active', _demoMode: true }
           ]
         });
-        
-        dispatch({ 
-          type: actionTypes.SET_TEMPLATES, 
+
+        dispatch({
+          type: actionTypes.SET_TEMPLATES,
           payload: [
             { id: 1, name: 'Risk Assessment Template', type: 'Risk', _demoMode: true },
             { id: 2, name: 'Compliance Checklist', type: 'Compliance', _demoMode: true }
           ]
         });
-        
-        dispatch({ 
-          type: actionTypes.SET_STATS, 
+
+        dispatch({
+          type: actionTypes.SET_STATS,
           payload: {
             regulators: 3,
             frameworks: 3,
@@ -436,10 +463,10 @@ export const AppProvider = ({ children }) => {
             _demoMode: true
           }
         });
-        
+
         return;
       }
-      
+
       // Load all essential data in parallel with error handling (for non-demo mode)
       const [
         regulatorsRes,
@@ -457,57 +484,57 @@ export const AppProvider = ({ children }) => {
 
       // Process results with fallback data
       if (regulatorsRes.status === 'fulfilled' && !regulatorsRes.value.error) {
-        dispatch({ 
-          type: actionTypes.SET_REGULATORS, 
-          payload: regulatorsRes.value.data?.data || [] 
+        dispatch({
+          type: actionTypes.SET_REGULATORS,
+          payload: regulatorsRes.value.data?.data || []
         });
       } else {
         // Set default stats if API fails
-        dispatch({ 
-          type: actionTypes.SET_REGULATORS, 
-          payload: [] 
+        dispatch({
+          type: actionTypes.SET_REGULATORS,
+          payload: []
         });
       }
 
       if (frameworksRes.status === 'fulfilled' && !frameworksRes.value.error) {
-        dispatch({ 
-          type: actionTypes.SET_FRAMEWORKS, 
-          payload: frameworksRes.value.data?.data || [] 
+        dispatch({
+          type: actionTypes.SET_FRAMEWORKS,
+          payload: frameworksRes.value.data?.data || []
         });
       } else {
-        dispatch({ 
-          type: actionTypes.SET_FRAMEWORKS, 
-          payload: [] 
+        dispatch({
+          type: actionTypes.SET_FRAMEWORKS,
+          payload: []
         });
       }
 
       if (organizationsRes.status === 'fulfilled' && !organizationsRes.value.error) {
-        dispatch({ 
-          type: actionTypes.SET_ORGANIZATIONS, 
-          payload: organizationsRes.value.data?.data || [] 
+        dispatch({
+          type: actionTypes.SET_ORGANIZATIONS,
+          payload: organizationsRes.value.data?.data || []
         });
       } else {
-        dispatch({ 
-          type: actionTypes.SET_ORGANIZATIONS, 
-          payload: [] 
+        dispatch({
+          type: actionTypes.SET_ORGANIZATIONS,
+          payload: []
         });
       }
 
       if (templatesRes.status === 'fulfilled' && !templatesRes.value.error) {
-        dispatch({ 
-          type: actionTypes.SET_TEMPLATES, 
-          payload: templatesRes.value.data?.data || [] 
+        dispatch({
+          type: actionTypes.SET_TEMPLATES,
+          payload: templatesRes.value.data?.data || []
         });
       } else {
-        dispatch({ 
-          type: actionTypes.SET_TEMPLATES, 
-          payload: [] 
+        dispatch({
+          type: actionTypes.SET_TEMPLATES,
+          payload: []
         });
       }
 
       if (statsRes.status === 'fulfilled' && !statsRes.value.error) {
-        dispatch({ 
-          type: actionTypes.SET_STATS, 
+        dispatch({
+          type: actionTypes.SET_STATS,
           payload: statsRes.value.data || {
             regulators: 25,
             frameworks: 21,
@@ -519,8 +546,8 @@ export const AppProvider = ({ children }) => {
         });
       } else {
         // Set default stats if API fails
-        dispatch({ 
-          type: actionTypes.SET_STATS, 
+        dispatch({
+          type: actionTypes.SET_STATS,
           payload: {
             regulators: 25,
             frameworks: 21,
@@ -535,8 +562,8 @@ export const AppProvider = ({ children }) => {
     } catch (error) {
       console.error('Error loading initial data:', error);
       // Set default data if everything fails
-      dispatch({ 
-        type: actionTypes.SET_STATS, 
+      dispatch({
+        type: actionTypes.SET_STATS,
         payload: {
           regulators: 25,
           frameworks: 21,
@@ -560,7 +587,7 @@ export const AppProvider = ({ children }) => {
           email: 'demo@shahin-ai.com',
           password: 'demo123'
         };
-        
+
         // Check if credentials match demo credentials
         if (credentials.email === demoCredentials.email && credentials.password === demoCredentials.password) {
           // Set demo user
@@ -574,16 +601,16 @@ export const AppProvider = ({ children }) => {
           return { success: false, error: 'Invalid demo credentials. Use: demo@shahin-ai.com / demo123' };
         }
       }
-      
+
       try {
         dispatch({ type: actionTypes.SET_LOADING, payload: true });
         const response = await apiServices.auth.login(credentials);
         const { user } = response.data.data || response.data;
-        
+
         // No need to manually store tokens as they'll be in HTTP-only cookies
         dispatch({ type: actionTypes.SET_USER, payload: user });
         dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: true });
-        
+
         return { success: true };
       } catch (error) {
         dispatch({ type: actionTypes.SET_ERROR, payload: error.response?.data?.message || error.message });
@@ -604,19 +631,19 @@ export const AppProvider = ({ children }) => {
         const demoUser = {
           id: 'demo-user',
           firstName: 'Demo',
-          lastName: 'User', 
+          lastName: 'User',
           email: 'demo@shahin-ai.com',
           role: 'admin',
           organization: 'Shahin-AI Demo'
         };
-        
+
         // Auto-login demo user after registration
         dispatch({ type: actionTypes.SET_USER, payload: demoUser });
         dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: true });
         console.log('🔓 Demo registration successful - secure demo access granted');
         return { success: true };
       }
-      
+
       try {
         dispatch({ type: actionTypes.SET_LOADING, payload: true });
         const response = await apiServices.auth.register(userData);
@@ -633,34 +660,34 @@ export const AppProvider = ({ children }) => {
         dispatch({ type: actionTypes.SET_LOADING, payload: false });
       }
     },
-    
+
     // Demo mode actions
     validateDemoSession: () => {
       if (!state.demoSession) return false;
-      
+
       const demoSession = new DemoSessionManager();
       demoSession.sessionStart = state.demoSecurity.startTime;
       demoSession.sessionId = state.demoSecurity.sessionId;
       demoSession.isValid = state.demoSecurity.isValid;
-      
+
       const isValid = demoSession.validateSession();
       const timeRemaining = demoSession.getTimeRemaining();
-      
+
       dispatch({ type: actionTypes.UPDATE_DEMO_TIME, payload: timeRemaining });
-      
+
       if (!isValid) {
         dispatch({ type: actionTypes.END_DEMO_SESSION });
         dispatch({ type: actionTypes.SET_ERROR, payload: 'Demo session expired' });
       }
-      
+
       return isValid;
     },
-    
+
     endDemoSession: () => {
       dispatch({ type: actionTypes.END_DEMO_SESSION });
       dispatch({ type: actionTypes.SET_ERROR, payload: 'Demo session ended' });
     },
-    
+
     getDemoModeInfo: () => {
       return {
         isDemoMode: state.isDemoMode,
@@ -796,13 +823,13 @@ export const AppProvider = ({ children }) => {
   // Demo mode timer effect
   useEffect(() => {
     let demoTimer = null;
-    
+
     if (state.isDemoMode && state.demoSecurity.isValid) {
       // Update demo time remaining every second
       demoTimer = setInterval(() => {
         actions.validateDemoSession();
       }, 1000);
-      
+
       // Validate session every 30 seconds
       const validationInterval = setInterval(() => {
         if (state.isDemoMode) {
@@ -813,13 +840,13 @@ export const AppProvider = ({ children }) => {
           }
         }
       }, 30000);
-      
+
       return () => {
         clearInterval(demoTimer);
         clearInterval(validationInterval);
       };
     }
-    
+
     return () => {
       if (demoTimer) clearInterval(demoTimer);
     };

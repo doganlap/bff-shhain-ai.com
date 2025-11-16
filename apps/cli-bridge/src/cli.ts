@@ -515,7 +515,7 @@ process.on('unhandledRejection', (error) => {
 });
 
 // Parse command line arguments
-program.parse();
+program.parse(process.argv);
 
 // Show help if no command provided
 if (!process.argv.slice(2).length) {

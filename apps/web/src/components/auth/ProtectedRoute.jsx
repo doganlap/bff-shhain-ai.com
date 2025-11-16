@@ -14,6 +14,18 @@ const ProtectedRoute = ({ children }) => {
 
   const checkAuthentication = async () => {
     try {
+      // Check for Super Admin Access
+      const appUser = localStorage.getItem('app_user');
+      const appToken = localStorage.getItem('app_token');
+      const appRole = localStorage.getItem('app_role');
+
+      if (appUser && appToken && appRole === 'SUPER_ADMIN') {
+        console.log('🔓 Super Admin access verified');
+        setIsAuthenticated(true);
+        setLoading(false);
+        return;
+      }
+
       // Check if we're in demo mode and user is already authenticated
       if (state.isDemoMode && state.isAuthenticated && state.user) {
         console.log('🔓 Demo mode authentication verified');
