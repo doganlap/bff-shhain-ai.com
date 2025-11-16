@@ -14,8 +14,14 @@
   ],
   "env": {
     "NODE_ENV": "production",
-    "FRONTEND_ORIGINS": "https://app-shahin-ai-com.vercel.app,https://app-shahin-ai-1uwk5615e-donganksa.vercel.app,https://grc-dashboard-ivory.vercel.app,https://shahin-ai.com,https://www.shahin-ai.com,https://dogan-ai.com,http://localhost:5173,http://localhost:3000",
-    "PUBLIC_BFF_URL": "https://bff-shahin-ai-com.vercel.app"
+    "FRONTEND_ORIGINS": "https://app.shahin-ai.com,https://app-shahin-ai-com.vercel.app,https://app-shahin-ai-1uwk5615e-donganksa.vercel.app,https://grc-dashboard-ivory.vercel.app,https://shahin-ai.com,https://www.shahin-ai.com,https://dogan-ai.com,http://localhost:5173,http://localhost:3000",
+    "PUBLIC_BFF_URL": "https://bff-shahin-ai-com.vercel.app",
+    "STAGING_OPEN_ACCESS": "true",
+    "STAGING_RESTRICT_PARTNER_ONLY": "true",
+    "STAGING_ALLOWED_ORIGINS": "https://app-shahin-ai-com.vercel.app,https://app-shahin-ai-1uwk5615e-donganksa.vercel.app,https://shahin-ai.com,https://www.shahin-ai.com",
+    "STAGING_CENTER_BASIC_AUTH": "true",
+    "STAGING_CENTER_DB_AUTH": "true",
+    "STAGING_ALLOWED_USERS": "ahmet@doganconsult.com"
   },
   "regions": ["iad1"]
 }

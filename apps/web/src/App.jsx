@@ -74,6 +74,7 @@ import {
   LoginPage,
   StoryDrivenRegistration,
   NotFoundPage,
+  NewLandingPage,
 
   // Demo, Partner, POC Access Paths
   DemoLanding,
@@ -142,7 +143,7 @@ const AppContent = () => {
     if (!import.meta.env.PROD) return;
     if (typeof window === 'undefined') return;
 
-    const canonicalHost = 'www.shahin-ai.com';
+    const canonicalHost = 'app.shahin-ai.com';
     const currentHost = window.location.host;
 
     if (currentHost !== canonicalHost) {
@@ -161,14 +162,7 @@ const AppContent = () => {
     >
       <Routes>
         {/* Public Routes */}
-        <Route
-          path="/"
-          element={isProd ? (
-            <Navigate to="https://www.shahin-ai.com" replace />
-          ) : (
-            <Navigate to="/app" replace />
-          )}
-        />
+        <Route path="/" element={<NewLandingPage />} />
         <Route path="/welcome" element={<Navigate to="/" replace />} />
 
         {/* ==================================================================

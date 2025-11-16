@@ -27,18 +27,26 @@ const DemoAccessForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Store visitor info in session storage
-    sessionStorage.setItem('demoVisitor', JSON.stringify({
-      ...formData,
-      accessTime: new Date().toISOString(),
-      sessionId: `demo_${Date.now()}`
-    }));
-
-    // Simulate brief loading
-    setTimeout(() => {
+    try {
+      const res = await fetch('/api/demo-access/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (!res.ok) {
+        throw new Error('Registration failed');
+      }
+      const data = await res.json();
+      if (data.status === 'granted') {
+        navigate('/demo-kit');
+      } else {
+        navigate('/demo-kit');
+      }
+    } catch (err) {
       navigate('/demo-kit');
-    }, 1000);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const isFormValid = formData.fullName && formData.email && formData.company;

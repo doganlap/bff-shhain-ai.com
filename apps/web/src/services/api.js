@@ -1,6 +1,12 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_BFF_URL || '/api';
+const API_BASE_URL =
+  import.meta.env.VITE_BFF_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_API_URL ||
+  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'https://bff-shahin-ai-com.vercel.app/api'
+    : '/api');
 
 // Create axios instance with error handling for test environment
 let api;

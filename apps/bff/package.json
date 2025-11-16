@@ -20,6 +20,7 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
+    "iconv-lite": "^0.6.3",
     "@prisma/client": "^6.19.0",
     "@sendgrid/mail": "^8.1.6",
     "@sentry/node": "^7.95.0",

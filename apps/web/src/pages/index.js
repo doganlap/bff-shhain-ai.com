@@ -142,6 +142,8 @@ export { default as StoryDrivenRegistration } from './auth/StoryDrivenRegistrati
 // ============================================================================
 
 export { default as LandingPage } from './public/LandingPage.jsx';
+export { default as NewLandingPage } from './LandingPage.jsx';
+export { default as SimpleLandingPage } from './public/SimpleLandingPage.jsx';
 export { default as NotFoundPage } from './public/NotFoundPage.jsx';
 export { default as ComponentsDemo } from './public/ComponentsDemo.jsx';
 export { default as ModernComponentsDemo } from './public/ModernComponentsDemo.jsx';

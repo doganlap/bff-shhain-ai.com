@@ -25,7 +25,8 @@ app.use(helmet({
         "wss://grc-backend.shahin-ai.com",
         "https://www.shahin-ai.com",
         "https://shahin-ai.com",
-        "https://grc.shahin-ai.com"
+        "https://grc.shahin-ai.com",
+        "https://bff-shahin-ai-com.vercel.app"
       ]
     }
   },
@@ -36,6 +37,8 @@ app.use(helmet({
 // CORS configuration for shahin-ai.com domains
 app.use(cors({
   origin: [
+    'http://localhost:5173',
+    'https://app.shahin-ai.com',
     'https://www.shahin-ai.com',
     'https://shahin-ai.com',
     'https://grc.shahin-ai.com',
@@ -76,6 +79,7 @@ app.get('/api/health', (req, res) => {
     version: '1.0.0'
   });
 });
+
 
 // Basic API routes for testing
 app.get('/api/test', (req, res) => {

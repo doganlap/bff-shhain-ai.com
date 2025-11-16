@@ -2,7 +2,73 @@
 
 const express = require('express');
 const prisma = require('../db/prisma');
+const bcrypt = require('bcryptjs');
 const router = express.Router();
+
+function requireCenterBasicAuth(req, res, next) {
+  if (process.env.STAGING_CENTER_BASIC_AUTH === 'true') {
+    const header = req.headers['authorization'] || '';
+    let u = '', p = '';
+    if (header.startsWith('Basic ')) {
+      const decoded = Buffer.from(header.slice(6), 'base64').toString('utf8');
+      const i = decoded.indexOf(':');
+      if (i >= 0) {
+        u = decoded.slice(0, i);
+        p = decoded.slice(i + 1);
+      }
+    }
+    const ok = u === process.env.CENTER_BASIC_USER && p === process.env.CENTER_BASIC_PASS;
+    if (!ok) {
+      res.setHeader('WWW-Authenticate', 'Basic realm="CommandCenter"');
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  }
+  next();
+}
+
+router.use(requireCenterBasicAuth);
+
+async function requireCenterDbAuth(req, res, next) {
+  if (process.env.STAGING_CENTER_DB_AUTH === 'true') {
+    const header = req.headers['authorization'] || '';
+    let u = '', p = '';
+    if (header.startsWith('Basic ')) {
+      const decoded = Buffer.from(header.slice(6), 'base64').toString('utf8');
+      const i = decoded.indexOf(':');
+      if (i >= 0) {
+        u = decoded.slice(0, i);
+        p = decoded.slice(i + 1);
+      }
+    }
+    if (!u || !p) {
+      res.setHeader('WWW-Authenticate', 'Basic realm="CommandCenter"');
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+  try {
+      const user = await prisma.users.findFirst({ where: { email: u } });
+      if (!user) {
+        res.setHeader('WWW-Authenticate', 'Basic realm="CommandCenter"');
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+      const allowedUsersStr = process.env.STAGING_ALLOWED_USERS || '';
+      const allowedUsers = allowedUsersStr.split(',').map(s => s.trim()).filter(Boolean);
+      if (allowedUsers.length && !allowedUsers.includes(user.email)) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+      const ok = await bcrypt.compare(p, user.password_hash);
+      if (!ok) {
+        res.setHeader('WWW-Authenticate', 'Basic realm="CommandCenter"');
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+      req.user = { id: user.id, email: user.email, tenantId: user.tenant_id, role: user.role };
+    } catch (_) {
+      return res.status(503).json({ error: 'Auth unavailable' });
+    }
+  }
+  next();
+}
+
+router.use(requireCenterDbAuth);
 
 // A secure endpoint to fetch data from the GRC database
 router.post('/query', async (req, res) => {
