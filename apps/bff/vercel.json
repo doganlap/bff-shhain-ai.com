@@ -15,10 +15,7 @@
   "env": {
     "NODE_ENV": "production",
     "FRONTEND_ORIGINS": "https://app-shahin-ai-com.vercel.app,https://app-shahin-ai-1uwk5615e-donganksa.vercel.app,https://grc-dashboard-ivory.vercel.app,https://shahin-ai.com,https://www.shahin-ai.com,https://dogan-ai.com,http://localhost:5173,http://localhost:3000",
-    "PUBLIC_BFF_URL": "https://bff-shahin-ai-com.vercel.app",
-    "DATABASE_URL": "postgres://38452a313303a24baeddfbfe8046678d396610943c9b34e65432968f33793f7f:sk_ziZoE_g62VBpHvM3Nv6C7@db.prisma.io:5432/postgres?sslmode=require",
-    "JWT_SECRET": "6687d5f5980b95e4029a32772757d2500f2d75e7dbf94bfa897034b2c8cf91ff56499cbc9e96841772b3f21fe4f1ed2e7ca7c9791309d393d2eb12d508141868",
-    "SERVICE_TOKEN": "afdfdb9c1fd0fece4655619b866f71335da4e492854d8b1a335355739f97ee3ec69ac0199b21efb9061e079fc45fba7bfb8a10f4322279ee81d4733dd999d8ba"
+    "PUBLIC_BFF_URL": "https://bff-shahin-ai-com.vercel.app"
   },
   "regions": ["iad1"]
 }
