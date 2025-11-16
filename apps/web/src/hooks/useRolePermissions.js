@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import AppContext from '../context/AppContext';
-import { apiServices } from '../services/api';
+import { apiServices } from '@/services/api';
 
 /**
  * Role-Based Permission Hook

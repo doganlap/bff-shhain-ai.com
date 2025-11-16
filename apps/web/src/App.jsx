@@ -75,6 +75,8 @@ import {
   StoryDrivenRegistration,
   NotFoundPage,
   LandingPage,
+  // Public routed pages
+  
 
   // Demo, Partner, POC Access Paths
   DemoLanding,
@@ -102,6 +104,10 @@ import TaskManagementPage from './pages/tasks/TaskManagementPage';
 import TaskDashboard from './pages/tasks/TaskDashboard';
 import GapAnalysisPage from './pages/gaps/GapAnalysisPage';
 import RemediationPlanPage from './pages/remediation/RemediationPlanPage';
+// Public subpages linked from Landing
+import PathSelection from './pages/public/PathSelection';
+import DemoAccessForm from './pages/public/DemoAccessForm';
+import DemoKit from './pages/public/DemoKit';
 
 // Layouts
 import AppLayout from './components/layout/AppLayout';
@@ -113,6 +119,7 @@ import AdvancedGRCDashboard from './components/AdvancedGRCDashboard';
 import MissionControlPage from './pages/system/MissionControlPage.jsx';
 import AdvancedAssessmentManager from './components/AdvancedAssessmentManager';
 import AdvancedFrameworkManager from './components/AdvancedFrameworkManager';
+import AutoRoutes from './components/dev/AutoRoutes.jsx';
 
 const isProd = import.meta.env.PROD;
 
@@ -162,15 +169,35 @@ const AppContent = () => {
     >
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/" element={<Navigate to="/app" replace />} />
         <Route path="/welcome" element={<Navigate to="/" replace />} />
+        <Route path="/paths" element={<PathSelection />} />
+        <Route path="/demo-access" element={<DemoAccessForm />} />
+        <Route path="/demo-kit" element={<DemoKit />} />
+        <Route path="/dev/auto/*" element={<AutoRoutes base="/dev/auto" />} />
+        <Route path="/pages/*" element={<AutoRoutes base="/pages" />} />
+        <Route path="/pages/app" element={
+          <ProtectedRoute>
+            <AppLayout />
+          </ProtectedRoute>
+        }>
+          <Route path="*" element={<AutoRoutes base="/pages/app" />} />
+        </Route>
 
         {/* ==================================================================
             DEMO ACCESS PATH - /demo
             ================================================================== */}
         <Route path="/demo" element={<DemoLanding />} />
         <Route path="/demo/register" element={<DemoRegister />} />
-        <Route path="/demo/app/*" element={<DemoAppLayout />} />
+        <Route path="/demo/app" element={<DemoAppLayout />}>
+          <Route index element={<EnhancedDashboard />} />
+          <Route path="dashboard" element={<EnhancedDashboard />} />
+          <Route path="assessments" element={<AssessmentsModuleEnhanced />} />
+          <Route path="frameworks" element={<FrameworksModuleEnhanced />} />
+          <Route path="controls" element={<ControlsModuleEnhanced />} />
+          <Route path="risks" element={<RiskManagementModuleEnhanced />} />
+          <Route path="compliance" element={<ComplianceTrackingModuleEnhanced />} />
+        </Route>
 
         {/* ==================================================================
             PARTNER ACCESS PATH - /partner

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/landing/Header';
 import Hero from '../../components/landing/Hero';
 import ProblemSolution from '../../components/landing/ProblemSolution';
@@ -73,17 +73,4 @@ const LandingPage = () => {
   );
 };
 
-const App = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/paths" element={<PathSelection />} />
-        <Route path="/demo-access" element={<DemoAccessForm />} />
-        <Route path="/demo-kit" element={<DemoKit />} />
-      </Routes>
-    </BrowserRouter>
-  );
-};
-
-export default App;
+export default LandingPage;

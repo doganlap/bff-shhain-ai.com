@@ -56,3 +56,9 @@
 .badge-success { background-color: var(--color-success-50); color: var(--color-success-600); }
 .badge-info { background-color: var(--color-info-50); color: var(--color-info-600); }
 .badge-gray { background-color: var(--color-gray-100); color: var(--color-gray-700); }
+
+html,
+:host {
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
+}

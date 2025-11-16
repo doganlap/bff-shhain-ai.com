@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRolePermissions } from './useRolePermissions';
-import { apiServices } from '../services/api';
+import { apiServices } from '@/services/api';
 
 /**
  * Bulk Operations Hook

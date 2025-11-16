@@ -1,5 +1,10 @@
-import React from 'react';
-import Plot from 'react-plotly.js';
+import React, { Suspense } from 'react';
+const LazyPlot = React.lazy(() => import('react-plotly.js'));
+const Plot = (props) => (
+  <Suspense fallback={<div />}> 
+    <LazyPlot {...props} />
+  </Suspense>
+);
 
 /**
  * Advanced Plotly Chart Components Library

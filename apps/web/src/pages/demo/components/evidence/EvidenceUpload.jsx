@@ -5,7 +5,7 @@ import {
   Image as FiImage, FileText as FiFileText, Download as FiDownload
 } from 'lucide-react';
 import { useI18n } from '../../hooks/useI18n';
-import { api } from '../../services/api';
+import { api } from '@/services/api';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = [

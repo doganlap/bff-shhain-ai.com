@@ -11,8 +11,8 @@ import ErrorBoundary from '../common/ErrorBoundary';
 import { Toaster } from 'sonner';
 
 const AppLayout = () => {
-  const { state } = useApp();
-  const { loading, sidebarOpen } = state;
+  const { state, actions } = useApp();
+  const { loading } = state;
   const { isRTL } = useI18n();
   const { isDark } = useTheme();
 
@@ -32,6 +32,12 @@ const AppLayout = () => {
         {/* Main Content Area - Flexible and Auto-sizing */}
         <div className="flex-1 flex flex-col min-h-0 transition-all duration-300 w-full">
           <Header />
+          <div className={`w-full ${isDark ? 'bg-gray-800' : 'bg-gray-100'} ${isRTL() ? 'text-right' : 'text-left'} border-b ${isDark ? 'border-gray-700' : 'border-gray-200'} px-3 py-2 text-sm flex items-center gap-3`}>
+            <span className={`${state.apiConnectionStatus === 'connected' ? 'text-green-600' : state.isOffline ? 'text-orange-600' : 'text-gray-600'}`}>
+              {state.apiConnectionStatus === 'connected' ? 'API Connected' : state.isOffline ? 'Offline Mode' : 'Checking Connection'}
+            </span>
+            <button onClick={actions?.refreshData} className={`${isDark ? 'text-blue-300' : 'text-blue-600'} hover:underline`} disabled={false}>Refresh</button>
+          </div>
           {/* Main Content - Fully Flexible and Responsive */}
           <main className="enterprise-content-area flex-1 min-h-0 overflow-auto">
             <div className="h-full w-full flex flex-col">

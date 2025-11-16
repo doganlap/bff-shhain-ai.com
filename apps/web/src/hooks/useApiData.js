@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { apiServices } from '../services/api';
+import { apiServices } from '@/services/api';
 
 const useApiData = (endpoint, params = {}, options = {}) => {
   const [data, setData] = useState(null);

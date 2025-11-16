@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import apiService from '../../services/apiEndpoints';
+import apiService from '@/services/apiEndpoints';
 import { toast } from 'sonner';
 import { CulturalLoadingSpinner } from '../../components/Animation/InteractiveAnimationToolkit';
 

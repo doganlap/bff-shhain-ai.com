@@ -1,6 +1,9 @@
 // prisma/seed.ts - Database Seeding Script
 import { PrismaClient } from '@prisma/client'
 
+const url = process.env.PRISMA_DATABASE_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL
+if (url) process.env.DATABASE_URL = url
+
 const prisma = new PrismaClient()
 
 async function main() {

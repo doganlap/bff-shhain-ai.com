@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { apiServices } from '../../services/api';
+import { apiServices } from '@/services/api';
 
 const OrganizationForm = () => {
   const [formData, setFormData] = useState({

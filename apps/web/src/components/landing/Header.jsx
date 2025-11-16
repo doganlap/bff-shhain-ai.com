@@ -231,24 +231,41 @@ const Header = ({ onLoginClick }) => {
               )}
             </div>
             
-            {/* Login Button */}
-            <div className="relative group">
-              <motion.button 
-                onClick={onLoginClick}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                className="relative flex items-center gap-2 font-arabic font-bold px-4 py-2 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all"
-                aria-label="دخول المنصة"
-              >
-                <LogIn className="w-5 h-5" strokeWidth={2.5} aria-hidden="true" />
-                <span>دخول</span>
-              </motion.button>
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                <div className="bg-gray-900 text-white text-xs font-arabic px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
-                  دخول منصة شاهين
-                </div>
+          {/* Login Button */}
+          <div className="relative group">
+            <motion.button 
+              onClick={onLoginClick}
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              className="relative flex items-center gap-2 font-arabic font-bold px-4 py-2 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-lg hover:shadow-xl transition-all"
+              aria-label="دخول المنصة"
+            >
+              <LogIn className="w-5 h-5" strokeWidth={2.5} aria-hidden="true" />
+              <span>دخول</span>
+            </motion.button>
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <div className="bg-gray-900 text-white text-xs font-arabic px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
+                دخول منصة شاهين
               </div>
             </div>
+          </div>
+
+          <div className="relative group">
+            <a
+              href="https://partner.shahin-ai.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative flex items-center gap-2 font-arabic font-bold px-4 py-2 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 text-white shadow-lg hover:shadow-xl transition-all"
+              aria-label="بوابة الشركاء"
+            >
+              بوابة الشركاء
+            </a>
+            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <div className="bg-gray-900 text-white text-xs font-arabic px-3 py-1.5 rounded-lg whitespace-nowrap shadow-lg">
+                الانتقال إلى بوابة الشركاء
+              </div>
+            </div>
+          </div>
 
             {/* Theme Toggle */}
             <div className="relative group">

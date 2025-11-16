@@ -6,7 +6,7 @@ import { AnimatedCard, AnimatedButton } from '../../components/Animation/Interac
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../../components/theme/ThemeProvider';
-import apiService from '../../services/apiEndpoints';
+import apiService from '@/services/apiEndpoints';
 import { toast } from 'sonner';
 
 const SettingsPage = () => {

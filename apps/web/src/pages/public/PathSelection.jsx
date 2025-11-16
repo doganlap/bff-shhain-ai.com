@@ -62,7 +62,7 @@ const PathSelection = () => {
         { ar: 'دعم فني مخصص', en: 'Dedicated support' }
       ],
       badge: { ar: 'للعملاء', en: 'CUSTOMERS', color: 'bg-blue-600' },
-      action: () => window.location.href = 'http://localhost:5173/login',
+      action: () => navigate('/login'),
       buttonText: { ar: 'تسجيل الدخول', en: 'Sign In' }
     }
   ];

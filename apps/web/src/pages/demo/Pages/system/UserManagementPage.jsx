@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Users, UserPlus, Edit, Trash2, Shield, Mail, Building, UserCheck, UserX, RefreshCw, Grid, List, Search } from 'lucide-react';
 import EnterprisePageLayout from '../../components/layout/EnterprisePageLayout';
-import apiService from '../../services/apiEndpoints';
+import apiService from '@/services/apiEndpoints';
 import { toast } from 'sonner';
 
 

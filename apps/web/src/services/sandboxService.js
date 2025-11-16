@@ -1,7 +1,7 @@
 // Sandbox/Playground Service - Create temporary demo sessions
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api'
-const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || 'http://localhost:5173'
+const API_BASE_URL = import.meta.env.VITE_API_URL || (typeof window !== 'undefined' ? `${window.location.origin}/api` : 'http://localhost:3005/api')
+const FRONTEND_URL = import.meta.env.VITE_FRONTEND_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:5173')
 
 /**
  * Create a temporary sandbox session for visitor

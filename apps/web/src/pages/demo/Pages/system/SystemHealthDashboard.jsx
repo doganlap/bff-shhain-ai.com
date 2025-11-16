@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { RefreshCw, Server, GitBranch, Database, Cloud } from 'lucide-react';
-import apiService from '../../services/apiEndpoints';
+import apiService from '../../../services/apiEndpoints';
 
 const SystemHealthDashboard = () => {
   

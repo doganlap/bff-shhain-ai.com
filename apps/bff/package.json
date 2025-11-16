@@ -19,6 +19,7 @@
     "migrate:local:reset": "dotenv -e .env.local -- npx prisma migrate reset",
     "db:local:seed": "dotenv -e .env.local -- npx tsx prisma/seed.ts",
     "db:local:studio": "dotenv -e .env.local -- npx prisma studio",
+    "db:production:seed": "npx tsx prisma/seed-production.ts",
     "test": "jest",
     "test:services": "jest test/services.test.js",
     "test:api": "jest test/api.integration.test.js",

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { getNavigationForRole } from './MultiTenantNavigation';
@@ -336,7 +336,7 @@ const Sidebar = () => {
           path: '/app/frameworks',
           icon: Target,
           description: t('frameworks.description'),
-          badge: stats.frameworks || 0
+          badge: (stats?.frameworks) || 0
         },
         {
           id: 'organizations',
@@ -344,7 +344,7 @@ const Sidebar = () => {
           path: '/app/organizations',
           icon: Building2,
           description: t('organizations.description'),
-          badge: stats.organizations || 0
+          badge: (stats?.organizations) || 0
         },
         {
           id: 'users',
@@ -360,7 +360,7 @@ const Sidebar = () => {
           path: '/app/regulators',
           icon: Award,
           description: 'Regulatory bodies',
-          badge: stats.regulators || 0
+          badge: (stats?.regulators) || 0
         }
       ]
     },
@@ -395,7 +395,7 @@ const Sidebar = () => {
           path: '/app/controls',
           icon: ShieldCheck,
           description: 'Mitigating controls',
-          badge: stats.controls || 0
+          badge: (stats?.controls) || 0
         }
       ]
     },
@@ -414,7 +414,7 @@ const Sidebar = () => {
           path: '/app/assessments',
           icon: FileText,
           description: 'Compliance assessments',
-          badge: stats.assessments || 0
+          badge: (stats?.assessments) || 0
         },
         {
           id: 'compliance',
@@ -1217,7 +1217,7 @@ const Sidebar = () => {
                   </div>
                   <div className="ml-2">
                     <p className="text-xs text-muted">Active</p>
-                    <p className="text-sm font-semibold text-title">{stats.assessments || 12}</p>
+                    <p className="text-sm font-semibold text-title">{(stats?.assessments) || 12}</p>
                   </div>
                 </div>
               </div>

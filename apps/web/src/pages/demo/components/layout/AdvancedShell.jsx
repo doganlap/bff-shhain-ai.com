@@ -11,7 +11,7 @@ import { Calendar, CreditCard, Play } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n';
 import { useTheme } from '../theme/ThemeProvider';
-import apiService from '../../services/apiEndpoints';
+import apiService from '@/services/apiEndpoints';
 import ProcessGuideBanner from '../guidance/ProcessGuideBanner';
 import { processGuides, resolveGuideKey } from '../../config/processGuides';
 

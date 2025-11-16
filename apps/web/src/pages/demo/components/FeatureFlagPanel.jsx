@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { useFeatureFlags } from '../contexts/FeatureFlagContext';
+import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
 
 const FeatureFlagPanel = () => {
   const { flags, getFlagStatus, setFeatureFlag, isProduction } = useFeatureFlags();

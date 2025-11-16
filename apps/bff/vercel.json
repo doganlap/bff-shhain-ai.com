@@ -36,17 +36,28 @@
     }
   ],
   "env": {
-    "DATABASE_URL": "postgres://38452a313303a24baeddfbfe8046678d396610943c9b34e65432968f33793f7f:sk_ziZoE_g62VBpHvM3Nv6C7@db.prisma.io:5432/postgres?sslmode=require",
+    "DATABASE_URL": "@database_url",
     "NODE_ENV": "production",
-    "JWT_SECRET": "shahin-ai-production-jwt-secret-2025-secure-32-chars-minimum",
-    "SERVICE_TOKEN": "shahin-ai-production-service-token-2025-secure-32-chars",
+    "JWT_SECRET": "@jwt_secret",
+    "JWT_REFRESH_SECRET": "@jwt_refresh_secret",
+    "SERVICE_TOKEN": "@service_token",
     "FRONTEND_ORIGINS": "https://app.shahin-ai.com,https://www.shahin-ai.com,https://shahin-ai.com",
     "PUBLIC_BFF_URL": "https://app.shahin-ai.com",
     "PRODUCTION_MODE": "true",
     "SINGLE_TENANT_MODE": "true",
     "ENABLE_TRANSACTIONS": "true",
     "ENABLE_WORKFLOWS": "true",
-    "ENABLE_AUDIT_LOGGING": "true"
+    "ENABLE_AUDIT_LOGGING": "true",
+    "REDIS_URL": "@redis_url",
+    "REDIS_TOKEN": "@redis_token",
+    "SENTRY_DSN": "@sentry_dsn",
+    "SENDGRID_API_KEY": "@sendgrid_api_key",
+    "STRIPE_SECRET_KEY": "@stripe_secret_key",
+    "OPENAI_API_KEY": "@openai_api_key",
+    "BYPASS_AUTH": "false",
+    "RATE_LIMIT_WINDOW_MS": "900000",
+    "RATE_LIMIT_MAX_REQUESTS": "100",
+    "SSL_ENABLED": "true"
   },
   "regions": ["iad1"]
 }

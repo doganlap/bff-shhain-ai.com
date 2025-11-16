@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import AdvancedAppShell from '../../components/layout/AdvancedAppShell';
 
@@ -80,15 +80,7 @@ const DemoAppLayout = () => {
       demoMode={true}
       sessionInfo={sessionInfo}
     >
-      <Routes>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<EnhancedDashboard demoMode={true} />} />
-        <Route path="assessments/*" element={<AdvancedAssessmentManager />} />
-        <Route path="frameworks/*" element={<AdvancedFrameworkManager />} />
-        <Route path="risks/*" element={<RiskManagementPage />} />
-        <Route path="evidence/*" element={<EvidencePage />} />
-        <Route path="*" element={<Navigate to="dashboard" replace />} />
-      </Routes>
+      <Outlet />
     </AdvancedAppShell>
   );
 };

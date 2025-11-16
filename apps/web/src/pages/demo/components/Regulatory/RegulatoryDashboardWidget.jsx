@@ -6,7 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, TrendingUp, ExternalLink, AlertCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { regulatoryAPI } from '../../services/api';
+import { regulatoryAPI } from '@/services/api';
 
 const RegulatoryDashboardWidget = () => {
   const [changes, setChanges] = useState([]);

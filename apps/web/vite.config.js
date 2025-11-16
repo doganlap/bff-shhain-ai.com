@@ -25,21 +25,25 @@ export default defineConfig({
     exclude: ['node_modules', 'dist', '.idea', '.git', '.cache'],
   },
   server: {
-    port: 5173,
+    port: 5177,
     host: '0.0.0.0',
+    open: true,
     proxy: {
-      "/api": {
-        target: "http://localhost:8085",
+      '/api': {
+        target: 'http://localhost:3005',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path, // Ensure path is passed through correctly
-      },
+        rewrite: (path) => path
+      }
     },
     cors: {
-      origin: ['http://localhost:3001', 'http://localhost:5173', 'http://localhost:5174'],
+      origin: ['http://localhost:3001', 'http://localhost:5173', 'http://localhost:5174', 'http://localhost:5177'],
       credentials: true,
       allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'X-Tenant-Id']
     },
+    fs: {
+      allow: ['..']
+    }
   },
   preview: {
     port: 4173,
@@ -48,14 +52,34 @@ export default defineConfig({
   },
   define: {
     global: 'globalThis',
+    'process.env': {},
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom', 'lucide-react', 'framer-motion']
+    include: ['react', 'react-dom', 'react-router-dom', 'lucide-react', 'framer-motion', '@emotion/is-prop-valid'],
+    esbuildOptions: {
+      // Handle strict mode issues with legacy dependencies
+      target: 'es2020',
+      supported: {
+        'top-level-await': true
+      }
+    }
+  },
+  resolve: {
+    alias: {
+      '@': '/src'
+    }
   },
   build: {
     // Increase chunk size threshold to reduce warning logs during the build
     chunkSizeWarningLimit: 2000,
     rollupOptions: {
+      external: (id) => {
+        // Handle @emotion/is-prop-valid require issue
+        if (id.includes('@emotion/is-prop-valid')) {
+          return false;
+        }
+        return false;
+      },
       output: {
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
@@ -66,10 +90,15 @@ export default defineConfig({
           ui: ['lucide-react', 'framer-motion', 'sonner'],
           charts: ['recharts'],
           utils: ['axios', 'date-fns', 'uuid']
+        },
+        globals: {
+          'react': 'React',
+          'react-dom': 'ReactDOM'
         }
       }
     },
-    sourcemap: false,
-    minify: 'esbuild'
+    sourcemap: true,
+    minify: 'esbuild',
+    target: 'es2020'
   }
 })

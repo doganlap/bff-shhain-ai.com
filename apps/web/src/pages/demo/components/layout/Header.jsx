@@ -5,7 +5,7 @@ import { useTheme } from '../theme/ThemeProvider';
 import { Bell, Search, User, LogOut, Settings, Globe, Grid3X3, Star, Sun, Moon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import ModernSlideNavigator from '../Navigation/ModernSlideNavigator';
-import { apiServices } from '../../services/api';
+import { apiServices } from '@/services/api';
 
 const Header = () => {
   const { state, actions } = useApp();

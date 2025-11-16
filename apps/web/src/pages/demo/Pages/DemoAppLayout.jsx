@@ -1,14 +1,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import AdvancedAppShell from '../../components/layout/AdvancedAppShell';
+import AdvancedAppShell from '../components/layout/AdvancedAppShell';
 
 // Import main pages
 import EnhancedDashboard from '../dashboard/EnhancedDashboard';
-import AdvancedAssessmentManager from '../../components/AdvancedAssessmentManager';
-import AdvancedFrameworkManager from '../../components/AdvancedFrameworkManager';
+import AdvancedAssessmentManager from '../components/AdvancedAssessmentManager';
+import AdvancedFrameworkManager from '../components/AdvancedFrameworkManager';
 import RiskManagementPage from '../grc-modules/RiskManagementPage';
 import EvidencePage from '../grc-modules/Evidence';
+import DemoDataTables from './DemoDataTables';
+import DemoPendingActions from './DemoPendingActions';
 
 /**
  * Demo App Layout - Protected demo environment
@@ -87,6 +89,8 @@ const DemoAppLayout = () => {
         <Route path="frameworks/*" element={<AdvancedFrameworkManager />} />
         <Route path="risks/*" element={<RiskManagementPage />} />
         <Route path="evidence/*" element={<EvidencePage />} />
+        <Route path="tables" element={<DemoDataTables />} />
+        <Route path="pending" element={<DemoPendingActions />} />
         <Route path="*" element={<Navigate to="dashboard" replace />} />
       </Routes>
     </AdvancedAppShell>

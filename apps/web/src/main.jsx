@@ -6,7 +6,7 @@ import { I18nProvider } from './hooks/useI18n.jsx';
 import { ThemeProvider } from './components/theme/ThemeProvider.jsx';
 import { CulturalAdaptationProvider } from './components/Cultural/CulturalAdaptationProvider.jsx';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import './i18n'; // Initialize i18n
 import './index.css';
 import './App.css';
@@ -59,14 +59,9 @@ const renderApp = () => {
             <I18nProvider defaultLanguage="ar">
               <CulturalAdaptationProvider>
                 <AppProvider>
-                  <Router
-                    future={{
-                      v7_startTransition: true,
-                      v7_relativeSplatPath: true
-                    }}
-                  >
+                  <BrowserRouter>
                     <App />
-                  </Router>
+                  </BrowserRouter>
                 </AppProvider>
               </CulturalAdaptationProvider>
             </I18nProvider>

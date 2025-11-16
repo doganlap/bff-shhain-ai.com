@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useRBAC } from '../../hooks/useRBAC';
+import { useRBAC } from '@/hooks/useRBAC';
 import { PermissionBasedCard } from '../common/PermissionBasedCard';
 import { Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
 

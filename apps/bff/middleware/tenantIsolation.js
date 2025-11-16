@@ -11,6 +11,14 @@ const { captureMessage } = require('../integrations/sentry');
  * Extracts and validates tenant ID from request
  */
 function tenantContext(req, res, next) {
+  // Bypass tenant context check if authentication is bypassed
+  if (process.env.BYPASS_AUTH === 'true' && process.env.NODE_ENV === 'development') {
+    // Use a default tenant ID for development bypass
+    req.tenantId = req.headers['x-tenant-id'] || '42c676e2-8d5e-4b1d-ae80-3986b82dd5c5';
+    res.setHeader('X-Tenant-ID', req.tenantId);
+    return next();
+  }
+
   // Extract tenant ID from multiple sources (priority order)
   const tenantId = 
     req.headers['x-tenant-id'] ||           // Header (preferred)
@@ -128,6 +136,19 @@ function verifyTenantAccess(req, res, next) {
  * Allows platform admins to access any tenant's data
  */
 function superAdminBypass(req, res, next) {
+  // Bypass all tenant checks if authentication is bypassed in development
+  if (process.env.BYPASS_AUTH === 'true' && process.env.NODE_ENV === 'development') {
+    logger.info('Development bypass - skipping tenant access verification', {
+      userId: req.user?.id,
+      tenantId: req.tenantId,
+      path: req.path,
+    });
+    
+    // Add flag to indicate super admin access for development
+    req.isSuperAdmin = true;
+    return next();
+  }
+
   const userRole = req.user?.role || req.user?.roles?.[0];
   
   // Platform admins and supervisor admins can access any tenant

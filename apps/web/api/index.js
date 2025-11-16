@@ -38,6 +38,7 @@ app.use(helmet({
 app.use(cors({
   origin: [
     'http://localhost:5173',
+    'http://localhost:5177',
     'https://app.shahin-ai.com',
     'https://www.shahin-ai.com',
     'https://shahin-ai.com',
@@ -87,6 +88,29 @@ app.get('/api/test', (req, res) => {
     message: 'Shahin AI GRC API is working!',
     timestamp: new Date().toISOString(),
     domain: 'shahin-ai.com'
+  });
+});
+
+app.get('/api/regulators/stats', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      totalRegulators: 3,
+      activeRegulators: 3,
+      totalPublications: 0,
+      inactiveRegulators: 0
+    }
+  });
+});
+
+app.get('/api/regulators', (req, res) => {
+  res.json({
+    success: true,
+    data: [
+      { id: 1, name: 'SEC', type: 'federal', isActive: true },
+      { id: 2, name: 'FINRA', type: 'self_regulatory', isActive: true },
+      { id: 3, name: 'CFTC', type: 'federal', isActive: true }
+    ]
   });
 });
 

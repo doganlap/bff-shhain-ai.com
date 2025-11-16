@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo, useRef } from 'react';
-import { apiServices } from '../services/api';
+import { apiServices } from '@/services/api';
 import {
   DEMO_MODE_CONFIG,
   DEMO_DATA_CHECKSUMS,

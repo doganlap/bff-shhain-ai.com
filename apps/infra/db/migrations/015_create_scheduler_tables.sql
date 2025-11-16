@@ -10,8 +10,8 @@
 
 CREATE TABLE IF NOT EXISTS scheduled_tasks (
     id SERIAL PRIMARY KEY,
-    organization_id INTEGER NOT NULL,
-    created_by INTEGER,
+    organization_id UUID NOT NULL,
+    created_by UUID,
 
     -- Task Information
     name VARCHAR(255) NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS scheduled_tasks (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
     CONSTRAINT scheduled_tasks_organization_fk
-        FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+        FOREIGN KEY (organization_id) REFERENCES tenants(id) ON DELETE CASCADE,
     CONSTRAINT scheduled_tasks_created_by_fk
         FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS task_executions (
     execution_duration INTEGER, -- Duration in seconds
 
     -- Execution Context
-    triggered_by INTEGER, -- User who triggered manual execution
+    triggered_by UUID, -- User who triggered manual execution
     trigger_type VARCHAR(50) DEFAULT 'scheduled', -- 'scheduled', 'manual', 'dependency', 'retry'
 
     -- Results and Logging
@@ -112,8 +112,8 @@ CREATE TABLE IF NOT EXISTS task_executions (
 
 CREATE TABLE IF NOT EXISTS automation_rules (
     id SERIAL PRIMARY KEY,
-    organization_id INTEGER NOT NULL,
-    created_by INTEGER,
+    organization_id UUID NOT NULL,
+    created_by UUID,
 
     -- Rule Information
     name VARCHAR(255) NOT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS automation_rules (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
     CONSTRAINT automation_rules_organization_fk
-        FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+        FOREIGN KEY (organization_id) REFERENCES tenants(id) ON DELETE CASCADE,
     CONSTRAINT automation_rules_created_by_fk
         FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
 );
@@ -148,7 +148,7 @@ CREATE TABLE IF NOT EXISTS automation_rules (
 
 CREATE TABLE IF NOT EXISTS ai_suggestions (
     id SERIAL PRIMARY KEY,
-    organization_id INTEGER NOT NULL,
+    organization_id UUID NOT NULL,
     task_id INTEGER,
 
     -- Suggestion Details
@@ -171,7 +171,7 @@ CREATE TABLE IF NOT EXISTS ai_suggestions (
 
     -- Status and Review
     status VARCHAR(50) DEFAULT 'pending', -- 'pending', 'accepted', 'rejected', 'implemented'
-    reviewed_by INTEGER,
+    reviewed_by UUID,
     reviewed_at TIMESTAMP WITH TIME ZONE,
     review_notes TEXT,
 
@@ -183,7 +183,7 @@ CREATE TABLE IF NOT EXISTS ai_suggestions (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
     CONSTRAINT ai_suggestions_organization_fk
-        FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+        FOREIGN KEY (organization_id) REFERENCES tenants(id) ON DELETE CASCADE,
     CONSTRAINT ai_suggestions_task_fk
         FOREIGN KEY (task_id) REFERENCES scheduled_tasks(id) ON DELETE CASCADE,
     CONSTRAINT ai_suggestions_reviewed_by_fk
@@ -532,7 +532,7 @@ CREATE TABLE IF NOT EXISTS ai_suggestions (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
     CONSTRAINT ai_suggestions_organization_fk
-        FOREIGN KEY (organization_id) REFERENCES organizations(id) ON DELETE CASCADE,
+        FOREIGN KEY (organization_id) REFERENCES tenants(id) ON DELETE CASCADE,
     CONSTRAINT ai_suggestions_task_fk
         FOREIGN KEY (task_id) REFERENCES scheduled_tasks(id) ON DELETE CASCADE,
     CONSTRAINT ai_suggestions_reviewed_by_fk
@@ -706,3 +706,42 @@ COMMENT ON COLUMN scheduled_tasks.ai_suggestions IS 'AI-generated optimization s
 COMMENT ON COLUMN task_executions.ai_analysis IS 'AI insights about execution performance';
 COMMENT ON COLUMN automation_rules.conditions IS 'Conditions that trigger the automation rule';
 COMMENT ON COLUMN automation_rules.actions IS 'Actions to take when rule conditions are met';
+
+CREATE TABLE IF NOT EXISTS scheduler_ignore_list (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    organization_id UUID NOT NULL,
+    value TEXT NOT NULL,
+    is_regex BOOLEAN NOT NULL DEFAULT FALSE,
+    regex_pattern TEXT,
+    scope TEXT DEFAULT 'task',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    CONSTRAINT scheduler_ignore_list_upper CHECK (value = UPPER(value)),
+    CONSTRAINT scheduler_ignore_list_regex_null CHECK ((is_regex AND regex_pattern IS NOT NULL) OR (NOT is_regex AND regex_pattern IS NULL)),
+    CONSTRAINT scheduler_ignore_list_unique UNIQUE (organization_id, value, is_regex, scope)
+);
+
+CREATE TRIGGER trigger_scheduler_ignore_list_updated_at
+    BEFORE UPDATE ON scheduler_ignore_list
+    FOR EACH ROW
+    EXECUTE FUNCTION update_scheduler_updated_at();
+
+CREATE OR REPLACE FUNCTION upsert_scheduler_ignore_list(
+    org_id UUID,
+    val TEXT,
+    is_re BOOLEAN,
+    pattern TEXT,
+    scope_in TEXT DEFAULT 'task'
+)
+RETURNS UUID AS $$
+DECLARE
+    rec_id UUID;
+BEGIN
+    INSERT INTO scheduler_ignore_list (organization_id, value, is_regex, regex_pattern, scope)
+    VALUES (org_id, UPPER(val), is_re, pattern, scope_in)
+    ON CONFLICT (organization_id, value, is_regex, scope)
+    DO UPDATE SET regex_pattern = EXCLUDED.regex_pattern, updated_at = NOW()
+    RETURNING id INTO rec_id;
+    RETURN rec_id;
+END;
+$$ LANGUAGE plpgsql;

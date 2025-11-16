@@ -9,13 +9,13 @@ const router = express.Router();
 
 // Service registry (should match main index.js)
 const services = {
-  'grc-api': process.env.GRC_API_URL || 'http://grc-api:3000',
-  'auth-service': process.env.AUTH_SERVICE_URL || 'http://auth-service:3001',
-  'partner-service': process.env.PARTNER_SERVICE_URL || 'http://partner-service:3003',
-  'notification-service': process.env.NOTIFICATION_SERVICE_URL || 'http://notification-service:3004',
-  'ai-scheduler-service': process.env.AI_SCHEDULER_SERVICE_URL || 'http://ai-scheduler-service:3005',
-  'rag-service': process.env.RAG_SERVICE_URL || 'http://rag-service:3006',
-  'regulatory-intelligence-ksa': process.env.REGULATORY_SERVICE_URL || 'http://regulatory-intelligence-ksa:3008'
+  'grc-api': process.env.GRC_API_URL || 'http://localhost:3006',
+  'auth-service': process.env.AUTH_SERVICE_URL || 'http://localhost:3001',
+  'partner-service': process.env.PARTNER_SERVICE_URL || 'http://localhost:3005',
+  'notification-service': process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:3007',
+  'ai-scheduler-service': process.env.AI_SCHEDULER_SERVICE_URL || 'http://localhost:3002',
+  'rag-service': process.env.RAG_SERVICE_URL || 'http://localhost:3003',
+  'regulatory-intelligence-ksa': process.env.REGULATORY_SERVICE_URL || 'http://localhost:3008'
 };
 
 /**

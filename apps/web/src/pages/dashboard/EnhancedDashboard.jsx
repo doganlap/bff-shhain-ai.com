@@ -1,5 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import Plot from 'react-plotly.js';
+import React, { useEffect, useState, Suspense } from 'react';
+const LazyPlot = React.lazy(() => import('react-plotly.js'));
+const Plot = (props) => (
+  <Suspense fallback={<div />}> 
+    <LazyPlot {...props} />
+  </Suspense>
+);
 import apiService from '../../services/apiEndpoints';
 import { toast } from 'sonner';
 

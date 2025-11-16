@@ -3,6 +3,9 @@ import fs from 'fs'
 import path from 'path'
 import csv from 'csv-parser'
 
+const url = process.env.PRISMA_DATABASE_URL || process.env.DATABASE_URL || process.env.POSTGRES_URL
+if (url) process.env.DATABASE_URL = url
+
 const prisma = new PrismaClient()
 
 async function readCSV(filePath: string): Promise<any[]> {

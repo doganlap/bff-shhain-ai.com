@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { X, TrendingUp, DollarSign, Users, Clock, AlertCircle, CheckCircle } from 'lucide-react';
-import { regulatoryAPI } from '../../services/api';
+import { regulatoryAPI } from '@/services/api';
 
 const ImpactAssessmentModal = ({ change, onClose }) => {
   const [impactData, setImpactData] = useState(null);

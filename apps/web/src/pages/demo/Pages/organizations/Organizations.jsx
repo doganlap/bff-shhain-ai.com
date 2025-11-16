@@ -1,6 +1,6 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { apiServices } from '../../services/api';
+import { apiServices } from '@/services/api';
 
 const Organizations = () => {
   const { data: organizations, isLoading, error } = useQuery({

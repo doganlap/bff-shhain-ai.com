@@ -1,6 +1,6 @@
 import React from 'react'
 import * as Dialog from '@radix-ui/react-dialog'
-import LoginForm from '../components/auth/LoginForm'
+import LoginForm from './components/auth/LoginForm'
 
 export default function LandingPage() {
   return (

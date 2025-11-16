@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Calendar, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
-import { regulatoryAPI } from '../../services/api';
+import { regulatoryAPI } from '@/services/api';
 
 const ComplianceCalendarWidget = () => {
   const [deadlines, setDeadlines] = useState([]);
