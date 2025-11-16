@@ -206,6 +206,9 @@ const SimpleLoginPage = () => {
           <div className="text-white/60 text-sm">
             Super Administrator Portal - Full System Access
           </div>
+          <div className="text-white/40 text-xs mt-1">
+            v2.0 - Updated {new Date().toISOString().split('T')[0]}
+          </div>
         </div>
       </div>
     </div>
