@@ -79,7 +79,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.vercel.app https://www.googletagmanager.com data: blob:; script-src-elem 'self' 'unsafe-inline' https://vercel.live https://*.vercel.app data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https: https://trae-api-sg.mchost.guru; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self' https://vercel.live https://*.vercel.app; frame-ancestors 'none'; connect-src 'self' https://*.vercel.app wss://*.vercel.app https://vercel.live wss://ws-us3.pusher.com https://sockjs-us3.pusher.com https://bff-shhain-ai-com.vercel.app wss://bff-shhain-ai-com.vercel.app https://www.shahin-ai.com https://shahin-ai.com https://api.shahin-ai.com https://api.grc-ecosystem.com https://bff.grc-ecosystem.com https://auth.grc-ecosystem.com https://docs.grc-ecosystem.com https://partners.grc-ecosystem.com https://notifications.grc-ecosystem.com https://ai.grc-ecosystem.com https://rag.grc-ecosystem.com https://regulatory.grc-ecosystem.com https://api.openai.com https://api-inference.huggingface.co https://shahin-openai.openai.azure.com https://shahin-vision.cognitiveservices.azure.com https://shahin-speech.cognitiveservices.azure.com;"
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://*.vercel.app https://www.googletagmanager.com data: blob:; script-src-elem 'self' 'unsafe-inline' https://vercel.live https://*.vercel.app data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https: https://trae-api-sg.mchost.guru; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self' https://vercel.live https://*.vercel.app; frame-ancestors 'none'; connect-src 'self' https://*.vercel.app wss://*.vercel.app https://vercel.live wss://ws-us3.pusher.com https://sockjs-us3.pusher.com https://assessmant-grc.vercel.app wss://assessmant-grc.vercel.app https://www.shahin-ai.com https://shahin-ai.com https://api.shahin-ai.com https://api.grc-ecosystem.com https://bff.grc-ecosystem.com https://auth.grc-ecosystem.com https://docs.grc-ecosystem.com https://partners.grc-ecosystem.com https://notifications.grc-ecosystem.com https://ai.grc-ecosystem.com https://rag.grc-ecosystem.com https://regulatory.grc-ecosystem.com https://api.openai.com https://api-inference.huggingface.co https://shahin-openai.openai.azure.com https://shahin-vision.cognitiveservices.azure.com https://shahin-speech.cognitiveservices.azure.com;"
         },
         {
           "key": "Strict-Transport-Security",
@@ -89,9 +89,10 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "https://bff-shhain-ai-com.vercel.app",
-    "VITE_API_BASE_URL": "https://bff-shhain-ai-com.vercel.app/api",
-    "VITE_WS_URL": "wss://bff-shhain-ai-com.vercel.app",
+    "VITE_BFF_URL": "https://assessmant-grc.vercel.app/api",
+    "VITE_API_URL": "https://assessmant-grc.vercel.app",
+    "VITE_API_BASE_URL": "https://assessmant-grc.vercel.app/api",
+    "VITE_WS_URL": "wss://assessmant-grc.vercel.app",
     "VITE_NODE_ENV": "production"
   },
   "github": {

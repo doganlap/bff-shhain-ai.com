@@ -30,7 +30,7 @@
 
 ### BFF Deployments:
 - ✅ **Working:** bff-shahin-ai-hc6q9cm94 (3h ago)
-- ✅ **Working:** bff-shahin-ai-3vvulmwmt (4h ago)  
+- ✅ **Working:** bff-shahin-ai-3vvulmwmt (4h ago)
 - ❌ **Failed:** bff-shahin-ai-prhrvux3n (2h ago)
 - ❌ **Failed:** bff-shahin-ai-hq3jh3yza (2h ago)
 - ❌ **Failed:** bff-shahin-ai-kdxahi1if (2h ago)

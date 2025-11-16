@@ -74,7 +74,7 @@ import {
   LoginPage,
   StoryDrivenRegistration,
   NotFoundPage,
-  NewLandingPage,
+  LandingPage,
 
   // Demo, Partner, POC Access Paths
   DemoLanding,
@@ -162,7 +162,7 @@ const AppContent = () => {
     >
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<NewLandingPage />} />
+        <Route path="/" element={<LandingPage />} />
         <Route path="/welcome" element={<Navigate to="/" replace />} />
 
         {/* ==================================================================
