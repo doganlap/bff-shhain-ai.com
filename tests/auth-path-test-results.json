@@ -1,0 +1,16 @@
+{
+  "summary": {
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "skipped": 27,
+    "passRate": "0%",
+    "timestamp": "2025-11-16T16:22:53.358Z"
+  },
+  "configuration": {
+    "web": "http://localhost:5173",
+    "bff": "http://localhost:3001",
+    "api": "http://localhost:5001"
+  },
+  "tests": []
+}

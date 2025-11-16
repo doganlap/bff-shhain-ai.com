@@ -1,0 +1,9 @@
+# Cloudflare Pages Redirects and Rewrites
+# Place this file in the landing-page/dist directory after build
+
+# API proxy to backend
+/api/*  https://api.shahin-ai.com/api/:splat  200
+
+# SPA fallback - serve index.html for all routes
+/*    /index.html   200
+

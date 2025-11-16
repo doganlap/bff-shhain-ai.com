@@ -129,7 +129,7 @@ export default function EnhancedDashboard() {
           <Plot data={[{ x: trends.dates, y: trends.compliance, type: 'scatter' }]} layout={{ title: 'Compliance Score Trend' }} />
           <Plot data={[{ value: kpis.complianceScore }]} layout={{ title: 'Overall Compliance' }} />
           <Plot data={[{ values: [3, 5, 2], labels: ['critical', 'high', 'medium'], type: 'pie' }]} layout={{ title: 'Risk Distribution by Severity' }} />
-          <Plot data={[[1,2,3],[4,5,6]]} layout={{ title: 'Controls Compliance Heatmap' }} />
+          <Plot data={[{ z: [[1,2,3],[4,5,6]], type: 'heatmap' }]} layout={{ title: 'Controls Compliance Heatmap' }} />
           <Plot data={[{ r: [kpis.complianceScore], theta: ['ISO 27001'], type: 'scatterpolar' }]} layout={{ title: 'Framework Compliance Comparison' }} />
           <Plot data={[{ x: [1,2,3], y: [4,5,6], type: 'bar' }]} layout={{ title: 'Assessment Activity' }} />
           <Plot data={[{ x: [1,2,3], y: [3,2,4], type: 'bar' }]} layout={{ title: 'Gaps by Domain' }} />

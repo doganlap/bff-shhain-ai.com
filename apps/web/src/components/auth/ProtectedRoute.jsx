@@ -2,89 +2,80 @@ import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import { CulturalLoadingSpinner } from '../Animation/InteractiveAnimationToolkit';
 import { useApp } from '../../context/AppContext';
+import { apiServices } from '../../services/api';
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, requiredPermission }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
 
   useEffect(() => {
-    checkAuthentication();
-  }, [state.isAuthenticated, state.isDemoMode]);
+    validateAccess();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.isAuthenticated, state.user]);
 
-  const checkAuthentication = async () => {
+  const hasRequiredPermission = (user) => {
+    if (!requiredPermission) return true;
+    const appRole = typeof localStorage !== 'undefined' ? localStorage.getItem('app_role') : null;
+    if (appRole === 'SUPER_ADMIN') return true;
+    const permissions = (user && (user.permissions || user.roles || user.scopes)) || [];
+    if (Array.isArray(permissions)) {
+      return permissions.includes(requiredPermission) || permissions.includes('admin') || permissions.includes('*');
+    }
+    return true;
+  };
+
+  const validateAccess = async () => {
     try {
-      // Check for Super Admin Access
       const appUser = localStorage.getItem('app_user');
       const appToken = localStorage.getItem('app_token');
       const appRole = localStorage.getItem('app_role');
 
       if (appUser && appToken && appRole === 'SUPER_ADMIN') {
-        console.log('🔓 Super Admin access verified');
         setIsAuthenticated(true);
         setLoading(false);
         return;
       }
 
-      // Check if we're in demo mode and user is already authenticated
-      if (state.isDemoMode && state.isAuthenticated && state.user) {
-        console.log('🔓 Demo mode authentication verified');
-        setIsAuthenticated(true);
+      if (state.isAuthenticated && state.user) {
+        setIsAuthenticated(hasRequiredPermission(state.user));
         setLoading(false);
         return;
       }
 
-      // Check for token in localStorage for non-demo mode
-      const token = localStorage.getItem('token');
-
-      if (!token) {
+      try {
+        const me = await apiServices.auth.me();
+        const user = me.data?.data?.user || me.data?.user || null;
+        if (user) {
+          dispatch({ type: 'SET_USER', payload: user });
+          dispatch({ type: 'SET_AUTHENTICATED', payload: true });
+          setIsAuthenticated(hasRequiredPermission(user));
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch {
         setIsAuthenticated(false);
-        setLoading(false);
-        return;
       }
-
-      // Simulate API call to validate token
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Mock validation - in real app, make API call to verify token
-      const user = localStorage.getItem('user');
-      if (token && user) {
-        setIsAuthenticated(true);
-      } else {
-        setIsAuthenticated(false);
-        // Clear invalid data
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-      }
-    } catch (error) {
-      console.error('Authentication check failed:', error);
-      setIsAuthenticated(false);
-      // Clear potentially corrupted data
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
     } finally {
       setLoading(false);
     }
   };
 
-  // Show loading spinner while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <CulturalLoadingSpinner culturalStyle="modern" />
-          <p className="mt-4 text-gray-600">Verifying authentication...</p>
+          <p className="mt-4 text-gray-600">Verifying access...</p>
         </div>
       </div>
     );
   }
 
-  // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // Render protected content if authenticated
   return children;
 };
 

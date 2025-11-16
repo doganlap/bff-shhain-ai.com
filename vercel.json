@@ -1,12 +1,11 @@
 {
   "version": 2,
   "installCommand": "pnpm install --no-frozen-lockfile",
-  "framework": "vite",
   "buildCommand": "cd apps/web && pnpm run build",
   "outputDirectory": "apps/web/dist",
   "functions": {
     "apps/bff/index.js": {
-      "runtime": "nodejs20.x",
+      "runtime": "@vercel/node@3.0.0",
       "maxDuration": 30
     }
   },
@@ -17,7 +16,42 @@
     },
     {
       "source": "/(.*)",
-      "destination": "/apps/web/dist/index.html"
+      "destination": "/index.html"
     }
-  ]
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://app.shahin-ai.com"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Authorization, Content-Type, X-Tenant-ID"
+        }
+      ]
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "env": {
+    "DATABASE_URL": "postgres://38452a313303a24baeddfbfe8046678d396610943c9b34e65432968f33793f7f:sk_ziZoE_g62VBpHvM3Nv6C7@db.prisma.io:5432/postgres?sslmode=require",
+    "NODE_ENV": "production",
+    "JWT_SECRET": "shahin-ai-production-jwt-secret-2025-secure-32-chars-minimum",
+    "SERVICE_TOKEN": "shahin-ai-production-service-token-2025-secure-32-chars",
+    "FRONTEND_ORIGINS": "https://app.shahin-ai.com,https://www.shahin-ai.com,https://shahin-ai.com",
+    "PRODUCTION_MODE": "true",
+    "SINGLE_TENANT_MODE": "true",
+    "ENABLE_TRANSACTIONS": "true",
+    "ENABLE_WORKFLOWS": "true",
+    "ENABLE_AUDIT_LOGGING": "true",
+    "VITE_API_BASE_URL": "https://app.shahin-ai.com/api",
+    "VITE_BFF_URL": "https://app.shahin-ai.com"
+  }
 }

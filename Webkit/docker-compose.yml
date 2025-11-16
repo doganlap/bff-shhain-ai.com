@@ -1,0 +1,24 @@
+services:
+  landing-page:
+    build:
+      context: ./landing-page
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-https://grc-backend-prod.delightfulwave-81a84bdf.eastus.azurecontainerapps.io/api}
+        - VITE_FRONTEND_URL=${VITE_FRONTEND_URL:-https://grc-frontend-prod.delightfulwave-81a84bdf.eastus.azurecontainerapps.io}
+    container_name: shahin-landing-page
+    ports:
+      - "4000:80"
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    labels:
+      - "com.docker.compose.project=shahin-grc"
+      - "com.docker.compose.service=landing-page"
+

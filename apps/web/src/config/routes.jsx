@@ -13,7 +13,7 @@ import ProtectedRoute from '../components/auth/ProtectedRoute';
 
 // Pages
  
-import GlassmorphismLoginPage from '../pages/auth/GlassmorphismLoginPage';
+import SimpleLoginPage from '../pages/auth/SimpleLoginPage.jsx';
 import NotFoundPage from '../pages/public/NotFoundPage';
 
 // Dashboard & Main Pages
@@ -49,7 +49,7 @@ export const routeConfig = {
     },
     {
       path: '/login',
-      element: <GlassmorphismLoginPage />,
+      element: <SimpleLoginPage />,
       title: 'Login',
       public: true
     },

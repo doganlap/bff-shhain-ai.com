@@ -10,54 +10,36 @@ async function main() {
   console.log('📋 Seeding Saudi compliance frameworks...')
 
   const frameworks = await Promise.all([
-    prisma.compliance_frameworks.upsert({
-      where: { code: 'NCA-ESSENTIAL' },
+    prisma.framework.upsert({
+      where: { id: 'NCA-ESSENTIAL' },
       update: {},
       create: {
-        code: 'NCA-ESSENTIAL',
+        id: 'NCA-ESSENTIAL',
         name: 'NCA Essential Cybersecurity Controls',
-        name_ar: 'متطلبات الأمن السيبراني الأساسية - الهيئة الوطنية للأمن السيبراني',
         description: 'Essential cybersecurity controls for Saudi organizations',
-        description_ar: 'متطلبات الأمن السيبراني الأساسية للمنظمات السعودية',
-        authority: 'NCA',
-        country: 'Saudi Arabia',
-        category: 'security',
-        status: 'active',
-        version: '2022'
+        category: 'security'
       }
     }),
 
-    prisma.compliance_frameworks.upsert({
-      where: { code: 'SAMA-CSF' },
+    prisma.framework.upsert({
+      where: { id: 'SAMA-CSF' },
       update: {},
       create: {
-        code: 'SAMA-CSF',
+        id: 'SAMA-CSF',
         name: 'SAMA Cybersecurity Framework',
-        name_ar: 'إطار الأمن السيبراني - البنك المركزي السعودي',
         description: 'Cybersecurity framework for Saudi financial institutions',
-        description_ar: 'إطار الأمن السيبراني للمؤسسات المالية السعودية',
-        authority: 'SAMA',
-        country: 'Saudi Arabia',
-        category: 'security',
-        status: 'active',
-        version: '2021'
+        category: 'security'
       }
     }),
 
-    prisma.compliance_frameworks.upsert({
-      where: { code: 'ISO27001' },
+    prisma.framework.upsert({
+      where: { id: 'ISO27001' },
       update: {},
       create: {
-        code: 'ISO27001',
+        id: 'ISO27001',
         name: 'ISO 27001 Information Security',
-        name_ar: 'أيزو 27001 أمن المعلومات',
         description: 'International information security management standard',
-        description_ar: 'المعيار الدولي لإدارة أمن المعلومات',
-        authority: 'ISO',
-        country: 'Saudi Arabia',
-        category: 'security',
-        status: 'active',
-        version: '2022'
+        category: 'security'
       }
     })
   ])

@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: shahin-db-local
+    environment:
+      POSTGRES_DB: shahin_local_db
+      POSTGRES_USER: shahin_local
+      POSTGRES_PASSWORD: shahin_local_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - shahin_db_data_local:/var/lib/postgresql/data
+    networks:
+      - shahin-local
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shahin_local -d shahin_local_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-shadow:
+    image: postgres:16
+    container_name: shahin-shadow-local
+    environment:
+      POSTGRES_DB: shahin_local_shadow
+      POSTGRES_USER: shahin_local
+      POSTGRES_PASSWORD: shahin_local_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - shahin_shadow_data_local:/var/lib/postgresql/data
+    networks:
+      - shahin-local
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shahin_local -d shahin_local_shadow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: shahin-redis-local
+    ports:
+      - "6379:6379"
+    volumes:
+      - shahin_redis_data_local:/data
+    networks:
+      - shahin-local
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  shahin_db_data_local:
+  shahin_shadow_data_local:
+  shahin_redis_data_local:
+
+networks:
+  shahin-local:
+    driver: bridge

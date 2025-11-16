@@ -1,0 +1,37 @@
+# Multi-stage build for Shahin AI Platform
+FROM node:18-alpine as frontend-builder
+
+# Build frontend
+WORKDIR /app/frontend
+COPY landing-page/package*.json ./
+RUN npm ci --only=production
+COPY landing-page/ ./
+RUN npm run build
+
+# Build backend
+FROM node:18-alpine as backend-builder
+WORKDIR /app/backend
+COPY backend/package*.json ./
+RUN npm ci --only=production
+COPY backend/ ./
+
+# Final production image
+FROM nginx:alpine
+
+# Copy frontend build
+COPY --from=frontend-builder /app/frontend/dist /usr/share/nginx/html
+
+# Copy nginx configuration
+COPY landing-page/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy backend (if needed for single container)
+COPY --from=backend-builder /app/backend /app/backend
+
+# Install Node.js for backend (if running in same container)
+RUN apk add --no-cache nodejs npm
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]

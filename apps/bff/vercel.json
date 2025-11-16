@@ -16,7 +16,7 @@
         },
         {
           "key": "Access-Control-Allow-Origin",
-          "value": "https://app-shahin-ai-com.vercel.app"
+          "value": "https://app.shahin-ai.com"
         },
         {
           "key": "Access-Control-Allow-Methods",
@@ -36,15 +36,17 @@
     }
   ],
   "env": {
+    "DATABASE_URL": "postgres://38452a313303a24baeddfbfe8046678d396610943c9b34e65432968f33793f7f:sk_ziZoE_g62VBpHvM3Nv6C7@db.prisma.io:5432/postgres?sslmode=require",
     "NODE_ENV": "production",
-    "FRONTEND_ORIGINS": "https://app.shahin-ai.com,https://app-shahin-ai-com.vercel.app,https://app-shahin-ai-1uwk5615e-donganksa.vercel.app,https://grc-dashboard-ivory.vercel.app,https://shahin-ai.com,https://www.shahin-ai.com,https://dogan-ai.com,http://localhost:5173,http://localhost:3000",
-    "PUBLIC_BFF_URL": "https://bff-shahin-ai-com.vercel.app",
-    "STAGING_OPEN_ACCESS": "true",
-    "STAGING_RESTRICT_PARTNER_ONLY": "true",
-    "STAGING_ALLOWED_ORIGINS": "https://app-shahin-ai-com.vercel.app,https://app-shahin-ai-1uwk5615e-donganksa.vercel.app,https://shahin-ai.com,https://www.shahin-ai.com",
-    "STAGING_CENTER_BASIC_AUTH": "true",
-    "STAGING_CENTER_DB_AUTH": "true",
-    "STAGING_ALLOWED_USERS": "ahmet@doganconsult.com"
+    "JWT_SECRET": "shahin-ai-production-jwt-secret-2025-secure-32-chars-minimum",
+    "SERVICE_TOKEN": "shahin-ai-production-service-token-2025-secure-32-chars",
+    "FRONTEND_ORIGINS": "https://app.shahin-ai.com,https://www.shahin-ai.com,https://shahin-ai.com",
+    "PUBLIC_BFF_URL": "https://app.shahin-ai.com",
+    "PRODUCTION_MODE": "true",
+    "SINGLE_TENANT_MODE": "true",
+    "ENABLE_TRANSACTIONS": "true",
+    "ENABLE_WORKFLOWS": "true",
+    "ENABLE_AUDIT_LOGGING": "true"
   },
   "regions": ["iad1"]
 }

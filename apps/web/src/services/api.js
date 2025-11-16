@@ -1,11 +1,50 @@
 import axios from 'axios';
 
-const API_BASE_URL =
+const ABSOLUTE_URL_REGEX = /^[a-zA-Z][a-zA-Z\d+\-.]*:\/\//;
+const appendApiSegment = (url) => {
+  const sanitized = url.replace(/\/+$/, '');
+  return sanitized.endsWith('/api') ? sanitized : `${sanitized}/api`;
+};
+
+const ensureApiBaseUrl = (rawUrl) => {
+  if (!rawUrl || typeof rawUrl !== 'string') {
+    return null;
+  }
+
+  const trimmed = rawUrl.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  if (trimmed.startsWith('/')) {
+    const relative = trimmed === '/' ? '/api' : appendApiSegment(trimmed);
+    return relative.replace(/\/+$/, '');
+  }
+
+  if (ABSOLUTE_URL_REGEX.test(trimmed)) {
+    try {
+      const parsed = new URL(trimmed);
+      if (parsed.pathname === '/' || parsed.pathname === '') {
+        parsed.pathname = '/api';
+      }
+      return parsed.toString().replace(/\/$/, '');
+    } catch {
+      return appendApiSegment(trimmed);
+    }
+  }
+
+  return appendApiSegment(trimmed);
+};
+
+const rawBaseUrl =
   import.meta.env.VITE_BFF_URL ||
   import.meta.env.VITE_API_BASE_URL ||
-  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_URL;
+
+const API_BASE_URL =
+  ensureApiBaseUrl(rawBaseUrl) ||
   (typeof window !== 'undefined' && window.location.hostname === 'localhost'
-    ? 'https://assessmant-grc.vercel.app/api'
+    ? 'http://localhost:3005/api'
     : '/api');
 
 // Create axios instance with error handling for test environment
@@ -190,25 +229,25 @@ const apiServices = {
     getStatistics: (id) => api.get(`/regulators/${id}/statistics`)
   },
   frameworks: {
-    getAll: (params) => api.get('/grc-frameworks', { params }),
-    getById: (id) => api.get(`/grc-frameworks/${id}`),
-    create: (frameworkData) => api.post('/grc-frameworks', frameworkData),
-    update: (id, frameworkData) => api.put(`/grc-frameworks/${id}`, frameworkData),
-    delete: (id) => api.delete(`/grc-frameworks/${id}`),
-    getControls: (id, params) => api.get(`/grc-frameworks/${id}/controls`, { params }),
-    getAssessments: (id, params) => api.get(`/grc-frameworks/${id}/assessments`, { params }),
-    import: (frameworkData) => api.post('/grc-frameworks/import', frameworkData),
-    export: (id) => api.get(`/grc-frameworks/${id}/export`)
+    getAll: (params) => api.get('/frameworks', { params }),
+    getById: (id) => api.get(`/frameworks/${id}`),
+    create: (frameworkData) => api.post('/frameworks', frameworkData),
+    update: (id, frameworkData) => api.put(`/frameworks/${id}`, frameworkData),
+    delete: (id) => api.delete(`/frameworks/${id}`),
+    getControls: (id, params) => api.get(`/frameworks/${id}/controls`, { params }),
+    getAssessments: (id, params) => api.get(`/frameworks/${id}/assessments`, { params }),
+    import: (frameworkData) => api.post('/frameworks/import', frameworkData),
+    export: (id) => api.get(`/frameworks/${id}/export`)
   },
   controls: {
-    getAll: (params) => api.get('/grc-controls', { params }),
-    getById: (id) => api.get(`/grc-controls/${id}`),
-    create: (controlData) => api.post('/grc-controls', controlData),
-    update: (id, controlData) => api.put(`/grc-controls/${id}`, controlData),
-    delete: (id) => api.delete(`/grc-controls/${id}`),
-    bulkUpdate: (controlsData) => api.put('/grc-controls/bulk', controlsData),
-    getResponses: (id, params) => api.get(`/grc-controls/${id}/responses`, { params }),
-    getEvidence: (id, params) => api.get(`/grc-controls/${id}/evidence`, { params })
+    getAll: (params) => api.get('/controls', { params }),
+    getById: (id) => api.get(`/controls/${id}`),
+    create: (controlData) => api.post('/controls', controlData),
+    update: (id, controlData) => api.put(`/controls/${id}`, controlData),
+    delete: (id) => api.delete(`/controls/${id}`),
+    bulkUpdate: (controlsData) => api.put('/controls/bulk', controlsData),
+    getResponses: (id, params) => api.get(`/controls/${id}/responses`, { params }),
+    getEvidence: (id, params) => api.get(`/controls/${id}/evidence`, { params })
   },
   assessments: {
     getAll: (params) => api.get('/assessments', { params }),
@@ -464,4 +503,3 @@ const apiServices = {
 export const regulatoryAPI = apiServices.regulatory;
 
 export { api, apiServices };
-

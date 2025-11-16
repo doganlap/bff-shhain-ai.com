@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        .test-result { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>🚀 GRC Platform API Connection Test</h1>
+    <p>Testing connection to backend API at: <strong>http://172.21.160.1:3007</strong></p>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE_URL = 'http://172.21.160.1:3007';
+        const resultsDiv = document.getElementById('results');
+        
+        function addResult(title, success, data = null) {
+            const div = document.createElement('div');
+            div.className = `test-result ${success ? 'success' : 'error'}`;
+            div.innerHTML = `
+                <h3>${title}</h3>
+                <p>Status: ${success ? '✅ SUCCESS' : '❌ FAILED'}</p>
+                ${data ? `<pre>${JSON.stringify(data, null, 2)}</pre>` : ''}
+            `;
+            resultsDiv.appendChild(div);
+        }
+
+        async function testAPI() {
+            // Test 1: Health Check
+            try {
+                const healthResponse = await fetch(`${API_BASE_URL}/healthz`);
+                const healthData = await healthResponse.json();
+                addResult('Health Check', healthResponse.ok, healthData);
+            } catch (error) {
+                addResult('Health Check', false, { error: error.message });
+            }
+
+            // Test 2: Login with Partner User
+            try {
+                const loginResponse = await fetch(`${API_BASE_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        email: 'ahmet@doganconsult.com',
+                        password: 'DoganCEO2025!'
+                    })
+                });
+                const loginData = await loginResponse.json();
+                addResult('Partner Login (ahmet@doganconsult.com)', loginResponse.ok, loginData);
+                
+                if (loginResponse.ok && loginData.token) {
+                    // Test 3: Get Current User
+                    try {
+                        const meResponse = await fetch(`${API_BASE_URL}/api/auth/me`, {
+                            headers: {
+                                'Authorization': `Bearer ${loginData.token}`
+                            }
+                        });
+                        const meData = await meResponse.json();
+                        addResult('Get Current User', meResponse.ok, meData);
+                    } catch (error) {
+                        addResult('Get Current User', false, { error: error.message });
+                    }
+                }
+            } catch (error) {
+                addResult('Partner Login', false, { error: error.message });
+            }
+        }
+
+        // Run tests when page loads
+        testAPI();
+    </script>
+</body>
+</html>

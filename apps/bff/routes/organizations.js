@@ -15,13 +15,13 @@ router.get('/', async (req, res) => {
     const { limit = 50, page = 1 } = req.query;
     const skip = (page - 1) * limit;
 
-    const organizations = await prisma.organizations.findMany({
+    const organizations = await prisma.Organization.findMany({
       skip,
       take: parseInt(limit),
-      orderBy: { created_at: 'desc' }
+      orderBy: { createdAt: 'desc' }
     });
 
-    const total = await prisma.organizations.count();
+    const total = await prisma.Organization.count();
 
     res.json({
       success: true,

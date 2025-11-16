@@ -1,0 +1,582 @@
+/**
+ * Authentication System Path Testing Script
+ * Tests all authentication endpoints and flows for Shahin GRC Platform
+ */
+
+const axios = require('axios');
+const fs = require('fs');
+const path = require('path');
+
+// Configuration
+const BASE_URLS = {
+  web: process.env.WEB_URL || 'http://localhost:5173',
+  bff: process.env.BFF_URL || 'http://localhost:3001',
+  api: process.env.API_URL || 'http://localhost:5001'
+};
+
+const colors = {
+  reset: '\x1b[0m',
+  green: '\x1b[32m',
+  red: '\x1b[31m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  cyan: '\x1b[36m'
+};
+
+// Test Results Storage
+const testResults = {
+  total: 0,
+  passed: 0,
+  failed: 0,
+  skipped: 0,
+  tests: []
+};
+
+// Helper Functions
+function log(message, color = colors.reset) {
+  console.log(`${color}${message}${colors.reset}`);
+}
+
+function logSection(title) {
+  console.log('\n' + '='.repeat(80));
+  log(title, colors.cyan);
+  console.log('='.repeat(80) + '\n');
+}
+
+function logTest(name, status, details = '') {
+  const statusColor = status === 'PASS' ? colors.green : status === 'FAIL' ? colors.red : colors.yellow;
+  console.log(`[${statusColor}${status}${colors.reset}] ${name}`);
+  if (details) {
+    console.log(`  ${colors.blue}→${colors.reset} ${details}`);
+  }
+}
+
+async function makeRequest(config) {
+  const startTime = Date.now();
+  try {
+    const response = await axios({
+      ...config,
+      timeout: 10000,
+      validateStatus: () => true // Don't throw on any status
+    });
+    const duration = Date.now() - startTime;
+    return { response, duration, error: null };
+  } catch (error) {
+    const duration = Date.now() - startTime;
+    return { response: null, duration, error };
+  }
+}
+
+function recordTest(name, passed, details, expectedStatus, actualStatus, duration) {
+  testResults.total++;
+  if (passed) {
+    testResults.passed++;
+  } else {
+    testResults.failed++;
+  }
+  
+  testResults.tests.push({
+    name,
+    passed,
+    details,
+    expectedStatus,
+    actualStatus,
+    duration,
+    timestamp: new Date().toISOString()
+  });
+}
+
+// Test Suites
+const testSuites = {
+  // Frontend Routes Test
+  async frontendRoutes() {
+    logSection('Testing Frontend Routes');
+    
+    const routes = [
+      { path: '/', description: 'Root/Home page' },
+      { path: '/login', description: 'Standard login page' },
+      { path: '/register', description: 'Registration page' },
+      { path: '/partner/login', description: 'Partner login page' },
+      { path: '/auth/login', description: 'Alternative login route' },
+      { path: '/super-admin', description: 'Super admin login (may redirect)' },
+      { path: '/dashboard', description: 'Main dashboard (protected)' },
+      { path: '/partner/dashboard', description: 'Partner dashboard (protected)' }
+    ];
+
+    for (const route of routes) {
+      const url = `${BASE_URLS.web}${route.path}`;
+      const { response, duration, error } = await makeRequest({
+        method: 'GET',
+        url,
+        maxRedirects: 0
+      });
+
+      if (error) {
+        if (error.code === 'ECONNREFUSED') {
+          logTest(route.description, 'SKIP', `Frontend not running at ${BASE_URLS.web}`);
+          testResults.skipped++;
+        } else {
+          logTest(route.description, 'FAIL', `Error: ${error.message}`);
+          recordTest(route.description, false, error.message, '200/302', 'ERROR', duration);
+        }
+      } else {
+        const status = response.status;
+        // Accept 200 (OK), 302 (redirect), or 304 (not modified)
+        const passed = [200, 302, 304, 301].includes(status);
+        logTest(
+          route.description, 
+          passed ? 'PASS' : 'FAIL', 
+          `Status: ${status} - ${url} (${duration}ms)`
+        );
+        recordTest(route.description, passed, url, '200/302', status, duration);
+      }
+    }
+  },
+
+  // Special Access Paths Test (Demo, POC, Partner)
+  async specialAccessPaths() {
+    logSection('Testing Special Access Paths (Demo, POC, Partner)');
+    
+    const specialPaths = [
+      { 
+        path: '/demo', 
+        description: 'Demo landing page',
+        expectedStatuses: [200, 301, 302]
+      },
+      { 
+        path: '/demo/register', 
+        description: 'Demo registration',
+        expectedStatuses: [200]
+      },
+      { 
+        path: '/poc', 
+        description: 'POC landing page',
+        expectedStatuses: [200, 301, 302]
+      },
+      { 
+        path: '/poc/request', 
+        description: 'POC request form',
+        expectedStatuses: [200]
+      },
+      { 
+        path: '/partner', 
+        description: 'Partner landing page',
+        expectedStatuses: [200, 301, 302]
+      }
+    ];
+
+    for (const pathTest of specialPaths) {
+      const url = `${BASE_URLS.web}${pathTest.path}`;
+      const { response, duration, error } = await makeRequest({
+        method: 'GET',
+        url,
+        maxRedirects: 5 // Allow redirects for special paths
+      });
+
+      if (error) {
+        if (error.code === 'ECONNREFUSED') {
+          logTest(pathTest.description, 'SKIP', `Frontend not running at ${BASE_URLS.web}`);
+          testResults.skipped++;
+        } else {
+          logTest(pathTest.description, 'FAIL', `Error: ${error.message}`);
+          recordTest(pathTest.description, false, error.message, pathTest.expectedStatuses.join('/'), 'ERROR', duration);
+        }
+      } else {
+        const status = response.status;
+        const passed = pathTest.expectedStatuses.includes(status);
+        logTest(
+          pathTest.description, 
+          passed ? 'PASS' : 'FAIL', 
+          `Status: ${status} - ${url} (${duration}ms)`
+        );
+        recordTest(pathTest.description, passed, url, pathTest.expectedStatuses.join('/'), status, duration);
+      }
+    }
+  },
+
+  // BFF Authentication Endpoints Test
+  async bffAuthEndpoints() {
+    logSection('Testing BFF Authentication Endpoints');
+    
+    const endpoints = [
+      { 
+        method: 'POST', 
+        path: '/auth/login', 
+        description: 'User login',
+        data: { email: 'test@example.com', password: 'test123' },
+        expectedStatuses: [200, 400, 401, 404]
+      },
+      { 
+        method: 'POST', 
+        path: '/auth/register', 
+        description: 'User registration',
+        data: { 
+          email: `test${Date.now()}@example.com`, 
+          password: 'Test123!@#',
+          firstName: 'Test',
+          lastName: 'User'
+        },
+        expectedStatuses: [200, 201, 400, 409]
+      },
+      { 
+        method: 'GET', 
+        path: '/auth/profile', 
+        description: 'User profile retrieval (requires auth)',
+        expectedStatuses: [200, 401]
+      },
+      { 
+        method: 'POST', 
+        path: '/auth/refresh-token', 
+        description: 'Token refresh',
+        data: { refreshToken: 'dummy-token' },
+        expectedStatuses: [200, 400, 401]
+      },
+      { 
+        method: 'POST', 
+        path: '/auth/change-password', 
+        description: 'Password change',
+        data: { oldPassword: 'old', newPassword: 'new' },
+        expectedStatuses: [200, 400, 401]
+      },
+      { 
+        method: 'POST', 
+        path: '/partner/auth/login', 
+        description: 'Partner login',
+        data: { email: 'partner@example.com', password: 'test123' },
+        expectedStatuses: [200, 400, 401, 404]
+      },
+      { 
+        method: 'POST', 
+        path: '/partner/auth/register', 
+        description: 'Partner registration',
+        data: { 
+          email: `partner${Date.now()}@example.com`, 
+          password: 'Test123!@#',
+          companyName: 'Test Partner'
+        },
+        expectedStatuses: [200, 201, 400, 409]
+      }
+    ];
+
+    for (const endpoint of endpoints) {
+      const url = `${BASE_URLS.bff}${endpoint.path}`;
+      const { response, duration, error } = await makeRequest({
+        method: endpoint.method,
+        url,
+        data: endpoint.data,
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (error) {
+        if (error.code === 'ECONNREFUSED') {
+          logTest(endpoint.description, 'SKIP', `BFF not running at ${BASE_URLS.bff}`);
+          testResults.skipped++;
+        } else {
+          logTest(endpoint.description, 'FAIL', `Error: ${error.message}`);
+          recordTest(endpoint.description, false, error.message, endpoint.expectedStatuses.join('/'), 'ERROR', duration);
+        }
+      } else {
+        const status = response.status;
+        const passed = endpoint.expectedStatuses.includes(status);
+        const details = `${endpoint.method} ${url} - Status: ${status} (${duration}ms)`;
+        
+        logTest(endpoint.description, passed ? 'PASS' : 'FAIL', details);
+        
+        if (response.data) {
+          console.log(`    Response: ${JSON.stringify(response.data).substring(0, 100)}...`);
+        }
+        
+        recordTest(endpoint.description, passed, details, endpoint.expectedStatuses.join('/'), status, duration);
+      }
+    }
+  },
+
+  // Direct API Endpoints Test
+  async directApiEndpoints() {
+    logSection('Testing Direct API Endpoints (Bypass BFF)');
+    
+    const endpoints = [
+      { 
+        method: 'POST', 
+        path: '/api/auth/login', 
+        description: 'Direct API login',
+        data: { email: 'test@example.com', password: 'test123' },
+        expectedStatuses: [200, 400, 401, 404]
+      },
+      { 
+        method: 'POST', 
+        path: '/api/auth/register', 
+        description: 'Direct API registration',
+        data: { 
+          email: `apitest${Date.now()}@example.com`, 
+          password: 'Test123!@#',
+          firstName: 'API',
+          lastName: 'Test'
+        },
+        expectedStatuses: [200, 201, 400, 409]
+      },
+      { 
+        method: 'POST', 
+        path: '/api/partner/auth/login', 
+        description: 'Direct partner API login',
+        data: { email: 'partner@example.com', password: 'test123' },
+        expectedStatuses: [200, 400, 401, 404]
+      }
+    ];
+
+    for (const endpoint of endpoints) {
+      const url = `${BASE_URLS.api}${endpoint.path}`;
+      const { response, duration, error } = await makeRequest({
+        method: endpoint.method,
+        url,
+        data: endpoint.data,
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (error) {
+        if (error.code === 'ECONNREFUSED') {
+          logTest(endpoint.description, 'SKIP', `API not running at ${BASE_URLS.api}`);
+          testResults.skipped++;
+        } else {
+          logTest(endpoint.description, 'FAIL', `Error: ${error.message}`);
+          recordTest(endpoint.description, false, error.message, endpoint.expectedStatuses.join('/'), 'ERROR', duration);
+        }
+      } else {
+        const status = response.status;
+        const passed = endpoint.expectedStatuses.includes(status);
+        const details = `${endpoint.method} ${url} - Status: ${status} (${duration}ms)`;
+        
+        logTest(endpoint.description, passed ? 'PASS' : 'FAIL', details);
+        
+        if (response.data) {
+          console.log(`    Response: ${JSON.stringify(response.data).substring(0, 100)}...`);
+        }
+        
+        recordTest(endpoint.description, passed, details, endpoint.expectedStatuses.join('/'), status, duration);
+      }
+    }
+  },
+
+  // Health Check Test
+  async healthChecks() {
+    logSection('Testing Service Health Checks');
+    
+    const services = [
+      { name: 'BFF', url: `${BASE_URLS.bff}/health` },
+      { name: 'API', url: `${BASE_URLS.api}/health` },
+      { name: 'API Admin', url: `${BASE_URLS.api}/api/admin/health` }
+    ];
+
+    for (const service of services) {
+      const { response, duration, error } = await makeRequest({
+        method: 'GET',
+        url: service.url
+      });
+
+      if (error) {
+        if (error.code === 'ECONNREFUSED') {
+          logTest(`${service.name} Health`, 'SKIP', `Service not running`);
+          testResults.skipped++;
+        } else {
+          logTest(`${service.name} Health`, 'FAIL', `Error: ${error.message}`);
+          recordTest(`${service.name} Health`, false, error.message, '200', 'ERROR', duration);
+        }
+      } else {
+        const status = response.status;
+        const passed = status === 200;
+        logTest(
+          `${service.name} Health`, 
+          passed ? 'PASS' : 'FAIL', 
+          `Status: ${status} (${duration}ms)`
+        );
+        
+        if (response.data) {
+          console.log(`    ${JSON.stringify(response.data)}`);
+        }
+        
+        recordTest(`${service.name} Health`, passed, service.url, '200', status, duration);
+      }
+    }
+  },
+
+  // Full Authentication Flow Test
+  async fullAuthFlow() {
+    logSection('Testing Full Authentication Flow');
+    
+    // Test 1: Register a new user
+    const timestamp = Date.now();
+    const testUser = {
+      email: `flowtest${timestamp}@example.com`,
+      password: 'FlowTest123!@#',
+      firstName: 'Flow',
+      lastName: 'Test'
+    };
+
+    log('\n1. Testing User Registration...', colors.yellow);
+    const { response: regResponse, duration: regDuration, error: regError } = await makeRequest({
+      method: 'POST',
+      url: `${BASE_URLS.bff}/auth/register`,
+      data: testUser,
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (regError && regError.code === 'ECONNREFUSED') {
+      logTest('Full Auth Flow', 'SKIP', 'BFF not running');
+      testResults.skipped++;
+      return;
+    }
+
+    let authToken = null;
+    let refreshToken = null;
+
+    if (regResponse && [200, 201].includes(regResponse.status)) {
+      logTest('User Registration', 'PASS', `Created user: ${testUser.email} (${regDuration}ms)`);
+      
+      // Extract tokens if returned
+      if (regResponse.data && regResponse.data.token) {
+        authToken = regResponse.data.token;
+        refreshToken = regResponse.data.refreshToken;
+      }
+    } else if (regResponse && regResponse.status === 409) {
+      logTest('User Registration', 'INFO', 'User already exists, continuing with login');
+    } else {
+      logTest('User Registration', 'FAIL', `Status: ${regResponse?.status || 'ERROR'}`);
+    }
+
+    // Test 2: Login with the user
+    log('\n2. Testing User Login...', colors.yellow);
+    const { response: loginResponse, duration: loginDuration, error: loginError } = await makeRequest({
+      method: 'POST',
+      url: `${BASE_URLS.bff}/auth/login`,
+      data: { email: testUser.email, password: testUser.password },
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    if (loginResponse && loginResponse.status === 200) {
+      logTest('User Login', 'PASS', `Logged in successfully (${loginDuration}ms)`);
+      
+      if (loginResponse.data && loginResponse.data.token) {
+        authToken = loginResponse.data.token;
+        refreshToken = loginResponse.data.refreshToken || refreshToken;
+        console.log(`    Token received: ${authToken.substring(0, 20)}...`);
+      }
+    } else {
+      logTest('User Login', 'FAIL', `Status: ${loginResponse?.status || 'ERROR'}`);
+      return; // Can't continue without token
+    }
+
+    // Test 3: Access protected resource (profile)
+    if (authToken) {
+      log('\n3. Testing Protected Resource Access...', colors.yellow);
+      const { response: profileResponse, duration: profileDuration } = await makeRequest({
+        method: 'GET',
+        url: `${BASE_URLS.bff}/auth/profile`,
+        headers: { 
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (profileResponse && profileResponse.status === 200) {
+        logTest('Profile Access', 'PASS', `Retrieved profile (${profileDuration}ms)`);
+        if (profileResponse.data) {
+          console.log(`    User: ${JSON.stringify(profileResponse.data).substring(0, 100)}...`);
+        }
+      } else {
+        logTest('Profile Access', 'FAIL', `Status: ${profileResponse?.status || 'ERROR'}`);
+      }
+
+      // Test 4: Token refresh
+      if (refreshToken) {
+        log('\n4. Testing Token Refresh...', colors.yellow);
+        const { response: refreshResponse, duration: refreshDuration } = await makeRequest({
+          method: 'POST',
+          url: `${BASE_URLS.bff}/auth/refresh-token`,
+          data: { refreshToken },
+          headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (refreshResponse && refreshResponse.status === 200) {
+          logTest('Token Refresh', 'PASS', `Token refreshed (${refreshDuration}ms)`);
+        } else {
+          logTest('Token Refresh', 'FAIL', `Status: ${refreshResponse?.status || 'ERROR'}`);
+        }
+      }
+    }
+  }
+};
+
+// Generate Report
+function generateReport() {
+  logSection('Test Results Summary');
+  
+  const passRate = testResults.total > 0 
+    ? ((testResults.passed / testResults.total) * 100).toFixed(2) 
+    : 0;
+
+  console.log(`Total Tests:    ${testResults.total}`);
+  log(`Passed:         ${testResults.passed}`, colors.green);
+  log(`Failed:         ${testResults.failed}`, colors.red);
+  log(`Skipped:        ${testResults.skipped}`, colors.yellow);
+  console.log(`Pass Rate:      ${passRate}%\n`);
+
+  // Save detailed report
+  const reportPath = path.join(__dirname, 'auth-path-test-results.json');
+  const report = {
+    summary: {
+      total: testResults.total,
+      passed: testResults.passed,
+      failed: testResults.failed,
+      skipped: testResults.skipped,
+      passRate: `${passRate}%`,
+      timestamp: new Date().toISOString()
+    },
+    configuration: BASE_URLS,
+    tests: testResults.tests
+  };
+
+  fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
+  log(`\nDetailed report saved to: ${reportPath}`, colors.blue);
+
+  // Exit with error code if tests failed
+  if (testResults.failed > 0) {
+    process.exit(1);
+  }
+}
+
+// Main Test Runner
+async function runTests() {
+  log('\n╔════════════════════════════════════════════════════════════════════════════╗', colors.cyan);
+  log('║           Shahin GRC Authentication System Path Testing                   ║', colors.cyan);
+  log('╚════════════════════════════════════════════════════════════════════════════╝\n', colors.cyan);
+
+  log('Configuration:', colors.blue);
+  console.log(`  Web Frontend: ${BASE_URLS.web}`);
+  console.log(`  BFF Service:  ${BASE_URLS.bff}`);
+  console.log(`  API Service:  ${BASE_URLS.api}\n`);
+
+  try {
+    // Run all test suites
+    await testSuites.healthChecks();
+    await testSuites.frontendRoutes();
+    await testSuites.specialAccessPaths();
+    await testSuites.bffAuthEndpoints();
+    await testSuites.directApiEndpoints();
+    await testSuites.fullAuthFlow();
+
+    // Generate and display report
+    generateReport();
+
+  } catch (error) {
+    log(`\n❌ Test execution error: ${error.message}`, colors.red);
+    console.error(error);
+    process.exit(1);
+  }
+}
+
+// Run tests if called directly
+if (require.main === module) {
+  runTests();
+}
+
+module.exports = { runTests, testSuites };

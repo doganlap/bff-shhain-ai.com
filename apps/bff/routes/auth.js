@@ -27,15 +27,10 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Missing credentials' });
     }
     const user = await prisma.users.findFirst({ where: { email: email.toLowerCase() } });
-    if (!user) {
+    if (!user || !user.password_hash) {
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }
-    let ok = false;
-    if (user.password_hash) {
-      ok = await bcrypt.compare(password, user.password_hash);
-    } else {
-      ok = password === 'admin123';
-    }
+    const ok = await bcrypt.compare(password, user.password_hash);
     if (!ok) {
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }

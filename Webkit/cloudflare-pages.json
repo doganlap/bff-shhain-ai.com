@@ -1,0 +1,53 @@
+{
+  "buildCommand": "cd landing-page && npm install && npm run build",
+  "outputDirectory": "landing-page/dist",
+  "devCommand": "cd landing-page && npm run dev",
+  "installCommand": "cd landing-page && npm install",
+  "framework": "vite",
+  "nodeVersion": "18",
+  "env": {
+    "VITE_API_URL": {
+      "value": "https://api.shahin-ai.com/api",
+      "type": "secret"
+    },
+    "VITE_FRONTEND_URL": {
+      "value": "https://www.shahin-ai.com",
+      "type": "secret"
+    }
+  },
+  "redirects": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://api.shahin-ai.com/api/:path*",
+      "statusCode": 200,
+      "force": true
+    }
+  ],
+  "headers": [
+    {
+      "source": "/*",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "geolocation=(), microphone=(), camera=()"
+        }
+      ]
+    }
+  ]
+}

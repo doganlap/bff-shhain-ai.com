@@ -9,7 +9,8 @@ const { logger } = require('../utils/logger');
 // Use Node.js built-in crypto.randomUUID() instead of uuid package to avoid ES module issues
 const uuidv4 = () => crypto.randomUUID();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+const { ENV } = require('../config/env');
+const JWT_SECRET = ENV.JWT_SECRET || 'your-secret-key-change-in-production';
 const JWT_EXPIRY = process.env.JWT_EXPIRY || '7d';
 
 // Email validation cache (5-minute TTL)
@@ -105,30 +106,40 @@ router.post('/public/demo/request', async (req, res) => {
         status: { in: ['approved_auto', 'approved_manual'] }
       },
       include: {
-        tenant: true
+        tenants: true
       }
     });
 
-    if (existingDemoRequest && existingDemoRequest.tenant) {
-      logger.info('Returning existing demo tenant', { requestId, tenantId: existingDemoRequest.tenant.id });
+    if (existingDemoRequest && existingDemoRequest.tenants) {
+      logger.info('Returning existing demo tenant', { requestId, tenantId: existingDemoRequest.tenants.id });
 
       // Return existing tenant
       const existingUser = await prisma.users.findFirst({
         where: {
-          tenant_id: existingDemoRequest.tenant_id,
+          tenant_id: existingDemoRequest.tenants.id,
           email: email.toLowerCase()
         }
       });
 
-      const token = generateToken(existingUser, existingDemoRequest.tenant);
+      const token = generateToken(existingUser, existingDemoRequest.tenants);
+      
+      // Add ID field for enhancedAuth compatibility
+      const decoded = jwt.decode(token);
+      decoded.id = decoded.sub; // Copy sub to id for enhancedAuth compatibility
+      
+      // Re-sign the token with the additional field
+      const enhancedToken = jwt.sign(decoded, JWT_SECRET, {
+        expiresIn: JWT_EXPIRY,
+        algorithm: 'HS256'
+      });
 
       return res.status(200).json({
         requestId: existingDemoRequest.id,
         status: 'approved_auto',
         tenant: {
-          id: existingDemoRequest.tenant.id,
-          slug: existingDemoRequest.tenant.slug,
-          type: existingDemoRequest.tenant.type
+          id: existingDemoRequest.tenants.id,
+          slug: existingDemoRequest.tenants.slug,
+          type: existingDemoRequest.tenants.type
         },
         user: {
           id: existingUser.id,
@@ -136,8 +147,8 @@ router.post('/public/demo/request', async (req, res) => {
           fullName: existingUser.full_name,
           role: existingUser.role
         },
-        token,
-        expiresAt: existingDemoRequest.tenant.expires_at
+        token: enhancedToken,
+        expiresAt: existingDemoRequest.tenants.expires_at
       });
     }
 
@@ -167,12 +178,14 @@ router.post('/public/demo/request', async (req, res) => {
       // 2. Create tenant
       const tenant = await tx.tenants.create({
         data: {
+          id: uuidv4(),
           slug: tenantSlug,
           display_name: companyName || `${fullName}'s Demo`,
           type: 'demo',
           status: 'active',
           sector,
           expires_at: demoExpiresAt,
+          updated_at: new Date(),
           metadata: {
             orgSize,
             useCases,
@@ -185,10 +198,12 @@ router.post('/public/demo/request', async (req, res) => {
       // 3. Create user
       const user = await tx.users.create({
         data: {
+          id: uuidv4(),
           tenant_id: tenant.id,
           email: email.toLowerCase(),
           full_name: fullName,
           role: 'demo-admin',
+          updated_at: new Date(),
           metadata: {
             demoUser: true,
             source: 'demo-registration'
@@ -210,6 +225,16 @@ router.post('/public/demo/request', async (req, res) => {
 
     // Generate JWT token
     const token = generateToken(result.user, result.tenant);
+    
+    // Add ID field for enhancedAuth compatibility
+    const decoded = jwt.decode(token);
+    decoded.id = decoded.sub; // Copy sub to id for enhancedAuth compatibility
+    
+    // Re-sign the token with the additional field
+    const enhancedToken = jwt.sign(decoded, JWT_SECRET, {
+      expiresIn: JWT_EXPIRY,
+      algorithm: 'HS256'
+    });
 
     logger.info('Demo environment created successfully', {
       requestId,
@@ -231,7 +256,7 @@ router.post('/public/demo/request', async (req, res) => {
         fullName: result.user.full_name,
         role: result.user.role
       },
-      token,
+      token: enhancedToken,
       expiresAt: result.tenant.expires_at
     });
 
@@ -403,6 +428,16 @@ router.post('/partner/auth/login', async (req, res) => {
 
     // Generate JWT token
     const token = generateToken(user, user.tenant);
+    
+    // Add ID field for enhancedAuth compatibility
+    const decoded = jwt.decode(token);
+    decoded.id = decoded.sub; // Copy sub to id for enhancedAuth compatibility
+    
+    // Re-sign the token with the additional field
+    const enhancedToken = jwt.sign(decoded, JWT_SECRET, {
+      expiresIn: JWT_EXPIRY,
+      algorithm: 'HS256'
+    });
 
     logger.info('Partner login successful', { userId: user.id, tenantId: user.tenant.id });
 
@@ -419,7 +454,7 @@ router.post('/partner/auth/login', async (req, res) => {
         type: user.tenant.type,
         status: user.tenant.status
       },
-      token
+      token: enhancedToken
     });
 
   } catch (error) {

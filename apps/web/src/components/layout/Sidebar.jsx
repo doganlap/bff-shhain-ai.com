@@ -214,7 +214,7 @@ const Sidebar = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sidebarOpen, selectedIndex, searchTerm, navigationGroups, actions, handleRefresh, handleNavigation]);
+  }, [sidebarOpen, selectedIndex, searchTerm, actions, handleRefresh, handleNavigation]);
 
   useEffect(() => {
     const handleResize = () => {

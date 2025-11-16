@@ -19,6 +19,7 @@ const { tenantContext, verifyTenantAccess, superAdminBypass, injectTenantFilter 
 const { forceHTTPS, hstsMiddleware, checkCertificateExpiry } = require('./config/https');
 const { setRLSContext } = require('./middleware/rlsContext');
 const healthRouter = require('./routes/health');
+const aiRouter = require('./routes/ai');
 const prisma = require('./db/prisma');
 
 // ✅ NEW: Import enhanced authentication and RBAC
@@ -842,6 +843,7 @@ app.get('/readyz', async (req, res) => {
 // ==========================================
 
 app.use('/health', healthRouter);
+app.use('/api/ai', aiRouter);
 
 // ==========================================
 // ERROR HANDLING MIDDLEWARE

@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: shahin-db-local
+    environment:
+      POSTGRES_DB: shahin_local_db
+      POSTGRES_USER: shahin_local
+      POSTGRES_PASSWORD: shahin_local_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - shahin_db_data_local:/var/lib/postgresql/data
+    networks:
+      - shahin-local
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shahin_local -d shahin_local_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  postgres-shadow:
+    image: postgres:16
+    container_name: shahin-shadow-local
+    environment:
+      POSTGRES_DB: shahin_local_shadow
+      POSTGRES_USER: shahin_local
+      POSTGRES_PASSWORD: shahin_local_password
+    ports:
+      - "5433:5432"
+    volumes:
+      - shahin_shadow_data_local:/var/lib/postgresql/data
+    networks:
+      - shahin-local
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shahin_local -d shahin_local_shadow"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: shahin-redis-local
+    ports:
+      - "6379:6379"
+    volumes:
+      - shahin_redis_data_local:/data
+    networks:
+      - shahin-local
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bff:
+    build:
+      context: ./apps/bff
+      dockerfile: Dockerfile
+    container_name: shahin-bff-local
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=development
+      - PORT=3005
+      - DATABASE_URL=postgresql://shahin_local:shahin_local_password@postgres:5432/shahin_local_db
+      - SHADOW_DATABASE_URL=postgresql://shahin_local:shahin_local_password@postgres-shadow:5432/shahin_local_shadow
+      - REDIS_URL=redis://redis:6379
+      - SERVICE_TOKEN=local-service-token-for-development-only
+      - INTERNAL_SERVICE_TOKEN=internal-service-token-for-development-only
+      - JWT_SECRET=local-jwt-secret-for-development-only
+      - JWT_REFRESH_SECRET=local-jwt-refresh-secret-for-development-only
+      - CORS_ORIGIN=http://localhost:5173
+      - LOG_LEVEL=debug
+    volumes:
+      - ./apps/bff/uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - shahin-local
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3005/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+volumes:
+  shahin_db_data_local:
+  shahin_shadow_data_local:
+  shahin_redis_data_local:
+
+networks:
+  shahin-local:
+    driver: bridge
