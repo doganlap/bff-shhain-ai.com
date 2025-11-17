@@ -1,12 +1,6 @@
 {
   "version": 2,
-  "name": "shahin-ai-app",
-  "builds": [
-    {
-      "src": "index.js",
-      "use": "@vercel/node"
-    }
-  ],
+  "name": "bff-shahin-ai",
   "routes": [
     {
       "src": "/api/(.*)",
@@ -22,15 +16,13 @@
     },
     {
       "src": "/(.*)",
-      "dest": "https://shahin-ai-app-donganksa.vercel.app/$1"
+      "dest": "/index.js"
     }
   ],
   "env": {
     "NODE_ENV": "production"
   },
-  "functions": {
-    "index.js": {
-      "maxDuration": 30
-    }
-  }
+  "builds": [
+    { "src": "index.js", "use": "@vercel/node" }
+  ]
 }

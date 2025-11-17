@@ -100,4 +100,3 @@ ENABLE_PERFORMANCE_MONITORING=true
 4. Deploy using:
    - `npm run vercel-build`
    - `vercel --prod`
-

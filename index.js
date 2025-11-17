@@ -188,6 +188,24 @@ app.use('/auth/', authLimiter);
 // Body parsing with limits
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+// Fallback JSON body parsing to handle edge cases in serverless proxies
+app.use((req, res, next) => {
+  try {
+    const ct = req.headers['content-type'] || '';
+    if (req.method === 'POST' && ct.includes('application/json')) {
+      if (typeof req.body === 'string' && req.body.length) {
+        req.body = JSON.parse(req.body);
+      } else if (Buffer.isBuffer(req.body)) {
+        const s = req.body.toString('utf8');
+        if (s) req.body = JSON.parse(s);
+      }
+    }
+  } catch (err) {
+    err.statusCode = 400;
+    return next(err);
+  }
+  next();
+});
 
 // Logging
 if (process.env.NODE_ENV === 'development') {
@@ -495,6 +513,14 @@ app.use('/api/strategic', authenticateToken, superAdminBypass, tenantContext, in
 // ✅ NEW: Microsoft Authentication routes
 const authRouter = require('./routes/auth');
 app.use('/api/auth', authRouter);
+
+// ✅ DEBUG: Debug routes (temporary)
+const debugRouter = require('./routes/debug');
+app.use('/api/debug', debugRouter);
+
+// ✅ FIX: Password fix route (temporary)
+const fixPasswordRouter = require('./routes/fix-password');
+app.use('/api/fix', fixPasswordRouter);
 
 // ✅ SERVICE HEALTH PROXY ROUTES
 // Add health check proxy routes for running services

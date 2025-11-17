@@ -1,4 +1,5 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
 
@@ -50,6 +51,8 @@ async function seedDatabase() {
     
     // Create sample users
     console.log('\n👥 Creating sample users...');
+    const adminHash = await bcrypt.hash('Admin@123', 12);
+    const partnerHash = await bcrypt.hash('Partner@123', 12);
     const users = await Promise.all([
       prisma.users.upsert({
         where: { 
@@ -58,12 +61,15 @@ async function seedDatabase() {
             email: 'admin@demo.com'
           }
         },
-        update: {},
+        update: {
+          password_hash: adminHash,
+          updated_at: new Date()
+        },
         create: {
           id: 'user-001',
           tenant_id: tenants[0].id,
           email: 'admin@demo.com',
-          password_hash: '$2b$10$xQZ8kN.qVx8X5.K8yK8yK8yK8yK8yK8yK8yK8yK8yK8yK', // Admin@123
+          password_hash: adminHash,
           full_name: 'Demo Admin',
           role: 'admin',
           is_partner: false,
@@ -79,12 +85,15 @@ async function seedDatabase() {
             email: 'partner@consulting.com'
           }
         },
-        update: {},
+        update: {
+          password_hash: partnerHash,
+          updated_at: new Date()
+        },
         create: {
           id: 'user-002',
           tenant_id: tenants[1].id,
           email: 'partner@consulting.com',
-          password_hash: '$2b$10$xQZ8kN.qVx8X5.K8yK8yK8yK8yK8yK8yK8yK8yK8yK8yK', // Partner@123
+          password_hash: partnerHash,
           full_name: 'Partner User',
           role: 'partner',
           is_partner: true,
