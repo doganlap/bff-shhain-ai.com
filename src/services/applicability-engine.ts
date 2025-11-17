@@ -669,7 +669,7 @@ export class ApplicabilityEngine {
     }
 
     let isApplicable = true;
-    let isMandatory = false;
+    const isMandatory = false;
     const reasons: string[] = [];
 
     // Check sector applicability

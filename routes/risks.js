@@ -14,13 +14,13 @@ router.get('/', async (req, res) => {
     const { limit = 50, page = 1 } = req.query;
     const skip = (page - 1) * limit;
 
-    const risks = await prisma.grc_risks.findMany({
+    const risks = await prisma.risk.findMany({
       skip,
       take: parseInt(limit),
-      orderBy: { created_at: 'desc' }
+      orderBy: { createdAt: 'desc' }
     });
 
-    const total = await prisma.grc_risks.count();
+    const total = await prisma.risk.count();
 
     res.json({
       success: true,
@@ -47,13 +47,14 @@ router.get('/', async (req, res) => {
 router.get('/heatmap', async (req, res) => {
   try {
     // This is a simplified example. A real implementation would involve aggregation.
-    const heatmapData = await prisma.grc_risks.groupBy({
-      by: ['impact_level', 'likelihood_level'],
-      _count: {
-        risk_id: true,
-      },
+    const buckets = await prisma.risk.findMany({ select: { impact: true, likelihood: true } });
+    const grid = {};
+    const lvl = (n) => (n >= 4 ? 'high' : n === 3 ? 'medium' : 'low');
+    buckets.forEach(r => {
+      const key = `${lvl(r.impact)}_${lvl(r.likelihood)}`;
+      grid[key] = (grid[key] || 0) + 1;
     });
-    res.json(heatmapData);
+    res.json(Object.entries(grid).map(([k,v]) => ({ bucket: k, count: v })));
   } catch (error) {
     handleError(res, error, 'Error fetching risk heatmap data');
   }
@@ -63,8 +64,8 @@ router.get('/heatmap', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const risk = await prisma.grc_risks.findUnique({
-      where: { risk_id: parseInt(id, 10) },
+    const risk = await prisma.risk.findUnique({
+      where: { id },
     });
     if (!risk) {
       return res.status(404).json({ error: 'Risk not found' });
@@ -78,9 +79,7 @@ router.get('/:id', async (req, res) => {
 // POST /api/risks - Create a new risk
 router.post('/', async (req, res) => {
   try {
-    const newRisk = await prisma.grc_risks.create({
-      data: req.body,
-    });
+    const newRisk = await prisma.risk.create({ data: req.body });
     res.status(201).json(newRisk);
   } catch (error) {
     handleError(res, error, 'Error creating risk');
@@ -91,10 +90,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const updatedRisk = await prisma.grc_risks.update({
-      where: { risk_id: parseInt(id, 10) },
-      data: req.body,
-    });
+    const updatedRisk = await prisma.risk.update({ where: { id }, data: req.body });
     res.json(updatedRisk);
   } catch (error) {
     handleError(res, error, 'Error updating risk');
@@ -208,12 +204,41 @@ router.get('/realtime', async (req, res) => {
       where: { updatedAt: { gte: last24Hours } }
     });
 
+    // Get real alert counts and risk trend
+    const activeAlerts = await prisma.alert.count({
+      where: { 
+        status: 'active',
+        createdAt: { gte: last24Hours }
+      }
+    });
+
+    // Calculate risk trend based on recent risk changes
+    const risksLastWeek = await prisma.risk.count({
+      where: { createdAt: { gte: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000) } }
+    });
+    
+    const risksPreviousWeek = await prisma.risk.count({
+      where: { 
+        createdAt: { 
+          gte: new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000),
+          lt: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+        }
+      }
+    });
+
+    let riskTrend = 'stable';
+    if (risksLastWeek > risksPreviousWeek * 1.2) {
+      riskTrend = 'increasing';
+    } else if (risksLastWeek < risksPreviousWeek * 0.8) {
+      riskTrend = 'decreasing';
+    }
+
     const realtimeMetrics = {
       timestamp: now.toISOString(),
       newRisksLast24h: newRisks,
       updatedRisksLast24h: updatedRisks,
-      activeAlerts: Math.floor(Math.random() * 10), // Simulated
-      riskTrend: Math.random() > 0.5 ? 'increasing' : 'stable', // Simulated
+      activeAlerts: activeAlerts,
+      riskTrend: riskTrend,
       monitoringStatus: 'active'
     };
 

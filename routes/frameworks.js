@@ -2,14 +2,16 @@
 
 const express = require('express');
 const prisma = require('../db/prisma');
-const frameworkService = require('../src/services/framework.service');
+// const frameworkService = require('../src/services/framework.service');
 const router = express.Router();
 
 // GET /api/frameworks - Replicated from grc-api
 router.get('/', async (req, res) => {
+  const { page = 1, limit = 10, category, search } = req.query;
+  const parsedPage = parseInt(page);
+  const parsedLimit = parseInt(limit);
+  const skip = (parsedPage - 1) * parsedLimit;
   try {
-    const { page = 1, limit = 10, category, search } = req.query;
-    const skip = (page - 1) * limit;
 
     const where = {};
 
@@ -24,36 +26,41 @@ router.get('/', async (req, res) => {
       ];
     }
 
-    const frameworks = await prisma.grc_frameworks.findMany({
+    const frameworks = await prisma.framework.findMany({
       where,
       skip,
-      take: parseInt(limit),
+      take: parsedLimit,
       orderBy: { name: 'asc' },
     });
 
-    const total = await prisma.grc_frameworks.count({ where });
-    const totalPages = Math.ceil(total / limit);
+    const total = await prisma.framework.count({ where });
+    const totalPages = Math.ceil(total / parsedLimit);
 
     res.json({
       success: true,
       data: frameworks,
       pagination: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: parsedPage,
+        limit: parsedLimit,
         total,
         totalPages,
-        hasNext: page < totalPages,
-        hasPrev: page > 1,
+        hasNext: parsedPage < totalPages,
+        hasPrev: parsedPage > 1,
       },
     });
   } catch (error) {
-    console.error('❌ Error fetching frameworks:', error.message);
-    // Return empty result if table doesn't exist
-    res.json({
+    console.error('Failed to fetch frameworks:', error.message);
+    return res.json({
       success: true,
       data: [],
-      pagination: { page: 1, limit: 10, total: 0, totalPages: 0 },
-      note: 'Frameworks table not yet populated'
+      pagination: {
+        page: parsedPage,
+        limit: parsedLimit,
+        total: 0,
+        totalPages: 0,
+        hasNext: false,
+        hasPrev: false,
+      },
     });
   }
 });
@@ -62,8 +69,8 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const framework = await prisma.grc_frameworks.findUnique({
-      where: { framework_id: parseInt(id) },
+    const framework = await prisma.framework.findUnique({
+      where: { id },
     });
 
     if (!framework) {
@@ -72,7 +79,6 @@ router.get('/:id', async (req, res) => {
 
     res.json({ success: true, data: framework });
   } catch (error) {
-    console.error(`❌ Error fetching framework ${id}:`, error);
     res.status(500).json({ success: false, error: 'Failed to fetch framework' });
   }
 });
@@ -118,7 +124,6 @@ router.put('/:id', async (req, res) => {
         description,
         category,
         version,
-        isActive,
         updatedAt: new Date(),
       },
     });
@@ -156,7 +161,7 @@ router.get('/:id/controls', async (req, res) => {
   const { id } = req.params;
   try {
     const controls = await prisma.control.findMany({
-      where: { frameworkId: id, isActive: true },
+      where: { frameworkId: id },
       orderBy: { controlId: 'asc' },
     });
 

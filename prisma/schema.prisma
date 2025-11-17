@@ -3,9 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model Assessment {
@@ -111,6 +110,7 @@ model User {
   updatedAt      DateTime
   organizationId String?
   AuditLog       AuditLog[]
+  documents      Document[]
   Session        Session[]
   Organization   Organization? @relation(fields: [organizationId], references: [id])
 }
@@ -220,6 +220,33 @@ model assessment_evidence {
   @@index([control_id])
   @@index([tenant_id])
   @@index([validation_status])
+}
+
+model Regulator {
+  id            Int           @id @default(autoincrement())
+  name          String        @unique
+  description   String?
+  type          String?
+  website       String?
+  contactEmail  String?
+  contactPhone  String?
+  address       String?
+  countryCode   String?
+  sectors       String[]
+  jurisdictions String[]
+  isActive      Boolean       @default(true)
+  publications  Publication[]
+}
+
+model Publication {
+  id           Int       @id @default(autoincrement())
+  regulatorId  Int
+  title        String
+  url          String?
+  publishedAt  DateTime  @default(now())
+  Regulator    Regulator @relation(fields: [regulatorId], references: [id])
+
+  @@index([regulatorId])
 }
 
 model assessment_findings {
@@ -559,36 +586,50 @@ model gap_analysis {
   @@index([tenant_id])
 }
 
+model Document {
+  id          String            @id
+  name        String
+  description String?
+  authorId    String?
+  createdAt   DateTime          @default(now())
+  author      User?             @relation(fields: [authorId], references: [id])
+  versions    DocumentVersion[]
+}
+
+model DocumentVersion {
+  id         String   @id
+  documentId String
+  fileName   String
+  filePath   String
+  fileType   String
+  fileSize   Int
+  createdAt  DateTime @default(now())
+  Document   Document @relation(fields: [documentId], references: [id])
+}
+
 model grc_controls {
   id                         String          @id
-  framework_id               String
-  framework_version          String          @default("v1.0")
+  framework_id               String?
   control_id                 String
   title                      String
   title_ar                   String?
   description                String?
   description_ar             String?
-  category                   String          @default("general")
+  category                   String?
   subcategory                String?
-  risk_level                 String          @default("medium")
+  risk_level                 String?
   control_type               String?
   implementation_status      String          @default("not_implemented")
   maturity_level             Int             @default(0)
-  evidence_required          Boolean         @default(true)
+  evidence_required          Boolean         @default(false)
   testing_frequency          String?
   implementation_guidance    String?
   implementation_guidance_ar String?
   related_regulations        Json            @default("[]")
-  sector                     String          @default("general")
-  regulator                  String?
-  impact                     String          @default("medium")
-  priority                   String          @default("medium")
-  scope                      String          @default("organization")
-  target                     String?
   tenant_id                  String?
   created_at                 DateTime        @default(now())
   updated_at                 DateTime        @updatedAt
-  grc_frameworks             grc_frameworks  @relation(fields: [framework_id], references: [id], onDelete: Cascade)
+  grc_frameworks             grc_frameworks? @relation(fields: [framework_id], references: [id], onDelete: Cascade)
 
   @@index([category])
   @@index([control_id])
@@ -1117,6 +1158,30 @@ model users {
   @@unique([tenant_id, email])
   @@index([email])
   @@index([tenant_id])
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model landing_requests {
+  id               Int       @id @default(autoincrement())
+  name             String    @db.VarChar(255)
+  company          String    @db.VarChar(255)
+  email            String    @db.VarChar(255)
+  phone            String?   @db.VarChar(50)
+  preferred_date   DateTime? @db.Date
+  preferred_time   String?   @db.VarChar(20)
+  access_type      String    @db.VarChar(20)
+  package          String?   @db.VarChar(100)
+  features         Json?
+  message          String?
+  lead_score       Int?      @default(0)
+  status           String?   @default("pending") @db.VarChar(20)
+  approval_token   String?
+  approved_at      DateTime? @db.Timestamp(6)
+  rejected_at      DateTime? @db.Timestamp(6)
+  rejection_reason String?
+  confirmed_at     DateTime? @db.Timestamp(6)
+  created_at       DateTime? @default(now()) @db.Timestamp(6)
+  updated_at       DateTime? @default(now()) @db.Timestamp(6)
 }
 
 enum Role {

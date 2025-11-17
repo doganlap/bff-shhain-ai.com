@@ -1,14 +1,19 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../db/prisma');
-const documentService = require('../src/services/document.service');
+// const documentService = require('../src/services/document.service');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
-// Ensure uploads directory exists
-const uploadDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadDir)) {
+// Use temp directory for Vercel serverless (read-only filesystem)
+// Vercel sets VERCEL_ENV automatically (production, preview, or development)
+const isVercel = process.env.VERCEL_ENV || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+const uploadDir = isVercel ? os.tmpdir() : path.join(__dirname, '..', 'uploads');
+
+// Only create directory in local development (not in serverless environments)
+if (!isVercel && !fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 

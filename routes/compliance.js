@@ -65,13 +65,10 @@ router.get('/gaps', async (req, res) => {
 // GET /api/compliance/score - Calculate the overall compliance score
 router.get('/score', async (req, res) => {
   try {
-    // This is a simplified calculation. A real implementation would be more complex.
-    const totalControls = await prisma.grc_controls.count();
-    const compliantControls = await prisma.grc_controls.count({
-      where: { control_status: 'Compliant' },
-    });
-    const score = totalControls > 0 ? (compliantControls / totalControls) * 100 : 0;
-    res.json({ score: Math.round(score), total: totalControls, compliant: compliantControls });
+    const totalControls = await prisma.control.count();
+    const compliantAssessments = await prisma.assessment.count({ where: { result: 'Compliant' } });
+    const score = totalControls > 0 ? Math.round((compliantAssessments / totalControls) * 100) : 0;
+    res.json({ success: true, data: { score, total: totalControls, compliant: compliantAssessments } });
   } catch (error) {
     handleError(res, error, 'Error calculating compliance score');
   }

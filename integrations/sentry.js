@@ -14,7 +14,7 @@ function initSentry(app) {
     return;
   }
   let ProfilingIntegration = null;
-  try { ProfilingIntegration = require('@sentry/profiling-node').ProfilingIntegration } catch {}
+  try { ProfilingIntegration = require('@sentry/profiling-node').ProfilingIntegration } catch (e) { void e; }
   const integrations = [
     new Sentry.Integrations.Http({ tracing: true }),
     new Sentry.Integrations.Express({ app })

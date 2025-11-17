@@ -40,43 +40,36 @@ const REPORT_TEMPLATES = {
  * @returns {Promise<string>} Generated file path
  */
 async function generateCompliancePDF(tenantId, outputPath) {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const doc = new PDFDocument();
-      const stream = fs.createWriteStream(outputPath);
+  const doc = new PDFDocument();
+  const stream = fs.createWriteStream(outputPath);
 
-      doc.pipe(stream);
+  doc.pipe(stream);
 
-      // Header
-      doc.fontSize(20).text('Compliance Summary Report', { align: 'center' });
-      doc.moveDown();
-      doc.fontSize(12).text(`Generated: ${new Date().toLocaleString()}`, { align: 'center' });
-      doc.moveDown(2);
+  doc.fontSize(20).text('Compliance Summary Report', { align: 'center' });
+  doc.moveDown();
+  doc.fontSize(12).text(`Generated: ${new Date().toLocaleString()}`, { align: 'center' });
+  doc.moveDown(2);
 
-      // Get compliance data
-      const { calculateComplianceScore } = require('./compliance.service');
-      const frameworks = await prisma.grc_frameworks.findMany({
-        where: tenantId ? { tenant_id: tenantId } : {},
-        take: 10
-      });
+  const { calculateComplianceScore } = require('./compliance.service');
+  const frameworks = await prisma.grc_frameworks.findMany({
+    where: tenantId ? { tenant_id: tenantId } : {},
+    take: 10
+  });
 
-      for (const framework of frameworks) {
-        const score = await calculateComplianceScore(framework.framework_id, tenantId);
+  for (const framework of frameworks) {
+    const score = await calculateComplianceScore(framework.framework_id, tenantId);
+    doc.fontSize(14).text(framework.name || framework.framework_name);
+    doc.fontSize(10).text(`Compliance Score: ${score.score}% (${score.level})`);
+    doc.text(`Total Requirements: ${score.total}`);
+    doc.text(`Compliant: ${score.compliant} | Non-Compliant: ${score.nonCompliant}`);
+    doc.moveDown();
+  }
 
-        doc.fontSize(14).text(framework.name || framework.framework_name);
-        doc.fontSize(10).text(`Compliance Score: ${score.score}% (${score.level})`);
-        doc.text(`Total Requirements: ${score.total}`);
-        doc.text(`Compliant: ${score.compliant} | Non-Compliant: ${score.nonCompliant}`);
-        doc.moveDown();
-      }
+  doc.end();
 
-      doc.end();
-
-      stream.on('finish', () => resolve(outputPath));
-      stream.on('error', reject);
-    } catch (err) {
-      reject(err);
-    }
+  return await new Promise((resolve, reject) => {
+    stream.on('finish', () => resolve(outputPath));
+    stream.on('error', reject);
   });
 }
 

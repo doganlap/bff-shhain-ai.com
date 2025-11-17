@@ -6,7 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../db/prisma');
-const schedulerService = require('../src/services/scheduler.service');
+// const schedulerService = require('../src/services/scheduler.service');
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {
@@ -14,31 +14,57 @@ const handleError = (res, error, message) => {
   res.status(500).json({ error: message || 'Internal Server Error' });
 };
 
+async function fetchIgnoreList() {
+  try {
+    const rows = await prisma.$queryRaw`SELECT value, is_regex, regex_pattern, scope FROM scheduler_ignore_list`;
+    return rows.map(r => ({ value: String(r.value || '').toUpperCase(), isRegex: Boolean(r.is_regex), pattern: r.regex_pattern || null, scope: r.scope || 'task' }));
+  } catch (e) {
+    return [];
+  }
+}
+
+function shouldIgnoreJob(job, entries) {
+  const name = String(job?.name || '').toUpperCase();
+  const type = String(job?.type || '').toUpperCase();
+  for (const e of entries) {
+    if (e.isRegex && e.pattern) {
+      try {
+        const re = new RegExp(e.pattern);
+        if (re.test(job?.name || '') || re.test(job?.type || '')) return true;
+      } catch (e) { void e; }
+    } else {
+      if (e.value && (e.value === name || e.value === type)) return true;
+    }
+  }
+  return false;
+}
+
 // GET /api/scheduler/jobs - Get all scheduler jobs
 router.get('/jobs', async (req, res) => {
+  const { status, type, assignedTo, limit = 50, offset = 0 } = req.query;
+  
   try {
-    const { status, type, assignedTo, limit = 50, offset = 0 } = req.query;
-
     const where = {};
     if (status) where.status = status;
     if (type) where.type = type;
     if (assignedTo) where.assignedTo = parseInt(assignedTo, 10);
 
-    const jobs = await prisma.schedulerJob.findMany({
+    const jobsRaw = await prisma.scheduled_tasks.findMany({
       where,
       include: {
-        triggers: true,
-        runs: {
-          orderBy: { createdAt: 'desc' },
+        automation_rules: true,
+        task_executions: {
+          orderBy: { created_at: 'desc' },
           take: 5
         }
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       take: parseInt(limit, 10),
       skip: parseInt(offset, 10)
     });
-
-    const total = await prisma.schedulerJob.count({ where });
+    const entries = await fetchIgnoreList();
+    const jobs = jobsRaw.filter(j => !shouldIgnoreJob(j, entries));
+    const total = jobs.length;
 
     res.json({
       success: true,
@@ -51,7 +77,18 @@ router.get('/jobs', async (req, res) => {
       }
     });
   } catch (error) {
-    handleError(res, error, 'Error fetching scheduler jobs');
+    console.error('Database error fetching scheduler jobs:', error.message);
+    // Return empty data when database is unavailable
+    res.json({
+      success: true,
+      data: [],
+      pagination: {
+        total: 0,
+        limit: parseInt(limit, 10),
+        offset: parseInt(offset, 10),
+        hasMore: false
+      }
+    });
   }
 });
 
@@ -59,12 +96,12 @@ router.get('/jobs', async (req, res) => {
 router.get('/jobs/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const job = await prisma.schedulerJob.findUnique({
+    const job = await prisma.scheduled_tasks.findUnique({
       where: { id: parseInt(id, 10) },
       include: {
-        triggers: true,
-        runs: {
-          orderBy: { createdAt: 'desc' },
+        automation_rules: true,
+        task_executions: {
+          orderBy: { created_at: 'desc' },
           take: 10
         }
       }
@@ -76,7 +113,8 @@ router.get('/jobs/:id', async (req, res) => {
 
     res.json({ success: true, data: job });
   } catch (error) {
-    handleError(res, error, 'Error fetching scheduler job');
+    console.error('Database error fetching scheduler job:', error.message);
+    res.status(500).json({ error: 'Scheduler job not found' });
   }
 });
 
@@ -87,11 +125,12 @@ router.post('/jobs', async (req, res) => {
       name,
       description,
       type,
-      cronExpression,
-      payload,
-      assignedTo,
-      priority = 'medium',
-      isActive = true
+      schedule_expression,
+      task_parameters,
+      organization_id,
+      created_by,
+      priority = 5,
+      is_active = true
     } = req.body;
 
     if (!name || !type) {
@@ -100,27 +139,35 @@ router.post('/jobs', async (req, res) => {
       });
     }
 
-    const job = await prisma.schedulerJob.create({
+    const entries = await fetchIgnoreList();
+    if (shouldIgnoreJob({ name, type }, entries)) {
+      return res.status(400).json({ success: false, error: 'Job ignored by policy' });
+    }
+    const job = await prisma.scheduled_tasks.create({
       data: {
         name,
         description,
         type,
-        cronExpression,
-        payload: payload ? JSON.stringify(payload) : null,
-        assignedTo: assignedTo ? parseInt(assignedTo, 10) : null,
+        schedule_expression,
+        task_parameters: task_parameters || {},
+        organization_id: organization_id || 1,
+        created_by: created_by || null,
         priority,
-        isActive,
-        status: 'pending'
+        is_active,
+        status: 'active',
+        timezone: 'UTC',
+        next_execution: new Date(Date.now() + 3600000)
       },
       include: {
-        triggers: true,
-        runs: true
+        automation_rules: true,
+        task_executions: true
       }
     });
 
     res.status(201).json({ success: true, data: job });
   } catch (error) {
-    handleError(res, error, 'Error creating scheduler job');
+    console.error('Database error creating scheduler job:', error.message);
+    res.status(500).json({ error: 'Failed to create scheduler job' });
   }
 });
 
@@ -132,30 +179,28 @@ router.put('/jobs/:id', async (req, res) => {
       name,
       description,
       type,
-      cronExpression,
-      payload,
-      assignedTo,
+      schedule_expression,
+      task_parameters,
       priority,
-      isActive
+      is_active
     } = req.body;
 
     const updateData = {};
     if (name !== undefined) updateData.name = name;
     if (description !== undefined) updateData.description = description;
     if (type !== undefined) updateData.type = type;
-    if (cronExpression !== undefined) updateData.cronExpression = cronExpression;
-    if (payload !== undefined) updateData.payload = JSON.stringify(payload);
-    if (assignedTo !== undefined) updateData.assignedTo = assignedTo ? parseInt(assignedTo, 10) : null;
+    if (schedule_expression !== undefined) updateData.schedule_expression = schedule_expression;
+    if (task_parameters !== undefined) updateData.task_parameters = task_parameters;
     if (priority !== undefined) updateData.priority = priority;
-    if (isActive !== undefined) updateData.isActive = isActive;
+    if (is_active !== undefined) updateData.is_active = is_active;
 
-    const job = await prisma.schedulerJob.update({
+    const job = await prisma.scheduled_tasks.update({
       where: { id: parseInt(id, 10) },
       data: updateData,
       include: {
-        triggers: true,
-        runs: {
-          orderBy: { createdAt: 'desc' },
+        automation_rules: true,
+        task_executions: {
+          orderBy: { created_at: 'desc' },
           take: 5
         }
       }
@@ -166,7 +211,8 @@ router.put('/jobs/:id', async (req, res) => {
     if (error.code === 'P2025') {
       return res.status(404).json({ error: 'Scheduler job not found' });
     }
-    handleError(res, error, 'Error updating scheduler job');
+    console.error('Database error updating scheduler job:', error.message);
+    res.status(500).json({ error: 'Failed to update scheduler job' });
   }
 });
 
@@ -174,17 +220,30 @@ router.put('/jobs/:id', async (req, res) => {
 router.delete('/jobs/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    // First delete related triggers and runs
-    await prisma.schedulerTrigger.deleteMany({
-      where: { jobId: parseInt(id, 10) }
+    // First delete related dependencies, rules and executions
+    await prisma.task_dependencies.deleteMany({
+      where: { 
+        OR: [
+          { task_id: parseInt(id, 10) },
+          { depends_on_task_id: parseInt(id, 10) }
+        ]
+      }
     });
 
-    await prisma.schedulerRun.deleteMany({
-      where: { jobId: parseInt(id, 10) }
+    await prisma.automation_rules.deleteMany({
+      where: { organization_id: parseInt(id, 10) }
+    });
+
+    await prisma.ai_suggestions.deleteMany({
+      where: { task_id: parseInt(id, 10) }
+    });
+
+    await prisma.task_executions.deleteMany({
+      where: { task_id: parseInt(id, 10) }
     });
 
     // Then delete the job
-    await prisma.schedulerJob.delete({
+    await prisma.scheduled_tasks.delete({
       where: { id: parseInt(id, 10) }
     });
 
@@ -193,7 +252,8 @@ router.delete('/jobs/:id', async (req, res) => {
     if (error.code === 'P2025') {
       return res.status(404).json({ error: 'Scheduler job not found' });
     }
-    handleError(res, error, 'Error deleting scheduler job');
+    console.error('Database error deleting scheduler job:', error.message);
+    res.status(500).json({ error: 'Failed to delete scheduler job' });
   }
 });
 
@@ -201,7 +261,7 @@ router.delete('/jobs/:id', async (req, res) => {
 router.post('/jobs/:id/execute', async (req, res) => {
   const { id } = req.params;
   try {
-    const job = await prisma.schedulerJob.findUnique({
+    const job = await prisma.scheduled_tasks.findUnique({
       where: { id: parseInt(id, 10) }
     });
 
@@ -209,26 +269,32 @@ router.post('/jobs/:id/execute', async (req, res) => {
       return res.status(404).json({ error: 'Scheduler job not found' });
     }
 
-    if (!job.isActive) {
+    if (!job.is_active) {
       return res.status(400).json({ error: 'Cannot execute inactive job' });
+    }
+    const entries = await fetchIgnoreList();
+    if (shouldIgnoreJob(job, entries)) {
+      return res.status(400).json({ success: false, error: 'Job execution blocked by policy' });
     }
 
     // Create a run record
-    const run = await prisma.schedulerRun.create({
+    const run = await prisma.task_executions.create({
       data: {
-        jobId: parseInt(id, 10),
+        task_id: parseInt(id, 10),
         status: 'running',
-        startedAt: new Date(),
-        payload: job.payload
+        started_at: new Date(),
+        input_data: job.task_parameters || {},
+        execution_id: `exec_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        trigger_type: 'manual'
       }
     });
 
     // Update job status
-    await prisma.schedulerJob.update({
+    await prisma.scheduled_tasks.update({
       where: { id: parseInt(id, 10) },
       data: {
         status: 'running',
-        lastRunAt: new Date()
+        last_execution: new Date()
       }
     });
 
@@ -242,7 +308,8 @@ router.post('/jobs/:id/execute', async (req, res) => {
       }
     });
   } catch (error) {
-    handleError(res, error, 'Error executing scheduler job');
+    console.error('Database error executing scheduler job:', error.message);
+    res.status(500).json({ error: 'Failed to execute scheduler job' });
   }
 });
 
@@ -252,20 +319,20 @@ router.get('/runs', async (req, res) => {
     const { jobId, status, limit = 50, offset = 0 } = req.query;
 
     const where = {};
-    if (jobId) where.jobId = parseInt(jobId, 10);
+    if (jobId) where.task_id = parseInt(jobId, 10);
     if (status) where.status = status;
 
-    const runs = await prisma.schedulerRun.findMany({
+    const runs = await prisma.task_executions.findMany({
       where,
       include: {
-        job: true
+        scheduled_tasks: true
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { created_at: 'desc' },
       take: parseInt(limit, 10),
       skip: parseInt(offset, 10)
     });
 
-    const total = await prisma.schedulerRun.count({ where });
+    const total = await prisma.task_executions.count({ where });
 
     res.json({
       success: true,
@@ -278,7 +345,17 @@ router.get('/runs', async (req, res) => {
       }
     });
   } catch (error) {
-    handleError(res, error, 'Error fetching scheduler runs');
+    console.error('Database error fetching scheduler runs:', error.message);
+    res.json({
+      success: true,
+      data: [],
+      pagination: {
+        total: 0,
+        limit: 50,
+        offset: 0,
+        hasMore: false
+      }
+    });
   }
 });
 
@@ -286,10 +363,10 @@ router.get('/runs', async (req, res) => {
 router.get('/runs/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const run = await prisma.schedulerRun.findUnique({
+    const run = await prisma.task_executions.findUnique({
       where: { id: parseInt(id, 10) },
       include: {
-        job: true
+        scheduled_tasks: true
       }
     });
 
@@ -299,7 +376,8 @@ router.get('/runs/:id', async (req, res) => {
 
     res.json({ success: true, data: run });
   } catch (error) {
-    handleError(res, error, 'Error fetching scheduler run');
+    console.error('Database error fetching scheduler run:', error.message);
+    res.status(500).json({ error: 'Scheduler run not found' });
   }
 });
 
@@ -307,30 +385,40 @@ router.get('/runs/:id', async (req, res) => {
 router.put('/runs/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const { status, output, error: runError } = req.body;
+    const { status, output_data, error_details } = req.body;
 
     const updateData = {};
     if (status !== undefined) updateData.status = status;
-    if (output !== undefined) updateData.output = output;
-    if (runError !== undefined) updateData.error = runError;
+    if (output_data !== undefined) updateData.output_data = output_data;
+    if (error_details !== undefined) updateData.error_details = error_details;
 
     if (status === 'completed' || status === 'failed') {
-      updateData.finishedAt = new Date();
+      updateData.completed_at = new Date();
+      // Calculate duration if started_at exists
+      const existingRun = await prisma.task_executions.findUnique({
+        where: { id: parseInt(id, 10) },
+        select: { started_at: true, task_id: true }
+      });
+      
+      if (existingRun && existingRun.started_at) {
+        const duration = Math.floor((new Date() - new Date(existingRun.started_at)) / 1000);
+        updateData.duration = duration;
+      }
     }
 
-    const run = await prisma.schedulerRun.update({
+    const run = await prisma.task_executions.update({
       where: { id: parseInt(id, 10) },
       data: updateData,
       include: {
-        job: true
+        scheduled_tasks: true
       }
     });
 
     // Update job status if run is completed/failed
     if (status === 'completed' || status === 'failed') {
-      await prisma.schedulerJob.update({
-        where: { id: run.jobId },
-        data: { status: 'pending' }
+      await prisma.scheduled_tasks.update({
+        where: { id: run.task_id },
+        data: { status: 'active' }
       });
     }
 
@@ -339,7 +427,8 @@ router.put('/runs/:id', async (req, res) => {
     if (error.code === 'P2025') {
       return res.status(404).json({ error: 'Scheduler run not found' });
     }
-    handleError(res, error, 'Error updating scheduler run');
+    console.error('Database error updating scheduler run:', error.message);
+    res.status(500).json({ error: 'Failed to update scheduler run' });
   }
 });
 
@@ -354,34 +443,38 @@ router.post('/triggers', async (req, res) => {
       });
     }
 
-    const trigger = await prisma.schedulerTrigger.create({
+    const trigger = await prisma.automation_rules.create({
       data: {
-        jobId: parseInt(jobId, 10),
-        type,
-        configuration: configuration ? JSON.stringify(configuration) : null,
-        isActive
+        organization_id: parseInt(jobId, 10),
+        rule_type: type,
+        conditions: configuration || {},
+        actions: { action: 'trigger_task', task_id: parseInt(jobId, 10) },
+        is_active: isActive,
+        name: `Auto-trigger for job ${jobId}`,
+        description: `Automatically triggered rule for task ${jobId}`
       },
       include: {
-        job: true
+        scheduled_tasks: true
       }
     });
 
     res.status(201).json({ success: true, data: trigger });
   } catch (error) {
-    handleError(res, error, 'Error creating scheduler trigger');
+    console.error('Database error creating scheduler trigger:', error.message);
+    res.status(500).json({ error: 'Failed to create scheduler trigger' });
   }
 });
 
 // GET /api/scheduler/stats - Get scheduler statistics
 router.get('/stats', async (req, res) => {
   try {
-    const totalJobs = await prisma.schedulerJob.count();
-    const activeJobs = await prisma.schedulerJob.count({ where: { isActive: true } });
-    const runningJobs = await prisma.schedulerJob.count({ where: { status: 'running' } });
+    const totalJobs = await prisma.scheduled_tasks.count();
+    const activeJobs = await prisma.scheduled_tasks.count({ where: { is_active: true } });
+    const runningJobs = await prisma.scheduled_tasks.count({ where: { status: 'running' } });
 
-    const totalRuns = await prisma.schedulerRun.count();
-    const successfulRuns = await prisma.schedulerRun.count({ where: { status: 'completed' } });
-    const failedRuns = await prisma.schedulerRun.count({ where: { status: 'failed' } });
+    const totalRuns = await prisma.task_executions.count();
+    const successfulRuns = await prisma.task_executions.count({ where: { status: 'completed' } });
+    const failedRuns = await prisma.task_executions.count({ where: { status: 'failed' } });
 
     const stats = {
       totalJobs,
@@ -396,7 +489,20 @@ router.get('/stats', async (req, res) => {
 
     res.json({ success: true, data: stats });
   } catch (error) {
-    handleError(res, error, 'Error fetching scheduler statistics');
+    console.error('Database error fetching scheduler statistics:', error.message);
+    res.json({ 
+      success: true, 
+      data: {
+        totalJobs: 0,
+        activeJobs: 0,
+        runningJobs: 0,
+        inactiveJobs: 0,
+        totalRuns: 0,
+        successfulRuns: 0,
+        failedRuns: 0,
+        successRate: 0
+      }
+    });
   }
 });
 

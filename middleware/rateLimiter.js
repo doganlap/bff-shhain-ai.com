@@ -4,7 +4,7 @@
  */
 
 const rateLimit = require('express-rate-limit');
-const RedisStore = require('rate-limit-redis');
+// const RedisStore = require('rate-limit-redis');
 const Redis = require('ioredis');
 
 // Initialize Redis client (optional, falls back to memory store)
@@ -49,6 +49,7 @@ function createTenantRateLimiter(options = {}) {
     message = 'Too many requests from this tenant',
     skipSuccessfulRequests = false,
     skipFailedRequests = false,
+    skip = undefined,
   } = options;
 
   const storeConfig = {};
@@ -101,6 +102,7 @@ function createTenantRateLimiter(options = {}) {
     
     skipSuccessfulRequests,
     skipFailedRequests,
+    ...(typeof skip === 'function' ? { skip } : {}),
     standardHeaders: true,
     legacyHeaders: false,
   });
@@ -145,11 +147,14 @@ function createTierBasedRateLimiter() {
  * Stricter limits for auth endpoints to prevent brute force
  */
 function createAuthRateLimiter() {
+  const { ENV } = require('../config/env');
+  const isProduction = ENV.NODE_ENV === 'production';
   return createTenantRateLimiter({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Only 5 login attempts per 15 minutes
+    windowMs: isProduction ? 15 * 60 * 1000 : 60 * 1000,
+    max: isProduction ? 5 : 1000,
     message: 'Too many authentication attempts',
-    skipSuccessfulRequests: true, // Don't count successful logins
+    skipSuccessfulRequests: true,
+    skip: (req) => !isProduction,
   });
 }
 

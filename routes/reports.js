@@ -72,7 +72,7 @@ router.get('/runs/:id/download', async (req, res) => {
 });
 
 // --- Helper function for report generation ---
-async function generateReport(runId, template, params) {
+async function generateReport(runId, template, _params) {
   const doc = new PDFDocument();
   const fileName = `report-${runId}-${Date.now()}.pdf`;
   const filePath = path.join(__dirname, '..', 'uploads', fileName);

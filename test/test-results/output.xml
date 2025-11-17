@@ -1,0 +1,1865 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.3.2 (Python 3.11.9 on win32)" generated="2025-11-16T19:06:15.467315" rpa="false" schemaversion="5">
+<suite id="s1" name="Authentication-Full-Path-Tests" source="D:\Projects\Shahin-ai-App\apps\bff\test\authentication-full-path-tests.robot">
+<kw name="Setup Authentication Test Environment" type="SETUP">
+<msg time="2025-11-16T19:06:15.888662" level="TRACE">Arguments: [  ]</msg>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.890257" level="TRACE">Arguments: [ 'Setting up authentication test environment...' ]</msg>
+<msg time="2025-11-16T19:06:15.890257" level="INFO">Setting up authentication test environment...</msg>
+<msg time="2025-11-16T19:06:15.890257" level="TRACE">Return: None</msg>
+<arg>Setting up authentication test environment...</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.889728" elapsed="0.000529"/>
+</kw>
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:15.890801" level="TRACE">Arguments: [ 'auth_session' | 'http://172.21.160.1:3007' | headers={'Content-Type': 'application/json', 'Accept': 'application/json'} ]</msg>
+<msg time="2025-11-16T19:06:15.890801" level="INFO">Creating Session using : alias=auth_session, url=http://172.21.160.1:3007, headers={'Content-Type': 'application/json', 'Accept': 'application/json'},                     cookies={}, auth=None, timeout=None, proxies=None, verify=False,                     debug=0 </msg>
+<msg time="2025-11-16T19:06:15.890801" level="DEBUG">Creating session: auth_session</msg>
+<msg time="2025-11-16T19:06:15.891391" level="TRACE">Return: &lt;requests.sessions.Session object at 0x000002719406B490&gt;</msg>
+<arg>auth_session</arg>
+<arg>${API_BASE_URL}</arg>
+<arg>headers={"Content-Type": "application/json", "Accept": "application/json"}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2025-11-16T19:06:15.890801" elapsed="0.000590"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.891927" level="TRACE">Arguments: [ 'Authentication test environment ready' ]</msg>
+<msg time="2025-11-16T19:06:15.891927" level="INFO">Authentication test environment ready</msg>
+<msg time="2025-11-16T19:06:15.891927" level="TRACE">Return: None</msg>
+<arg>Authentication test environment ready</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.891391" elapsed="0.001071"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.892462" level="TRACE">Arguments: [ 'BFF URL: http://172.21.160.1:3007' ]</msg>
+<msg time="2025-11-16T19:06:15.892462" level="INFO">BFF URL: http://172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:15.892462" level="TRACE">Return: None</msg>
+<arg>BFF URL: ${BFF_BASE_URL}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.892462" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.892982" level="TRACE">Arguments: [ 'API URL: http://172.21.160.1:3007' ]</msg>
+<msg time="2025-11-16T19:06:15.892982" level="INFO">API URL: http://172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:15.892982" level="TRACE">Return: None</msg>
+<arg>API URL: ${API_BASE_URL}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.892982" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.892982" level="TRACE">Arguments: [ 'Web URL: http://172.21.160.1:5174' ]</msg>
+<msg time="2025-11-16T19:06:15.892982" level="INFO">Web URL: http://172.21.160.1:5174</msg>
+<msg time="2025-11-16T19:06:15.892982" level="TRACE">Return: None</msg>
+<arg>Web URL: ${WEB_BASE_URL}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.892982" elapsed="0.000000"/>
+</kw>
+<msg time="2025-11-16T19:06:15.892982" level="TRACE">Return: None</msg>
+<doc>Setup test environment for authentication tests</doc>
+<status status="PASS" start="2025-11-16T19:06:15.888105" elapsed="0.004877"/>
+</kw>
+<test id="s1-t1" name="TC001_Health_Check_All_Services" line="62">
+<kw name="GET" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:15.893992" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/health' | expected_status='200' ]</msg>
+<msg time="2025-11-16T19:06:15.896695" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:15.902562" level="DEBUG">http://172.21.160.1:3007 "GET /health HTTP/1.1" 200 145</msg>
+<msg time="2025-11-16T19:06:15.903119" level="INFO">GET Request : url=http://172.21.160.1:3007/health 
+ path_url=/health 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg time="2025-11-16T19:06:15.903669" level="INFO">GET Response : url=http://172.21.160.1:3007/health 
+ status=200, reason=OK 
+ headers={'X-Request-ID': 'req_1763309255874_5e0c506b0c753d48', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '1ms', 'Content-Length': '145', 'ETag': 'W/"91-xyf8qSnUjiQSaVKUPFyGGvgyvgE"', 'Date': 'Sun, 16 Nov 2025 16:07:35 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"healthy","service":"BFF","timestamp":"2025-11-16T16:07:35.875Z","uptime":3205.594712811,"environment":"development","version":"1.0.0"} 
+ </msg>
+<msg time="2025-11-16T19:06:15.903669" level="TRACE">Return: &lt;Response [200]&gt;</msg>
+<msg time="2025-11-16T19:06:15.903669" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>${BFF_BASE_URL}/health</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.892982" elapsed="0.010687"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.905277" level="TRACE">Arguments: [ 'healthy' | 'healthy' ]</msg>
+<msg time="2025-11-16T19:06:15.905277" level="DEBUG">Argument types are:
+&lt;class 'str'&gt;
+&lt;class 'str'&gt;</msg>
+<msg time="2025-11-16T19:06:15.905277" level="TRACE">Return: None</msg>
+<arg>${response.json()['status']}</arg>
+<arg>healthy</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.904739" elapsed="0.000538"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.905802" level="TRACE">Arguments: [ "BFF Service Status: {'status': 'healthy', 'service': 'BFF', 'timestamp': '2025-11-16T16:07:35.875Z', 'uptime': 3205.594712811, 'environment': 'development', 'version': '1.0.0'}" ]</msg>
+<msg time="2025-11-16T19:06:15.906320" level="INFO">BFF Service Status: {'status': 'healthy', 'service': 'BFF', 'timestamp': '2025-11-16T16:07:35.875Z', 'uptime': 3205.594712811, 'environment': 'development', 'version': '1.0.0'}</msg>
+<msg time="2025-11-16T19:06:15.906320" level="TRACE">Return: None</msg>
+<arg>BFF Service Status: ${response.json()}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.905802" elapsed="0.000518"/>
+</kw>
+<kw name="GET" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:15.906320" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/health' | expected_status='200' ]</msg>
+<msg time="2025-11-16T19:06:15.907364" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:15.912724" level="DEBUG">http://172.21.160.1:3007 "GET /health HTTP/1.1" 200 145</msg>
+<msg time="2025-11-16T19:06:15.913254" level="INFO">GET Request : url=http://172.21.160.1:3007/health 
+ path_url=/health 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive'} 
+ body=None 
+ </msg>
+<msg time="2025-11-16T19:06:15.913254" level="INFO">GET Response : url=http://172.21.160.1:3007/health 
+ status=200, reason=OK 
+ headers={'X-Request-ID': 'req_1763309255884_236ec42ade8b3656', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '0ms', 'Content-Length': '145', 'ETag': 'W/"91-koAuioiPsZ0aVzwbYygFu/qs01Y"', 'Date': 'Sun, 16 Nov 2025 16:07:35 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"status":"healthy","service":"BFF","timestamp":"2025-11-16T16:07:35.884Z","uptime":3205.604458259,"environment":"development","version":"1.0.0"} 
+ </msg>
+<msg time="2025-11-16T19:06:15.913254" level="TRACE">Return: &lt;Response [200]&gt;</msg>
+<msg time="2025-11-16T19:06:15.913782" level="INFO">${response} = &lt;Response [200]&gt;</msg>
+<var>${response}</var>
+<arg>${API_BASE_URL}/health</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.906320" elapsed="0.007462"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.915355" level="TRACE">Arguments: [ 'healthy' | 'healthy' ]</msg>
+<msg time="2025-11-16T19:06:15.915951" level="DEBUG">Argument types are:
+&lt;class 'str'&gt;
+&lt;class 'str'&gt;</msg>
+<msg time="2025-11-16T19:06:15.915951" level="TRACE">Return: None</msg>
+<arg>${response.json()['status']}</arg>
+<arg>healthy</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.914300" elapsed="0.001651"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.916493" level="TRACE">Arguments: [ "API Service Status: {'status': 'healthy', 'service': 'BFF', 'timestamp': '2025-11-16T16:07:35.884Z', 'uptime': 3205.604458259, 'environment': 'development', 'version': '1.0.0'}" ]</msg>
+<msg time="2025-11-16T19:06:15.916493" level="INFO">API Service Status: {'status': 'healthy', 'service': 'BFF', 'timestamp': '2025-11-16T16:07:35.884Z', 'uptime': 3205.604458259, 'environment': 'development', 'version': '1.0.0'}</msg>
+<msg time="2025-11-16T19:06:15.917036" level="TRACE">Return: None</msg>
+<arg>API Service Status: ${response.json()}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.915951" elapsed="0.001085"/>
+</kw>
+<doc>Verify all authentication-related services are running</doc>
+<tag>authentication</tag>
+<tag>health</tag>
+<tag>smoke</tag>
+<status status="PASS" start="2025-11-16T19:06:15.892982" elapsed="0.024054"/>
+</test>
+<test id="s1-t2" name="TC002_Standard_User_Login_Flow" line="76">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.918081" level="TRACE">Arguments: [ 'email=${TEST_USER_EMAIL}' | 'password=${TEST_USER_PASSWORD}' ]</msg>
+<msg time="2025-11-16T19:06:15.919090" level="TRACE">Return: {'email': 'ahmet@doganconsult.com', 'password': 'PartnerPass123!'}</msg>
+<msg time="2025-11-16T19:06:15.919090" level="INFO">${login_data} = {'email': 'ahmet@doganconsult.com', 'password': 'PartnerPass123!'}</msg>
+<var>${login_data}</var>
+<arg>email=${TEST_USER_EMAIL}</arg>
+<arg>password=${TEST_USER_PASSWORD}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.918081" elapsed="0.001009"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.919090" level="TRACE">Arguments: [ 'Content-Type=application/json' | 'X-Request-ID=robot_test_001' ]</msg>
+<msg time="2025-11-16T19:06:15.920159" level="TRACE">Return: {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_001'}</msg>
+<msg time="2025-11-16T19:06:15.920159" level="INFO">${headers} = {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_001'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=robot_test_001</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.919090" elapsed="0.001069"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:15.920159" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/login' | json={'email': 'ahmet@doganconsult.com', 'password': 'PartnerPass123!'} | headers={'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_001'} | expected_status='200' ]</msg>
+<msg time="2025-11-16T19:06:15.921770" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:15.928590" level="DEBUG">http://172.21.160.1:3007 "POST /auth/login HTTP/1.1" 404 169</msg>
+<msg time="2025-11-16T19:06:15.929115" level="INFO">POST Request : url=http://172.21.160.1:3007/auth/login 
+ path_url=/auth/login 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_001', 'Content-Length': '66'} 
+ body=b'{"email": "ahmet@doganconsult.com", "password": "PartnerPass123!"}' 
+ </msg>
+<msg time="2025-11-16T19:06:15.929652" level="INFO">POST Response : url=http://172.21.160.1:3007/auth/login 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_001', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '2ms', 'Content-Length': '169', 'ETag': 'W/"a9-XdwAxUVPvzhfV1BAJHERMGCfg7U"', 'Date': 'Sun, 16 Nov 2025 16:07:35 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /auth/login","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_001","timestamp":"2025-11-16T16:07:35.901Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:15.929652" level="FAIL">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</msg>
+<msg time="2025-11-16T19:06:15.932049" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</msg>
+<var>${response}</var>
+<arg>${AUTH_LOGIN_ENDPOINT}</arg>
+<arg>json=${login_data}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:15.920159" elapsed="0.011890">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>'token' in ${response.json()}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.932590" elapsed="0.000000"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<arg>${response.json()['token']}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.933662" elapsed="0.000000"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<arg>${response.json()['user']}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.934173" elapsed="0.000000"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<arg>${AUTH_TOKEN}</arg>
+<arg>${response.json()['token']}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.934173" elapsed="0.000000"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<arg>${REFRESH_TOKEN}</arg>
+<arg>${response.json()['refreshToken']}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.934173" elapsed="0.000000"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<arg>${BEARER_TOKEN}</arg>
+<arg>Bearer ${response.json()['token']}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.934173" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Login successful for user: ${TEST_USER_EMAIL}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.934707" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Token received: ${AUTH_TOKEN}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.935220" elapsed="0.000000"/>
+</kw>
+<doc>Test standard user login with email and password</doc>
+<tag>authentication</tag>
+<tag>critical</tag>
+<tag>login</tag>
+<tag>standard</tag>
+<status status="FAIL" start="2025-11-16T19:06:15.917551" elapsed="0.017669">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</status>
+</test>
+<test id="s1-t3" name="TC003_Partner_User_Login_Flow" line="106">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.936782" level="TRACE">Arguments: [ 'email=${TEST_PARTNER_EMAIL}' | 'password=${TEST_PARTNER_PASSWORD}' ]</msg>
+<msg time="2025-11-16T19:06:15.936782" level="TRACE">Return: {'email': 'amr@doganconsult.com', 'password': 'PartnerPass123!'}</msg>
+<msg time="2025-11-16T19:06:15.936782" level="INFO">${login_data} = {'email': 'amr@doganconsult.com', 'password': 'PartnerPass123!'}</msg>
+<var>${login_data}</var>
+<arg>email=${TEST_PARTNER_EMAIL}</arg>
+<arg>password=${TEST_PARTNER_PASSWORD}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.936782" elapsed="0.000000"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.937319" level="TRACE">Arguments: [ 'Content-Type=application/json' | 'X-Request-ID=robot_test_002' | 'X-Tenant-ID=${TEST_TENANT_ID}' ]</msg>
+<msg time="2025-11-16T19:06:15.937319" level="TRACE">Return: {'Content-Type': 'application/json',
+ 'X-Request-ID': 'robot_test_002',
+ 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'}</msg>
+<msg time="2025-11-16T19:06:15.937319" level="INFO">${headers} = {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_002', 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=robot_test_002</arg>
+<arg>X-Tenant-ID=${TEST_TENANT_ID}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.937319" elapsed="0.000000"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:15.937831" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/partner/auth/login' | json={'email': 'amr@doganconsult.com', 'password': 'PartnerPass123!'} | headers={'Content-Type': 'application/json',
+ 'X-Request-ID': 'robot_test_002',
+ 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'} | expected_status='200' ]</msg>
+<msg time="2025-11-16T19:06:15.939985" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:15.946247" level="DEBUG">http://172.21.160.1:3007 "POST /partner/auth/login HTTP/1.1" 404 177</msg>
+<msg time="2025-11-16T19:06:15.946840" level="INFO">POST Request : url=http://172.21.160.1:3007/partner/auth/login 
+ path_url=/partner/auth/login 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_002', 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e', 'Content-Length': '64'} 
+ body=b'{"email": "amr@doganconsult.com", "password": "PartnerPass123!"}' 
+ </msg>
+<msg time="2025-11-16T19:06:15.946840" level="INFO">POST Response : url=http://172.21.160.1:3007/partner/auth/login 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_002', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '0ms', 'Content-Length': '177', 'ETag': 'W/"b1-dH22oE0/NuYzNdaH+vzXG5R0YiQ"', 'Date': 'Sun, 16 Nov 2025 16:07:35 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /partner/auth/login","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_002","timestamp":"2025-11-16T16:07:35.918Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:15.947379" level="FAIL">Url: http://172.21.160.1:3007/partner/auth/login Expected status: 404 != 200</msg>
+<msg time="2025-11-16T19:06:15.948441" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/partner/auth/login Expected status: 404 != 200</msg>
+<var>${response}</var>
+<arg>${PARTNER_LOGIN_ENDPOINT}</arg>
+<arg>json=${login_data}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:15.937831" elapsed="0.010610">Url: http://172.21.160.1:3007/partner/auth/login Expected status: 404 != 200</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>'token' in ${response.json()}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.948441" elapsed="0.000000"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<arg>${response.json()['token']}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.949458" elapsed="0.000000"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${response.json()['user']['role']}</arg>
+<arg>partner-admin</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.949458" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Partner login successful for: ${TEST_PARTNER_EMAIL}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.950141" elapsed="0.000000"/>
+</kw>
+<doc>Test partner-specific login flow</doc>
+<tag>authentication</tag>
+<tag>critical</tag>
+<tag>login</tag>
+<tag>partner</tag>
+<status status="FAIL" start="2025-11-16T19:06:15.936272" elapsed="0.013869">Url: http://172.21.160.1:3007/partner/auth/login Expected status: 404 != 200</status>
+</test>
+<test id="s1-t4" name="TC004_Demo_User_Registration_Flow" line="131">
+<kw name="Get Current Date" owner="DateTime">
+<msg time="2025-11-16T19:06:15.951184" level="TRACE">Arguments: [ result_format='%Y%m%d%H%M%S' ]</msg>
+<msg time="2025-11-16T19:06:15.951715" level="TRACE">Return: '20251116190615'</msg>
+<msg time="2025-11-16T19:06:15.951715" level="INFO">${timestamp} = 20251116190615</msg>
+<var>${timestamp}</var>
+<arg>result_format=%Y%m%d%H%M%S</arg>
+<doc>Returns current local or UTC time with an optional increment.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.951184" elapsed="0.000531"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.951715" level="TRACE">Arguments: [ 'robot.demo.20251116190615@test.com' ]</msg>
+<msg time="2025-11-16T19:06:15.951715" level="TRACE">Return: 'robot.demo.20251116190615@test.com'</msg>
+<msg time="2025-11-16T19:06:15.951715" level="INFO">${demo_email} = robot.demo.20251116190615@test.com</msg>
+<var>${demo_email}</var>
+<arg>robot.demo.${timestamp}@test.com</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.951715" elapsed="0.000000"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.951715" level="TRACE">Arguments: [ 'fullName=Robot Demo User' | 'email=${demo_email}' | 'companyName=Robot Demo Company' | 'sector=technology' | 'orgSize=small' | 'useCases=["compliance", "risk-management"]' ]</msg>
+<msg time="2025-11-16T19:06:15.952226" level="TRACE">Return: {'fullName': 'Robot Demo User',
+ 'email': 'robot.demo.20251116190615@test.com',
+ 'companyName': 'Robot Demo Company',
+ 'sector': 'technology',
+ 'orgSize': 'small',
+ 'useCases': '["compliance", "risk-management"]'}</msg>
+<msg time="2025-11-16T19:06:15.952226" level="INFO">${demo_data} = {'fullName': 'Robot Demo User', 'email': 'robot.demo.20251116190615@test.com', 'companyName': 'Robot Demo Company', 'sector': 'technology', 'orgSize': 'small', 'useCases': '["compliance", "risk-manage...</msg>
+<var>${demo_data}</var>
+<arg>fullName=Robot Demo User</arg>
+<arg>email=${demo_email}</arg>
+<arg>companyName=Robot Demo Company</arg>
+<arg>sector=technology</arg>
+<arg>orgSize=small</arg>
+<arg>useCases=["compliance", "risk-management"]</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.951715" elapsed="0.000511"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.952226" level="TRACE">Arguments: [ 'Content-Type=application/json' | 'X-Request-ID=robot_test_demo_001' ]</msg>
+<msg time="2025-11-16T19:06:15.952226" level="TRACE">Return: {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_demo_001'}</msg>
+<msg time="2025-11-16T19:06:15.952226" level="INFO">${headers} = {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_demo_001'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=robot_test_demo_001</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.952226" elapsed="0.000532"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:15.952758" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/api/public/demo/request' | json={'fullName': 'Robot Demo User',
+ 'email': 'robot.demo.20251116190615@test.com',
+ 'companyName': 'Robot Demo Company',
+ 'sector': 'technology',
+ 'orgSize': 'small',
+ 'useCases': '["compliance", "risk-management"]'} | headers={'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_demo_001'} | expected_status='201' ]</msg>
+<msg time="2025-11-16T19:06:15.953812" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:15.973894" level="DEBUG">http://172.21.160.1:3007 "POST /api/public/demo/request HTTP/1.1" 500 123</msg>
+<msg time="2025-11-16T19:06:15.974437" level="INFO">POST Request : url=http://172.21.160.1:3007/api/public/demo/request 
+ path_url=/api/public/demo/request 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_demo_001', 'Content-Length': '212'} 
+ body=b'{"fullName": "Robot Demo User", "email": "robot.demo.20251116190615@test.com", "companyName": "Robot Demo Company", "sector": "technology", "orgSize": "small", "useCases": "[\\"compliance\\", \\"risk-management\\"]"}' 
+ </msg>
+<msg time="2025-11-16T19:06:15.974968" level="INFO">POST Response : url=http://172.21.160.1:3007/api/public/demo/request 
+ status=500, reason=Internal Server Error 
+ headers={'X-Request-ID': 'robot_test_demo_001', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'RateLimit-Policy': '100;w=900', 'RateLimit-Limit': '100', 'RateLimit-Remaining': '94', 'RateLimit-Reset': '337', 'X-Response-Time': '16ms', 'Content-Length': '123', 'ETag': 'W/"7b-rOa0weRWqCLJf6Unzt6oV9rMaWs"', 'Date': 'Sun, 16 Nov 2025 16:07:35 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"error":"INTERNAL_ERROR","message":"Failed to create demo environment","requestId":"f2ffdb59-7513-4d39-95c2-116938962f74"} 
+ </msg>
+<msg time="2025-11-16T19:06:15.975496" level="FAIL">Url: http://172.21.160.1:3007/api/public/demo/request Expected status: 500 != 201</msg>
+<msg time="2025-11-16T19:06:15.976035" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/api/public/demo/request Expected status: 500 != 201</msg>
+<var>${response}</var>
+<arg>${BFF_BASE_URL}/api/public/demo/request</arg>
+<arg>json=${demo_data}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=201</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:15.952758" elapsed="0.023277">Url: http://172.21.160.1:3007/api/public/demo/request Expected status: 500 != 201</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>'token' in ${response.json()}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.976578" elapsed="0.000000"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${response.json()['status']}</arg>
+<arg>approved_auto</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.976578" elapsed="0.000000"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<arg>${response.json()['tenant']}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.977093" elapsed="0.000000"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<arg>${response.json()['user']}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.977093" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Demo user registered and authenticated successfully: ${demo_email}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.977696" elapsed="0.000000"/>
+</kw>
+<doc>Test demo user registration and instant access</doc>
+<tag>authentication</tag>
+<tag>demo</tag>
+<tag>instant-access</tag>
+<tag>registration</tag>
+<status status="FAIL" start="2025-11-16T19:06:15.950672" elapsed="0.027550">Url: http://172.21.160.1:3007/api/public/demo/request Expected status: 500 != 201</status>
+</test>
+<test id="s1-t5" name="TC005_User_Registration_Flow" line="162">
+<kw name="Get Current Date" owner="DateTime">
+<msg time="2025-11-16T19:06:15.980923" level="TRACE">Arguments: [ result_format='%Y%m%d%H%M%S' ]</msg>
+<msg time="2025-11-16T19:06:15.980923" level="TRACE">Return: '20251116190615'</msg>
+<msg time="2025-11-16T19:06:15.980923" level="INFO">${timestamp} = 20251116190615</msg>
+<var>${timestamp}</var>
+<arg>result_format=%Y%m%d%H%M%S</arg>
+<doc>Returns current local or UTC time with an optional increment.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.980373" elapsed="0.000550"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.981445" level="TRACE">Arguments: [ 'robot.test.20251116190615@test.com' ]</msg>
+<msg time="2025-11-16T19:06:15.981984" level="TRACE">Return: 'robot.test.20251116190615@test.com'</msg>
+<msg time="2025-11-16T19:06:15.981984" level="INFO">${test_email} = robot.test.20251116190615@test.com</msg>
+<var>${test_email}</var>
+<arg>robot.test.${timestamp}@test.com</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.981445" elapsed="0.000539"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.982528" level="TRACE">Arguments: [ 'email=${test_email}' | 'password=Test@1234' | 'name=Robot Test User' | 'organization=Robot Test Org' | 'role=user' ]</msg>
+<msg time="2025-11-16T19:06:15.982528" level="TRACE">Return: {'email': 'robot.test.20251116190615@test.com',
+ 'password': 'Test@1234',
+ 'name': 'Robot Test User',
+ 'organization': 'Robot Test Org',
+ 'role': 'user'}</msg>
+<msg time="2025-11-16T19:06:15.982528" level="INFO">${registration_data} = {'email': 'robot.test.20251116190615@test.com', 'password': 'Test@1234', 'name': 'Robot Test User', 'organization': 'Robot Test Org', 'role': 'user'}</msg>
+<var>${registration_data}</var>
+<arg>email=${test_email}</arg>
+<arg>password=Test@1234</arg>
+<arg>name=Robot Test User</arg>
+<arg>organization=Robot Test Org</arg>
+<arg>role=user</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.981984" elapsed="0.000544"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.983050" level="TRACE">Arguments: [ 'Content-Type=application/json' | 'X-Request-ID=robot_test_004' ]</msg>
+<msg time="2025-11-16T19:06:15.983595" level="TRACE">Return: {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_004'}</msg>
+<msg time="2025-11-16T19:06:15.983595" level="INFO">${headers} = {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_004'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=robot_test_004</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.983050" elapsed="0.000545"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:15.984113" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/register' | json={'email': 'robot.test.20251116190615@test.com',
+ 'password': 'Test@1234',
+ 'name': 'Robot Test User',
+ 'organization': 'Robot Test Org',
+ 'role': 'user'} | headers={'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_004'} | expected_status='201' ]</msg>
+<msg time="2025-11-16T19:06:15.985674" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:15.991533" level="DEBUG">http://172.21.160.1:3007 "POST /auth/register HTTP/1.1" 404 172</msg>
+<msg time="2025-11-16T19:06:15.992075" level="INFO">POST Request : url=http://172.21.160.1:3007/auth/register 
+ path_url=/auth/register 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_004', 'Content-Length': '149'} 
+ body=b'{"email": "robot.test.20251116190615@test.com", "password": "Test@1234", "name": "Robot Test User", "organization": "Robot Test Org", "role": "user"}' 
+ </msg>
+<msg time="2025-11-16T19:06:15.992075" level="INFO">POST Response : url=http://172.21.160.1:3007/auth/register 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_004', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '1ms', 'Content-Length': '172', 'ETag': 'W/"ac-pCzA+MIXHvQ4YRwROJalaHXN6kY"', 'Date': 'Sun, 16 Nov 2025 16:07:35 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /auth/register","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_004","timestamp":"2025-11-16T16:07:35.963Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:15.992075" level="FAIL">Url: http://172.21.160.1:3007/auth/register Expected status: 404 != 201</msg>
+<msg time="2025-11-16T19:06:15.993086" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/register Expected status: 404 != 201</msg>
+<var>${response}</var>
+<arg>${AUTH_REGISTER_ENDPOINT}</arg>
+<arg>json=${registration_data}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=201</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:15.984113" elapsed="0.008973">Url: http://172.21.160.1:3007/auth/register Expected status: 404 != 201</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.993596" elapsed="0.000000"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<arg>${response.json()['user']}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.994102" elapsed="0.000000"/>
+</kw>
+<kw name="Set Suite Variable" owner="BuiltIn">
+<arg>${CREATED_USER_ID}</arg>
+<arg>${response.json()['user']['id']}</arg>
+<doc>Makes a variable available everywhere within the scope of the current suite.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.994651" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>User registered successfully with ID: ${CREATED_USER_ID}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:15.994651" elapsed="0.000000"/>
+</kw>
+<doc>Test complete user registration process</doc>
+<tag>authentication</tag>
+<tag>registration</tag>
+<tag>user-management</tag>
+<status status="FAIL" start="2025-11-16T19:06:15.978753" elapsed="0.016978">Url: http://172.21.160.1:3007/auth/register Expected status: 404 != 201</status>
+</test>
+<test id="s1-t6" name="TC006_Partner_Registration_Flow" line="191">
+<kw name="Get Current Date" owner="DateTime">
+<msg time="2025-11-16T19:06:15.997333" level="TRACE">Arguments: [ result_format='%Y%m%d%H%M%S' ]</msg>
+<msg time="2025-11-16T19:06:15.997333" level="TRACE">Return: '20251116190615'</msg>
+<msg time="2025-11-16T19:06:15.997333" level="INFO">${timestamp} = 20251116190615</msg>
+<var>${timestamp}</var>
+<arg>result_format=%Y%m%d%H%M%S</arg>
+<doc>Returns current local or UTC time with an optional increment.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.996788" elapsed="0.000545"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.997869" level="TRACE">Arguments: [ 'partner.robot.20251116190615@partner.com' ]</msg>
+<msg time="2025-11-16T19:06:15.997869" level="TRACE">Return: 'partner.robot.20251116190615@partner.com'</msg>
+<msg time="2025-11-16T19:06:15.998401" level="INFO">${partner_email} = partner.robot.20251116190615@partner.com</msg>
+<var>${partner_email}</var>
+<arg>partner.robot.${timestamp}@partner.com</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.997869" elapsed="0.000532"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:15.998943" level="TRACE">Arguments: [ 'email=${partner_email}' | 'password=Partner@1234' | 'name=Robot Partner User' | 'organization=Robot Partner Org' | 'organizationType=consulting' | 'role=partner-admin' ]</msg>
+<msg time="2025-11-16T19:06:15.999489" level="TRACE">Return: {'email': 'partner.robot.20251116190615@partner.com',
+ 'password': 'Partner@1234',
+ 'name': 'Robot Partner User',
+ 'organization': 'Robot Partner Org',
+ 'organizationType': 'consulting',
+ 'role': 'partner-admin'}</msg>
+<msg time="2025-11-16T19:06:15.999489" level="INFO">${registration_data} = {'email': 'partner.robot.20251116190615@partner.com', 'password': 'Partner@1234', 'name': 'Robot Partner User', 'organization': 'Robot Partner Org', 'organizationType': 'consulting', 'role': 'partner-...</msg>
+<var>${registration_data}</var>
+<arg>email=${partner_email}</arg>
+<arg>password=Partner@1234</arg>
+<arg>name=Robot Partner User</arg>
+<arg>organization=Robot Partner Org</arg>
+<arg>organizationType=consulting</arg>
+<arg>role=partner-admin</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:15.998943" elapsed="0.001083"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.000553" level="TRACE">Arguments: [ 'Content-Type=application/json' | 'X-Request-ID=robot_test_005' ]</msg>
+<msg time="2025-11-16T19:06:16.000553" level="TRACE">Return: {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_005'}</msg>
+<msg time="2025-11-16T19:06:16.000553" level="INFO">${headers} = {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_005'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=robot_test_005</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.000026" elapsed="0.000527"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.001070" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/partner/auth/register' | json={'email': 'partner.robot.20251116190615@partner.com',
+ 'password': 'Partner@1234',
+ 'name': 'Robot Partner User',
+ 'organization': 'Robot Partner Org',
+ 'organizationType': 'consulting',
+ 'role': 'partner-admin'} | headers={'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_005'} | expected_status='201' ]</msg>
+<msg time="2025-11-16T19:06:16.003705" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.010148" level="DEBUG">http://172.21.160.1:3007 "POST /partner/auth/register HTTP/1.1" 404 180</msg>
+<msg time="2025-11-16T19:06:16.010708" level="INFO">POST Request : url=http://172.21.160.1:3007/partner/auth/register 
+ path_url=/partner/auth/register 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_005', 'Content-Length': '207'} 
+ body=b'{"email": "partner.robot.20251116190615@partner.com", "password": "Partner@1234", "name": "Robot Partner User", "organization": "Robot Partner Org", "organizationType": "consulting", "role": "partner-admin"}' 
+ </msg>
+<msg time="2025-11-16T19:06:16.011231" level="INFO">POST Response : url=http://172.21.160.1:3007/partner/auth/register 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_005', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '1ms', 'Content-Length': '180', 'ETag': 'W/"b4-DHnaIFJjlihptaecWTUMgD/BKFA"', 'Date': 'Sun, 16 Nov 2025 16:07:35 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /partner/auth/register","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_005","timestamp":"2025-11-16T16:07:35.982Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.011231" level="FAIL">Url: http://172.21.160.1:3007/partner/auth/register Expected status: 404 != 201</msg>
+<msg time="2025-11-16T19:06:16.012295" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/partner/auth/register Expected status: 404 != 201</msg>
+<var>${response}</var>
+<arg>${PARTNER_REGISTER_ENDPOINT}</arg>
+<arg>json=${registration_data}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=201</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.001070" elapsed="0.011225">Url: http://172.21.160.1:3007/partner/auth/register Expected status: 404 != 201</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.012826" elapsed="0.000000"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<arg>${response.json()['user']}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.012826" elapsed="0.000000"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<arg>${response.json()['tenant']}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.013365" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Partner registered successfully with tenant: ${response.json()['tenant']['id']}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.013365" elapsed="0.000534"/>
+</kw>
+<doc>Test partner organization and user registration</doc>
+<tag>authentication</tag>
+<tag>multi-tenant</tag>
+<tag>partner</tag>
+<tag>registration</tag>
+<status status="FAIL" start="2025-11-16T19:06:15.996256" elapsed="0.017643">Url: http://172.21.160.1:3007/partner/auth/register Expected status: 404 != 201</status>
+</test>
+<test id="s1-t7" name="TC007_Authenticated_Profile_Access" line="221">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.016533" level="TRACE">Arguments: [ 'Authorization=${BEARER_TOKEN}' | 'X-Request-ID=robot_test_006' | 'X-Tenant-ID=${TEST_TENANT_ID}' ]</msg>
+<msg time="2025-11-16T19:06:16.017066" level="TRACE">Return: {'Authorization': '',
+ 'X-Request-ID': 'robot_test_006',
+ 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'}</msg>
+<msg time="2025-11-16T19:06:16.017066" level="INFO">${headers} = {'Authorization': '', 'X-Request-ID': 'robot_test_006', 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'}</msg>
+<var>${headers}</var>
+<arg>Authorization=${BEARER_TOKEN}</arg>
+<arg>X-Request-ID=robot_test_006</arg>
+<arg>X-Tenant-ID=${TEST_TENANT_ID}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.016001" elapsed="0.001065"/>
+</kw>
+<kw name="GET" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.017579" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/me' | headers={'Authorization': '',
+ 'X-Request-ID': 'robot_test_006',
+ 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'} | expected_status='200' ]</msg>
+<msg time="2025-11-16T19:06:16.019721" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.024491" level="DEBUG">http://172.21.160.1:3007 "GET /auth/me HTTP/1.1" 404 165</msg>
+<msg time="2025-11-16T19:06:16.025036" level="INFO">GET Request : url=http://172.21.160.1:3007/auth/me 
+ path_url=/auth/me 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': '', 'X-Request-ID': 'robot_test_006', 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'} 
+ body=None 
+ </msg>
+<msg time="2025-11-16T19:06:16.025036" level="INFO">GET Response : url=http://172.21.160.1:3007/auth/me 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_006', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '0ms', 'Content-Length': '165', 'ETag': 'W/"a5-0r2Aw1KKl98ttL4BgvbcxdylSgg"', 'Date': 'Sun, 16 Nov 2025 16:07:35 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot GET /auth/me","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_006","timestamp":"2025-11-16T16:07:35.997Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.025036" level="FAIL">Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 200</msg>
+<msg time="2025-11-16T19:06:16.026105" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 193, in session_less_get
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 200</msg>
+<var>${response}</var>
+<arg>${AUTH_PROFILE_ENDPOINT}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.017579" elapsed="0.008526">Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 200</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.026105" elapsed="0.000000"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<arg>${response.json()['user']}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.026644" elapsed="0.000000"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${response.json()['user']['email']}</arg>
+<arg>${TEST_USER_EMAIL}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.026644" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Profile accessed successfully for: ${TEST_USER_EMAIL}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.026644" elapsed="0.000000"/>
+</kw>
+<doc>Test accessing user profile with valid authentication token</doc>
+<tag>authentication</tag>
+<tag>authorization</tag>
+<tag>profile</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.014939" elapsed="0.012224">Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 200</status>
+</test>
+<test id="s1-t8" name="TC008_Token_Refresh_Flow" line="240">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.029326" level="TRACE">Arguments: [ 'Authorization=${BEARER_TOKEN}' | 'Content-Type=application/json' | 'X-Request-ID=robot_test_007' ]</msg>
+<msg time="2025-11-16T19:06:16.029864" level="TRACE">Return: {'Authorization': '',
+ 'Content-Type': 'application/json',
+ 'X-Request-ID': 'robot_test_007'}</msg>
+<msg time="2025-11-16T19:06:16.030393" level="INFO">${headers} = {'Authorization': '', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_007'}</msg>
+<var>${headers}</var>
+<arg>Authorization=${BEARER_TOKEN}</arg>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=robot_test_007</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.028781" elapsed="0.001612"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.030955" level="TRACE">Arguments: [ 'refreshToken=${REFRESH_TOKEN}' ]</msg>
+<msg time="2025-11-16T19:06:16.031482" level="TRACE">Return: {'refreshToken': ''}</msg>
+<msg time="2025-11-16T19:06:16.031482" level="INFO">${refresh_data} = {'refreshToken': ''}</msg>
+<var>${refresh_data}</var>
+<arg>refreshToken=${REFRESH_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.030955" elapsed="0.000527"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.032014" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/refresh' | json={'refreshToken': ''} | headers={'Authorization': '',
+ 'Content-Type': 'application/json',
+ 'X-Request-ID': 'robot_test_007'} | expected_status='200' ]</msg>
+<msg time="2025-11-16T19:06:16.033694" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.039206" level="DEBUG">http://172.21.160.1:3007 "POST /auth/refresh HTTP/1.1" 404 171</msg>
+<msg time="2025-11-16T19:06:16.040292" level="INFO">POST Request : url=http://172.21.160.1:3007/auth/refresh 
+ path_url=/auth/refresh 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': '', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_007', 'Content-Length': '20'} 
+ body=b'{"refreshToken": ""}' 
+ </msg>
+<msg time="2025-11-16T19:06:16.040292" level="INFO">POST Response : url=http://172.21.160.1:3007/auth/refresh 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_007', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '0ms', 'Content-Length': '171', 'ETag': 'W/"ab-sIKqK1CS/1agEgSbWT9IsRQKVNg"', 'Date': 'Sun, 16 Nov 2025 16:07:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /auth/refresh","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_007","timestamp":"2025-11-16T16:07:36.011Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.040833" level="FAIL">Url: http://172.21.160.1:3007/auth/refresh Expected status: 404 != 200</msg>
+<msg time="2025-11-16T19:06:16.041921" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/refresh Expected status: 404 != 200</msg>
+<var>${response}</var>
+<arg>${AUTH_REFRESH_ENDPOINT}</arg>
+<arg>json=${refresh_data}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.032014" elapsed="0.010437">Url: http://172.21.160.1:3007/auth/refresh Expected status: 404 != 200</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.042979" elapsed="0.000000"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<arg>${response.json()['token']}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.043507" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Token refreshed successfully</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.044035" elapsed="0.000000"/>
+</kw>
+<doc>Test JWT token refresh mechanism</doc>
+<tag>authentication</tag>
+<tag>security</tag>
+<tag>token</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.028214" elapsed="0.016370">Url: http://172.21.160.1:3007/auth/refresh Expected status: 404 != 200</status>
+</test>
+<test id="s1-t9" name="TC009_Invalid_Credentials_Handling" line="262">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.046178" level="TRACE">Arguments: [ 'email=invalid@email.com' | 'password=wrongpassword' ]</msg>
+<msg time="2025-11-16T19:06:16.046178" level="TRACE">Return: {'email': 'invalid@email.com', 'password': 'wrongpassword'}</msg>
+<msg time="2025-11-16T19:06:16.046178" level="INFO">${login_data} = {'email': 'invalid@email.com', 'password': 'wrongpassword'}</msg>
+<var>${login_data}</var>
+<arg>email=invalid@email.com</arg>
+<arg>password=wrongpassword</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.046178" elapsed="0.000000"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.046711" level="TRACE">Arguments: [ 'Content-Type=application/json' | 'X-Request-ID=robot_test_008' ]</msg>
+<msg time="2025-11-16T19:06:16.046711" level="TRACE">Return: {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_008'}</msg>
+<msg time="2025-11-16T19:06:16.046711" level="INFO">${headers} = {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_008'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=robot_test_008</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.046711" elapsed="0.000000"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.047244" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/login' | json={'email': 'invalid@email.com', 'password': 'wrongpassword'} | headers={'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_008'} | expected_status='401' ]</msg>
+<msg time="2025-11-16T19:06:16.048825" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.054812" level="DEBUG">http://172.21.160.1:3007 "POST /auth/login HTTP/1.1" 404 169</msg>
+<msg time="2025-11-16T19:06:16.055334" level="INFO">POST Request : url=http://172.21.160.1:3007/auth/login 
+ path_url=/auth/login 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_008', 'Content-Length': '59'} 
+ body=b'{"email": "invalid@email.com", "password": "wrongpassword"}' 
+ </msg>
+<msg time="2025-11-16T19:06:16.055888" level="INFO">POST Response : url=http://172.21.160.1:3007/auth/login 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_008', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '1ms', 'Content-Length': '169', 'ETag': 'W/"a9-z1/6GZfCftunCyeUwSmVlWOTNtc"', 'Date': 'Sun, 16 Nov 2025 16:07:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /auth/login","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_008","timestamp":"2025-11-16T16:07:36.027Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.055888" level="FAIL">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 401</msg>
+<msg time="2025-11-16T19:06:16.057473" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 401</msg>
+<var>${response}</var>
+<arg>${AUTH_LOGIN_ENDPOINT}</arg>
+<arg>json=${login_data}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=401</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.047244" elapsed="0.010229">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 401</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']} == False</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.057998" elapsed="0.000000"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${response.json()['message']}</arg>
+<arg>Invalid credentials</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.058584" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Invalid credentials properly rejected</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.059114" elapsed="0.000000"/>
+</kw>
+<doc>Test authentication with invalid credentials</doc>
+<tag>authentication</tag>
+<tag>error-handling</tag>
+<tag>security</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.045126" elapsed="0.014533">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 401</status>
+</test>
+<test id="s1-t10" name="TC010_Missing_Credentials_Handling" line="284">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.061289" level="TRACE">Arguments: [ 'email=${EMPTY}' | 'password=${EMPTY}' ]</msg>
+<msg time="2025-11-16T19:06:16.061289" level="TRACE">Return: {'email': '', 'password': ''}</msg>
+<msg time="2025-11-16T19:06:16.062821" level="INFO">${login_data} = {'email': '', 'password': ''}</msg>
+<var>${login_data}</var>
+<arg>email=${EMPTY}</arg>
+<arg>password=${EMPTY}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.061289" elapsed="0.001532"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.062821" level="TRACE">Arguments: [ 'Content-Type=application/json' | 'X-Request-ID=robot_test_009' ]</msg>
+<msg time="2025-11-16T19:06:16.062821" level="TRACE">Return: {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_009'}</msg>
+<msg time="2025-11-16T19:06:16.062821" level="INFO">${headers} = {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_009'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=robot_test_009</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.062821" elapsed="0.000000"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.064887" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/login' | json={'email': '', 'password': ''} | headers={'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_009'} | expected_status='400' ]</msg>
+<msg time="2025-11-16T19:06:16.066404" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.073566" level="DEBUG">http://172.21.160.1:3007 "POST /auth/login HTTP/1.1" 404 169</msg>
+<msg time="2025-11-16T19:06:16.074085" level="INFO">POST Request : url=http://172.21.160.1:3007/auth/login 
+ path_url=/auth/login 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_009', 'Content-Length': '29'} 
+ body=b'{"email": "", "password": ""}' 
+ </msg>
+<msg time="2025-11-16T19:06:16.074085" level="INFO">POST Response : url=http://172.21.160.1:3007/auth/login 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_009', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '1ms', 'Content-Length': '169', 'ETag': 'W/"a9-xAxgK6gHr7d7fQ8W3O2SP0kz4sw"', 'Date': 'Sun, 16 Nov 2025 16:07:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /auth/login","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_009","timestamp":"2025-11-16T16:07:36.045Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.074085" level="FAIL">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 400</msg>
+<msg time="2025-11-16T19:06:16.074636" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 400</msg>
+<var>${response}</var>
+<arg>${AUTH_LOGIN_ENDPOINT}</arg>
+<arg>json=${login_data}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=400</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.064357" elapsed="0.010816">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 400</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']} == False</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.075173" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Missing credentials properly validated</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.075711" elapsed="0.000000"/>
+</kw>
+<doc>Test authentication with missing credentials</doc>
+<tag>authentication</tag>
+<tag>error-handling</tag>
+<tag>validation</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.060734" elapsed="0.015507">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 400</status>
+</test>
+<test id="s1-t11" name="TC011_Unauthorized_Access_Handling" line="305">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.077838" level="TRACE">Arguments: [ 'X-Request-ID=robot_test_010' ]</msg>
+<msg time="2025-11-16T19:06:16.078366" level="TRACE">Return: {'X-Request-ID': 'robot_test_010'}</msg>
+<msg time="2025-11-16T19:06:16.078366" level="INFO">${headers} = {'X-Request-ID': 'robot_test_010'}</msg>
+<var>${headers}</var>
+<arg>X-Request-ID=robot_test_010</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.077838" elapsed="0.000528"/>
+</kw>
+<kw name="GET" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.078911" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/me' | headers={'X-Request-ID': 'robot_test_010'} | expected_status='401' ]</msg>
+<msg time="2025-11-16T19:06:16.080487" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.087479" level="DEBUG">http://172.21.160.1:3007 "GET /auth/me HTTP/1.1" 404 165</msg>
+<msg time="2025-11-16T19:06:16.088009" level="INFO">GET Request : url=http://172.21.160.1:3007/auth/me 
+ path_url=/auth/me 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'X-Request-ID': 'robot_test_010'} 
+ body=None 
+ </msg>
+<msg time="2025-11-16T19:06:16.088009" level="INFO">GET Response : url=http://172.21.160.1:3007/auth/me 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_010', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '0ms', 'Content-Length': '165', 'ETag': 'W/"a5-nH39IqE4+5D1A56Fv0rycW9sRhY"', 'Date': 'Sun, 16 Nov 2025 16:07:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot GET /auth/me","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_010","timestamp":"2025-11-16T16:07:36.058Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.088571" level="FAIL">Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 401</msg>
+<msg time="2025-11-16T19:06:16.089636" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 193, in session_less_get
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 401</msg>
+<var>${response}</var>
+<arg>${AUTH_PROFILE_ENDPOINT}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=401</arg>
+<doc>Sends a GET request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.078911" elapsed="0.010725">Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 401</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']} == False</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.090721" elapsed="0.000000"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${response.json()['message']}</arg>
+<arg>Unauthorized</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.090721" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Unauthorized access properly blocked</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.091261" elapsed="0.000000"/>
+</kw>
+<doc>Test accessing protected endpoints without authentication</doc>
+<tag>authentication</tag>
+<tag>authorization</tag>
+<tag>security</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.077299" elapsed="0.013962">Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 401</status>
+</test>
+<test id="s1-t12" name="TC012_Super_Admin_Access_Control" line="321">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.093409" level="TRACE">Arguments: [ 'Authorization=${BEARER_TOKEN}' | 'X-Request-ID=robot_test_011' | 'X-Tenant-ID=${TEST_TENANT_ID}' ]</msg>
+<msg time="2025-11-16T19:06:16.093409" level="TRACE">Return: {'Authorization': '',
+ 'X-Request-ID': 'robot_test_011',
+ 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'}</msg>
+<msg time="2025-11-16T19:06:16.093933" level="INFO">${headers} = {'Authorization': '', 'X-Request-ID': 'robot_test_011', 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'}</msg>
+<var>${headers}</var>
+<arg>Authorization=${BEARER_TOKEN}</arg>
+<arg>X-Request-ID=robot_test_011</arg>
+<arg>X-Tenant-ID=${TEST_TENANT_ID}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.092891" elapsed="0.001042"/>
+</kw>
+<kw name="GET" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.095023" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/admin/users' | headers={'Authorization': '',
+ 'X-Request-ID': 'robot_test_011',
+ 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'} | expected_status='200' ]</msg>
+<msg time="2025-11-16T19:06:16.096608" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.102615" level="DEBUG">http://172.21.160.1:3007 "GET /admin/users HTTP/1.1" 404 169</msg>
+<msg time="2025-11-16T19:06:16.103144" level="INFO">GET Request : url=http://172.21.160.1:3007/admin/users 
+ path_url=/admin/users 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': '', 'X-Request-ID': 'robot_test_011', 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'} 
+ body=None 
+ </msg>
+<msg time="2025-11-16T19:06:16.103670" level="INFO">GET Response : url=http://172.21.160.1:3007/admin/users 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_011', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '0ms', 'Content-Length': '169', 'ETag': 'W/"a9-cSWCuWKRrltnU7HJWPoQDx3GuLE"', 'Date': 'Sun, 16 Nov 2025 16:07:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot GET /admin/users","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_011","timestamp":"2025-11-16T16:07:36.074Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.104225" level="FAIL">Url: http://172.21.160.1:3007/admin/users Expected status: 404 != 200</msg>
+<msg time="2025-11-16T19:06:16.104752" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 193, in session_less_get
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/admin/users Expected status: 404 != 200</msg>
+<var>${response}</var>
+<arg>${SUPER_ADMIN_ENDPOINT}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.094495" elapsed="0.010257">Url: http://172.21.160.1:3007/admin/users Expected status: 404 != 200</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.105299" elapsed="0.000000"/>
+</kw>
+<kw name="Should Not Be Empty" owner="BuiltIn">
+<arg>${response.json()['users']}</arg>
+<doc>Verifies that the given item is not empty.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.105299" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Super admin access granted</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.105833" elapsed="0.000000"/>
+</kw>
+<doc>Test super admin access with proper authorization</doc>
+<tag>admin</tag>
+<tag>authentication</tag>
+<tag>authorization</tag>
+<tag>rbac</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.092368" elapsed="0.013465">Url: http://172.21.160.1:3007/admin/users Expected status: 404 != 200</status>
+</test>
+<test id="s1-t13" name="TC013_Multi_Tenant_Isolation" line="339">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.106871" level="TRACE">Arguments: [ 'Authorization=${BEARER_TOKEN}' | 'X-Request-ID=robot_test_012' | 'X-Tenant-ID=${TEST_TENANT_ID}' ]</msg>
+<msg time="2025-11-16T19:06:16.107385" level="TRACE">Return: {'Authorization': '',
+ 'X-Request-ID': 'robot_test_012',
+ 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'}</msg>
+<msg time="2025-11-16T19:06:16.107385" level="INFO">${headers} = {'Authorization': '', 'X-Request-ID': 'robot_test_012', 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'}</msg>
+<var>${headers}</var>
+<arg>Authorization=${BEARER_TOKEN}</arg>
+<arg>X-Request-ID=robot_test_012</arg>
+<arg>X-Tenant-ID=${TEST_TENANT_ID}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.106871" elapsed="0.000514"/>
+</kw>
+<kw name="GET" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.107385" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/me' | headers={'Authorization': '',
+ 'X-Request-ID': 'robot_test_012',
+ 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'} | expected_status='200' ]</msg>
+<msg time="2025-11-16T19:06:16.109505" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.114930" level="DEBUG">http://172.21.160.1:3007 "GET /auth/me HTTP/1.1" 404 165</msg>
+<msg time="2025-11-16T19:06:16.115476" level="INFO">GET Request : url=http://172.21.160.1:3007/auth/me 
+ path_url=/auth/me 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': '', 'X-Request-ID': 'robot_test_012', 'X-Tenant-ID': '75688778-0cf1-4a5c-9536-9acd2e5c9a0e'} 
+ body=None 
+ </msg>
+<msg time="2025-11-16T19:06:16.115998" level="INFO">GET Response : url=http://172.21.160.1:3007/auth/me 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_012', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '0ms', 'Content-Length': '165', 'ETag': 'W/"a5-xVd/OQwvHw/G7cynqXQReBILqjU"', 'Date': 'Sun, 16 Nov 2025 16:07:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot GET /auth/me","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_012","timestamp":"2025-11-16T16:07:36.087Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.115998" level="FAIL">Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 200</msg>
+<msg time="2025-11-16T19:06:16.117091" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 193, in session_less_get
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 200</msg>
+<var>${response}</var>
+<arg>${AUTH_PROFILE_ENDPOINT}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.107385" elapsed="0.009706">Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 200</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.117609" elapsed="0.000000"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${response.json()['user']['tenantId']}</arg>
+<arg>${TEST_TENANT_ID}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.118128" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Multi-tenant isolation working correctly</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.118673" elapsed="0.000000"/>
+</kw>
+<doc>Test multi-tenant data isolation</doc>
+<tag>authentication</tag>
+<tag>isolation</tag>
+<tag>multi-tenant</tag>
+<tag>security</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.106350" elapsed="0.012840">Url: http://172.21.160.1:3007/auth/me Expected status: 404 != 200</status>
+</test>
+<test id="s1-t14" name="TC014_Request_ID_Tracking" line="357">
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.121356" level="TRACE">Arguments: [ 'robot_test_tracking_001' ]</msg>
+<msg time="2025-11-16T19:06:16.121356" level="TRACE">Return: 'robot_test_tracking_001'</msg>
+<msg time="2025-11-16T19:06:16.121356" level="INFO">${test_request_id} = robot_test_tracking_001</msg>
+<var>${test_request_id}</var>
+<arg>robot_test_tracking_001</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.121356" elapsed="0.000000"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.121879" level="TRACE">Arguments: [ 'Content-Type=application/json' | 'X-Request-ID=${test_request_id}' ]</msg>
+<msg time="2025-11-16T19:06:16.122407" level="TRACE">Return: {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_tracking_001'}</msg>
+<msg time="2025-11-16T19:06:16.122407" level="INFO">${headers} = {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_tracking_001'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=${test_request_id}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.121879" elapsed="0.000528"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.122407" level="TRACE">Arguments: [ 'email=${TEST_USER_EMAIL}' | 'password=${TEST_USER_PASSWORD}' ]</msg>
+<msg time="2025-11-16T19:06:16.122943" level="TRACE">Return: {'email': 'ahmet@doganconsult.com', 'password': 'PartnerPass123!'}</msg>
+<msg time="2025-11-16T19:06:16.122943" level="INFO">${login_data} = {'email': 'ahmet@doganconsult.com', 'password': 'PartnerPass123!'}</msg>
+<var>${login_data}</var>
+<arg>email=${TEST_USER_EMAIL}</arg>
+<arg>password=${TEST_USER_PASSWORD}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.122407" elapsed="0.000536"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.122943" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/login' | json={'email': 'ahmet@doganconsult.com', 'password': 'PartnerPass123!'} | headers={'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_tracking_001'} | expected_status='200' ]</msg>
+<msg time="2025-11-16T19:06:16.124497" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.129349" level="DEBUG">http://172.21.160.1:3007 "POST /auth/login HTTP/1.1" 404 178</msg>
+<msg time="2025-11-16T19:06:16.130166" level="INFO">POST Request : url=http://172.21.160.1:3007/auth/login 
+ path_url=/auth/login 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_tracking_001', 'Content-Length': '66'} 
+ body=b'{"email": "ahmet@doganconsult.com", "password": "PartnerPass123!"}' 
+ </msg>
+<msg time="2025-11-16T19:06:16.130166" level="INFO">POST Response : url=http://172.21.160.1:3007/auth/login 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_tracking_001', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '1ms', 'Content-Length': '178', 'ETag': 'W/"b2-UXw6vxHbTh6V8YFf6TDG3z8GIDQ"', 'Date': 'Sun, 16 Nov 2025 16:07:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /auth/login","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_tracking_001","timestamp":"2025-11-16T16:07:36.102Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.130166" level="FAIL">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</msg>
+<msg time="2025-11-16T19:06:16.131918" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</msg>
+<var>${response}</var>
+<arg>${AUTH_LOGIN_ENDPOINT}</arg>
+<arg>json=${login_data}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.122943" elapsed="0.008975">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.132494" elapsed="0.000000"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${response.headers['x-request-id']}</arg>
+<arg>${test_request_id}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.133603" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Request ID tracking working correctly</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.134126" elapsed="0.000000"/>
+</kw>
+<doc>Test request ID tracking for authentication requests</doc>
+<tag>authentication</tag>
+<tag>monitoring</tag>
+<tag>tracking</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.120262" elapsed="0.014394">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</status>
+</test>
+<test id="s1-t15" name="TC015_Rate_Limiting_Protection" line="381">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.136233" level="TRACE">Arguments: [ 'email=rate.limit@test.com' | 'password=wrongpassword' ]</msg>
+<msg time="2025-11-16T19:06:16.136751" level="TRACE">Return: {'email': 'rate.limit@test.com', 'password': 'wrongpassword'}</msg>
+<msg time="2025-11-16T19:06:16.136751" level="INFO">${login_data} = {'email': 'rate.limit@test.com', 'password': 'wrongpassword'}</msg>
+<var>${login_data}</var>
+<arg>email=rate.limit@test.com</arg>
+<arg>password=wrongpassword</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.136233" elapsed="0.000518"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.137297" level="TRACE">Arguments: [ 'Content-Type=application/json' | 'X-Request-ID=robot_test_rate_001' ]</msg>
+<msg time="2025-11-16T19:06:16.137820" level="TRACE">Return: {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_rate_001'}</msg>
+<msg time="2025-11-16T19:06:16.137820" level="INFO">${headers} = {'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_rate_001'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=robot_test_rate_001</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.137297" elapsed="0.000523"/>
+</kw>
+<for flavor="IN RANGE">
+<iter>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.138924" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/login' | json={'email': 'rate.limit@test.com', 'password': 'wrongpassword'} | headers={'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_rate_001'} ]</msg>
+<msg time="2025-11-16T19:06:16.140567" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.146644" level="DEBUG">http://172.21.160.1:3007 "POST /auth/login HTTP/1.1" 404 174</msg>
+<msg time="2025-11-16T19:06:16.147184" level="INFO">POST Request : url=http://172.21.160.1:3007/auth/login 
+ path_url=/auth/login 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_rate_001', 'Content-Length': '61'} 
+ body=b'{"email": "rate.limit@test.com", "password": "wrongpassword"}' 
+ </msg>
+<msg time="2025-11-16T19:06:16.147184" level="INFO">POST Response : url=http://172.21.160.1:3007/auth/login 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_rate_001', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '0ms', 'Content-Length': '174', 'ETag': 'W/"ae-EGp+ooAofIG26EccngxHLA9xhD4"', 'Date': 'Sun, 16 Nov 2025 16:07:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /auth/login","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_rate_001","timestamp":"2025-11-16T16:07:36.118Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.147184" level="FAIL">HTTPError: 404 Client Error: Not Found for url: http://172.21.160.1:3007/auth/login</msg>
+<msg time="2025-11-16T19:06:16.148777" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 570, in _check_status
+    resp.raise_for_status()
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\requests\models.py", line 1021, in raise_for_status
+    raise HTTPError(http_error_msg, response=self)
+requests.exceptions.HTTPError: 404 Client Error: Not Found for url: http://172.21.160.1:3007/auth/login</msg>
+<var>${response}</var>
+<arg>${AUTH_LOGIN_ENDPOINT}</arg>
+<arg>json=${login_data}</arg>
+<arg>headers=${headers}</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.138924" elapsed="0.009853">HTTPError: 404 Client Error: Not Found for url: http://172.21.160.1:3007/auth/login</status>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Attempt ${i}: Status ${response.status_code}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.149321" elapsed="0.000000"/>
+</kw>
+<kw name="Sleep" owner="BuiltIn">
+<arg>1 second</arg>
+<doc>Pauses the test executed for the given time.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.149321" elapsed="0.000519"/>
+</kw>
+<var name="${i}">1</var>
+<status status="FAIL" start="2025-11-16T19:06:16.138373" elapsed="0.011467">HTTPError: 404 Client Error: Not Found for url: http://172.21.160.1:3007/auth/login</status>
+</iter>
+<var>${i}</var>
+<value>1</value>
+<value>6</value>
+<status status="FAIL" start="2025-11-16T19:06:16.138373" elapsed="0.011467">HTTPError: 404 Client Error: Not Found for url: http://172.21.160.1:3007/auth/login</status>
+</for>
+<kw name="Log" owner="BuiltIn">
+<arg>Rate limiting test completed</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.150396" elapsed="0.000000"/>
+</kw>
+<doc>Test rate limiting for authentication endpoints</doc>
+<tag>authentication</tag>
+<tag>rate-limiting</tag>
+<tag>security</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.135179" elapsed="0.015217">HTTPError: 404 Client Error: Not Found for url: http://172.21.160.1:3007/auth/login</status>
+</test>
+<test id="s1-t16" name="TC016_CORS_Policy_Validation" line="405">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.152038" level="TRACE">Arguments: [ 'Content-Type=application/json' | 'Origin=http://172.21.160.1:5174' | 'X-Request-ID=robot_test_cors_001' ]</msg>
+<msg time="2025-11-16T19:06:16.152038" level="TRACE">Return: {'Content-Type': 'application/json',
+ 'Origin': 'http://172.21.160.1:5174',
+ 'X-Request-ID': 'robot_test_cors_001'}</msg>
+<msg time="2025-11-16T19:06:16.152038" level="INFO">${headers} = {'Content-Type': 'application/json', 'Origin': 'http://172.21.160.1:5174', 'X-Request-ID': 'robot_test_cors_001'}</msg>
+<var>${headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>Origin=http://172.21.160.1:5174</arg>
+<arg>X-Request-ID=robot_test_cors_001</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.152038" elapsed="0.000533"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.152571" level="TRACE">Arguments: [ 'email=${TEST_USER_EMAIL}' | 'password=${TEST_USER_PASSWORD}' ]</msg>
+<msg time="2025-11-16T19:06:16.152571" level="TRACE">Return: {'email': 'ahmet@doganconsult.com', 'password': 'PartnerPass123!'}</msg>
+<msg time="2025-11-16T19:06:16.152571" level="INFO">${login_data} = {'email': 'ahmet@doganconsult.com', 'password': 'PartnerPass123!'}</msg>
+<var>${login_data}</var>
+<arg>email=${TEST_USER_EMAIL}</arg>
+<arg>password=${TEST_USER_PASSWORD}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.152571" elapsed="0.000000"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.153101" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/login' | json={'email': 'ahmet@doganconsult.com', 'password': 'PartnerPass123!'} | headers={'Content-Type': 'application/json',
+ 'Origin': 'http://172.21.160.1:5174',
+ 'X-Request-ID': 'robot_test_cors_001'} | expected_status='200' ]</msg>
+<msg time="2025-11-16T19:06:16.154153" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.159474" level="DEBUG">http://172.21.160.1:3007 "POST /auth/login HTTP/1.1" 404 174</msg>
+<msg time="2025-11-16T19:06:16.160696" level="INFO">POST Request : url=http://172.21.160.1:3007/auth/login 
+ path_url=/auth/login 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'Origin': 'http://172.21.160.1:5174', 'X-Request-ID': 'robot_test_cors_001', 'Content-Length': '66'} 
+ body=b'{"email": "ahmet@doganconsult.com", "password": "PartnerPass123!"}' 
+ </msg>
+<msg time="2025-11-16T19:06:16.160696" level="INFO">POST Response : url=http://172.21.160.1:3007/auth/login 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_cors_001', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '1ms', 'Content-Length': '174', 'ETag': 'W/"ae-mDnk/6f9oJw/pGGJKASMGKCUh+0"', 'Date': 'Sun, 16 Nov 2025 16:07:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /auth/login","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_cors_001","timestamp":"2025-11-16T16:07:36.132Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.161248" level="FAIL">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</msg>
+<msg time="2025-11-16T19:06:16.161805" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</msg>
+<var>${response}</var>
+<arg>${AUTH_LOGIN_ENDPOINT}</arg>
+<arg>json=${login_data}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.153101" elapsed="0.008704">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.161805" elapsed="0.000000"/>
+</kw>
+<kw name="Should Contain" owner="BuiltIn">
+<arg>${response.headers['access-control-allow-origin']}</arg>
+<arg>172.21.160.1:5174</arg>
+<doc>Fails if ``container`` does not contain ``item`` one or more times.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.162352" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>CORS policy validated successfully</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.162352" elapsed="0.000000"/>
+</kw>
+<doc>Test CORS policy for authentication endpoints</doc>
+<tag>authentication</tag>
+<tag>cors</tag>
+<tag>security</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.151515" elapsed="0.011936">Url: http://172.21.160.1:3007/auth/login Expected status: 404 != 200</status>
+</test>
+<test id="s1-t17" name="TC017_Logout_Flow" line="428">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.165553" level="TRACE">Arguments: [ 'Authorization=${BEARER_TOKEN}' | 'Content-Type=application/json' | 'X-Request-ID=robot_test_013' ]</msg>
+<msg time="2025-11-16T19:06:16.165553" level="TRACE">Return: {'Authorization': '',
+ 'Content-Type': 'application/json',
+ 'X-Request-ID': 'robot_test_013'}</msg>
+<msg time="2025-11-16T19:06:16.165553" level="INFO">${headers} = {'Authorization': '', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_013'}</msg>
+<var>${headers}</var>
+<arg>Authorization=${BEARER_TOKEN}</arg>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=robot_test_013</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.165042" elapsed="0.000511"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.165553" level="TRACE">Arguments: [ 'refreshToken=${REFRESH_TOKEN}' ]</msg>
+<msg time="2025-11-16T19:06:16.166071" level="TRACE">Return: {'refreshToken': ''}</msg>
+<msg time="2025-11-16T19:06:16.166071" level="INFO">${logout_data} = {'refreshToken': ''}</msg>
+<var>${logout_data}</var>
+<arg>refreshToken=${REFRESH_TOKEN}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.165553" elapsed="0.000518"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.166071" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/logout' | json={'refreshToken': ''} | headers={'Authorization': '',
+ 'Content-Type': 'application/json',
+ 'X-Request-ID': 'robot_test_013'} | expected_status='200' ]</msg>
+<msg time="2025-11-16T19:06:16.166634" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.174204" level="DEBUG">http://172.21.160.1:3007 "POST /auth/logout HTTP/1.1" 404 170</msg>
+<msg time="2025-11-16T19:06:16.174737" level="INFO">POST Request : url=http://172.21.160.1:3007/auth/logout 
+ path_url=/auth/logout 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Authorization': '', 'Content-Type': 'application/json', 'X-Request-ID': 'robot_test_013', 'Content-Length': '20'} 
+ body=b'{"refreshToken": ""}' 
+ </msg>
+<msg time="2025-11-16T19:06:16.174737" level="INFO">POST Response : url=http://172.21.160.1:3007/auth/logout 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'robot_test_013', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '1ms', 'Content-Length': '170', 'ETag': 'W/"aa-E0E6uD39R11F832Wgx89Q6sCHiU"', 'Date': 'Sun, 16 Nov 2025 16:07:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /auth/logout","code":"ENDPOINT_NOT_FOUND","requestId":"robot_test_013","timestamp":"2025-11-16T16:07:36.145Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.175337" level="FAIL">Url: http://172.21.160.1:3007/auth/logout Expected status: 404 != 200</msg>
+<msg time="2025-11-16T19:06:16.176924" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/logout Expected status: 404 != 200</msg>
+<var>${response}</var>
+<arg>${AUTH_LOGOUT_ENDPOINT}</arg>
+<arg>json=${logout_data}</arg>
+<arg>headers=${headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.166071" elapsed="0.010853">Url: http://172.21.160.1:3007/auth/logout Expected status: 404 != 200</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.177987" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>User logged out successfully</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.177987" elapsed="0.000546"/>
+</kw>
+<doc>Test user logout process</doc>
+<tag>authentication</tag>
+<tag>logout</tag>
+<tag>security</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.164511" elapsed="0.014022">Url: http://172.21.160.1:3007/auth/logout Expected status: 404 != 200</status>
+</test>
+<test id="s1-t18" name="TC018_Complete_Authentication_Journey" line="449">
+<kw name="Get Current Date" owner="DateTime">
+<msg time="2025-11-16T19:06:16.180687" level="TRACE">Arguments: [ result_format='%Y%m%d%H%M%S' ]</msg>
+<msg time="2025-11-16T19:06:16.180687" level="TRACE">Return: '20251116190616'</msg>
+<msg time="2025-11-16T19:06:16.181223" level="INFO">${timestamp} = 20251116190616</msg>
+<var>${timestamp}</var>
+<arg>result_format=%Y%m%d%H%M%S</arg>
+<doc>Returns current local or UTC time with an optional increment.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.180128" elapsed="0.001095"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.181737" level="TRACE">Arguments: [ 'journey.20251116190616@test.com' ]</msg>
+<msg time="2025-11-16T19:06:16.181737" level="TRACE">Return: 'journey.20251116190616@test.com'</msg>
+<msg time="2025-11-16T19:06:16.181737" level="INFO">${journey_email} = journey.20251116190616@test.com</msg>
+<var>${journey_email}</var>
+<arg>journey.${timestamp}@test.com</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.181223" elapsed="0.000514"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.182799" level="TRACE">Arguments: [ 'email=${journey_email}' | 'password=Journey@1234' | 'name=Journey Test User' | 'organization=Journey Test Org' ]</msg>
+<msg time="2025-11-16T19:06:16.183341" level="TRACE">Return: {'email': 'journey.20251116190616@test.com',
+ 'password': 'Journey@1234',
+ 'name': 'Journey Test User',
+ 'organization': 'Journey Test Org'}</msg>
+<msg time="2025-11-16T19:06:16.183341" level="INFO">${reg_data} = {'email': 'journey.20251116190616@test.com', 'password': 'Journey@1234', 'name': 'Journey Test User', 'organization': 'Journey Test Org'}</msg>
+<var>${reg_data}</var>
+<arg>email=${journey_email}</arg>
+<arg>password=Journey@1234</arg>
+<arg>name=Journey Test User</arg>
+<arg>organization=Journey Test Org</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.182799" elapsed="0.001061"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.183860" level="TRACE">Arguments: [ 'Content-Type=application/json' | 'X-Request-ID=journey_test_001' ]</msg>
+<msg time="2025-11-16T19:06:16.184406" level="TRACE">Return: {'Content-Type': 'application/json', 'X-Request-ID': 'journey_test_001'}</msg>
+<msg time="2025-11-16T19:06:16.184406" level="INFO">${reg_headers} = {'Content-Type': 'application/json', 'X-Request-ID': 'journey_test_001'}</msg>
+<var>${reg_headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=journey_test_001</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.183860" elapsed="0.000546"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<msg time="2025-11-16T19:06:16.184922" level="TRACE">Arguments: [ 'http://172.21.160.1:3007/auth/register' | json={'email': 'journey.20251116190616@test.com',
+ 'password': 'Journey@1234',
+ 'name': 'Journey Test User',
+ 'organization': 'Journey Test Org'} | headers={'Content-Type': 'application/json', 'X-Request-ID': 'journey_test_001'} | expected_status='201' ]</msg>
+<msg time="2025-11-16T19:06:16.185970" level="DEBUG">Starting new HTTP connection (1): 172.21.160.1:3007</msg>
+<msg time="2025-11-16T19:06:16.191217" level="DEBUG">http://172.21.160.1:3007 "POST /auth/register HTTP/1.1" 404 174</msg>
+<msg time="2025-11-16T19:06:16.191753" level="INFO">POST Request : url=http://172.21.160.1:3007/auth/register 
+ path_url=/auth/register 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Type': 'application/json', 'X-Request-ID': 'journey_test_001', 'Content-Length': '137'} 
+ body=b'{"email": "journey.20251116190616@test.com", "password": "Journey@1234", "name": "Journey Test User", "organization": "Journey Test Org"}' 
+ </msg>
+<msg time="2025-11-16T19:06:16.191753" level="INFO">POST Response : url=http://172.21.160.1:3007/auth/register 
+ status=404, reason=Not Found 
+ headers={'X-Request-ID': 'journey_test_001', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'X-Response-Time': '0ms', 'Content-Length': '174', 'ETag': 'W/"ae-k0uBaABf0bkd6E8PdVu/4+4fin4"', 'Date': 'Sun, 16 Nov 2025 16:07:36 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"success":false,"error":"Not Found","message":"Cannot POST /auth/register","code":"ENDPOINT_NOT_FOUND","requestId":"journey_test_001","timestamp":"2025-11-16T16:07:36.163Z"} 
+ </msg>
+<msg time="2025-11-16T19:06:16.192300" level="FAIL">Url: http://172.21.160.1:3007/auth/register Expected status: 404 != 201</msg>
+<msg time="2025-11-16T19:06:16.192300" level="DEBUG">Traceback (most recent call last):
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\utils.py", line 141, in decorator
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\RequestsKeywords.py", line 220, in session_less_post
+    self._check_status(expected_status, response, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\RequestsLibrary\SessionKeywords.py", line 582, in _check_status
+    assert_equal(resp.status_code, expected_status, msg)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 180, in assert_equal
+    _report_inequality(first, second, "!=", msg, values, formatter)
+  File "C:\Users\DoganConsult\AppData\Local\Programs\Python\Python311\Lib\site-packages\robot\utils\asserts.py", line 237, in _report_inequality
+    raise AssertionError(msg)
+AssertionError: Url: http://172.21.160.1:3007/auth/register Expected status: 404 != 201</msg>
+<var>${reg_response}</var>
+<arg>${AUTH_REGISTER_ENDPOINT}</arg>
+<arg>json=${reg_data}</arg>
+<arg>headers=${reg_headers}</arg>
+<arg>expected_status=201</arg>
+<doc>Sends a POST request.</doc>
+<status status="FAIL" start="2025-11-16T19:06:16.184406" elapsed="0.007894">Url: http://172.21.160.1:3007/auth/register Expected status: 404 != 201</status>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${reg_response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.193454" elapsed="0.000000"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<var>${login_data}</var>
+<arg>email=${journey_email}</arg>
+<arg>password=Journey@1234</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.194014" elapsed="0.000000"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<var>${login_headers}</var>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=journey_test_002</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.194582" elapsed="0.000000"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<var>${login_response}</var>
+<arg>${AUTH_LOGIN_ENDPOINT}</arg>
+<arg>json=${login_data}</arg>
+<arg>headers=${login_headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.194582" elapsed="0.000000"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${login_response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.195119" elapsed="0.000000"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<var>${journey_token}</var>
+<arg>${login_response.json()['token']}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.195119" elapsed="0.000000"/>
+</kw>
+<kw name="Set Variable" owner="BuiltIn">
+<var>${journey_bearer}</var>
+<arg>Bearer ${journey_token}</arg>
+<doc>Returns the given values which can then be assigned to a variables.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.195119" elapsed="0.000000"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<var>${profile_headers}</var>
+<arg>Authorization=${journey_bearer}</arg>
+<arg>X-Request-ID=journey_test_003</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.195119" elapsed="0.000000"/>
+</kw>
+<kw name="GET" owner="RequestsLibrary">
+<var>${profile_response}</var>
+<arg>${AUTH_PROFILE_ENDPOINT}</arg>
+<arg>headers=${profile_headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a GET request.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.195650" elapsed="0.000000"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${profile_response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.195650" elapsed="0.000000"/>
+</kw>
+<kw name="Should Be Equal" owner="BuiltIn">
+<arg>${profile_response.json()['user']['email']}</arg>
+<arg>${journey_email}</arg>
+<doc>Fails if the given objects are unequal.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.195650" elapsed="0.000517"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<var>${refresh_headers}</var>
+<arg>Authorization=${journey_bearer}</arg>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=journey_test_004</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.196167" elapsed="0.000000"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<var>${refresh_data}</var>
+<arg>refreshToken=${journey_token}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.196696" elapsed="0.000000"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<var>${refresh_response}</var>
+<arg>${AUTH_REFRESH_ENDPOINT}</arg>
+<arg>json=${refresh_data}</arg>
+<arg>headers=${refresh_headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.196696" elapsed="0.000000"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${refresh_response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.196696" elapsed="0.000000"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<var>${logout_headers}</var>
+<arg>Authorization=${journey_bearer}</arg>
+<arg>Content-Type=application/json</arg>
+<arg>X-Request-ID=journey_test_005</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.197227" elapsed="0.000000"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<var>${logout_data}</var>
+<arg>refreshToken=${journey_token}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.197227" elapsed="0.000000"/>
+</kw>
+<kw name="POST" owner="RequestsLibrary">
+<var>${logout_response}</var>
+<arg>${AUTH_LOGOUT_ENDPOINT}</arg>
+<arg>json=${logout_data}</arg>
+<arg>headers=${logout_headers}</arg>
+<arg>expected_status=200</arg>
+<doc>Sends a POST request.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.197227" elapsed="0.000525"/>
+</kw>
+<kw name="Should Be True" owner="BuiltIn">
+<arg>${logout_response.json()['success']}</arg>
+<doc>Fails if the given condition is not true.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.197752" elapsed="0.000000"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<arg>Complete authentication journey successful for: ${journey_email}</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="NOT RUN" start="2025-11-16T19:06:16.197752" elapsed="0.000000"/>
+</kw>
+<doc>Test complete authentication journey from registration to logout</doc>
+<tag>authentication</tag>
+<tag>critical</tag>
+<tag>end-to-end</tag>
+<tag>journey</tag>
+<status status="FAIL" start="2025-11-16T19:06:16.179598" elapsed="0.018673">Url: http://172.21.160.1:3007/auth/register Expected status: 404 != 201</status>
+</test>
+<kw name="Cleanup Authentication Test Environment" type="TEARDOWN">
+<msg time="2025-11-16T19:06:16.201119" level="TRACE">Arguments: [  ]</msg>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.201119" level="TRACE">Arguments: [ 'Cleaning up authentication test environment...' ]</msg>
+<msg time="2025-11-16T19:06:16.201667" level="INFO">Cleaning up authentication test environment...</msg>
+<msg time="2025-11-16T19:06:16.201667" level="TRACE">Return: None</msg>
+<arg>Cleaning up authentication test environment...</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.201119" elapsed="0.000548"/>
+</kw>
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.201667" level="TRACE">Arguments: [ 'Authorization=${BEARER_TOKEN}' | 'X-Request-ID=cleanup_001' ]</msg>
+<msg time="2025-11-16T19:06:16.202183" level="TRACE">Return: {'Authorization': '', 'X-Request-ID': 'cleanup_001'}</msg>
+<msg time="2025-11-16T19:06:16.202183" level="INFO">${headers} = {'Authorization': '', 'X-Request-ID': 'cleanup_001'}</msg>
+<var>${headers}</var>
+<arg>Authorization=${BEARER_TOKEN}</arg>
+<arg>X-Request-ID=cleanup_001</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.201667" elapsed="0.000516"/>
+</kw>
+<kw name="Run Keyword If" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.203272" level="TRACE">Arguments: [ "'' != ''" | 'Log' | 'Test user cleanup would be performed here' ]</msg>
+<msg time="2025-11-16T19:06:16.203272" level="TRACE">Return: None</msg>
+<arg>'${AUTH_TOKEN}' != '${EMPTY}'</arg>
+<arg>Log</arg>
+<arg>Test user cleanup would be performed here</arg>
+<doc>Runs the given keyword with the given arguments, if ``condition`` is true.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.202732" elapsed="0.000540"/>
+</kw>
+<kw name="Log" owner="BuiltIn">
+<msg time="2025-11-16T19:06:16.203810" level="TRACE">Arguments: [ 'Authentication test environment cleaned up' ]</msg>
+<msg time="2025-11-16T19:06:16.203810" level="INFO">Authentication test environment cleaned up</msg>
+<msg time="2025-11-16T19:06:16.203810" level="TRACE">Return: None</msg>
+<arg>Authentication test environment cleaned up</arg>
+<doc>Logs the given message with the given level.</doc>
+<status status="PASS" start="2025-11-16T19:06:16.203810" elapsed="0.000000"/>
+</kw>
+<msg time="2025-11-16T19:06:16.204345" level="TRACE">Return: None</msg>
+<doc>Cleanup test data and environment</doc>
+<status status="PASS" start="2025-11-16T19:06:16.200599" elapsed="0.003746"/>
+</kw>
+<doc>Complete Authentication Path Test Suite for Shahin GRC Platform
+Tests all authentication components, paths, configuration, registration, and routing</doc>
+<status status="FAIL" start="2025-11-16T19:06:15.468909" elapsed="0.735436"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="17" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="0" fail="1" skip="0">admin</stat>
+<stat pass="1" fail="17" skip="0">authentication</stat>
+<stat pass="0" fail="3" skip="0">authorization</stat>
+<stat pass="0" fail="1" skip="0">cors</stat>
+<stat pass="0" fail="3" skip="0">critical</stat>
+<stat pass="0" fail="1" skip="0">demo</stat>
+<stat pass="0" fail="1" skip="0">end-to-end</stat>
+<stat pass="0" fail="2" skip="0">error-handling</stat>
+<stat pass="1" fail="0" skip="0">health</stat>
+<stat pass="0" fail="1" skip="0">instant-access</stat>
+<stat pass="0" fail="1" skip="0">isolation</stat>
+<stat pass="0" fail="1" skip="0">journey</stat>
+<stat pass="0" fail="2" skip="0">login</stat>
+<stat pass="0" fail="1" skip="0">logout</stat>
+<stat pass="0" fail="1" skip="0">monitoring</stat>
+<stat pass="0" fail="2" skip="0">multi-tenant</stat>
+<stat pass="0" fail="2" skip="0">partner</stat>
+<stat pass="0" fail="1" skip="0">profile</stat>
+<stat pass="0" fail="1" skip="0">rate-limiting</stat>
+<stat pass="0" fail="1" skip="0">rbac</stat>
+<stat pass="0" fail="3" skip="0">registration</stat>
+<stat pass="0" fail="7" skip="0">security</stat>
+<stat pass="1" fail="0" skip="0">smoke</stat>
+<stat pass="0" fail="1" skip="0">standard</stat>
+<stat pass="0" fail="1" skip="0">token</stat>
+<stat pass="0" fail="1" skip="0">tracking</stat>
+<stat pass="0" fail="1" skip="0">user-management</stat>
+<stat pass="0" fail="1" skip="0">validation</stat>
+</tag>
+<suite>
+<stat name="Authentication-Full-Path-Tests" id="s1" pass="1" fail="17" skip="0">Authentication-Full-Path-Tests</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.3.2 (Python 3.11.9 on win32)" generated="2025-11-16T19:25:44.648162" rpa="false" schemaversion="5">
+<suite id="s1" name="Bff-Authentication-Tests" source="D:\Projects\Shahin-ai-App\apps\bff\test\bff-authentication-tests.robot">
+<kw name="Create BFF Session" type="SETUP">
+<kw name="Create Session" owner="RequestsLibrary">
+<msg time="2025-11-16T19:25:44.938341" level="INFO">Creating Session using : alias=bff, url=http://172.21.160.1:3007, headers={},                     cookies={}, auth=None, timeout=10, proxies=None, verify=False,                     debug=0 </msg>
+<arg>bff</arg>
+<arg>${BASE_URL}</arg>
+<arg>timeout=${DEFAULT_TIMEOUT}</arg>
+<doc>Create Session: create a HTTP session to a server</doc>
+<status status="PASS" start="2025-11-16T19:25:44.938341" elapsed="0.000000"/>
+</kw>
+<status status="PASS" start="2025-11-16T19:25:44.936826" elapsed="0.003024"/>
+</kw>
+<test id="s1-t1" name="Demo Registration Uses /api/public/demo/request" line="120">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:25:44.940373" level="INFO">${payload} = {'fullName': 'Web User', 'email': 'webuser@example.com', 'companyName': 'Web Corp'}</msg>
+<var>${payload}</var>
+<arg>fullName=${DEMO_FULL_NAME}</arg>
+<arg>email=${USER_EMAIL}</arg>
+<arg>companyName=${DEMO_COMPANY}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:25:44.940373" elapsed="0.000000"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2025-11-16T19:25:44.963322" level="INFO">POST Request : url=http://172.21.160.1:3007/api/public/demo/request 
+ path_url=/api/public/demo/request 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '83', 'Content-Type': 'application/json'} 
+ body=b'{"fullName": "Web User", "email": "webuser@example.com", "companyName": "Web Corp"}' 
+ </msg>
+<msg time="2025-11-16T19:25:44.963866" level="INFO">POST Response : url=http://172.21.160.1:3007/api/public/demo/request 
+ status=200, reason=OK 
+ headers={'X-Request-ID': 'req_1763310423623_156594f14c1dfb04', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'RateLimit-Policy': '100;w=900', 'RateLimit-Limit': '100', 'RateLimit-Remaining': '85', 'RateLimit-Reset': '263', 'X-Response-Time': '10ms', 'Content-Length': '925', 'ETag': 'W/"39d-IIQ2rFOioThneikDk2XbbD0pBFQ"', 'Date': 'Sun, 16 Nov 2025 16:27:03 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"requestId":"1a4e094b-27ee-453b-b199-880ea291c106","status":"approved_auto","tenant":{"id":"781152cd-fa06-474b-bc5e-9b1200c9beea","slug":"web-corp-demo-mi1suovb","type":"demo"},"user":{"id":"ba11820f-fc46-4515-af10-a09f8011f1da","email":"webuser@example.com","fullName":"Web User","role":"demo-admin"},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiYTExODIwZi1mYzQ2LTQ1MTUtYWYxMC1hMDlmODAxMWYxZGEiLCJlbWFpbCI6IndlYnVzZXJAZXhhbXBsZS5jb20iLCJ0ZW5hbnRJZCI6Ijc4MTE1MmNkLWZhMDYtNDc0Yi1iYzVlLTliMTIwMGM5YmVlYSIsInRlbmFudFR5cGUiOiJkZW1vIiwidGVuYW50U2x1ZyI6IndlYi1jb3JwLWRlbW8tbWkxc3VvdmIiLCJyb2xlIjoiZGVtby1hZG1pbiIsImlhdCI6MTc2MzMxMDQyMywianRpIjoiYmExMTgyMGYtZmM0Ni00NTE1LWFmMTAtYTA5ZjgwMTFmMWRhLTc4MTE1MmNkLWZhMDYtNDc0Yi1iYzVlLTliMTIwMGM5YmVlYS0xNzYzMzEwNDIzIiwiaXNzIjoiZ3JjLWJmZiIsImF1ZCI6ImdyYy1wbGF0Zm9ybSIsImV4cCI6MTc2MzkxNTIyM30.no03Vzg6zTKeKNEdHlqsHCWxW6s7NQnQ9614m0ivp2s","expiresAt":"2025-12-16T14:16:59.495Z"} 
+ </msg>
+<msg time="2025-11-16T19:25:44.963866" level="INFO">${resp} = &lt;Response [200]&gt;</msg>
+<var>${resp}</var>
+<arg>bff</arg>
+<arg>/api/public/demo/request</arg>
+<arg>json=${payload}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="PASS" start="2025-11-16T19:25:44.941957" elapsed="0.021909"/>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<msg time="2025-11-16T19:25:44.965444" level="INFO">Argument types are:
+&lt;class 'int'&gt;
+&lt;class 'str'&gt;</msg>
+<arg>${resp.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="PASS" start="2025-11-16T19:25:44.964389" elapsed="0.001055"/>
+</kw>
+<kw name="To Json" owner="RequestsLibrary">
+<msg time="2025-11-16T19:25:44.965970" level="WARN">Keyword 'RequestsLibrary.To Json' is deprecated. Please use ${resp.json()} instead. Have a look at the improved HTML output as pretty printing replacement.</msg>
+<msg time="2025-11-16T19:25:44.967059" level="INFO">To JSON using : content={"requestId":"1a4e094b-27ee-453b-b199-880ea291c106","status":"approved_auto","tenant":{"id":"781152cd-fa06-474b-bc5e-9b1200c9beea","slug":"web-corp-demo-mi1suovb","type":"demo"},"user":{"id":"ba11820f-fc46-4515-af10-a09f8011f1da","email":"webuser@example.com","fullName":"Web User","role":"demo-admin"},"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJiYTExODIwZi1mYzQ2LTQ1MTUtYWYxMC1hMDlmODAxMWYxZGEiLCJlbWFpbCI6IndlYnVzZXJAZXhhbXBsZS5jb20iLCJ0ZW5hbnRJZCI6Ijc4MTE1MmNkLWZhMDYtNDc0Yi1iYzVlLTliMTIwMGM5YmVlYSIsInRlbmFudFR5cGUiOiJkZW1vIiwidGVuYW50U2x1ZyI6IndlYi1jb3JwLWRlbW8tbWkxc3VvdmIiLCJyb2xlIjoiZGVtby1hZG1pbiIsImlhdCI6MTc2MzMxMDQyMywianRpIjoiYmExMTgyMGYtZmM0Ni00NTE1LWFmMTAtYTA5ZjgwMTFmMWRhLTc4MTE1MmNkLWZhMDYtNDc0Yi1iYzVlLTliMTIwMGM5YmVlYS0xNzYzMzEwNDIzIiwiaXNzIjoiZ3JjLWJmZiIsImF1ZCI6ImdyYy1wbGF0Zm9ybSIsImV4cCI6MTc2MzkxNTIyM30.no03Vzg6zTKeKNEdHlqsHCWxW6s7NQnQ9614m0ivp2s","expiresAt":"2025-12-16T14:16:59.495Z"} </msg>
+<msg time="2025-11-16T19:25:44.967059" level="INFO">To JSON using : pretty_print=False </msg>
+<msg time="2025-11-16T19:25:44.967601" level="INFO">${data} = {'requestId': '1a4e094b-27ee-453b-b199-880ea291c106', 'status': 'approved_auto', 'tenant': {'id': '781152cd-fa06-474b-bc5e-9b1200c9beea', 'slug': 'web-corp-demo-mi1suovb', 'type': 'demo'}, 'user': {'i...</msg>
+<var>${data}</var>
+<arg>${resp.content}</arg>
+<doc>*DEPRECATED* Please use ${resp.json()} instead. Have a look at the improved HTML output as pretty printing replacement.</doc>
+<status status="PASS" start="2025-11-16T19:25:44.965970" elapsed="0.001631"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${data}</arg>
+<arg>requestId</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-11-16T19:25:44.967601" elapsed="0.000520"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${data}</arg>
+<arg>status</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="PASS" start="2025-11-16T19:25:44.968647" elapsed="0.000000"/>
+</kw>
+<tag>demo</tag>
+<tag>public</tag>
+<status status="PASS" start="2025-11-16T19:25:44.939850" elapsed="0.029311"/>
+</test>
+<test id="s1-t2" name="POC Request Uses /api/public/poc/request" line="132">
+<kw name="Create Dictionary" owner="BuiltIn">
+<msg time="2025-11-16T19:25:44.971436" level="INFO">${payload} = {'fullName': 'POC User', 'email': 'webuser@example.com', 'companyName': 'POC Corp'}</msg>
+<var>${payload}</var>
+<arg>fullName=${POC_FULL_NAME}</arg>
+<arg>email=${USER_EMAIL}</arg>
+<arg>companyName=${POC_COMPANY}</arg>
+<doc>Creates and returns a dictionary based on the given ``items``.</doc>
+<status status="PASS" start="2025-11-16T19:25:44.970735" elapsed="0.000701"/>
+</kw>
+<kw name="POST On Session" owner="RequestsLibrary">
+<msg time="2025-11-16T19:25:44.980831" level="INFO">POST Request : url=http://172.21.160.1:3007/api/public/poc/request 
+ path_url=/api/public/poc/request 
+ headers={'User-Agent': 'python-requests/2.31.0', 'Accept-Encoding': 'gzip, deflate, br, zstd', 'Accept': '*/*', 'Connection': 'keep-alive', 'Content-Length': '83', 'Content-Type': 'application/json'} 
+ body=b'{"fullName": "POC User", "email": "webuser@example.com", "companyName": "POC Corp"}' 
+ </msg>
+<msg time="2025-11-16T19:25:44.980831" level="INFO">POST Response : url=http://172.21.160.1:3007/api/public/poc/request 
+ status=400, reason=Bad Request 
+ headers={'X-Request-ID': 'req_1763310423647_c68878f950a51402', 'Content-Security-Policy': "default-src 'self';script-src 'self' 'unsafe-inline';style-src 'self' 'unsafe-inline';img-src 'self' data: https:;connect-src 'self';font-src 'self';object-src 'none';media-src 'self';frame-ancestors 'none';base-uri 'self';form-action 'self';script-src-attr 'none';upgrade-insecure-requests", 'Cross-Origin-Opener-Policy': 'same-origin', 'Cross-Origin-Resource-Policy': 'cross-origin', 'Origin-Agent-Cluster': '?1', 'Referrer-Policy': 'no-referrer', 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload', 'X-Content-Type-Options': 'nosniff', 'X-DNS-Prefetch-Control': 'off', 'X-Download-Options': 'noopen', 'X-Permitted-Cross-Domain-Policies': 'none', 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, private', 'Vary': 'Origin', 'Access-Control-Allow-Credentials': 'true', 'RateLimit-Policy': '100;w=900', 'RateLimit-Limit': '100', 'RateLimit-Remaining': '84', 'RateLimit-Reset': '263', 'X-Response-Time': '2ms', 'Content-Length': '74', 'ETag': 'W/"4a-ZIpw3aW98IhZX4PfSAe/jV/yQBs"', 'Date': 'Sun, 16 Nov 2025 16:27:03 GMT', 'Connection': 'keep-alive', 'Keep-Alive': 'timeout=5'} 
+ body={"error":"VALIDATION_ERROR","message":"At least one use case is required"} 
+ </msg>
+<msg time="2025-11-16T19:25:44.981374" level="FAIL">HTTPError: 400 Client Error: Bad Request for url: http://172.21.160.1:3007/api/public/poc/request</msg>
+<var>${resp}</var>
+<arg>bff</arg>
+<arg>/api/public/poc/request</arg>
+<arg>json=${payload}</arg>
+<doc>Sends a POST request on a previously created HTTP Session.</doc>
+<status status="FAIL" start="2025-11-16T19:25:44.972485" elapsed="0.012653">HTTPError: 400 Client Error: Bad Request for url: http://172.21.160.1:3007/api/public/poc/request</status>
+</kw>
+<kw name="Should Be Equal As Integers" owner="BuiltIn">
+<arg>${resp.status_code}</arg>
+<arg>200</arg>
+<doc>Fails if objects are unequal after converting them to integers.</doc>
+<status status="NOT RUN" start="2025-11-16T19:25:44.985704" elapsed="0.000000"/>
+</kw>
+<kw name="To Json" owner="RequestsLibrary">
+<msg time="2025-11-16T19:25:44.986256" level="WARN">Keyword 'RequestsLibrary.To Json' is deprecated. Please use ${resp.json()} instead. Have a look at the improved HTML output as pretty printing replacement.</msg>
+<var>${data}</var>
+<arg>${resp.content}</arg>
+<doc>*DEPRECATED* Please use ${resp.json()} instead. Have a look at the improved HTML output as pretty printing replacement.</doc>
+<status status="NOT RUN" start="2025-11-16T19:25:44.986256" elapsed="0.001094"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${data}</arg>
+<arg>requestId</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="NOT RUN" start="2025-11-16T19:25:44.987350" elapsed="0.000000"/>
+</kw>
+<kw name="Dictionary Should Contain Key" owner="Collections">
+<arg>${data}</arg>
+<arg>status</arg>
+<doc>Fails if ``key`` is not found from ``dictionary``.</doc>
+<status status="NOT RUN" start="2025-11-16T19:25:44.987882" elapsed="0.000000"/>
+</kw>
+<tag>poc</tag>
+<tag>public</tag>
+<status status="FAIL" start="2025-11-16T19:25:44.970213" elapsed="0.018213">HTTPError: 400 Client Error: Bad Request for url: http://172.21.160.1:3007/api/public/poc/request</status>
+</test>
+<kw name="Delete All Sessions" owner="RequestsLibrary" type="TEARDOWN">
+<msg time="2025-11-16T19:25:44.990051" level="INFO">Deleting All Sessions</msg>
+<doc>Removes all the session objects</doc>
+<status status="PASS" start="2025-11-16T19:25:44.989520" elapsed="0.000531"/>
+</kw>
+<doc>Full-path authentication and public-access tests for BFF</doc>
+<status status="FAIL" start="2025-11-16T19:25:44.651110" elapsed="0.338941"/>
+</suite>
+<statistics>
+<total>
+<stat pass="1" fail="1" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="1" fail="0" skip="0">demo</stat>
+<stat pass="0" fail="1" skip="0">poc</stat>
+<stat pass="1" fail="1" skip="0">public</stat>
+</tag>
+<suite>
+<stat name="Bff-Authentication-Tests" id="s1" pass="1" fail="1" skip="0">Bff-Authentication-Tests</stat>
+</suite>
+</statistics>
+<errors>
+<msg time="2025-11-16T19:25:44.965970" level="WARN">Keyword 'RequestsLibrary.To Json' is deprecated. Please use ${resp.json()} instead. Have a look at the improved HTML output as pretty printing replacement.</msg>
+<msg time="2025-11-16T19:25:44.986256" level="WARN">Keyword 'RequestsLibrary.To Json' is deprecated. Please use ${resp.json()} instead. Have a look at the improved HTML output as pretty printing replacement.</msg>
+</errors>
+</robot>

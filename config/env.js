@@ -5,8 +5,16 @@
 
 function parseEnv() {
   const DATABASE_URL = process.env.DATABASE_URL;
-  if (!DATABASE_URL) {
+  const allowMissingDatabaseUrl =
+    process.env.VERCEL ||
+    process.env.ALLOW_DBLESS_START === 'true';
+
+  if (!DATABASE_URL && !allowMissingDatabaseUrl) {
     throw new Error('DATABASE_URL environment variable is required');
+  }
+
+  if (!DATABASE_URL && allowMissingDatabaseUrl) {
+    console.warn('Warning: DATABASE_URL is not set. Database-backed routes will be unavailable until it is configured.');
   }
 
   // Parse comma-separated frontend origins
@@ -14,7 +22,7 @@ function parseEnv() {
   const FRONTEND_ORIGINS = originsStr.split(',').map(o => o.trim());
 
   return {
-    DATABASE_URL,
+    DATABASE_URL: DATABASE_URL || null,
     FRONTEND_ORIGINS,
     PUBLIC_BFF_URL: process.env.PUBLIC_BFF_URL,
     NODE_ENV: process.env.NODE_ENV || 'development',

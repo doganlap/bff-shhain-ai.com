@@ -6,7 +6,7 @@
  * - Audit logging for all login attempts
  */
 
-const { auditAuthEvent, auditSecurityEvent, AuditEventType, AuditSeverity } = require('./auditLogger');
+const { auditSecurityEvent, AuditEventType, AuditSeverity } = require('./auditLogger');
 const { logger } = require('../utils/logger');
 
 // In-memory store for login attempts (use Redis in production)

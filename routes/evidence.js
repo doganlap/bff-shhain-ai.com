@@ -4,10 +4,15 @@ const prisma = require('../db/prisma');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const os = require('os');
 
-// Ensure uploads directory exists
-const uploadDir = path.join(__dirname, '..', 'uploads');
-if (!fs.existsSync(uploadDir)) {
+// Use temp directory for serverless environments (e.g., Vercel) which have read-only /var/task
+const isServerless = process.env.VERCEL_ENV || process.env.VERCEL || process.env.LAMBDA_TASK_ROOT;
+const localUploadRoot = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads');
+const uploadDir = isServerless ? os.tmpdir() : localUploadRoot;
+
+// Only create local uploads directory when not in serverless environment
+if (!isServerless && !fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
@@ -34,7 +39,7 @@ const handleError = (res, error, message) => {
 router.get('/', async (req, res) => {
   try {
     const evidence = await prisma.evidence.findMany({
-      include: { control: true, author: true },
+      include: { Assessment: true },
     });
     res.json(evidence);
   } catch (error) {
@@ -88,8 +93,8 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const singleEvidence = await prisma.evidence.findUnique({
-      where: { id: parseInt(id, 10) },
-      include: { control: true, author: true },
+      where: { id },
+      include: { Assessment: true },
     });
     if (!singleEvidence) {
       return res.status(404).json({ error: 'Evidence not found' });
@@ -103,7 +108,8 @@ router.get('/:id', async (req, res) => {
 // POST /api/evidence - Create a new evidence record
 router.post('/', async (req, res) => {
   try {
-    const newEvidence = await prisma.evidence.create({ data: req.body });
+    const { name, fileUrl, fileType, assessmentId, uploadedBy } = req.body;
+    const newEvidence = await prisma.evidence.create({ data: { name, fileUrl, fileType, assessmentId, uploadedBy } });
     res.status(201).json(newEvidence);
   } catch (error) {
     handleError(res, error, 'Error creating evidence');
@@ -113,18 +119,16 @@ router.post('/', async (req, res) => {
 // POST /api/evidence/upload - Upload a file and create evidence
 router.post('/upload', upload.single('file'), async (req, res) => {
   try {
-    const { originalname, mimetype, path, size } = req.file;
-    const { name, description, controlId, authorId } = req.body;
+    const { originalname, mimetype, path } = req.file;
+    const { name, assessmentId, uploadedBy } = req.body;
 
     const newEvidence = await prisma.evidence.create({
       data: {
         name: name || originalname,
-        description: description || '',
-        filePath: path,
+        fileUrl: path,
         fileType: mimetype,
-        fileSize: size,
-        controlId: controlId ? parseInt(controlId) : undefined,
-        authorId: authorId ? parseInt(authorId) : undefined,
+        assessmentId,
+        uploadedBy: uploadedBy || 'user-admin-1',
       },
     });
     res.status(201).json(newEvidence);
@@ -138,7 +142,7 @@ router.put('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const updatedEvidence = await prisma.evidence.update({
-      where: { id: parseInt(id, 10) },
+      where: { id },
       data: req.body,
     });
     res.json(updatedEvidence);
@@ -153,7 +157,7 @@ router.patch('/:id/status', async (req, res) => {
     const { status } = req.body;
     try {
         const updatedEvidence = await prisma.evidence.update({
-            where: { id: parseInt(id, 10) },
+            where: { id },
             data: { status },
         });
         res.json(updatedEvidence);
@@ -167,7 +171,7 @@ router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     // In a real app, you should also delete the file from the 'uploads' directory
-    await prisma.evidence.delete({ where: { id: parseInt(id, 10) } });
+    await prisma.evidence.delete({ where: { id } });
     res.status(204).send();
   } catch (error) {
     handleError(res, error, 'Error deleting evidence');

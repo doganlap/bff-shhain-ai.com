@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "shahin-ai-app",
   "builds": [
     {
       "src": "index.js",
@@ -8,16 +9,28 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
       "dest": "/index.js"
+    },
+    {
+      "src": "/bff/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/health",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "https://shahin-ai-app-donganksa.vercel.app/$1"
     }
   ],
   "env": {
-    "NODE_ENV": "production",
-    "FRONTEND_ORIGINS": "https://app-shahin-ai-com.vercel.app",
-    "PUBLIC_BFF_URL": "https://bff-shhain-ai-com.vercel.app",
-    "DATABASE_URL": "@database-url",
-    "JWT_SECRET": "@jwt-secret"
+    "NODE_ENV": "production"
   },
-  "regions": ["iad1"]
+  "functions": {
+    "index.js": {
+      "maxDuration": 30
+    }
+  }
 }

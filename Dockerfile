@@ -9,10 +9,16 @@ ENV BUILD_VERSION=${BUILD_VERSION}
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package.json ./
 
-# Clear npm cache and install dependencies fresh (production only for smaller image)
-RUN npm cache clean --force && npm ci --only=production --no-optional
+# Copy Prisma files before npm install to avoid postinstall issues
+COPY prisma ./prisma
+
+# Install dependencies
+RUN npm install --ignore-scripts
+
+# Generate Prisma client manually
+RUN npx prisma generate
 
 # Copy application code
 COPY . .
@@ -27,7 +33,7 @@ USER nodejs
 # Expose port (should match PORT in .env)
 EXPOSE 3005
 
-# Health check using new health endpoint
+# Health check using the health endpoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3005/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
