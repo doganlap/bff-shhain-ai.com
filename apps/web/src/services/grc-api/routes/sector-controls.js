@@ -245,6 +245,74 @@ router.get('/', async (req, res) => {
 });
 
 /**
+ * POST /api/sector-controls/seed
+ * Seed regulators, frameworks, and controls into the database for demo/testing
+ */
+router.post('/seed', async (req, res) => {
+  try {
+    const sector = req.body?.sector || 'banking';
+
+    const ensureRegulator = async (code, name, sector) => {
+      const existing = await query('SELECT id FROM regulators WHERE code = $1', [code]);
+      if (existing.rows.length > 0) return existing.rows[0].id;
+      const result = await query(
+        `INSERT INTO regulators (name, code, sector, is_active)
+         VALUES ($1, $2, $3, true)
+         RETURNING id`,
+        [name, code, sector]
+      );
+      return result.rows[0].id;
+    };
+
+    const ensureFramework = async (frameworkCode, name, regulatorId) => {
+      const existing = await query('SELECT id FROM grc_frameworks WHERE framework_code = $1', [frameworkCode]);
+      if (existing.rows.length > 0) return existing.rows[0].id;
+      const result = await query(
+        `INSERT INTO grc_frameworks (name, framework_code, regulator_id, is_active)
+         VALUES ($1, $2, $3, true)
+         RETURNING id`,
+        [name, frameworkCode, regulatorId]
+      );
+      return result.rows[0].id;
+    };
+
+    const ensureControl = async (frameworkId, controlCode, title, criticality, isMandatory) => {
+      const existing = await query('SELECT id FROM grc_controls WHERE control_code = $1', [controlCode]);
+      if (existing.rows.length > 0) return existing.rows[0].id;
+      const result = await query(
+        `INSERT INTO grc_controls (framework_id, control_code, title, criticality_level, is_mandatory, is_active)
+         VALUES ($1, $2, $3, $4, $5, true)
+         RETURNING id`,
+        [frameworkId, controlCode, title, criticality, !!isMandatory]
+      );
+      return result.rows[0].id;
+    };
+
+    // Seed regulators
+    const samaId = await ensureRegulator('SAMA', 'Saudi Central Bank (SAMA)', sector);
+    const ncaId = await ensureRegulator('NCA', 'National Cybersecurity Authority (NCA)', 'technology');
+    const citcId = await ensureRegulator('CITC', 'Communications and Information Technology Commission (CITC)', 'telecommunications');
+
+    // Seed frameworks
+    const isoId = await ensureFramework('ISO27001', 'ISO 27001', samaId);
+    const nistId = await ensureFramework('NIST-CSF', 'NIST Cybersecurity Framework', ncaId);
+    const samaCsId = await ensureFramework('SAMA-CS', 'SAMA Cybersecurity Framework', samaId);
+
+    // Seed controls
+    await ensureControl(isoId, 'ISO-AC-01', 'Access Control Policy', 'medium', true);
+    await ensureControl(isoId, 'ISO-CR-02', 'Cryptography Standard', 'high', false);
+    await ensureControl(nistId, 'NIST-PR.AC-3', 'Identity Management', 'medium', true);
+    await ensureControl(nistId, 'NIST-DE.AE-1', 'Anomalies Detection', 'low', false);
+    await ensureControl(samaCsId, 'SAMA-CS-AC-05', 'Privileged Access Management', 'high', true);
+
+    res.json({ success: true, message: 'Sector controls seed completed', sector });
+  } catch (error) {
+    console.error('❌ Error seeding sector controls:', error);
+    res.status(500).json({ success: false, error: 'Seed failed', message: error.message });
+  }
+});
+
+/**
  * POST /api/sector-controls/auto-configure
  * Auto-configure organization based on sector and characteristics
  */

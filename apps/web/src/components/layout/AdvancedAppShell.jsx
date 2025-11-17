@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Home, Shield, Target, FileText, Building2, Users, BarChart3, Database, Settings, Menu, X, Search, Bell, MessageSquare, HelpCircle, ChevronLeft, ChevronRight, Bot, Eye, AlertTriangle, UserCheck, Archive, Activity, CheckCircle, Workflow, ShieldCheck, Grid3X3, Zap, Star } from 'lucide-react';
+import { Shield, Menu, X, Search, Bell, HelpCircle, ChevronLeft, ChevronRight, UserCheck, Grid3X3, Star } from 'lucide-react';
 import ErrorBoundary from '../common/ErrorBoundary';
 import { Toaster } from 'sonner';
 import { useApp } from '../../context/AppContext';
@@ -17,8 +17,8 @@ const AdvancedAppShell = () => {
   const location = useLocation();
   const { state } = useApp();
   const { user } = state;
-  const { language, isRTL, t } = useI18n();
-  const { isDark } = useTheme();
+  const { language, isRTL } = useI18n();
+  const { isDark, currentTheme, setTheme, themes } = useTheme();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -131,7 +131,7 @@ const AdvancedAppShell = () => {
                 sidebarCollapsed ? 'w-20' : 'w-64 sm:w-72'
               }`}
               style={{
-                background: isDark() 
+                background: isDark 
                   ? 'linear-gradient(135deg, rgba(17, 24, 39, 0.95) 0%, rgba(31, 41, 55, 0.9) 100%)'
                   : 'linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 250, 252, 0.9) 100%)'
               }}
@@ -332,7 +332,7 @@ const AdvancedAppShell = () => {
                     role={userRole} 
                     currentTenant={state.currentTenant} 
                     tenants={[]} 
-                    onTenantSwitch={(tenant)=>{}}
+                    onTenantSwitch={() => {}}
                   />
                 </div>
               )}
@@ -415,7 +415,7 @@ const AdvancedAppShell = () => {
         />
         {/* Role Activation Panel */}
         <div className="px-6 py-3 border-t border-slate-200">
-          <RoleActivationPanel role={userRole} currentTenant={state.currentTenant} tenants={[]} onTenantSwitch={(tenant)=>{}} />
+          <RoleActivationPanel role={userRole} currentTenant={state.currentTenant} tenants={[]} onTenantSwitch={() => {}} />
         </div>
       </div>
     </ErrorBoundary>

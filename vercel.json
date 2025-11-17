@@ -1,70 +1,37 @@
 {
   "version": 2,
-  "framework": "vite",
-  "installCommand": "pnpm install --no-frozen-lockfile",
-  "buildCommand": "cd apps/web && pnpm run build",
-  "outputDirectory": "apps/web/dist",
-  "rewrites": [
+  "builds": [
     {
-      "source": "/((?!manifest\\.json|favicon\\.ico|logo192\\.png|logo512\\.png|robots\\.txt|sitemap\\.xml|_next|api).*)",
-      "destination": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "https://app.shahin-ai.com"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "Authorization, Content-Type, X-Tenant-ID"
-        }
-      ]
+      "src": "apps/bff/index.js",
+      "use": "@vercel/node"
     },
     {
-      "source": "/manifest.json",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(favicon\\.ico|logo192\\.png|logo512\\.png|robots\\.txt)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "src": "apps/web/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "apps/web/dist"
+      }
     }
   ],
-  "cleanUrls": true,
-  "trailingSlash": false,
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/apps/bff/index.js"
+    },
+    {
+      "src": "/bff/(.*)",
+      "dest": "/apps/bff/index.js"
+    },
+    {
+      "src": "/health",
+      "dest": "/apps/bff/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/apps/web/$1"
+    }
+  ],
   "env": {
-    "DATABASE_URL": "postgres://38452a313303a24baeddfbfe8046678d396610943c9b34e65432968f33793f7f:sk_ziZoE_g62VBpHvM3Nv6C7@db.prisma.io:5432/postgres?sslmode=require",
-    "NODE_ENV": "production",
-    "JWT_SECRET": "shahin-ai-production-jwt-secret-2025-secure-32-chars-minimum",
-    "SERVICE_TOKEN": "shahin-ai-production-service-token-2025-secure-32-chars",
-    "FRONTEND_ORIGINS": "https://app.shahin-ai.com,https://www.shahin-ai.com,https://shahin-ai.com",
-    "PRODUCTION_MODE": "true",
-    "SINGLE_TENANT_MODE": "true",
-    "ENABLE_TRANSACTIONS": "true",
-    "ENABLE_WORKFLOWS": "true",
-    "ENABLE_AUDIT_LOGGING": "true",
-    "VITE_API_BASE_URL": "https://app.shahin-ai.com/api",
-    "VITE_BFF_URL": "https://app.shahin-ai.com"
+    "NODE_ENV": "production"
   }
 }

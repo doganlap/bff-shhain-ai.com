@@ -27,21 +27,28 @@ router.post('/query', async (req, res) => {
             });
         }
 
-        // Mock response for development
-        res.json({
-            success: true,
-            query,
-            response: `Mock RAG response for: ${query}`,
-            sources: [],
-            metadata: {
-                processedAt: new Date().toISOString(),
-                model: 'mock-rag-model'
-            }
+        // Forward to BFF for real RAG processing
+        const response = await fetch('http://localhost:3000/api/rag/query', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': req.headers.authorization || ''
+            },
+            body: JSON.stringify({ query })
         });
+
+        if (!response.ok) {
+            throw new Error(`BFF request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        res.json(data);
     } catch (error) {
+        console.error('RAG query error:', error);
         res.status(500).json({
             success: false,
-            error: error.message
+            error: 'RAG service unavailable',
+            details: error.message
         });
     }
 });

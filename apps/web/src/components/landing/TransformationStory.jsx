@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import UnifiedLogo from './UnifiedLogo'
 import { 
-  CloudOff, FileText, Users, AlertTriangle, Clock, DollarSign,
-  Zap, Cpu, Shield, CheckCircle, Sparkles, TrendingUp,
-  Layers, Filter, MapPin, Leaf, Briefcase, UserCheck, Building2,
+  FileText, Users, AlertTriangle, Clock, DollarSign,
+  Cpu, CheckCircle, Sparkles,
+  Layers, Briefcase, UserCheck, Building2,
   Coffee, Moon, Frown, Smile, Target, Award
 } from 'lucide-react'
 

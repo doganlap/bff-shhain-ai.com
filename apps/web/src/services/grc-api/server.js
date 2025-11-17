@@ -66,9 +66,7 @@ const aiProxyRoutes = require('./routes/ai-proxy');
 const supervisorRoutes = require('./routes/admin/supervisorRoutes');
 // const platformRoutes = require('./routes/admin/platformRoutes'); // Moved to /demo
 
-// Import demo routes
-const demoVectorSearchRoutes = require('./routes/demo/vector-search');
-const demoPlatformRoutes = require('./routes/demo/admin/platformRoutes');
+
 
 // Create Express app
 const app = express();
@@ -126,6 +124,40 @@ app.use(helmet({
   xssFilter: true
 }));
 
+// Cookie parsing for auth cookies
+app.use(cookieParser());
+
+// Basic CSRF in production: set token cookie on GET, require X-CSRF-Token for mutating
+const crypto = require('crypto');
+app.use((req, res, next) => {
+  try {
+    const secure = process.env.NODE_ENV === 'production';
+    if (req.method === 'GET' && !req.cookies.csrfToken) {
+      const csrf = crypto.randomBytes(20).toString('hex');
+      res.cookie('csrfToken', csrf, {
+        httpOnly: false,
+        secure,
+        sameSite: 'Lax',
+        path: '/',
+      });
+    }
+  } catch {}
+  next();
+});
+
+app.use((req, res, next) => {
+  const secure = process.env.NODE_ENV === 'production';
+  const mutating = ['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method);
+  if (secure && mutating) {
+    const headerToken = req.headers['x-csrf-token'];
+    const cookieToken = req.cookies && req.cookies.csrfToken;
+    if (!headerToken || !cookieToken || headerToken !== cookieToken) {
+      return res.status(403).json({ success: false, message: 'CSRF validation failed' });
+    }
+  }
+  next();
+});
+
 // Optional authentication middleware to populate req.user if token is present
 // app.use('/api/', optionalAuth);
 
@@ -155,7 +187,7 @@ const generalLimiter = rateLimit({
 // Stricter rate limiting for authentication endpoints
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 10 auth requests per windowMs
+  max: 10, // limit each IP to 10 auth requests per windowMs
   message: {
     error: 'Too many authentication attempts, please try again later.',
     retryAfter: '15 minutes'
@@ -179,7 +211,7 @@ const uploadLimiter = rateLimit({
 
 // Apply rate limiters
 // app.use('/api/', generalLimiter);
-// app.use('/api/auth/', authLimiter);
+app.use('/api/auth/', authLimiter);
 app.use('/api/documents/upload', uploadLimiter);
 
 // Register auth routes before security stack
@@ -199,8 +231,7 @@ app.use('/api/', ...securityStack());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Cookie parsing middleware
-app.use(cookieParser());
+// Cookie parsing middleware (already applied above)
 
 // Passport middleware
 // app.use(passport.initialize());
@@ -563,9 +594,7 @@ app.use('/api/supervisor', supervisorRoutes);
 // Platform admin routes
 // app.use('/api/platform', platformRoutes); // Moved to /demo
 
-// Demo routes
-app.use('/api/demo/vector-search', demoVectorSearchRoutes);
-app.use('/api/demo/platform', demoPlatformRoutes);
+
 
 // ==========================================
 // FRONTEND ROUTING

@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRBAC } from '../../hooks/useRBAC';
 import { PermissionBasedCard } from '../common/PermissionBasedCard';
-import { Eye, EyeOff, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 export const RoleDashboardCards = ({ roleCards = [], title = "Role Permissions", collapsible = true }) => {
-  const { user, hasPermission } = useRBAC();
+  const { user } = useRBAC();
   const [isExpanded, setIsExpanded] = useState(false);
 
   if (roleCards.length === 0) return null;

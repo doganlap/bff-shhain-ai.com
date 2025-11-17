@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../db/prisma');
-const organizationService = require('../src/services/organization.service');
+// const organizationService = require('../src/services/organization.service');
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {
@@ -14,9 +14,9 @@ router.get('/', async (req, res) => {
   const { limit = 50, page = 1 } = req.query;
   const parsedLimit = parseInt(limit);
   const parsedPage = parseInt(page);
+  const skip = (parsedPage - 1) * parsedLimit;
   
   try {
-    const skip = (parsedPage - 1) * parsedLimit;
 
     const organizations = await prisma.organization.findMany({
       skip,
@@ -38,11 +38,15 @@ router.get('/', async (req, res) => {
     });
   } catch (error) {
     console.error('Database error fetching organizations:', error.message);
-    res.json({
+    return res.json({
       success: true,
       data: [],
-      pagination: { page: parsedPage, limit: parsedLimit, total: 0, totalPages: 0 },
-      note: 'Organizations table not yet available'
+      pagination: {
+        page: parsedPage,
+        limit: parsedLimit,
+        total: 0,
+        totalPages: 0
+      }
     });
   }
 });
@@ -52,7 +56,7 @@ router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     const organization = await prisma.organization.findUnique({
-      where: { id: parseInt(id, 10) },
+      where: { id },
       include: { 
         users: true 
       },
@@ -63,22 +67,7 @@ router.get('/:id', async (req, res) => {
     res.json(organization);
   } catch (error) {
     console.error('Database error fetching organization:', error.message);
-    // Return mock organization when database is unavailable
-    const mockOrganization = {
-      id: parseInt(id, 10),
-      name: 'Sample Organization',
-      description: 'A sample organization for testing',
-      type: 'enterprise',
-      industry: 'Technology',
-      size: 'medium',
-      website: 'https://example.com',
-      contact_email: 'contact@example.com',
-      is_active: true,
-      createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
-      updatedAt: new Date(Date.now() - 86400000).toISOString(),
-      users: []
-    };
-    res.json(mockOrganization);
+    res.status(500).json({ success: false, error: 'Failed to fetch organization' });
   }
 });
 
@@ -99,7 +88,7 @@ router.put('/:id', async (req, res) => {
     if (is_active !== undefined) updateData.is_active = is_active;
 
     const updatedOrganization = await prisma.organization.update({
-      where: { id: parseInt(id, 10) },
+      where: { id },
       data: updateData,
     });
     res.json(updatedOrganization);
@@ -108,21 +97,7 @@ router.put('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Organization not found' });
     }
     console.error('Database error updating organization:', error.message);
-    // Return mock updated organization when database is unavailable
-    const mockUpdatedOrg = {
-      id: parseInt(id, 10),
-      name: req.body.name || 'Updated Organization',
-      description: req.body.description || 'Updated description',
-      type: req.body.type || 'enterprise',
-      industry: req.body.industry || 'Technology',
-      size: req.body.size || 'medium',
-      website: req.body.website || 'https://updated-example.com',
-      contact_email: req.body.contact_email || 'updated@example.com',
-      is_active: req.body.is_active !== undefined ? req.body.is_active : true,
-      createdAt: new Date(Date.now() - 86400000 * 30).toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    res.json(mockUpdatedOrg);
+    res.status(500).json({ success: false, error: 'Failed to update organization' });
   }
 });
 
@@ -141,8 +116,7 @@ router.get('/:id/units', async (req, res) => {
     res.json(units);
   } catch (error) {
     console.error('Database error fetching business units:', error.message);
-    // Return empty array when database is unavailable
-    res.json([]);
+    res.status(500).json({ success: false, error: 'Failed to fetch business units' });
   }
 });
 
@@ -171,21 +145,7 @@ router.post('/', async (req, res) => {
     res.status(201).json(organization);
   } catch (error) {
     console.error('Database error creating organization:', error.message);
-    // Return mock organization when database is unavailable
-    const mockOrganization = {
-      id: Math.floor(Math.random() * 1000),
-      name: req.body.name || 'New Organization',
-      description: req.body.description || 'New organization description',
-      type: req.body.type || 'enterprise',
-      industry: req.body.industry || 'Technology',
-      size: req.body.size || 'medium',
-      website: req.body.website || 'https://neworg.com',
-      contact_email: req.body.contact_email || 'contact@neworg.com',
-      is_active: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    res.status(201).json(mockOrganization);
+    res.status(500).json({ success: false, error: 'Failed to create organization' });
   }
 });
 
@@ -194,7 +154,7 @@ router.delete('/:id', async (req, res) => {
   const { id } = req.params;
   try {
     await prisma.organization.delete({
-      where: { id: parseInt(id, 10) },
+      where: { id },
     });
     res.json({ message: 'Organization deleted successfully' });
   } catch (error) {
@@ -202,8 +162,7 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Organization not found' });
     }
     console.error('Database error deleting organization:', error.message);
-    // Return success even if database is unavailable (mock delete)
-    res.json({ message: 'Organization deleted successfully' });
+    res.status(500).json({ success: false, error: 'Failed to delete organization' });
   }
 });
 
@@ -234,21 +193,7 @@ router.post('/:id/units', async (req, res) => {
     res.status(201).json(unit);
   } catch (error) {
     console.error('Database error creating business unit:', error.message);
-    // Return mock business unit when database is unavailable
-    const mockUnit = {
-      id: Math.floor(Math.random() * 1000),
-      name: req.body.name || 'New Business Unit',
-      description: req.body.description || 'New business unit description',
-      type: req.body.type || 'department',
-      industry: 'Internal',
-      size: 'small',
-      website: '',
-      contact_email: '',
-      is_active: true,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    res.status(201).json(mockUnit);
+    res.status(500).json({ success: false, error: 'Failed to create business unit' });
   }
 });
 

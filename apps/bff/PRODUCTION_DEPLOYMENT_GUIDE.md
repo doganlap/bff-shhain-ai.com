@@ -90,6 +90,7 @@ chmod +x deploy-production.sh
 ```
 
 The script will automatically:
+
 - ✅ Check environment variables
 - ✅ Install dependencies
 - ✅ Generate Prisma client
@@ -132,12 +133,15 @@ vercel --prod
 The production seeding script creates:
 
 ### 🏢 Organizations
+
 - **Master Organization**: Main platform organization
 - **Partner Organization**: For partner access
 - **Demo Organization**: For demonstration purposes
 
 ### 👥 Demo Users
+
 | Email | Password | Role |
+
 |-------|----------|------|
 | admin@shahin-ai.com | SuperAdmin2025 | Admin |
 | manager@shahin-ai.com | Manager2025 | Manager |
@@ -145,11 +149,13 @@ The production seeding script creates:
 | auditor@shahin-ai.com | Auditor2025 | Auditor |
 
 ### 📋 Frameworks & Controls
+
 - **ISO 27001:2022**: 3 sample controls
 - **SOC 2 Type II**: 2 sample controls
 - **ISO 27701:2019**: 1 sample control
 
 ### ⚠️ Risks & Assessments
+
 - Sample risks with different categories and priorities
 - Sample assessment for ISO 27001 gap analysis
 
@@ -157,12 +163,14 @@ The production seeding script creates:
 
 ### 1. Health Check
 
+
 ```bash
 # Check if deployment is healthy
 curl https://your-deployment-url/health
 ```
 
 ### 2. API Endpoints Test
+
 
 ```bash
 # Test authentication

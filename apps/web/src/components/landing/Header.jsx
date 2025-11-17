@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { Shield, Sparkles, LogIn, Bot, Menu, ChevronDown } from 'lucide-react'
+import { Sparkles, LogIn, Menu, ChevronDown } from 'lucide-react'
 import { motion } from 'framer-motion'
-import DemoBooking from './DemoBooking'
 import LoginModal from './LoginModal'
 import UnifiedLogo from './UnifiedLogo'
 import ThemeToggle from './ThemeToggle'
@@ -9,10 +8,10 @@ import { useScrollSpy, useScrollProgress, useHeaderVisibility } from '../../hook
 
 const Header = ({ onLoginClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isDemoOpen, setIsDemoOpen] = useState(false)
+  
   const [isLoginOpen, setIsLoginOpen] = useState(false)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-  const [bookingType, setBookingType] = useState('demo')
+  
   const dropdownRef = useRef(null)
 
   // All sections for navigation
@@ -387,12 +386,7 @@ const Header = ({ onLoginClick }) => {
         )}
       </nav>
 
-      {/* Demo Booking Modal */}
-      <DemoBooking 
-        isOpen={isDemoOpen} 
-        onClose={() => setIsDemoOpen(false)}
-        bookingType={bookingType}
-      />
+      
 
       {/* Login Modal */}
       <LoginModal 

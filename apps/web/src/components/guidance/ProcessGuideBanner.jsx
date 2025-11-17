@@ -5,7 +5,7 @@ import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../theme/ThemeProvider';
 
 const ProcessGuideBanner = ({ guide }) => {
-  const { t, language } = useI18n();
+  const { language } = useI18n();
   const { isDark } = useTheme();
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();

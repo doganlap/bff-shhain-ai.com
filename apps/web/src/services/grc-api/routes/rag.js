@@ -39,91 +39,7 @@ const upload = multer({
   }
 });
 
-// Mock vector database (in production, use Pinecone, Chroma, or similar)
-const mockVectorDB = {
-  documents: [
-    {
-      id: 1,
-      name: 'SAMA Cybersecurity Framework.pdf',
-      type: 'PDF',
-      size: '2.4 MB',
-      uploaded: '2024-01-15',
-      status: 'processed',
-      chunks: 156,
-      embeddings: 156,
-      path: '/mock/sama_framework.pdf'
-    },
-    {
-      id: 2,
-      name: 'ISO 27001 Implementation Guide.docx',
-      type: 'DOCX',
-      size: '1.8 MB',
-      uploaded: '2024-01-14',
-      status: 'processed',
-      chunks: 98,
-      embeddings: 98,
-      path: '/mock/iso27001_guide.docx'
-    },
-    {
-      id: 3,
-      name: 'NCA Compliance Checklist.xlsx',
-      type: 'XLSX',
-      size: '0.5 MB',
-      uploaded: '2024-01-13',
-      status: 'processing',
-      chunks: 0,
-      embeddings: 0,
-      path: '/mock/nca_checklist.xlsx'
-    },
-    {
-      id: 4,
-      name: 'PCI DSS Requirements.pdf',
-      type: 'PDF',
-      size: '3.2 MB',
-      uploaded: '2024-01-12',
-      status: 'processed',
-      chunks: 203,
-      embeddings: 203,
-      path: '/mock/pci_dss.pdf'
-    }
-  ],
-  chunks: [
-    {
-      id: 1,
-      documentId: 1,
-      content: 'Organizations must implement multi-factor authentication for all privileged accounts accessing critical systems. This requirement applies to both internal users and third-party service providers.',
-      page: 45,
-      section: 'Access Control Requirements',
-      embedding: [0.1, 0.2, 0.3, 0.4], // Mock embedding vector
-      metadata: { context: 'Authentication and Authorization' }
-    },
-    {
-      id: 2,
-      documentId: 2,
-      content: 'Access control procedures should be documented and regularly reviewed. Organizations must maintain an inventory of all user accounts and their associated privileges.',
-      page: 23,
-      section: 'A.9.1 Access Control Management',
-      embedding: [0.2, 0.3, 0.4, 0.5],
-      metadata: { context: 'User Access Management' }
-    },
-    {
-      id: 3,
-      documentId: 4,
-      content: 'Strong authentication mechanisms must be implemented for all system components. Default passwords and authentication parameters must be changed before systems are put into production.',
-      page: 67,
-      section: 'Requirement 8: Authentication',
-      embedding: [0.3, 0.4, 0.5, 0.6],
-      metadata: { context: 'Identity and Access Management' }
-    }
-  ],
-  stats: {
-    totalDocuments: 4,
-    processedDocuments: 3,
-    totalChunks: 657,
-    totalEmbeddings: 657,
-    queriesProcessed: 1234
-  }
-};
+// Database queries for RAG operations
 
 // Text extraction functions
 async function extractTextFromPDF(filePath) {
@@ -175,40 +91,61 @@ function chunkText(text, chunkSize = 500, overlap = 50) {
   return chunks;
 }
 
-// Mock similarity search function
-function mockSimilaritySearch(query, chunks, topK = 5) {
-  // In production, this would use actual vector similarity
-  // For now, we'll use simple keyword matching
-  const queryLower = query.toLowerCase();
-  const scoredChunks = chunks.map(chunk => {
-    const contentLower = chunk.content.toLowerCase();
-    let score = 0;
+// Database similarity search function
+async function similaritySearch(query, limit = 5, minRelevance = 0.1) {
+  try {
+    const results = await query(`
+      SELECT 
+        rc.id,
+        rc.document_id,
+        rc.content,
+        rc.page,
+        rc.section,
+        rc.metadata,
+        rd.name as document_name,
+        0.5 as relevance -- Placeholder relevance score
+      FROM rag_chunks rc
+      JOIN rag_documents rd ON rc.document_id = rd.id
+      WHERE rc.content ILIKE $1
+      AND rd.status = 'processed'
+      ORDER BY relevance DESC
+      LIMIT $2
+    `, [`%${query}%`, limit]);
 
-    // Simple keyword matching score
-    const queryWords = queryLower.split(' ');
-    queryWords.forEach(word => {
-      if (contentLower.includes(word)) {
-        score += 1;
-      }
-    });
-
-    return { ...chunk, relevance: score / queryWords.length };
-  });
-
-  return scoredChunks
-    .filter(chunk => chunk.relevance > 0)
-    .sort((a, b) => b.relevance - a.relevance)
-    .slice(0, topK);
+    return results;
+  } catch (error) {
+    console.error('Error in similarity search:', error);
+    return [];
+  }
 }
 
 // Routes
 
 // Get RAG statistics
-router.get('/stats', (req, res) => {
+router.get('/stats', async (req, res) => {
   try {
+    const stats = await query(`
+      SELECT 
+        COUNT(*) as total_documents,
+        COUNT(CASE WHEN status = 'processed' THEN 1 END) as processed_documents,
+        COUNT(CASE WHEN status = 'processing' THEN 1 END) as processing_documents,
+        SUM(chunks) as total_chunks,
+        SUM(embeddings) as total_embeddings,
+        COUNT(DISTINCT queries.id) as queries_processed
+      FROM rag_documents rd
+      LEFT JOIN rag_queries rq ON rd.id = rq.document_id
+    `);
+
     res.json({
       success: true,
-      data: mockVectorDB.stats
+      data: stats[0] || {
+        total_documents: 0,
+        processed_documents: 0,
+        processing_documents: 0,
+        total_chunks: 0,
+        total_embeddings: 0,
+        queries_processed: 0
+      }
     });
   } catch (error) {
     console.error('Error getting RAG stats:', error);
@@ -221,22 +158,56 @@ router.get('/stats', (req, res) => {
 });
 
 // Get all documents
-router.get('/documents', (req, res) => {
+router.get('/documents', async (req, res) => {
   try {
-    const { status, type } = req.query;
-    let documents = mockVectorDB.documents;
+    const { status, type, limit = 50, offset = 0 } = req.query;
+    
+    let whereClause = 'WHERE 1=1';
+    const params = [];
+    let paramIndex = 1;
 
     if (status) {
-      documents = documents.filter(doc => doc.status === status);
+      whereClause += ` AND status = $${paramIndex}`;
+      params.push(status);
+      paramIndex++;
     }
 
     if (type) {
-      documents = documents.filter(doc => doc.type === type);
+      whereClause += ` AND type = $${paramIndex}`;
+      params.push(type);
+      paramIndex++;
     }
+
+    params.push(limit, offset);
+
+    const documents = await query(`
+      SELECT 
+        rd.*,
+        COUNT(rc.id) as chunk_count,
+        COUNT(rq.id) as query_count
+      FROM rag_documents rd
+      LEFT JOIN rag_chunks rc ON rd.id = rc.document_id
+      LEFT JOIN rag_queries rq ON rd.id = rq.document_id
+      ${whereClause}
+      GROUP BY rd.id
+      ORDER BY rd.created_at DESC
+      LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+    `, params);
+
+    const countResult = await query(`
+      SELECT COUNT(*) as total
+      FROM rag_documents rd
+      ${whereClause}
+    `, params.slice(0, -2));
 
     res.json({
       success: true,
-      data: documents
+      data: documents,
+      pagination: {
+        total: parseInt(countResult[0]?.total || 0),
+        limit: parseInt(limit),
+        offset: parseInt(offset)
+      }
     });
   } catch (error) {
     console.error('Error getting documents:', error);
@@ -249,12 +220,32 @@ router.get('/documents', (req, res) => {
 });
 
 // Get document by ID
-router.get('/documents/:id', (req, res) => {
+router.get('/documents/:id', async (req, res) => {
   try {
     const documentId = parseInt(req.params.id);
-    const document = mockVectorDB.documents.find(doc => doc.id === documentId);
+    
+    const document = await query(`
+      SELECT 
+        rd.*,
+        COUNT(rc.id) as chunk_count,
+        COUNT(rq.id) as query_count,
+        json_agg(
+          json_build_object(
+            'id', rc.id,
+            'content', rc.content,
+            'page', rc.page,
+            'section', rc.section,
+            'metadata', rc.metadata
+          ) ORDER BY rc.created_at
+        ) FILTER (WHERE rc.id IS NOT NULL) as chunks
+      FROM rag_documents rd
+      LEFT JOIN rag_chunks rc ON rd.id = rc.document_id
+      LEFT JOIN rag_queries rq ON rd.id = rq.document_id
+      WHERE rd.id = $1
+      GROUP BY rd.id
+    `, [documentId]);
 
-    if (!document) {
+    if (!document || document.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Document not found'
@@ -263,7 +254,7 @@ router.get('/documents/:id', (req, res) => {
 
     res.json({
       success: true,
-      data: document
+      data: document[0]
     });
   } catch (error) {
     console.error('Error getting document:', error);
@@ -322,33 +313,37 @@ router.post('/documents/upload', upload.single('document'), async (req, res) => 
     // Chunk the text
     const chunks = chunkText(extractedText);
 
-    // Create document record
-    const newDocument = {
-      id: mockVectorDB.documents.length + 1,
-      name: originalname,
-      type: ext.substring(1).toUpperCase(),
-      size: `${(size / 1024 / 1024).toFixed(1)} MB`,
-      uploaded: new Date().toISOString().split('T')[0],
-      status: 'processed',
-      chunks: chunks.length,
-      embeddings: chunks.length,
-      path: filePath,
-      filename
-    };
+    // Create document record in database
+    const documentResult = await query(`
+      INSERT INTO rag_documents (name, type, size, status, chunks, embeddings, path, filename, uploaded)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+      RETURNING id
+    `, [originalname, ext.substring(1).toUpperCase(), `${(size / 1024 / 1024).toFixed(1)} MB`, 'processed', chunks.length, chunks.length, filePath, filename]);
 
-    // Add to mock database
-    mockVectorDB.documents.push(newDocument);
+    const documentId = documentResult[0].id;
 
-    // Update stats
-    mockVectorDB.stats.totalDocuments++;
-    mockVectorDB.stats.processedDocuments++;
-    mockVectorDB.stats.totalChunks += chunks.length;
-    mockVectorDB.stats.totalEmbeddings += chunks.length;
+    // Store chunks in database
+    for (let i = 0; i < chunks.length; i++) {
+      await query(`
+        INSERT INTO rag_chunks (document_id, content, chunk_index, created_at)
+        VALUES ($1, $2, $3, NOW())
+      `, [documentId, chunks[i], i]);
+    }
 
     res.json({
       success: true,
       message: 'Document uploaded and processed successfully',
-      data: newDocument
+      data: {
+        id: documentId,
+        name: originalname,
+        type: ext.substring(1).toUpperCase(),
+        size: `${(size / 1024 / 1024).toFixed(1)} MB`,
+        status: 'processed',
+        chunks: chunks.length,
+        embeddings: chunks.length,
+        path: filePath,
+        filename
+      }
     });
   } catch (error) {
     console.error('Error uploading document:', error);
@@ -368,16 +363,22 @@ router.post('/documents/upload', upload.single('document'), async (req, res) => 
 router.delete('/documents/:id', async (req, res) => {
   try {
     const documentId = parseInt(req.params.id);
-    const documentIndex = mockVectorDB.documents.findIndex(doc => doc.id === documentId);
+    
+    // Get document details from database
+    const documentResult = await query(`
+      SELECT id, path, status, chunks, embeddings 
+      FROM rag_documents 
+      WHERE id = $1
+    `, [documentId]);
 
-    if (documentIndex === -1) {
+    if (documentResult.length === 0) {
       return res.status(404).json({
         success: false,
         message: 'Document not found'
       });
     }
 
-    const document = mockVectorDB.documents[documentIndex];
+    const document = documentResult[0];
 
     // Delete file if it exists
     if (document.path && document.path !== '/mock/sama_framework.pdf') {
@@ -388,16 +389,9 @@ router.delete('/documents/:id', async (req, res) => {
       }
     }
 
-    // Remove from database
-    mockVectorDB.documents.splice(documentIndex, 1);
-
-    // Update stats
-    mockVectorDB.stats.totalDocuments--;
-    if (document.status === 'processed') {
-      mockVectorDB.stats.processedDocuments--;
-    }
-    mockVectorDB.stats.totalChunks -= document.chunks || 0;
-    mockVectorDB.stats.totalEmbeddings -= document.embeddings || 0;
+    // Delete chunks and document from database
+    await query('DELETE FROM rag_chunks WHERE document_id = $1', [documentId]);
+    await query('DELETE FROM rag_documents WHERE id = $1', [documentId]);
 
     res.json({
       success: true,
@@ -414,7 +408,7 @@ router.delete('/documents/:id', async (req, res) => {
 });
 
 // Query documents (RAG search)
-router.post('/query', (req, res) => {
+router.post('/query', async (req, res) => {
   try {
     const { query, maxResults = 5, minRelevance = 0.1 } = req.body;
 
@@ -426,27 +420,24 @@ router.post('/query', (req, res) => {
     }
 
     // Perform similarity search
-    const results = mockSimilaritySearch(query, mockVectorDB.chunks, maxResults);
+    const results = await similaritySearch(query, maxResults, minRelevance);
 
-    // Filter by minimum relevance
-    const filteredResults = results.filter(result => result.relevance >= minRelevance);
+    // Format results
+    const formattedResults = results.map(result => ({
+      id: result.id,
+      document: result.document_name,
+      relevance: result.relevance,
+      chunk: result.content,
+      page: result.page,
+      section: result.section,
+      context: result.metadata?.context || 'General'
+    }));
 
-    // Format results with document information
-    const formattedResults = filteredResults.map(chunk => {
-      const document = mockVectorDB.documents.find(doc => doc.id === chunk.documentId);
-      return {
-        id: chunk.id,
-        document: document?.name || 'Unknown Document',
-        relevance: chunk.relevance,
-        chunk: chunk.content,
-        page: chunk.page,
-        section: chunk.section,
-        context: chunk.metadata?.context || 'General'
-      };
-    });
-
-    // Update query stats
-    mockVectorDB.stats.queriesProcessed++;
+    // Log the query for analytics
+    await query(`
+      INSERT INTO rag_queries (query, response, relevance_score, created_at)
+      VALUES ($1, $2, $3, NOW())
+    `, [query, JSON.stringify(formattedResults), formattedResults.length > 0 ? Math.max(...formattedResults.map(r => r.relevance)) : 0]);
 
     res.json({
       success: true,
@@ -476,10 +467,22 @@ router.post('/search', (req, res) => {
 });
 
 // Get document chunks
-router.get('/documents/:id/chunks', (req, res) => {
+router.get('/documents/:id/chunks', async (req, res) => {
   try {
     const documentId = parseInt(req.params.id);
-    const chunks = mockVectorDB.chunks.filter(chunk => chunk.documentId === documentId);
+    
+    const chunks = await query(`
+      SELECT 
+        rc.id,
+        rc.content,
+        rc.page,
+        rc.section,
+        rc.metadata,
+        rc.created_at
+      FROM rag_chunks rc
+      WHERE rc.document_id = $1
+      ORDER BY rc.created_at
+    `, [documentId]);
 
     res.json({
       success: true,
@@ -495,10 +498,25 @@ router.get('/documents/:id/chunks', (req, res) => {
   }
 });
 
-// Get RAG settings (mock)
-router.get('/settings', (req, res) => {
+// Get RAG settings from database
+router.get('/settings', async (req, res) => {
   try {
-    const settings = {
+    const settings = await query(`
+      SELECT 
+        model,
+        max_results as "maxResults",
+        min_relevance as "minRelevance",
+        chunk_size as "chunkSize",
+        chunk_overlap as "chunkOverlap",
+        embedding_model as "embeddingModel",
+        temperature
+      FROM rag_settings
+      WHERE is_active = true
+      ORDER BY created_at DESC
+      LIMIT 1
+    `);
+
+    const defaultSettings = {
       model: 'gpt-4',
       maxResults: 5,
       minRelevance: 0.7,
@@ -510,7 +528,7 @@ router.get('/settings', (req, res) => {
 
     res.json({
       success: true,
-      data: settings
+      data: settings[0] || defaultSettings
     });
   } catch (error) {
     console.error('Error getting RAG settings:', error);
@@ -522,18 +540,22 @@ router.get('/settings', (req, res) => {
   }
 });
 
-// Update RAG settings (mock)
-router.put('/settings', (req, res) => {
+// Update RAG settings
+router.put('/settings', async (req, res) => {
   try {
-    const { settings } = req.body;
+    const { model, maxResults, minRelevance, chunkSize, chunkOverlap, embeddingModel, temperature } = req.body;
 
-    // In production, save settings to database
-    console.log('Updating RAG settings:', settings);
+    await query(`
+      INSERT INTO rag_settings (
+        model, max_results, min_relevance, chunk_size, 
+        chunk_overlap, embedding_model, temperature, is_active, created_at
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, true, NOW())
+    `, [model, maxResults, minRelevance, chunkSize, chunkOverlap, embeddingModel, temperature]);
 
     res.json({
       success: true,
       message: 'Settings updated successfully',
-      data: settings
+      data: req.body
     });
   } catch (error) {
     console.error('Error updating RAG settings:', error);

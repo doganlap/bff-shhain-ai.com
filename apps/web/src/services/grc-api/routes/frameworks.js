@@ -59,51 +59,20 @@ router.get('/', async (req, res) => {
       }
     });
   } catch (error) {
-    const pageNum = parseInt(req.query.page || 1);
-    const limitNum = parseInt(req.query.limit || 10);
-    res.json({
-      success: true,
-      data: [],
-      pagination: {
-        page: pageNum,
-        limit: limitNum,
-        total: 0,
-        totalPages: 0,
-        hasNext: false,
-        hasPrev: pageNum > 1
-      }
-    });
+    res.status(500).json({ success: false, error: 'Failed to fetch frameworks' });
   }
 });
 
 router.get('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const { rows } = await query(`
-      SELECT
-        f.id,
-        f.framework_code,
-        f.name_en,
-        f.name_ar,
-        f.description_en,
-        f.description_ar,
-        f.framework_type,
-        f.category,
-        f.industry_sectors,
-        f.issuing_authority_id,
-        r.name_en as authority_name_en,
-        r.name_ar as authority_name_ar
-      FROM
-        unified_frameworks f
-      LEFT JOIN
-        unified_regulatory_authorities r
-      ON
-        f.issuing_authority_id = r.id
-      WHERE
-        f.id = $1
+    const frameworkResult = await query(`
+      SELECT id, framework_code, name, category, issuing_authority, status, is_active
+      FROM grc_frameworks
+      WHERE id = $1
     `, [id]);
 
-    if (rows.length === 0) {
+    if (frameworkResult.rows.length === 0) {
       return res.status(404).json({
         success: false,
         error: 'Framework not found'
@@ -111,9 +80,10 @@ router.get('/:id', async (req, res) => {
     }
 
     const controlsResult = await query(`
-      SELECT * FROM unified_controls_master
+      SELECT id, framework_id, control_code, title, criticality_level, is_mandatory, is_active
+      FROM grc_controls
       WHERE framework_id = $1 AND is_active = true
-      ORDER BY control_id
+      ORDER BY control_code
     `, [id]);
 
     res.json({
@@ -125,12 +95,38 @@ router.get('/:id', async (req, res) => {
     });
 
   } catch (error) {
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch framework',
-      message: error.message
-    });
+    res.status(500).json({ success: false, error: 'Failed to fetch framework' });
   }
 });
 
 module.exports = router;
+
+/**
+ * POST /api/frameworks/seed
+ * Seed core frameworks into the database
+ */
+router.post('/seed', async (req, res) => {
+  try {
+    const frameworks = [
+      { code: 'ISO27001', name: 'ISO 27001', category: 'information_security', issuing_authority: 'ISO', status: 'active' },
+      { code: 'NIST-CSF', name: 'NIST Cybersecurity Framework', category: 'cybersecurity', issuing_authority: 'NIST', status: 'active' },
+      { code: 'SAMA-CS', name: 'SAMA Cybersecurity Framework', category: 'banking', issuing_authority: 'SAMA', status: 'active' },
+    ];
+
+    for (const fw of frameworks) {
+      const existing = await query('SELECT id FROM grc_frameworks WHERE framework_code = $1', [fw.code]);
+      if (existing.rows.length === 0) {
+        await query(
+          `INSERT INTO grc_frameworks (framework_code, name, category, issuing_authority, status, is_active)
+           VALUES ($1, $2, $3, $4, $5, true)`,
+          [fw.code, fw.name, fw.category, fw.issuing_authority, fw.status]
+        );
+      }
+    }
+
+    res.json({ success: true, message: 'Frameworks seed completed' });
+  } catch (error) {
+    console.error('❌ Error seeding frameworks:', error);
+    res.status(500).json({ success: false, error: 'Seed failed', message: error.message });
+  }
+});

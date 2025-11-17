@@ -55,7 +55,7 @@ const Contact = () => {
             نحن هنا للمساعدة. تواصل معنا لأي استفسارات أو للحصول على مزيد من المعلومات حول شاهين للحوكمة
           </p>
           <p className="font-english text-base text-gray-500 max-w-3xl mx-auto mt-2">
-            We're here to help. Contact us with any questions or to learn more about Shahin GRC
+            We&apos;re here to help. Contact us with any questions or to learn more about Shahin GRC
           </p>
         </motion.div>
 
@@ -176,7 +176,7 @@ const Contact = () => {
               {submitStatus === 'success' && (
                 <div className="flex items-center gap-2 text-green-600 bg-green-50 border border-green-200 rounded-lg p-4">
                   <CheckCircle className="w-5 h-5" />
-                  <span className="font-english text-sm">Message sent successfully! We'll get back to you soon.</span>
+                  <span className="font-english text-sm">Message sent successfully! We&apos;ll get back to you soon.</span>
                 </div>
               )}
 

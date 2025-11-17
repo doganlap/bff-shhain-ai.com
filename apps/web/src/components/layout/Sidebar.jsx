@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { getNavigationForRole } from './MultiTenantNavigation';
@@ -121,23 +120,24 @@ const Sidebar = () => {
   const [selectedIndex, setSelectedIndex] = useState(-1);
   const sidebarRef = useRef(null);
 
+
   // Touch gesture handlers
-  const handleTouchStart = (e) => {
+  const handleTouchStart = React.useCallback((e) => {
     setTouchEnd(null);
     setTouchStart({
       x: e.touches[0].clientX,
       y: e.touches[0].clientY,
     });
-  };
+  }, []);
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = React.useCallback((e) => {
     setTouchEnd({
       x: e.touches[0].clientX,
       y: e.touches[0].clientY,
     });
-  };
+  }, []);
 
-  const handleTouchEnd = () => {
+  const handleTouchEnd = React.useCallback(() => {
     if (!touchStart || !touchEnd) return;
 
     const deltaX = touchStart.x - touchEnd.x;
@@ -158,7 +158,7 @@ const Sidebar = () => {
         }
       }
     }
-  };
+  }, [touchStart, touchEnd, sidebarOpen, actions]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -182,7 +182,11 @@ const Sidebar = () => {
 
       // Arrow key navigation
       if (sidebarOpen) {
-        const allItems = navigationGroups.flatMap(group => group.items);
+        const allItems = getNavigationForRole(
+          user?.role || 'team_member',
+          state.currentTenant || { id: 1, name: 'Default' },
+          stats
+        ).flatMap(section => section.items || []);
 
         switch (e.key) {
           case 'ArrowDown':
@@ -214,7 +218,7 @@ const Sidebar = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sidebarOpen, selectedIndex, searchTerm, actions, handleRefresh, handleNavigation]);
+  }, [sidebarOpen, selectedIndex, searchTerm, actions, handleRefresh, handleNavigation, user?.role, state.currentTenant, stats]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -242,7 +246,7 @@ const Sidebar = () => {
       sidebar.removeEventListener('touchmove', handleTouchMove);
       sidebar.removeEventListener('touchend', handleTouchEnd);
     };
-  }, []);
+  }, []); // Remove touch handler dependencies - they don't change
 
   // Save user preferences
   useEffect(() => {

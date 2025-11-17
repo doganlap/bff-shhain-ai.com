@@ -32,7 +32,7 @@ const ParallaxSection = () => {
               يجب أن تكون بسيطة، ذكية، وفي متناول الجميع.
             </p>
             <p className="font-english text-base text-gray-500 max-w-3xl mx-auto mt-4">
-              Shahin isn't just a tool - we're your partner in success. We believe effective 
+              Shahin isn&apos;t just a tool - we&apos;re your partner in success. We believe effective 
               governance should be simple, smart, and accessible to everyone.
             </p>
           </motion.div>

@@ -61,7 +61,7 @@ async function requireCenterDbAuth(req, res, next) {
         return res.status(401).json({ error: 'Unauthorized' });
       }
       req.user = { id: user.id, email: user.email, tenantId: user.tenant_id, role: user.role };
-    } catch (_) {
+    } catch (e) {
       return res.status(503).json({ error: 'Auth unavailable' });
     }
   }

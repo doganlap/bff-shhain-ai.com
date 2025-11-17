@@ -6,7 +6,7 @@ import { AnimatedCard, AnimatedButton } from '../../components/Animation/Interac
 import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../../components/theme/ThemeProvider';
-import apiService from '@/services/apiEndpoints';
+import { apiServices } from '@/services/api';
 import { toast } from 'sonner';
 
 const SettingsPage = () => {
@@ -18,13 +18,10 @@ const SettingsPage = () => {
   const [settings, setSettings] = useState({});
   
   // Fetch real settings from API
-  useEffect(() => {
-    fetchSettings();
-  }, [fetchSettings]);
   
   const fetchSettings = useCallback(async () => {
     try {
-      const response = await apiService.settings.get();
+      const response = await apiServices.settings.getSettings();
       if (response?.data?.success && response.data.data) {
         setSettings(response.data.data);
       } else {
@@ -67,11 +64,14 @@ const SettingsPage = () => {
       toast.error('Failed to load settings');
     }
   }, [isDark, language, state?.user]);
+  useEffect(() => {
+    fetchSettings();
+  }, [fetchSettings]);
   
   // Save settings to API
   const handleSaveSettings = async () => {
     try {
-      const response = await apiService.settings.update(settings);
+      const response = await apiServices.settings.updateSettings(settings);
       if (response?.data?.success) {
         toast.success('Settings saved successfully');
         

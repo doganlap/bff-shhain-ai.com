@@ -12,8 +12,8 @@ const FEATURE_FLAGS = {
   // Enable/disable specific features
   ENABLE_REAL_APIS_ONLY: process.env.REACT_APP_REAL_APIS_ONLY === 'true',
   
-  // Mock data controls
-  ALLOW_MOCK_DATA: process.env.NODE_ENV !== 'production' && process.env.REACT_APP_ALLOW_MOCK_DATA !== 'false',
+  // Mock data controls - DISABLE ALL MOCK DATA
+  ALLOW_MOCK_DATA: false, // Force real data only
   
   // Feature toggles
   ENABLE_OPTIMISTIC_UPDATES: true,

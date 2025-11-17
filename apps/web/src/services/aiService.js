@@ -37,7 +37,7 @@ class AIService {
     }
 
     if (!this.isConnected) {
-      return this.getFallbackAgents();
+      throw new Error('AI service connection failed');
     }
 
     try {
@@ -51,40 +51,7 @@ class AIService {
     }
   }
 
-  getFallbackAgents() {
-    return [
-      {
-        id: 'compliance-scanner',
-        name: 'Compliance Scanner',
-        nameAr: 'ماسح الامتثال',
-        status: 'offline',
-        description: 'AI-powered compliance analysis',
-        descriptionAr: 'تحليل الامتثال بالذكاء الاصطناعي',
-        message: '⚠️ العامل غير متصل بخدمة ذكاء اصطناعي. يرجى التحقق من إعدادات الخدمة.',
-        messageEn: '⚠️ Agent not connected to AI service. Please check service configuration.'
-      },
-      {
-        id: 'risk-analyzer',
-        name: 'Risk Analyzer',
-        nameAr: 'محلل المخاطر',
-        status: 'offline',
-        description: 'Intelligent risk assessment',
-        descriptionAr: 'تقييم المخاطر الذكي',
-        message: '⚠️ العامل غير متصل بخدمة ذكاء اصطناعي.',
-        messageEn: '⚠️ Agent not connected to AI service.'
-      },
-      {
-        id: 'evidence-collector',
-        name: 'Evidence Collector',
-        nameAr: 'جامع الأدلة',
-        status: 'offline',
-        description: 'Automated evidence gathering',
-        descriptionAr: 'جمع الأدلة التلقائي',
-        message: '⚠️ العامل غير متصل بخدمة ذكاء اصطناعي.',
-        messageEn: '⚠️ Agent not connected to AI service.'
-      }
-    ];
-  }
+  // Removed fallback agents - now throws error if AI service unavailable
 
   async startAgent(agentId) {
     if (!this.isConnected) {

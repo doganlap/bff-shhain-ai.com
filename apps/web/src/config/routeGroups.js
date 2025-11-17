@@ -19,7 +19,7 @@ export const ROUTE_GROUPS = {
       { path: '/login', name: 'Login', component: 'GlassmorphismLoginPage' },
       { path: '/register', name: 'Register', component: 'StoryDrivenRegistration' },
       { path: '/landing', name: 'Landing', component: 'LandingPage' },
-      { path: '/demo', name: 'Demo', component: 'DemoPage' },
+      
     ]
   },
 
@@ -161,8 +161,7 @@ export const ROUTE_GROUPS = {
         name: 'Specialized',
         routes: [
           { path: '/app/ksa-grc', name: 'KSA GRC', component: 'KSAGRCPage' },
-          { path: '/app/components-demo', name: 'Components Demo', component: 'ComponentsDemoPage' },
-          { path: '/demo/modern-components', name: 'Modern Components', component: 'ModernComponentsDemo' },
+          
         ]
       },
     }

@@ -1,12 +1,15 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useMemo, useRef } from 'react';
 import { apiServices } from '@/services/api';
-import {
-  DEMO_MODE_CONFIG,
-  DEMO_DATA_CHECKSUMS,
-  DemoSessionManager,
-  validateDemoMode,
-  demoSecurityUtils
-} from '../config/demoMode.config';
+
+// Demo mode configuration
+const DEMO_MODE_CONFIG = {
+  sessionDuration: 30 * 60 * 1000, // 30 minutes
+  maxUsers: 5,
+  maxOrganizations: 3,
+  maxAssessments: 10,
+  features: ['basic-dashboard', 'assessments', 'reports']
+};
+
 
 // Initial state
 const initialState = {
@@ -59,12 +62,7 @@ const actionTypes = {
   SET_TOKEN: 'SET_TOKEN',
   LOGOUT: 'LOGOUT',
 
-  // Demo mode
-  SET_DEMO_MODE: 'SET_DEMO_MODE',
-  SET_DEMO_SESSION: 'SET_DEMO_SESSION',
-  UPDATE_DEMO_TIME: 'UPDATE_DEMO_TIME',
-  SET_DEMO_SECURITY: 'SET_DEMO_SECURITY',
-  END_DEMO_SESSION: 'END_DEMO_SESSION',
+  
 
   // Data
   SET_REGULATORS: 'SET_REGULATORS',
@@ -216,6 +214,19 @@ export const AppProvider = ({ children }) => {
       if (appRole === 'SUPER_ADMIN') {
         initializeApp();
       }
+
+      const savedToken = typeof localStorage !== 'undefined' ? localStorage.getItem('app_token') : null;
+      const savedUser = typeof localStorage !== 'undefined' ? localStorage.getItem('app_user') : null;
+      if (savedToken) {
+        dispatch({ type: actionTypes.SET_TOKEN, payload: savedToken });
+      }
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser);
+          dispatch({ type: actionTypes.SET_USER, payload: parsed });
+          dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: true });
+        } catch {}
+      }
     } catch {}
   }, []);
 
@@ -249,115 +260,21 @@ export const AppProvider = ({ children }) => {
         } catch (error) {
           clearTimeout(timeoutId);
           console.error('🔌 API connection failed:', error);
-          console.log('🎯 Switching to offline demo mode');
-
-          // Load demo data for offline mode
-          setDemoData();
-
-          // Set a demo user for offline mode and auto-login
-          const demoUser = {
-            id: 'demo-user',
-            firstName: 'Demo',
-            lastName: 'User',
-            email: 'demo@shahin-ai.com',
-            role: 'admin',
-            organization: 'Shahin-AI Demo'
-          };
-
-          dispatch({ type: actionTypes.SET_USER, payload: demoUser });
-          dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: true });
-
-          console.log('🔓 Auto-login successful: Demo user automatically logged in');
-          console.log('📋 Demo credentials for manual login: demo@shahin-ai.com / demo123');
-
-          // Set offline mode flag
-          dispatch({ type: actionTypes.SET_ERROR, payload: 'Offline Demo Mode - Using sample data' });
+          dispatch({ type: actionTypes.SET_ERROR, payload: 'API connection failed' });
         }
 
       } catch (error) {
         console.error('App initialization error:', error);
         dispatch({ type: actionTypes.SET_ERROR, payload: error.message });
 
-        // Fallback to demo data even if initialization fails
-        console.log('🎯 Fallback: Loading demo data');
-        setDemoData();
+        
       } finally {
         dispatch({ type: actionTypes.SET_LOADING, payload: false });
       }
     }, []);
 
   // Set demo data for offline mode with security and integrity
-  const setDemoData = () => {
-    console.log('🔐 Initializing secure demo mode...');
-
-    // Start demo session
-    const demoSession = new DemoSessionManager();
-    const sessionId = demoSession.startSession();
-
-    // Set demo mode state
-    dispatch({ type: actionTypes.SET_DEMO_MODE, payload: true });
-    dispatch({ type: actionTypes.SET_DEMO_SESSION, payload: {
-      id: sessionId,
-      start: demoSession.sessionStart,
-      expires: demoSession.sessionStart + DEMO_MODE_CONFIG.security.maxDemoDuration
-    }});
-
-    // Add security watermark to demo data
-    const demoStats = demoSecurityUtils.addDemoWatermark({
-      regulators: 12,
-      frameworks: 8,
-      controls: 156,
-      assessments: 24,
-      organizations: 5,
-      compliance_score: 94.2
-    });
-
-    const demoRegulators = demoSecurityUtils.addDemoWatermark([
-      { id: 1, name: 'SAMA', nameAr: 'البنك المركزي السعودي', type: 'Banking' },
-      { id: 2, name: 'CMA', nameAr: 'هيئة السوق المالية', type: 'Capital Markets' },
-      { id: 3, name: 'CITC', nameAr: 'هيئة الاتصالات وتقنية المعلومات', type: 'Telecommunications' }
-    ]);
-
-    const demoFrameworks = demoSecurityUtils.addDemoWatermark([
-      { id: 1, name: 'ISO 27001', description: 'Information Security Management' },
-      { id: 2, name: 'NIST Framework', description: 'Cybersecurity Framework' },
-      { id: 3, name: 'SAMA Cyber Security', description: 'SAMA Cybersecurity Framework' }
-    ]);
-
-    const demoOrganizations = demoSecurityUtils.addDemoWatermark([
-      { id: 1, name: 'Demo Bank', type: 'Financial Institution', status: 'Active' },
-      { id: 2, name: 'Tech Corp', type: 'Technology', status: 'Active' }
-    ]);
-
-    // Dispatch secure demo data
-    dispatch({ type: actionTypes.SET_STATS, payload: demoStats });
-    dispatch({ type: actionTypes.SET_REGULATORS, payload: demoRegulators });
-    dispatch({ type: actionTypes.SET_FRAMEWORKS, payload: demoFrameworks });
-    dispatch({ type: actionTypes.SET_ORGANIZATIONS, payload: demoOrganizations });
-
-    // Validate demo data integrity
-    const validation = validateDemoMode({
-      regulators: demoRegulators,
-      frameworks: demoFrameworks,
-      organizations: demoOrganizations,
-      stats: demoStats,
-      user: { id: 'demo-user' },
-      isAuthenticated: true
-    });
-
-    if (!validation.isValid) {
-      console.error('❌ Demo mode validation failed:', validation.errors);
-      dispatch({
-        type: actionTypes.SET_ERROR,
-        payload: 'Demo mode validation failed: ' + validation.errors.join(', ')
-      });
-      return;
-    }
-
-    console.log('✅ Secure demo data loaded with integrity validation');
-    console.log('🔒 Demo session started:', sessionId);
-    console.log('⏰ Demo session expires in:', Math.round(DEMO_MODE_CONFIG.security.maxDemoDuration / (1000 * 60 * 60)), 'hours');
-  };
+  
 
   const initializeApp = async () => {
     try {
@@ -385,8 +302,7 @@ export const AppProvider = ({ children }) => {
       }
 
       // Check if user is already authenticated by making a request to /auth/me
-      // Skip this in demo mode since user is already set up
-      if (!state.isDemoMode) {
+      {
         try {
           const response = await apiServices.auth.me();
           if (response.data?.success && response.data?.data?.user) {
@@ -412,60 +328,7 @@ export const AppProvider = ({ children }) => {
 
   const loadInitialData = useCallback(async () => {
     try {
-      // Use demo data in demo mode instead of making API calls
-      if (state.isDemoMode) {
-        console.log('🎯 Demo mode: Loading demo data without API calls');
-
-        // Set demo data directly
-        dispatch({
-          type: actionTypes.SET_REGULATORS,
-          payload: [
-            { id: 1, name: 'SAMA', nameAr: 'البنك المركزي السعودي', type: 'Banking', _demoMode: true },
-            { id: 2, name: 'CMA', nameAr: 'هيئة السوق المالية', type: 'Capital Markets', _demoMode: true },
-            { id: 3, name: 'CITC', nameAr: 'هيئة الاتصالات وتقنية المعلومات', type: 'Telecommunications', _demoMode: true }
-          ]
-        });
-
-        dispatch({
-          type: actionTypes.SET_FRAMEWORKS,
-          payload: [
-            { id: 1, name: 'ISO 27001', description: 'Information Security Management', _demoMode: true },
-            { id: 2, name: 'NIST Framework', description: 'Cybersecurity Framework', _demoMode: true },
-            { id: 3, name: 'SAMA Cyber Security', description: 'SAMA Cybersecurity Framework', _demoMode: true }
-          ]
-        });
-
-        dispatch({
-          type: actionTypes.SET_ORGANIZATIONS,
-          payload: [
-            { id: 1, name: 'Demo Bank', type: 'Financial Institution', status: 'Active', _demoMode: true },
-            { id: 2, name: 'Tech Corp', type: 'Technology', status: 'Active', _demoMode: true }
-          ]
-        });
-
-        dispatch({
-          type: actionTypes.SET_TEMPLATES,
-          payload: [
-            { id: 1, name: 'Risk Assessment Template', type: 'Risk', _demoMode: true },
-            { id: 2, name: 'Compliance Checklist', type: 'Compliance', _demoMode: true }
-          ]
-        });
-
-        dispatch({
-          type: actionTypes.SET_STATS,
-          payload: {
-            regulators: 3,
-            frameworks: 3,
-            controls: 156,
-            assessments: 12,
-            organizations: 2,
-            compliance_score: 94.2,
-            _demoMode: true
-          }
-        });
-
-        return;
-      }
+      
 
       // Load all essential data in parallel with error handling (for non-demo mode)
       const [
@@ -580,36 +443,25 @@ export const AppProvider = ({ children }) => {
   const actions = {
     // Authentication actions
     login: async (credentials) => {
-      // Handle demo mode login with security measures
-      if (state.isDemoMode) {
-        // Allow demo login with predefined credentials
-        const demoCredentials = {
-          email: 'demo@shahin-ai.com',
-          password: 'demo123'
-        };
-
-        // Check if credentials match demo credentials
-        if (credentials.email === demoCredentials.email && credentials.password === demoCredentials.password) {
-          // Set demo user
-          dispatch({ type: actionTypes.SET_USER, payload: state.user });
-          dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: true });
-          console.log('🔓 Demo login successful - secure demo access granted');
-          return { success: true };
-        } else {
-          // Block invalid demo login attempts
-          dispatch({ type: actionTypes.SET_ERROR, payload: 'Invalid demo credentials. Use: demo@shahin-ai.com / demo123' });
-          return { success: false, error: 'Invalid demo credentials. Use: demo@shahin-ai.com / demo123' };
-        }
-      }
 
       try {
         dispatch({ type: actionTypes.SET_LOADING, payload: true });
         const response = await apiServices.auth.login(credentials);
-        const { user } = response.data.data || response.data;
+        const { user, token } = response.data.data || response.data;
 
         // No need to manually store tokens as they'll be in HTTP-only cookies
         dispatch({ type: actionTypes.SET_USER, payload: user });
         dispatch({ type: actionTypes.SET_AUTHENTICATED, payload: true });
+        if (token) {
+          dispatch({ type: actionTypes.SET_TOKEN, payload: token });
+          try {
+            localStorage.setItem('app_token', token);
+            localStorage.setItem('app_user', JSON.stringify(user));
+            if (user?.tenant_id) {
+              localStorage.setItem('tenant_id', String(user.tenant_id));
+            }
+          } catch {}
+        }
 
         return { success: true };
       } catch (error) {
@@ -622,6 +474,11 @@ export const AppProvider = ({ children }) => {
 
     logout: () => {
       dispatch({ type: actionTypes.LOGOUT });
+      try {
+        localStorage.removeItem('app_token');
+        localStorage.removeItem('app_user');
+        localStorage.removeItem('tenant_id');
+      } catch {}
     },
 
     register: async (userData) => {
@@ -851,6 +708,23 @@ export const AppProvider = ({ children }) => {
       if (demoTimer) clearInterval(demoTimer);
     };
   }, [state.isDemoMode, state.demoSecurity.isValid]);
+
+  useEffect(() => {
+    const onServiceError = (e) => {
+      const mod = e.detail?.module;
+      const status = e.detail?.status;
+      const msg = mod ? `${mod.toUpperCase()} service unavailable (${status})` : `Service unavailable (${status})`;
+      dispatch({ type: actionTypes.SET_ERROR, payload: msg });
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('service-error', onServiceError);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('service-error', onServiceError);
+      }
+    };
+  }, []);
 
   const value = {
     state,

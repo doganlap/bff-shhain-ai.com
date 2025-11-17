@@ -47,10 +47,10 @@ robot ^
     --timestampoutputs ^
     --name "Shahin GRC BFF Authentication Tests" ^
     --tagdoc "auth:Authentication tests" ^
-    --tagdoc "demo:Demo registration tests" ^
+
     --tagdoc "partner:Partner login tests" ^
     --tagdoc "public:Public access tests" ^
-    --include demo ^
+
     --include public ^
     bff-authentication-tests.robot
 
@@ -73,7 +73,7 @@ echo Timestamp: %TIMESTAMP%
 echo.
 
 echo 🔑 Key Test Results:
-echo    - Demo Registration: Working endpoint
+echo    - Demo Registration: REMOVED
 echo    - Public POC Request: May have issues
 echo    - Partner Login: Requires specific partner user setup
 echo    - Standard Auth Login: May require seeded users
@@ -99,7 +99,7 @@ if "%TEST_STATUS%"=="PASS" (
 
 echo.
 echo 🔍 To run specific test cases, use:
-echo    robot --test "Demo Registration Uses /api/public/demo/request" bff-authentication-tests.robot
+
 echo    robot --test "POC Request Uses /api/public/poc/request" bff-authentication-tests.robot
 echo    robot --tag demo bff-authentication-tests.robot
 echo    robot --tag public bff-authentication-tests.robot
@@ -110,7 +110,7 @@ echo 🎯 Running Focused Tests on Working Endpoints...
 robot ^
     --outputdir "%RESULTS_DIR%\focused" ^
     --loglevel INFO ^
-    --test "Demo Registration Uses /api/public/demo/request" ^
+
     --test "POC Request Uses /api/public/poc/request" ^
     bff-authentication-tests.robot
 

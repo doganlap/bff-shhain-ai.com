@@ -65,6 +65,13 @@ const services = {
   'regulatory-intelligence-ksa': process.env.REGULATORY_SERVICE_URL || 'http://localhost:3008'
 };
 
+// Debug: Log the actual service URLs being used
+console.log('Service Registry Configuration:');
+console.log('  AUTH_SERVICE_URL:', process.env.AUTH_SERVICE_URL);
+console.log('  auth-service:', services['auth-service']);
+console.log('  PARTNER_SERVICE_URL:', process.env.PARTNER_SERVICE_URL);
+console.log('  partner-service:', services['partner-service']);
+
 const SERVICE_TOKEN = process.env.SERVICE_TOKEN || 'default-token';
 
 // ==========================================
@@ -326,11 +333,11 @@ const injectTenantContext = (req, res, next) => {
 // PROXY MIDDLEWARE FACTORY
 // ==========================================
 
-const createServiceProxy = (target, serviceName) => {
+const createServiceProxy = (target, serviceName, options = {}) => {
   return createProxyMiddleware({
     target,
     changeOrigin: true,
-    pathRewrite: {
+    pathRewrite: options.pathRewrite || {
       [`^/api/${serviceName}`]: '/api', // Remove service prefix
     },
     onProxyReq: (proxyReq, req, res) => {
@@ -435,8 +442,11 @@ app.use('/api/rag', authenticateToken, superAdminBypass, tenantContext, injectTe
 const dashboardRouter = require('./routes/dashboard');
 app.use('/api/dashboard', authenticateToken, superAdminBypass, tenantContext, injectTenantFilter, dashboardRouter);
 
-const assessmentTemplatesRouter = require('./routes/assessmentTemplates');
+const assessmentTemplatesRouter = require('./routes/assessment-templates');
 app.use('/api/assessment-templates', authenticateToken, superAdminBypass, tenantContext, injectTenantFilter, assessmentTemplatesRouter);
+
+const invitationsRouter = require('./routes/invitations');
+app.use('/api/invitations', invitationsRouter);
 
 const onboardingRouter = require('./src/routes/onboarding.routes.js');
 app.use('/api/onboarding', authenticateToken, superAdminBypass, tenantContext, injectTenantFilter, onboardingRouter);
@@ -485,6 +495,24 @@ app.use('/api/strategic', authenticateToken, superAdminBypass, tenantContext, in
 // ✅ NEW: Microsoft Authentication routes
 const authRouter = require('./routes/auth');
 app.use('/api/auth', authRouter);
+
+// ✅ SERVICE HEALTH PROXY ROUTES
+// Add health check proxy routes for running services
+app.get('/api/auth/health', createServiceProxy(services['auth-service'], 'auth', {
+  pathRewrite: { '^/api/auth/health': '/api/health' }
+}));
+app.get('/api/grc/health', createServiceProxy(services['grc-api'], 'grc', {
+  pathRewrite: { '^/api/grc/health': '/health' }
+}));
+app.get('/api/partner/health', createServiceProxy(services['partner-service'], 'partner', {
+  pathRewrite: { '^/api/partner/health': '/health' }
+}));
+app.get('/api/notification/health', createServiceProxy(services['notification-service'], 'notification', {
+  pathRewrite: { '^/api/notification/health': '/health' }
+}));
+app.get('/api/regulatory/health', createServiceProxy(services['regulatory-intelligence-ksa'], 'regulatory', {
+  pathRewrite: { '^/api/regulatory/health': '/health' }
+}));
 
 // ✅ NEW: Stripe Payment routes
 const paymentsRouter = require('./routes/payments');
@@ -597,7 +625,7 @@ app.post('/api/auth/login', authLimiter, checkAllowedOrigin, async (req, res) =>
         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure, sameSite: secure ? 'none' : 'lax', maxAge: 7 * 24 * 60 * 60 * 1000 });
         return res.json({ success: true, token, refreshToken, user: { id: payload.id, email: payload.email, tenantId: payload.tenantId, role: 'admin' } });
       }
-    } catch {}
+    } catch (e) { void e; }
     res.status(500).json({ success: false, error: 'Login failed' });
   }
 });
@@ -646,9 +674,6 @@ app.get('/api/auth/me', authenticateToken, (req, res) => {
     }
   });
 });
-
-// ✅ NEW: Auth service health check proxy
-app.get('/api/auth/health', createServiceProxy(services['auth-service'], 'auth'));
 
 // ==========================================
 // PUBLIC ACCESS ROUTES (Demo, Partner, POC)
@@ -799,6 +824,10 @@ app.get('/api/audit-logs',
     // ...existing proxy config...
   })
 );
+
+// Table routes (for UniversalTableViewer)
+const tablesRouter = require('./routes/tables');
+app.use('/api/tables', authenticateToken, tablesRouter);
 
 // ============================================
 // FALLBACK: GENERIC PROXY FOR OTHER ROUTES
@@ -1025,7 +1054,40 @@ process.on('SIGTERM', () => {
     logger.error('Forced shutdown after timeout');
     process.exit(1);
   }, 30000);
-});
+  });
+
+  try {
+    const { Server } = require('socket.io');
+    const io = new Server(server, {
+      cors: {
+        origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5177'],
+        credentials: true
+      }
+    });
+
+    io.on('connection', (socket) => {
+      socket.on('join_assessment', ({ assessmentId }) => {
+        socket.join(`assessment_${assessmentId}`);
+        io.to(`assessment_${assessmentId}`).emit('user_joined', { userId: socket.id, assessmentId });
+      });
+
+      socket.on('assessment_update', (payload) => {
+        const { assessmentId } = payload || {};
+        if (assessmentId) io.to(`assessment_${assessmentId}`).emit('assessment_updated', payload);
+      });
+
+      socket.on('document_edit', (payload) => {
+        const { documentId } = payload || {};
+        if (documentId) io.to(`document_${documentId}`).emit('document_edited', payload);
+      });
+
+      socket.on('disconnect', () => {
+        // Broadcast user_left could be room-specific; keeping minimal
+      });
+    });
+  } catch (e) {
+    console.warn('Socket.IO initialization skipped:', e.message);
+  }
 }
 
 process.on('SIGINT', () => {

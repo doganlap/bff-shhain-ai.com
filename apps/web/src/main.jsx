@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import { AppProvider } from './context/AppContext.jsx';
+import { WebSocketProvider } from './context/WebSocketContext.jsx';
 import { I18nProvider } from './hooks/useI18n.jsx';
 import { ThemeProvider } from './components/theme/ThemeProvider.jsx';
 import { CulturalAdaptationProvider } from './components/Cultural/CulturalAdaptationProvider.jsx';
@@ -59,9 +60,16 @@ const renderApp = () => {
             <I18nProvider defaultLanguage="ar">
               <CulturalAdaptationProvider>
                 <AppProvider>
-                  <BrowserRouter>
-                    <App />
-                  </BrowserRouter>
+                  <WebSocketProvider>
+                    <BrowserRouter
+                      future={{
+                        v7_startTransition: true,
+                        v7_relativeSplatPath: true,
+                      }}
+                    >
+                      <App />
+                    </BrowserRouter>
+                  </WebSocketProvider>
                 </AppProvider>
               </CulturalAdaptationProvider>
             </I18nProvider>

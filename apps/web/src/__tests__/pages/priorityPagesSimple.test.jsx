@@ -98,25 +98,7 @@ vi.mock('framer-motion', () => ({
   useAnimation: () => ({ start: vi.fn(), stop: vi.fn() })
 }));
 
-// Mock lucide-react icons
-vi.mock('lucide-react', () => ({
-  RefreshCw: () => <span>🔄</span>,
-  Download: () => <span>⬇️</span>,
-  Plus: () => <span>➕</span>,
-  Edit: () => <span>✏️</span>,
-  Trash2: () => <span>🗑️</span>,
-  Search: () => <span>🔍</span>,
-  Filter: () => <span>🔽</span>,
-  TrendingUp: () => <span>📈</span>,
-  Activity: () => <span>📊</span>,
-  AlertTriangle: () => <span>⚠️</span>,
-  CheckCircle: () => <span>✅</span>,
-  Clock: () => <span>⏰</span>,
-  Database: () => <span>🗄️</span>,
-  Server: () => <span>🖥️</span>,
-  Shield: () => <span>🛡️</span>,
-  BarChart3: () => <span>📊</span>
-}));
+// Use global icon stubs from testSetup to handle all Lucide icons
 
 describe('Priority Pages Basic Tests', () => {
   beforeEach(() => {

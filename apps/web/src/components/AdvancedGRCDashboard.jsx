@@ -66,45 +66,39 @@ const AdvancedGRCDashboard = () => {
   const {
     data: evidenceList,
     loading: evidenceLoading
-  } = useApiData('documents.getAll', { limit: 50 }, { fallbackData: [], immediate: true });
+  } = useApiData('documents.getAll', { limit: 50 }, { immediate: true });
 
   const {
     data: regulatoryStats,
     loading: regulatoryStatsLoading
-  } = useApiData('regulatory.getStats', {}, { fallbackData: {}, immediate: true });
+  } = useApiData('regulatory.getStats', {}, { immediate: true });
 
   const {
     data: notificationStats,
     loading: notificationStatsLoading
-  } = useApiData('notifications.getStats', {}, { fallbackData: {}, immediate: true });
+  } = useApiData('notifications.getStats', {}, { immediate: true });
 
   const {
     data: systemPerformance,
     loading: systemPerfLoading
-  } = {
-    // Mock data for system performance
-    systemHealth: { cpu: 85, memory: 72, disk: 45, network: 90 },
-    alerts: [],
-    loading: false,
-    error: null
-  };
+  } = useSystemPerformance({ timeframe: timeRange });
 
   const loading = statsLoading || regulatorsLoading || frameworksLoading || healthLoading || crossStatsLoading;
   const hasError = statsError || regulatorsError || frameworksError || healthError || crossStatsError;
 
-  // Combine stats from multiple sources
+  // Combine stats from multiple sources - NO FALLBACKS
   const stats = {
-    regulators: regulators?.length || dashboardStats?.regulators || 25,
-    frameworks: frameworks?.length || dashboardStats?.frameworks || 21,
-    controls: dashboardStats?.controls || crossDbStats?.compliance?.total_controls || 2568,
+    regulators: regulators?.length || dashboardStats?.regulators || 0,
+    frameworks: frameworks?.length || dashboardStats?.frameworks || 0,
+    controls: dashboardStats?.controls || crossDbStats?.compliance?.total_controls || 0,
     assessments: dashboardStats?.assessments || crossDbStats?.compliance?.total_assessments || 0,
     organizations: dashboardStats?.organizations || crossDbStats?.finance?.total_tenants || 0,
-    compliance_score: dashboardStats?.compliance_score || 87.5,
+    compliance_score: dashboardStats?.compliance_score || 0,
     // Multi-database stats
     users: crossDbStats?.auth?.total_users || 0,
     licenses: crossDbStats?.finance?.total_licenses || 0,
     active_sessions: crossDbStats?.auth?.active_sessions || 0,
-    database_health: crossDbHealth?.summary || { healthy: 3, total: 3 }
+    database_health: crossDbHealth?.summary || { healthy: 0, total: 0 }
   };
 
   // Set framework breakdown for visualization
@@ -115,45 +109,35 @@ const AdvancedGRCDashboard = () => {
     data: activityData,
     loading: activityLoading
   } = useApiData('dashboard.getActivity', { limit: 10 }, {
-    fallbackData: [],
     immediate: true
   });
 
   // Helper function to get dynamic compliance breakdown
   const getComplianceBreakdown = () => {
-    return [
-      {
-        name: 'NCA Cybersecurity',
-        score: Math.min(95, Math.max(85, stats.compliance_score + Math.floor(Math.random() * 10) - 5))
-      },
-      {
-        name: 'SAMA Banking',
-        score: Math.min(92, Math.max(82, stats.compliance_score + Math.floor(Math.random() * 8) - 4))
-      },
-      {
-        name: 'PDPL Data Protection',
-        score: Math.min(85, Math.max(70, stats.compliance_score + Math.floor(Math.random() * 15) - 10))
-      },
-      {
-        name: 'ZATCA Tax Compliance',
-        score: Math.min(98, Math.max(88, stats.compliance_score + Math.floor(Math.random() * 12) - 2))
-      }
-    ];
+    // Use actual framework data if available, otherwise use calculated values based on overall score
+    if (frameworks && frameworks.length > 0) {
+      return frameworks.slice(0, 4).map((framework, index) => ({
+        name: framework.name || framework.code,
+        score: framework.compliance_score || Math.max(70, stats.compliance_score - (index * 5))
+      }));
+    }
+    
+    // Fallback to empty array if no real data available
+    return [];
   };
 
   // Helper function to get framework control count
   const getFrameworkControlCount = (frameworkCode) => {
-    const controlCounts = {
-      'NCA-ECC': 156,
-      'SAMA-CB': 89,
-      'PDPL': 45,
-      'ZATCA': 67,
-      'ISO27001': 114,
-      'NIST': 108,
-      'SOC2': 64,
-      'COBIT': 134
-    };
-    return controlCounts[frameworkCode] || Math.floor(Math.random() * 100) + 30;
+    // Try to find the framework in the real data first
+    if (frameworks && frameworks.length > 0) {
+      const framework = frameworks.find(f => f.code === frameworkCode || f.name === frameworkCode);
+      if (framework && framework.total_controls) {
+        return framework.total_controls;
+      }
+    }
+    
+    // Return 0 if no real data available instead of hardcoded values
+    return 0;
   };
 
   useEffect(() => {

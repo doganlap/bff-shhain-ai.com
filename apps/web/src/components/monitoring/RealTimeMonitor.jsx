@@ -3,31 +3,55 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Activity, AlertTriangle, CheckCircle, Clock, Zap, ZapOff, TrendingUp, TrendingDown } from 'lucide-react';
 import { useI18n } from '../../hooks/useI18n';
 import { useTheme } from '../theme/ThemeProvider';
+import { apiServices } from '../../services/api';
 
 const RealTimeMonitor = ({ data, enabled = true, loading = false }) => {
   const { t, language } = useI18n();
   const { isDark } = useTheme();
   const [lastUpdate, setLastUpdate] = useState(new Date());
   const [realtimeData, setRealtimeData] = useState(data);
+  const [isLoading, setIsLoading] = useState(loading);
 
-  // Simulate real-time updates
+  // Fetch real-time data from API
+  const fetchRealtimeData = async () => {
+    if (!enabled) return;
+    
+    try {
+      setIsLoading(true);
+      // Try multiple real-time endpoints
+      let response;
+      
+      // First try risks real-time endpoint
+      try {
+        response = await apiServices.risks.getRealTimeMetrics();
+      } catch (error) {
+        // Fallback to monitoring real-time endpoint
+        response = await apiServices.monitoring.getRealTimeMetrics();
+      }
+      
+      if (response?.data) {
+        setRealtimeData(response.data);
+        setLastUpdate(new Date());
+      }
+    } catch (error) {
+      console.error('Failed to fetch real-time data:', error);
+      // Keep existing data on error
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Real-time updates with data fetching
   useEffect(() => {
     if (!enabled) return;
 
+    // Initial fetch
+    fetchRealtimeData();
+
+    // Set up interval for real-time updates
     const interval = setInterval(() => {
-      setLastUpdate(new Date());
-      // Simulate minor data changes
-      setRealtimeData(prev => ({
-        ...prev,
-        kpis: {
-          ...prev?.kpis,
-          compliance: {
-            ...prev?.kpis?.compliance,
-            value: `${Math.floor(Math.random() * 10) + 85}%`
-          }
-        }
-      }));
-    }, 5000); // Update every 5 seconds
+      fetchRealtimeData();
+    }, 30000); // Update every 30 seconds
 
     return () => clearInterval(interval);
   }, [enabled]);
@@ -58,7 +82,7 @@ const RealTimeMonitor = ({ data, enabled = true, loading = false }) => {
     }
   };
 
-  if (loading) {
+  if (loading || isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>

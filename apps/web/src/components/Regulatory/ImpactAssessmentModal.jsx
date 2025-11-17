@@ -3,7 +3,7 @@
  * Shows detailed AI-powered impact analysis of regulatory change
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X, TrendingUp, DollarSign, Users, Clock, AlertCircle, CheckCircle } from 'lucide-react';
 import { regulatoryAPI } from '@/services/api';
 
@@ -11,11 +11,7 @@ const ImpactAssessmentModal = ({ change, onClose }) => {
   const [impactData, setImpactData] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    loadImpactAnalysis();
-  }, [change.id]);
-
-  const loadImpactAnalysis = async () => {
+  const loadImpactAnalysis = useCallback(async () => {
     setLoading(true);
     try {
       const response = await regulatoryAPI.getChangeDetails(change.id);
@@ -25,7 +21,11 @@ const ImpactAssessmentModal = ({ change, onClose }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [change.id]);
+
+  useEffect(() => {
+    loadImpactAnalysis();
+  }, [loadImpactAnalysis]);
 
   const getImpactScoreColor = (score) => {
     if (score >= 8) return 'text-red-600 bg-red-100';

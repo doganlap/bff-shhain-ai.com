@@ -147,10 +147,10 @@ const Testimonials = () => {
 
                     {/* Testimonial Text */}
                     <p className="font-arabic text-xl text-gray-900 leading-relaxed mb-6">
-                      "{testimonials[currentIndex].text}"
+                      {testimonials[currentIndex].text}
                     </p>
                     <p className="font-english text-base text-gray-700 leading-relaxed mb-8">
-                      "{testimonials[currentIndex].textEn}"
+                      {testimonials[currentIndex].textEn}
                     </p>
 
                     {/* Author Info */}

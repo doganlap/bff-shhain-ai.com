@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Play, Pause, Square, RefreshCw, Clock, CheckCircle, XCircle,
   Plus, Search, Calendar, User, Settings, BarChart3, Activity,
@@ -16,9 +16,8 @@ const SchedulerConsolePage = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBy, setFilterBy] = useState('all');
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [, setSelectedJob] = useState(null);
+  const [, setShowCreateModal] = useState(false);
   const [activeTab, setActiveTab] = useState('jobs');
 
   // Scheduler statistics
@@ -34,19 +33,11 @@ const SchedulerConsolePage = () => {
   });
 
   // Job form data
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    type: 'assessment',
-    schedule: '0 0 * * *', // Daily at midnight
-    enabled: true,
-    parameters: {}
-  });
+  
 
   useEffect(() => {
     loadJobs();
     loadSchedulerStats();
-    // Auto-refresh every 30 seconds
     const interval = setInterval(() => {
       loadJobs();
       loadSchedulerStats();
@@ -54,7 +45,7 @@ const SchedulerConsolePage = () => {
     return () => clearInterval(interval);
   }, [searchTerm, filterBy, loadJobs, loadSchedulerStats]);
 
-  const loadJobs = async () => {
+  const loadJobs = useCallback(async () => {
     try {
       setLoading(true);
       const response = await apiService.scheduler.getAll({
@@ -64,42 +55,25 @@ const SchedulerConsolePage = () => {
       const jobsData = response.data || response || [];
       setJobs(jobsData);
     } catch (error) {
-      console.error('Error loading jobs:', error);
       toast.error(language === 'ar' ? 'فشل تحميل المهام' : 'Failed to load jobs');
       setJobs([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, filterBy, language]);
 
-  const loadSchedulerStats = async () => {
+  const loadSchedulerStats = useCallback(async () => {
     try {
       const response = await apiService.scheduler.getStats();
       if (response?.data) {
         setSchedulerStats(response.data);
       }
     } catch (error) {
-      console.error('Error loading scheduler stats:', error);
     }
-  };
+  }, []);
 
   // Job Operations
-  const handleCreateJob = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await apiService.scheduler.create(formData);
-      if (response.data?.success || response.success) {
-        toast.success(language === 'ar' ? 'تم إنشاء المهمة بنجاح!' : 'Job created successfully!');
-        setShowCreateModal(false);
-        resetForm();
-        loadJobs();
-        loadSchedulerStats();
-      }
-    } catch (error) {
-      console.error('Error creating job:', error);
-      toast.error(language === 'ar' ? 'فشل إنشاء المهمة' : 'Failed to create job');
-    }
-  };
+  
 
   const handleRunJob = async (jobId) => {
     try {
@@ -110,7 +84,6 @@ const SchedulerConsolePage = () => {
         loadSchedulerStats();
       }
     } catch (error) {
-      console.error('Error running job:', error);
       toast.error(language === 'ar' ? 'فشل تشغيل المهمة' : 'Failed to run job');
     }
   };
@@ -124,7 +97,6 @@ const SchedulerConsolePage = () => {
         loadSchedulerStats();
       }
     } catch (error) {
-      console.error('Error pausing job:', error);
       toast.error(language === 'ar' ? 'فشل إيقاف المهمة' : 'Failed to pause job');
     }
   };
@@ -138,21 +110,11 @@ const SchedulerConsolePage = () => {
         loadSchedulerStats();
       }
     } catch (error) {
-      console.error('Error deleting job:', error);
       toast.error(language === 'ar' ? 'فشل حذف المهمة' : 'Failed to delete job');
     }
   };
 
-  const resetForm = () => {
-    setFormData({
-      name: '',
-      description: '',
-      type: 'assessment',
-      schedule: '0 0 * * *',
-      enabled: true,
-      parameters: {}
-    });
-  };
+  
 
   const getStatusIcon = (status) => {
     switch (status?.toLowerCase()) {

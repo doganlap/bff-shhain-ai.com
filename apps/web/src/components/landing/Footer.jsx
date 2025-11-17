@@ -1,6 +1,5 @@
 import React from 'react'
-import { Shield, ExternalLink } from 'lucide-react'
-import { motion } from 'framer-motion'
+import { ExternalLink } from 'lucide-react'
 import UnifiedLogo from './UnifiedLogo'
 
 const Footer = () => {

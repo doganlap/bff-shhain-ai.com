@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CheckCircle, XCircle, AlertTriangle, RefreshCw, Server, Database, Globe, Cpu } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+ 
+import { Loader2, CheckCircle, XCircle, AlertTriangle, RefreshCw, Server, Globe, Cpu } from 'lucide-react';
 
 // Simple UI components for the foundation test
 const CardComponent = ({ children, className = '' }) => (
@@ -75,6 +72,10 @@ const AlertComponent = ({ children, variant = 'default' }) => {
   );
 };
 
+const AlertDescriptionComponent = ({ children }) => (
+  <div className="text-sm">{children}</div>
+);
+
 const FoundationTest = () => {
   const [healthStatus, setHealthStatus] = useState(null);
   const [aiHealthStatus, setAiHealthStatus] = useState(null);
@@ -83,7 +84,7 @@ const FoundationTest = () => {
 
   const API_BASE_URL = import.meta.env.VITE_BFF_URL || import.meta.env.VITE_API_URL || 'http://localhost:3005/api';
 
-  const checkHealth = async () => {
+  const checkHealth = useCallback(async () => {
     setLoading(true);
     setError(null);
     
@@ -113,11 +114,11 @@ const FoundationTest = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_BASE_URL]);
 
   useEffect(() => {
     checkHealth();
-  }, []);
+  }, [checkHealth]);
 
   const getStatusIcon = (status) => {
     if (status === 'healthy' || status === true) {

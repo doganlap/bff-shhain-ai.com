@@ -1,63 +1,36 @@
 {
   "version": 2,
+  "name": "shahin-ai-app",
   "builds": [
     {
       "src": "index.js",
       "use": "@vercel/node"
     }
   ],
-  "headers": [
+  "routes": [
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Credentials",
-          "value": "true"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "https://app.shahin-ai.com"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization, X-Tenant-ID"
-        }
-      ]
-    }
-  ],
-  "rewrites": [
+      "src": "/api/(.*)",
+      "dest": "/index.js"
+    },
     {
-      "source": "/(.*)",
-      "destination": "/index.js"
+      "src": "/bff/(.*)",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/health",
+      "dest": "/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "https://shahin-ai-app-donganksa.vercel.app/$1"
     }
   ],
   "env": {
-    "DATABASE_URL": "@database_url",
-    "NODE_ENV": "production",
-    "JWT_SECRET": "@jwt_secret",
-    "JWT_REFRESH_SECRET": "@jwt_refresh_secret",
-    "SERVICE_TOKEN": "@service_token",
-    "FRONTEND_ORIGINS": "https://app.shahin-ai.com,https://www.shahin-ai.com,https://shahin-ai.com",
-    "PUBLIC_BFF_URL": "https://app.shahin-ai.com",
-    "PRODUCTION_MODE": "true",
-    "SINGLE_TENANT_MODE": "true",
-    "ENABLE_TRANSACTIONS": "true",
-    "ENABLE_WORKFLOWS": "true",
-    "ENABLE_AUDIT_LOGGING": "true",
-    "REDIS_URL": "@redis_url",
-    "REDIS_TOKEN": "@redis_token",
-    "SENTRY_DSN": "@sentry_dsn",
-    "SENDGRID_API_KEY": "@sendgrid_api_key",
-    "STRIPE_SECRET_KEY": "@stripe_secret_key",
-    "OPENAI_API_KEY": "@openai_api_key",
-    "BYPASS_AUTH": "false",
-    "RATE_LIMIT_WINDOW_MS": "900000",
-    "RATE_LIMIT_MAX_REQUESTS": "100",
-    "SSL_ENABLED": "true"
+    "NODE_ENV": "production"
   },
-  "regions": ["iad1"]
+  "functions": {
+    "index.js": {
+      "maxDuration": 30
+    }
+  }
 }

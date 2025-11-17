@@ -77,6 +77,29 @@ try {
         }
       } catch {}
 
+      // Attach Authorization token if present
+      try {
+        const token = typeof localStorage !== 'undefined' ? localStorage.getItem('app_token') : null;
+        if (token && !config.headers['Authorization']) {
+          config.headers['Authorization'] = `Bearer ${token}`;
+        }
+      } catch {}
+
+      // Attach CSRF token in production for mutating requests
+      try {
+        const isMutating = ['POST', 'PUT', 'PATCH', 'DELETE'].includes((config.method || 'get').toUpperCase());
+        const isProd = (import.meta.env?.PROD) || (typeof process !== 'undefined' && process.env?.NODE_ENV === 'production');
+        if (isMutating && typeof document !== 'undefined' && isProd) {
+          const match = document.cookie.split('; ').find((c) => c.startsWith('csrfToken='));
+          if (match) {
+            const csrf = match.split('=')[1];
+            if (csrf) {
+              config.headers['X-CSRF-Token'] = csrf;
+            }
+          }
+        }
+      } catch {}
+
       // Centralized request metadata for observability
       const reqId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
       config.headers['X-Request-ID'] = reqId;
@@ -164,12 +187,36 @@ if (api && api.interceptors && api.interceptors.response) {
       return Promise.reject(notFoundError);
     }
 
+    if (error.response?.status === 429) {
+      const rateLimitError = new Error('Rate limit exceeded. Please try again later.');
+      rateLimitError.type = 'RATE_LIMIT_ERROR';
+      rateLimitError.originalError = error;
+      const headerRetry = error.response?.headers?.['retry-after'] || error.response?.headers?.['Retry-After'];
+      const bodyRetry = error.response?.data?.retryAfter;
+      rateLimitError.retryAfter = Number(headerRetry || bodyRetry || 0) || undefined;
+      toast.warning('Too many requests');
+      return Promise.reject(rateLimitError);
+    }
+
     if (error.response?.status >= 500) {
       // Server errors
       const serverError = new Error('Server Error: Something went wrong on our end. Please try again later.');
       serverError.type = 'SERVER_ERROR';
       serverError.originalError = error;
       toast.error('Server error');
+      try {
+        if (typeof window !== 'undefined') {
+          const path = (error.config?.url || '').split('?')[0] || '';
+          const module = path.replace(/^\/?/, '').split('/')[0] || 'api';
+          window.dispatchEvent(new CustomEvent('service-error', {
+            detail: {
+              module,
+              status: error.response?.status,
+              url: error.config?.url || path
+            }
+          }));
+        }
+      } catch {}
       return Promise.reject(serverError);
     }
 
@@ -229,7 +276,8 @@ const apiServices = {
     delete: (id) => api.delete(`/organizations/${id}`),
     getAssessments: (id, params) => api.get(`/organizations/${id}/assessments`, { params }),
     getCompliance: (id) => api.get(`/organizations/${id}/compliance`),
-    getMetrics: (id) => api.get(`/organizations/${id}/metrics`)
+    getMetrics: (id) => api.get(`/organizations/${id}/metrics`),
+    seed: () => api.post('/organizations/seed')
   },
   regulators: {
     getAll: (params) => api.get('/regulators', { params }),
@@ -238,7 +286,8 @@ const apiServices = {
     update: (id, regulatorData) => api.put(`/regulators/${id}`, regulatorData),
     delete: (id) => api.delete(`/regulators/${id}`),
     getFrameworks: (id, params) => api.get(`/regulators/${id}/frameworks`, { params }),
-    getStatistics: (id) => api.get(`/regulators/${id}/statistics`)
+    getStatistics: (id) => api.get(`/regulators/${id}/statistics`),
+    seed: () => api.post('/regulators/seed')
   },
   frameworks: {
     getAll: (params) => api.get('/frameworks', { params }),
@@ -249,7 +298,8 @@ const apiServices = {
     getControls: (id, params) => api.get(`/frameworks/${id}/controls`, { params }),
     getAssessments: (id, params) => api.get(`/frameworks/${id}/assessments`, { params }),
     import: (frameworkData) => api.post('/frameworks/import', frameworkData),
-    export: (id) => api.get(`/frameworks/${id}/export`)
+    export: (id) => api.get(`/frameworks/${id}/export`),
+    seed: () => api.post('/frameworks/seed')
   },
   controls: {
     getAll: (params) => api.get('/controls', { params }),
@@ -325,7 +375,8 @@ const apiServices = {
     getById: (id) => api.get(`/sector-controls/${id}`),
     getBySector: (sector, params) => api.get(`/sector-controls/sector/${sector}`, { params }),
     getEstimate: (estimateData) => api.post('/sector-controls/estimate', estimateData),
-    getMapping: (mappingData) => api.post('/sector-controls/mapping', mappingData)
+    getMapping: (mappingData) => api.post('/sector-controls/mapping', mappingData),
+    seed: (sector) => api.post('/sector-controls/seed', { sector })
   },
   reports: {
     getComplianceReport: (params) => api.get('/reports/compliance', { params }),
@@ -403,7 +454,10 @@ const apiServices = {
     send: (notificationData) => api.post('/notifications/send', notificationData),
     sendEmail: (emailData) => api.post('/notifications/email', emailData),
     getAll: (params) => api.get('/notifications', { params }),
-    getTemplates: () => api.get('/notifications/templates')
+    getTemplates: () => api.get('/notifications/templates'),
+    markAsRead: (id) => api.put(`/notifications/${id}/read`),
+    markAllAsRead: () => api.put('/notifications/read-all'),
+    delete: (id) => api.delete(`/notifications/${id}`)
   },
   adminAnthropic: {
     getKey: (id) => api.get(`/platform/anthropic/api-keys/${id}`),

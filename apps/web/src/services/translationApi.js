@@ -7,7 +7,7 @@
 import axios from 'axios';
 import translationCache from './translationCache';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3005/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3006/api';
 
 // Create axios instance with default config
 const api = axios.create({

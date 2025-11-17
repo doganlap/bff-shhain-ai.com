@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Bot, Cpu, MessageCircle, Shield, Code, Activity, Users, CheckCircle, Zap } from 'lucide-react'
+import { MessageCircle, Shield, Code, Activity, Users, Cpu, Bot, CheckCircle } from 'lucide-react'
 
 const AITeamShowcase = () => {
   const [selectedAgent, setSelectedAgent] = useState(0)

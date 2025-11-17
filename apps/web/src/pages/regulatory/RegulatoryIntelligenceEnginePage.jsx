@@ -34,10 +34,6 @@ const RegulatoryIntelligenceEnginePage = () => {
   const [complianceCalendar, setComplianceCalendar] = useState([]);
   const [alerts, setAlerts] = useState([]);
 
-  useEffect(() => {
-    loadRegulatoryData();
-  }, [loadRegulatoryData]);
-
   const loadRegulatoryData = useCallback(async () => {
     setLoading(true);
     try {
@@ -94,6 +90,10 @@ const RegulatoryIntelligenceEnginePage = () => {
       setLoading(false);
     }
   }, [language]);
+
+  useEffect(() => {
+    loadRegulatoryData();
+  }, [loadRegulatoryData]);
 
   
 

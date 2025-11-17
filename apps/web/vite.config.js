@@ -30,9 +30,10 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3005',
+        target: 'http://localhost:3006',
         changeOrigin: true,
         secure: false,
+        ws: true,
         rewrite: (path) => path
       }
     },
@@ -89,7 +90,8 @@ export default defineConfig({
           router: ['react-router-dom'],
           ui: ['lucide-react', 'framer-motion', 'sonner'],
           charts: ['recharts'],
-          utils: ['axios', 'date-fns', 'uuid']
+          utils: ['axios', 'date-fns', 'uuid'],
+          plotly: ['react-plotly.js', 'plotly.js']
         },
         globals: {
           'react': 'React',

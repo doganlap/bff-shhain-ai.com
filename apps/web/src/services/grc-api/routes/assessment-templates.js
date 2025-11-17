@@ -20,58 +20,50 @@ router.get('/', authenticateToken, requireTenantAccess, async (req, res) => {
       is_active = true
     } = req.query;
 
-    // Return mock data since assessment_templates table doesn't exist
-    const mockTemplates = [
-      {
-        id: 1,
-        name: "ISO 27001 Security Assessment",
-        description: "Comprehensive security assessment based on ISO 27001 framework",
-        framework_id: 1,
-        category: "security",
-        is_active: true,
-        section_count: 5,
-        created_at: "2025-11-01T10:00:00.000Z"
-      },
-      {
-        id: 2,
-        name: "GDPR Compliance Assessment",
-        description: "Data protection and privacy compliance assessment",
-        framework_id: 2,
-        category: "privacy",
-        is_active: true,
-        section_count: 4,
-        created_at: "2025-11-02T10:00:00.000Z"
-      }
-    ];
+    // Query database for assessment templates
+    const templates = await query(`
+      SELECT at.*, f.name as framework_name, COUNT(ats.id) as section_count
+      FROM assessment_templates at
+      LEFT JOIN grc_frameworks f ON at.framework_id = f.id
+      LEFT JOIN assessment_template_sections ats ON at.id = ats.template_id
+      WHERE at.is_active = $1
+      ${framework_id ? 'AND at.framework_id = $2' : ''}
+      ${category ? `AND at.category = $${framework_id ? 3 : 2}` : ''}
+      ${search ? `AND (at.name ILIKE $${framework_id && category ? 4 : framework_id || category ? 3 : 2} OR at.description ILIKE $${framework_id && category ? 4 : framework_id || category ? 3 : 2})` : ''}
+      GROUP BY at.id, f.name
+      ORDER BY at.created_at DESC
+      LIMIT $${framework_id && category && search ? 5 : framework_id || category || search ? 4 : 3}
+      OFFSET $${framework_id && category && search ? 6 : framework_id || category || search ? 5 : 4}
+    `, [
+      is_active,
+      ...(framework_id ? [framework_id] : []),
+      ...(category ? [category] : []),
+      ...(search ? [`%${search}%`] : []),
+      limit,
+      (page - 1) * limit
+    ]);
 
-    // Apply basic filtering
-    let filteredTemplates = mockTemplates.filter(template => template.is_active === is_active);
-    
-    if (framework_id) {
-      filteredTemplates = filteredTemplates.filter(template => template.framework_id == framework_id);
-    }
-    
-    if (category) {
-      filteredTemplates = filteredTemplates.filter(template => template.category === category);
-    }
-    
-    if (search) {
-      const searchLower = search.toLowerCase();
-      filteredTemplates = filteredTemplates.filter(template => 
-        template.name.toLowerCase().includes(searchLower) || 
-        template.description.toLowerCase().includes(searchLower)
-      );
-    }
+    // Get total count for pagination
+    const countResult = await query(`
+      SELECT COUNT(*) as total
+      FROM assessment_templates at
+      WHERE at.is_active = $1
+      ${framework_id ? 'AND at.framework_id = $2' : ''}
+      ${category ? `AND at.category = $${framework_id ? 3 : 2}` : ''}
+      ${search ? `AND (at.name ILIKE $${framework_id && category ? 4 : framework_id || category ? 3 : 2} OR at.description ILIKE $${framework_id && category ? 4 : framework_id || category ? 3 : 2})` : ''}
+    `, [
+      is_active,
+      ...(framework_id ? [framework_id] : []),
+      ...(category ? [category] : []),
+      ...(search ? [`%${search}%`] : [])
+    ]);
 
-    // Pagination
-    const offset = (page - 1) * limit;
-    const paginatedTemplates = filteredTemplates.slice(offset, offset + limit);
-    const total = filteredTemplates.length;
+    const total = parseInt(countResult[0]?.total || 0);
     const totalPages = Math.ceil(total / limit);
 
     res.json({
       success: true,
-      data: paginatedTemplates,
+      data: templates,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),

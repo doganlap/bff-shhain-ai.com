@@ -6,8 +6,8 @@
 
 import React from 'react';
 import { useRBAC } from '../../hooks/useRBAC';
-import { AnimatedCard, CulturalLoadingSpinner } from '../Animation/InteractiveAnimationToolkit';
-import { Lock, Eye, EyeOff, Shield, BarChart3, TrendingUp, Activity, AlertTriangle } from 'lucide-react';
+import { AnimatedCard, CulturalLoadingSpinner, AnimatedButton } from '../Animation/InteractiveAnimationToolkit';
+import { Shield } from 'lucide-react';
 import { useI18n } from '../../hooks/useI18n';
 import { useTheme } from '../theme/ThemeProvider';
 
@@ -35,13 +35,10 @@ export const PermissionBasedCard = ({
   ...cardProps
 }) => {
   const { 
-    hasPermission, 
-    hasAnyPermission, 
     hasAllPermissions,
     hasFeature,
     isSuperAdmin,
-    userRole,
-    userPermissions 
+    userRole
   } = useRBAC();
 
   // Check permissions
@@ -198,8 +195,6 @@ export const PermissionBasedButton = ({
   ...props
 }) => {
   const { 
-    hasPermission, 
-    hasAnyPermission, 
     hasAllPermissions,
     hasFeature,
     isSuperAdmin,
@@ -235,9 +230,6 @@ export const PermissionBasedButton = ({
     }
     return null;
   }
-
-  // Import the AnimatedButton from the toolkit
-  const { AnimatedButton } = require('../Animation/InteractiveAnimationToolkit');
 
   return (
     <AnimatedButton
@@ -355,7 +347,7 @@ export const RoleBasedCards = ({
  * Shows different card layouts based on user role
  */
 export const RoleDashboardCards = ({ data, loading = false }) => {
-  const { userRole, hasPermission } = useRBAC();
+  const { userRole } = useRBAC();
   const { t } = useI18n();
   const { isDark } = useTheme();
 

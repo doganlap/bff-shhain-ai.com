@@ -264,9 +264,6 @@ const StoryDrivenRegistration = () => {
 
   // Validation functions
   const validateTab = React.useCallback((tabIndex) => {
-    const tab = registrationTabs[tabIndex];
-    //
-    
     switch (tabIndex) {
       case 0: // Personal Info
         return (
@@ -422,10 +419,8 @@ const StoryDrivenRegistration = () => {
     setLoading(false);
   };
 
-  const handleExitPopupSubmit = (leadData) => {
-    console.log('Exit intent lead captured:', leadData);
+  const handleExitPopupSubmit = () => {
     setShowExitPopup(false);
-    // Optionally redirect or show thank you message
   };
 
   const handleExitPopupClose = () => {

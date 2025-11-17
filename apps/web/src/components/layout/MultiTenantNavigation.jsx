@@ -13,7 +13,7 @@ import {
   CheckCircle, Activity, Bell, Bot, TrendingUp, Globe,
   Briefcase, ChevronDown, Zap,
   Calendar, Brain, Search, FolderOpen,
-  BarChart2
+  BarChart2, Table
 } from 'lucide-react';
 
 /**
@@ -60,6 +60,7 @@ export const getNavigationForRole = (userRole, tenantContext, stats = {}) => {
         id: 'users-access', name: 'Users & Access', icon: Shield, collapsed: true,
         items: [
           { id: 'users', name: 'Users', path: '/app/users', icon: Users },
+          { id: 'invitations', name: 'Invitations', path: '/app/users/invitations', icon: Users },
           { id: 'roles-permissions', name: 'Roles & Permissions', path: '/app/settings/security', icon: Shield }
         ],
         category: 'Platform'
@@ -115,7 +116,8 @@ export const getNavigationForRole = (userRole, tenantContext, stats = {}) => {
         id: 'administration', name: 'Administration', icon: Building2, collapsed: false,
         items: [
           { id: 'all-tenants', name: 'All Tenants', path: '/app/organizations', icon: Building2, badge: stats.tenants || 0 },
-          { id: 'tenant-billing', name: 'Billing & Subscriptions', path: '/app/licenses', icon: DollarSign, badge: stats.invoices || 0 }
+          { id: 'tenant-billing', name: 'Billing & Subscriptions', path: '/app/licenses', icon: DollarSign, badge: stats.invoices || 0 },
+          { id: 'table-viewer', name: 'Table Viewer', path: '/app/tables/users', icon: Table, badge: null }
         ],
         category: 'Platform'
       }
@@ -136,6 +138,7 @@ export const getNavigationForRole = (userRole, tenantContext, stats = {}) => {
         id: 'organization-management', name: 'Organization Management', icon: Building2, collapsed: true, category: 'Team',
         items: [
           { id: 'teams-users', name: 'Teams & Users', path: '/app/users', icon: Users, badge: stats.users || 0 },
+          { id: 'invitations', name: 'Invitations', path: '/app/users/invitations', icon: Users },
           { id: 'departments', name: 'Departments', path: '/app/organizations', icon: Building2 },
           { id: 'roles-permissions', name: 'Roles & Permissions', path: '/app/settings/security', icon: Shield }
         ]
@@ -158,7 +161,8 @@ export const getNavigationForRole = (userRole, tenantContext, stats = {}) => {
           { id: 'advanced-assessments', name: 'Advanced Assessments', path: '/advanced/assessments', icon: FileText },
           { id: 'advanced-frameworks', name: 'Advanced Frameworks', path: '/advanced/frameworks', icon: Target },
           { id: 'advanced-controls', name: 'Advanced Controls', path: '/app/controls', icon: Shield },
-          { id: 'advanced-reports', name: 'Advanced Reports', path: '/app/reports', icon: BarChart3 }
+          { id: 'advanced-reports', name: 'Advanced Reports', path: '/app/reports', icon: BarChart3 },
+          { id: 'table-viewer', name: 'Table Viewer', path: '/app/tables/users', icon: Table }
         ],
         visible: advancedEnabled
       },

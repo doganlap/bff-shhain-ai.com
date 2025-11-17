@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import { Check } from 'lucide-react'
-import DemoBooking from './DemoBooking'
+import { useNavigate } from 'react-router-dom'
 
 const Pricing = () => {
-  const [isDemoOpen, setIsDemoOpen] = useState(false)
+  const navigate = useNavigate()
   const packages = [
     {
       name: 'Starter',
@@ -113,7 +113,7 @@ const Pricing = () => {
               </ul>
 
               <button 
-                onClick={() => setIsDemoOpen(true)}
+                onClick={() => navigate('/login')}
                 className={`w-full py-3 rounded-lg font-semibold transition-all ${
                   pkg.highlight
                     ? 'bg-brand-primary text-white hover:bg-brand-secondary hover:shadow-lg'
@@ -137,12 +137,7 @@ const Pricing = () => {
         </div>
       </div>
 
-      {/* Demo Booking Modal */}
-      <DemoBooking 
-        isOpen={isDemoOpen} 
-        onClose={() => setIsDemoOpen(false)}
-        type="demo"
-      />
+      
     </section>
   )
 }

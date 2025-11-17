@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import {
   Search as FiSearch, Grid as FiGrid, List as FiList, Download as FiDownload, Plus as FiPlus,
@@ -27,13 +27,7 @@ const TaskDashboard = () => {
     completed: { title: 'Completed', color: 'green', icon: FiCheckCircle }
   };
 
-  useEffect(() => {
-    loadTasks();
-    loadStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
-
-  const loadTasks = async () => {
+  const loadTasks = useCallback(async () => {
     try {
       setLoading(true);
       const params = new URLSearchParams();
@@ -41,8 +35,7 @@ const TaskDashboard = () => {
       if (filters.priority) params.append('priority', filters.priority);
       if (filters.search) params.append('search', filters.search);
       if (filters.assigned_to) params.append('assigned_to', filters.assigned_to);
-      params.append('limit', '500'); // Load more for dashboard
-
+      params.append('limit', '500');
       const response = await api.get(`/api/tasks?${params}`);
       setTasks(response.data.data || []);
     } catch (error) {
@@ -50,16 +43,23 @@ const TaskDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filters]);
 
-  const loadStats = async () => {
+  const loadStats = useCallback(async () => {
     try {
       const response = await api.get('/api/tasks/stats');
       setStats(response.data.stats);
     } catch (error) {
       console.error('Failed to load stats:', error);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadTasks();
+    loadStats();
+  }, [filters, loadTasks, loadStats]);
+
+  
 
   const handleDragEnd = async (result) => {
     if (!result.destination) return;

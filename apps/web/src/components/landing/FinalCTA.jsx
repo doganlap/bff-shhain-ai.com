@@ -1,11 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight, Sparkles, CheckCircle, Shield, Zap } from 'lucide-react'
-import DemoBooking from './DemoBooking'
+import { Sparkles, CheckCircle, Shield, Zap } from 'lucide-react'
 
 const FinalCTA = () => {
-  const [isDemoOpen, setIsDemoOpen] = useState(false)
-  const [isPOCOpen, setIsPOCOpen] = useState(false)
+  
 
   const benefits = [
     'ابدأ في دقائق بدلاً من أسابيع',
@@ -109,17 +107,7 @@ const FinalCTA = () => {
         </div>
       </div>
 
-      {/* Demo & POC Booking Modals */}
-      <DemoBooking 
-        isOpen={isDemoOpen} 
-        onClose={() => setIsDemoOpen(false)}
-        type="demo"
-      />
-      <DemoBooking 
-        isOpen={isPOCOpen} 
-        onClose={() => setIsPOCOpen(false)}
-        type="poc"
-      />
+      
     </section>
   )
 }

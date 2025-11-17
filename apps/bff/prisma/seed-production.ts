@@ -266,8 +266,8 @@ async function main() {
       update: {},
       create: {
         ...PARTNER_ORG,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       }
     });
 
@@ -278,8 +278,8 @@ async function main() {
       update: {},
       create: {
         ...DEMO_ORG,
-        createdAt: new Date(),
-        updatedAt: new Date()
+        created_at: new Date(),
+        updated_at: new Date()
       }
     });
 

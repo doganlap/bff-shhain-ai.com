@@ -3,25 +3,22 @@
  * Comprehensive analytics with charts and database API integration
  */
 
-import React, { useState, useEffect } from 'react';
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { TrendingUp, TrendingDown, Users, HardDrive, Activity, Calendar, Filter, Download, RefreshCw, BarChart3, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { TrendingUp, Activity, Download, RefreshCw, BarChart3, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../theme/ThemeProvider';
-import { useApp } from '../../context/AppContext';
 import analyticsApi from '../../services/analyticsApi';
 import { toast } from 'sonner';
 
 const AdvancedAnalyticsDashboard = ({ 
   data = [], 
   tenantId, 
-  loading = false, 
   mode = 'standard',
   onRefresh,
   onExport 
 }) => {
   const { isDark } = useTheme();
-  const { state } = useApp();
   const [analyticsData, setAnalyticsData] = useState({
     usageTrends: [],
     featureBreakdown: [],
@@ -55,7 +52,7 @@ const AdvancedAnalyticsDashboard = ({
     if (data.length > 0 && tenantId) {
       loadAnalyticsData();
     }
-  }, [data, tenantId, filters]);
+  }, [data, tenantId, filters, loadAnalyticsData]);
 
   // Real-time data updates
   useEffect(() => {
@@ -63,15 +60,14 @@ const AdvancedAnalyticsDashboard = ({
 
     const interval = setInterval(() => {
       loadRealTimeData();
-    }, 30000); // Update every 30 seconds
+    }, 30000);
 
     return () => clearInterval(interval);
-  }, [tenantId, mode]);
+  }, [tenantId, mode, loadRealTimeData]);
 
-  const loadAnalyticsData = async () => {
+  const loadAnalyticsData = useCallback(async () => {
     try {
       setIsLoading(true);
-      console.log('Loading analytics data for tenant:', tenantId);
       
       // Try to fetch real analytics data from API
       try {
@@ -82,14 +78,6 @@ const AdvancedAnalyticsDashboard = ({
           analyticsApi.getEfficiencyMetrics(tenantId, filters.dateRange),
           analyticsApi.getUsageAlerts(tenantId, 80)
         ]);
-        
-        console.log('API responses:', {
-          analytics: analyticsResponse,
-          trends: trendsResponse,
-          breakdown: breakdownResponse,
-          efficiency: efficiencyResponse,
-          alerts: alertsResponse
-        });
         
         // Combine all analytics data
         const combinedData = {
@@ -106,19 +94,22 @@ const AdvancedAnalyticsDashboard = ({
         
         setAnalyticsData(combinedData);
         setLastUpdateTime(new Date());
-        console.log('Analytics data loaded successfully');
         
       } catch (apiError) {
-        console.warn('API call failed, falling back to mock data:', apiError);
-        toast.info('Using demo data - API connection unavailable');
+        toast.error('Failed to load analytics data from API');
         
-        // Fallback to mock data if API fails
-        const mockData = generateAnalyticsData();
-        setAnalyticsData(mockData);
+        // Use empty data instead of mock data to ensure accuracy
+        setAnalyticsData({
+          usageTrends: [],
+          featureBreakdown: [],
+          timeSeries: [],
+          topFeatures: [],
+          alerts: [],
+          summary: {}
+        });
       }
       
     } catch (error) {
-      console.error('Error loading analytics data:', error);
       toast.error('Failed to load analytics data');
       
       // Final fallback to empty data
@@ -133,11 +124,10 @@ const AdvancedAnalyticsDashboard = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [tenantId, filters, data]);
 
   // Generate analytics data from real API data
   const generateAnalyticsData = () => {
-    console.log('Generating analytics data from:', data);
     
     if (!data || data.length === 0) {
       // Return empty state if no input data
@@ -186,11 +176,22 @@ const AdvancedAnalyticsDashboard = ({
     const timeSeries = Array.from({ length: 7 }, (_, i) => {
       const date = new Date();
       date.setDate(date.getDate() - (6 - i));
+      
+      // Calculate actual usage and efficiency from real data for this date
+      const dayData = data.filter(item => {
+        const itemDate = new Date(item.period_start);
+        return itemDate.toDateString() === date.toDateString();
+      });
+      
+      const totalUsage = dayData.reduce((sum, item) => sum + item.used_value, 0);
+      const totalLimit = dayData.reduce((sum, item) => sum + item.limit_value, 0);
+      const efficiency = totalLimit > 0 ? (totalUsage / totalLimit) * 100 : 0;
+      
       return {
         date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        usage: 0, // Use real data instead of Math.random()
-        limit: 200,
-        efficiency: 0 // Use real data instead of Math.random()
+        usage: totalUsage,
+        limit: totalLimit,
+        efficiency: efficiency
       };
     });
 
@@ -248,7 +249,7 @@ const AdvancedAnalyticsDashboard = ({
     }));
   };
 
-  const loadRealTimeData = async () => {
+  const loadRealTimeData = useCallback(async () => {
     try {
       setIsRealTimeUpdating(true);
       const realTimeData = await analyticsApi.getRealTimeAnalytics(tenantId);
@@ -262,11 +263,10 @@ const AdvancedAnalyticsDashboard = ({
       setLastUpdateTime(new Date());
       
     } catch (error) {
-      console.error('Error loading real-time data:', error);
     } finally {
       setIsRealTimeUpdating(false);
     }
-  };
+  }, [tenantId]);
 
   const handleRefresh = () => {
     loadAnalyticsData();
@@ -306,7 +306,6 @@ const AdvancedAnalyticsDashboard = ({
       toast.success(`Analytics data exported as ${format.toUpperCase()}`);
       
     } catch (error) {
-      console.error('Export failed:', error);
       toast.error('Failed to export analytics data');
     }
   };

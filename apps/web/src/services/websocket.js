@@ -17,7 +17,11 @@ class WebSocketService {
       return;
     }
 
-    const wsUrl = import.meta.env?.VITE_WS_URL || 'http://localhost:3008';
+    if (import.meta.env?.VITE_WS_DISABLED === 'true') {
+      console.log('[WebSocket] Disabled by configuration');
+      return;
+    }
+    const wsUrl = import.meta.env?.VITE_WS_URL || 'http://localhost:3006';
 
     this.socket = io(wsUrl, {
       auth: {
@@ -26,8 +30,8 @@ class WebSocketService {
       transports: ['websocket', 'polling'],
       autoConnect: true,
       reconnection: true,
-      reconnectionAttempts: this.maxReconnectAttempts,
-      reconnectionDelay: 1000,
+      reconnectionAttempts: 1,
+      reconnectionDelay: 2000,
       timeout: 10000
     });
 

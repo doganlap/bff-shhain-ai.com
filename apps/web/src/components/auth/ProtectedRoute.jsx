@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Navigate } from 'react-router-dom';
 import { CulturalLoadingSpinner } from '../Animation/InteractiveAnimationToolkit';
 import { useApp } from '../../context/AppContext';
@@ -9,11 +9,7 @@ const ProtectedRoute = ({ children, requiredPermission }) => {
   const [loading, setLoading] = useState(true);
   const { state, dispatch } = useApp();
 
-  useEffect(() => {
-    validateAccess();
-  }, [state.isAuthenticated, state.user]);
-
-  const hasRequiredPermission = (user) => {
+  const hasRequiredPermission = useCallback((user) => {
     if (!requiredPermission) return true;
     const appRole = typeof localStorage !== 'undefined' ? localStorage.getItem('app_role') : null;
     if (appRole === 'SUPER_ADMIN') return true;
@@ -22,9 +18,9 @@ const ProtectedRoute = ({ children, requiredPermission }) => {
       return permissions.includes(requiredPermission) || permissions.includes('admin') || permissions.includes('*');
     }
     return true;
-  };
+  }, [requiredPermission]);
 
-  const validateAccess = async () => {
+  const validateAccess = useCallback(async () => {
     try {
       const devBypass = (import.meta?.env?.DEV) || (import.meta?.env?.VITE_BYPASS_AUTH === 'true');
       if (devBypass) {
@@ -64,7 +60,13 @@ const ProtectedRoute = ({ children, requiredPermission }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [state.isAuthenticated, state.user, dispatch]);
+
+  useEffect(() => {
+    validateAccess();
+  }, [validateAccess]);
+
+
 
   if (loading) {
     return (

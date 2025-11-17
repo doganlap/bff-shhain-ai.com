@@ -1,12 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
-import { Shield, ArrowRight, Play } from 'lucide-react'
-import DemoBooking from './DemoBooking'
 import UnifiedLogo from './UnifiedLogo'
 
 const Hero = () => {
-  const [isDemoOpen, setIsDemoOpen] = useState(false)
-  const [isPOCOpen, setIsPOCOpen] = useState(false)
+  
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-brand-primary via-blue-700 to-brand-secondary pt-20">
       {/* Warm Professional Background */}
@@ -130,17 +127,7 @@ const Hero = () => {
         </motion.div>
       </div>
 
-      {/* Demo & POC Booking Modals */}
-      <DemoBooking 
-        isOpen={isDemoOpen} 
-        onClose={() => setIsDemoOpen(false)}
-        type="demo"
-      />
-      <DemoBooking 
-        isOpen={isPOCOpen} 
-        onClose={() => setIsPOCOpen(false)}
-        type="poc"
-      />
+      
     </section>
   )
 }

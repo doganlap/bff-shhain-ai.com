@@ -5,7 +5,7 @@ const regulatorService = require('../src/services/regulator.service');
 const axios = require('axios');
 
 // Configuration for regulatory intelligence service
-const REGULATORY_SERVICE_URL = process.env.REGULATORY_SERVICE_URL || 'http://localhost:3004';
+const REGULATORY_SERVICE_URL = process.env.REGULATORY_SERVICE_URL || 'http://localhost:3008';
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {
@@ -16,101 +16,60 @@ const handleError = (res, error, message) => {
 // GET /api/regulators - Get all regulators
 router.get('/', async (req, res) => {
   try {
-    const regulators = await prisma.regulator.findMany({
-      include: { publications: true },
-    });
-    res.json(regulators);
+    const regs = await prisma.$queryRaw`SELECT id, name, description, type, website, "contactEmail", "contactPhone", address, "countryCode", sectors, jurisdictions, "isActive" FROM "Regulator" ORDER BY id`;
+    const pubRows = await prisma.$queryRaw`SELECT id, "regulatorId", title, url, "publishedAt" FROM "Publication"`;
+    const byReg = new Map();
+    for (const p of pubRows) {
+      const arr = byReg.get(p.regulatorId) || [];
+      arr.push({ id: p.id, title: p.title, url: p.url, publishedAt: p.publishedAt });
+      byReg.set(p.regulatorId, arr);
+    }
+    const result = regs.map(r => ({ ...r, publications: byReg.get(r.id) || [] }));
+    res.json(result);
   } catch (error) {
     console.error('Database error fetching regulators:', error.message);
-    // Return mock data when database is unavailable
-    const mockRegulators = [
-      {
-        id: 1,
-        name: 'SEC',
-        description: 'Securities and Exchange Commission',
-        type: 'federal',
-        website: 'https://www.sec.gov',
-        contactEmail: 'info@sec.gov',
-        isActive: true,
-        publications: []
-      },
-      {
-        id: 2,
-        name: 'FINRA',
-        description: 'Financial Industry Regulatory Authority',
-        type: 'self_regulatory',
-        website: 'https://www.finra.org',
-        contactEmail: 'info@finra.org',
-        isActive: true,
-        publications: []
-      },
-      {
-        id: 3,
-        name: 'CFTC',
-        description: 'Commodity Futures Trading Commission',
-        type: 'federal',
-        website: 'https://www.cftc.gov',
-        contactEmail: 'info@cftc.gov',
-        isActive: true,
-        publications: []
-      }
-    ];
-    res.json(mockRegulators);
+    res.json([]);
   }
 });
 
 // GET /api/regulators/stats - Get regulatory statistics
-router.get('/stats', async (req, res) => {
+
+// GET /api/regulators/changes - Get regulatory changes from intelligence service
+router.get('/changes', async (req, res) => {
   try {
-    const totalRegulators = await prisma.regulator.count();
-    const activeRegulators = await prisma.regulator.count({ where: { isActive: true } });
-    const totalPublications = await prisma.publication.count();
+    const { regulator, limit = 50 } = req.query;
 
-    const stats = {
-      totalRegulators,
-      activeRegulators,
-      totalPublications,
-      inactiveRegulators: totalRegulators - activeRegulators
-    };
+    const response = await axios.get(`${REGULATORY_SERVICE_URL}/api/regulatory/changes`, {
+      params: { regulator, limit },
+      timeout: 10000
+    });
 
-    res.json({ success: true, data: stats });
+    res.json(response.data);
   } catch (error) {
-    console.error('Database error fetching regulatory stats:', error.message);
-    // Return mock stats when database is unavailable
-    const mockStats = {
-      totalRegulators: 3,
-      activeRegulators: 3,
-      totalPublications: 0,
-      inactiveRegulators: 0
-    };
-    res.json({ success: true, data: mockStats });
+    console.error('Error fetching regulatory changes:', error.message);
+    // Return empty array instead of mock data
+    res.json({ success: true, count: 0, data: [] });
   }
 });
 
 // GET /api/regulators/:id - Get a single regulator by ID
-router.get('/:id', async (req, res) => {
+router.get('/:id(\\d+)', async (req, res) => {
   const { id } = req.params;
   try {
-    const regulator = await prisma.regulator.findUnique({
-      where: { id: parseInt(id, 10) },
-      include: { publications: true },
-    });
-    if (!regulator) {
-      return res.status(404).json({ error: 'Regulator not found' });
-    }
-    res.json(regulator);
+    const rows = await prisma.$queryRaw`SELECT id, name, description, type, website, "contactEmail", "contactPhone", address, "countryCode", sectors, jurisdictions, "isActive" FROM "Regulator" WHERE id = ${parseInt(id, 10)} LIMIT 1`;
+    if (!rows.length) return res.status(404).json({ error: 'Regulator not found' });
+    const pubs = await prisma.$queryRaw`SELECT id, title, url, "publishedAt" FROM "Publication" WHERE "regulatorId" = ${parseInt(id, 10)} ORDER BY id`;
+    res.json({ ...rows[0], publications: pubs });
   } catch (error) {
     handleError(res, error, 'Error fetching regulator by ID');
   }
 });
 
 // GET /api/regulators/:id/publications - Get publications for a regulator
-router.get('/:id/publications', async (req, res) => {
+router.get('/:id(\\d+)/publications', async (req, res) => {
   const { id } = req.params;
   try {
-    const publications = await prisma.publication.findMany({
-      where: { regulatorId: parseInt(id, 10) },
-    });
+    const publications = await prisma.$queryRaw`SELECT id, title, url, "publishedAt" FROM "Publication" WHERE "regulatorId" = ${parseInt(id, 10)} ORDER BY id`;
     res.json(publications);
   } catch (error) {
     handleError(res, error, 'Error fetching regulator publications');
@@ -120,7 +79,7 @@ router.get('/:id/publications', async (req, res) => {
 // POST /api/regulators - Create a new regulator
 router.post('/', async (req, res) => {
   try {
-    const { name, description, type, website, contactEmail, isActive = true } = req.body;
+    const { name, description, type, website, contactEmail, contactPhone, address, countryCode, sectors = [], jurisdictions = [], isActive = true } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Name is required' });
@@ -133,6 +92,11 @@ router.post('/', async (req, res) => {
         type,
         website,
         contactEmail,
+        contactPhone,
+        address,
+        countryCode,
+        sectors,
+        jurisdictions,
         isActive
       },
     });
@@ -147,7 +111,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   const { id } = req.params;
   try {
-    const { name, description, type, website, contactEmail, isActive } = req.body;
+    const { name, description, type, website, contactEmail, contactPhone, address, countryCode, sectors, jurisdictions, isActive } = req.body;
 
     const updatedRegulator = await prisma.regulator.update({
       where: { id: parseInt(id, 10) },
@@ -157,6 +121,11 @@ router.put('/:id', async (req, res) => {
         type,
         website,
         contactEmail,
+        contactPhone,
+        address,
+        countryCode,
+        sectors,
+        jurisdictions,
         isActive
       },
     });
@@ -204,52 +173,18 @@ router.get('/stats', async (req, res) => {
     res.json({ success: true, data: stats });
   } catch (error) {
     console.error('Database error fetching regulatory stats:', error.message);
-    // Return mock stats when database is unavailable
-    const mockStats = {
-      totalRegulators: 3,
-      activeRegulators: 3,
-      totalPublications: 0,
-      inactiveRegulators: 0
-    };
-    res.json({ success: true, data: mockStats });
+    res.json({ success: true, data: { totalRegulators: 0, activeRegulators: 0, totalPublications: 0, inactiveRegulators: 0 } });
   }
 });
 
 // GET /api/regulators/:id - Get a single regulator by ID
-router.get('/:id', async (req, res) => {
-  const { id } = req.params;
-  try {
-    const regulator = await prisma.regulator.findUnique({
-      where: { id: parseInt(id, 10) },
-      include: { publications: true },
-    });
-    if (!regulator) {
-      return res.status(404).json({ error: 'Regulator not found' });
-    }
-    res.json(regulator);
-  } catch (error) {
-    console.error('Database error fetching regulator by ID:', error.message);
-    // Return mock regulator when database is unavailable
-    const mockRegulator = {
-      id: parseInt(id, 10),
-      name: 'SEC',
-      description: 'Securities and Exchange Commission',
-      type: 'federal',
-      website: 'https://www.sec.gov',
-      contactEmail: 'info@sec.gov',
-      isActive: true,
-      publications: []
-    };
-    res.json(mockRegulator);
-  }
-});
 
 // Regulatory Intelligence Integration Routes
 
 // GET /api/regulators/changes - Get regulatory changes from intelligence service
 router.get('/changes', async (req, res) => {
   try {
-    const { regulator, limit = 50, language } = req.query;
+    const { regulator, limit = 50 } = req.query;
 
     const response = await axios.get(`${REGULATORY_SERVICE_URL}/api/regulatory/changes`, {
       params: { regulator, limit },
@@ -268,7 +203,7 @@ router.get('/changes', async (req, res) => {
 router.get('/:regulatorId/changes', async (req, res) => {
   try {
     const { regulatorId } = req.params;
-    const { limit = 50, language } = req.query;
+    const { limit = 50 } = req.query;
 
     const response = await axios.get(`${REGULATORY_SERVICE_URL}/api/regulatory/changes`, {
       params: { regulator: regulatorId, limit },

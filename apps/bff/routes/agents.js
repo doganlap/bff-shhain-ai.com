@@ -228,7 +228,7 @@ router.post('/:agentId/metrics/record', async (req, res) => {
             agentId,
             operation,
             duration,
-            success
+            operationSuccess: success
         });
     } catch (error) {
         console.error('Error recording agent metric:', error);

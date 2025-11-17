@@ -1,23 +1,20 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { useParams } from 'react-router-dom';
 import { 
-  Search, Filter, Download, RefreshCw, Eye, 
+  Search, Download, RefreshCw, Eye, 
   ChevronLeft, ChevronRight, ArrowUpDown
 } from 'lucide-react';
 import { apiServices } from '../services/api';
 import { useApiData } from '../hooks/useApiData';
 import ErrorFallback from './common/ErrorFallback';
 import LoadingSpinner from './common/LoadingSpinner';
-import { DataTable } from './advanced';
 
 const UniversalTableViewer = () => {
   const { tableName } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
-  const [selectedColumns, setSelectedColumns] = useState([]);
 
   // Fetch table data
   const { 
@@ -32,13 +29,10 @@ const UniversalTableViewer = () => {
     limit: pageSize,
     search: searchQuery,
     sort: sortConfig.key ? `${sortConfig.key}:${sortConfig.direction}` : undefined
-  }, {
-    fallbackData: { data: [], pagination: { total: 0, page: 1, limit: 20 } }
   });
 
   // Fetch table schema/metadata
   const { data: tableSchema } = useApiData('tables.getTableSchema', { table: tableName }, {
-    fallbackData: { columns: [] },
     immediate: true
   });
 
@@ -86,7 +80,6 @@ const UniversalTableViewer = () => {
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
     } catch (error) {
-      console.error('Export failed:', error);
       alert('Export failed. Please try again.');
     }
   };

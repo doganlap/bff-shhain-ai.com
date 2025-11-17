@@ -1,13 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ControlCard } from '../../components/cards/AssessmentCards';
 import {
-  ControlCard,
-  MaturityBadge
-} from '../../components/cards/AssessmentCards';
-import {
-  Shield, CheckCircle2, XCircle, AlertTriangle, FileText,
+  AlertTriangle,
   ChevronDown, ChevronRight, Filter, Search, Download
 } from 'lucide-react';
+
+const MANDATORY_SECTIONS = [
+  { id: 1, name: 'Governance & Strategy', nameAr: 'الحوكمة والاستراتيجية' },
+  { id: 2, name: 'Risk Management', nameAr: 'إدارة المخاطر' },
+  { id: 3, name: 'Asset Management', nameAr: 'إدارة الأصول' },
+  { id: 4, name: 'Access Control', nameAr: 'التحكم في الوصول' },
+  { id: 5, name: 'Cryptography', nameAr: 'التشفير' },
+  { id: 6, name: 'Physical Security', nameAr: 'الأمن المادي' },
+  { id: 7, name: 'Operations Security', nameAr: 'أمن العمليات' },
+  { id: 8, name: 'Communications Security', nameAr: 'أمن الاتصالات' },
+  { id: 9, name: 'System Acquisition', nameAr: 'اقتناء الأنظمة' },
+  { id: 10, name: 'Incident Management', nameAr: 'إدارة الحوادث' },
+  { id: 11, name: 'Business Continuity', nameAr: 'استمرارية الأعمال' },
+  { id: 12, name: 'Compliance', nameAr: 'الامتثال' }
+];
 
 /**
  * ASSESSMENT EXECUTION PAGE
@@ -34,64 +46,79 @@ const AssessmentPage = () => {
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // 12 Mandatory Sections (Shahin Standard)
-  const SECTIONS = [
-    { id: 1, name: 'Governance & Strategy', nameAr: 'الحوكمة والاستراتيجية' },
-    { id: 2, name: 'Risk Management', nameAr: 'إدارة المخاطر' },
-    { id: 3, name: 'Asset Management', nameAr: 'إدارة الأصول' },
-    { id: 4, name: 'Access Control', nameAr: 'التحكم في الوصول' },
-    { id: 5, name: 'Cryptography', nameAr: 'التشفير' },
-    { id: 6, name: 'Physical Security', nameAr: 'الأمن المادي' },
-    { id: 7, name: 'Operations Security', nameAr: 'أمن العمليات' },
-    { id: 8, name: 'Communications Security', nameAr: 'أمن الاتصالات' },
-    { id: 9, name: 'System Acquisition', nameAr: 'اقتناء الأنظمة' },
-    { id: 10, name: 'Incident Management', nameAr: 'إدارة الحوادث' },
-    { id: 11, name: 'Business Continuity', nameAr: 'استمرارية الأعمال' },
-    { id: 12, name: 'Compliance', nameAr: 'الامتثال' }
-  ];
+ 
 
   useEffect(() => {
+    const fetchAssessmentData = async () => {
+      try {
+        setLoading(true);
+
+        const response = await fetch(`/api/assessments/${id}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+        });
+        const data = await response.json();
+        setAssessment(data);
+
+        const sectionsData = await Promise.all(
+          MANDATORY_SECTIONS.map(async (section) => {
+            const controlsResponse = await fetch(
+              `/api/assessments/${id}/sections/${section.id}/controls`,
+              { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }
+            );
+            const controls = await controlsResponse.json();
+
+            return {
+              ...section,
+              controls,
+              score: data[`section_${section.id}_score`] || 0,
+              status: data[`section_${section.id}_status`] || 'not_started'
+            };
+          })
+        );
+
+        setSections(sectionsData);
+      } catch (error) {
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchAssessmentData();
-  }, [id, fetchAssessmentData]);
-
-  const fetchAssessmentData = async () => {
-    try {
-      setLoading(true);
-
-      const response = await fetch(`/api/assessments/${id}`, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-      });
-      const data = await response.json();
-      setAssessment(data);
-
-      // Fetch controls grouped by section
-      const sectionsData = await Promise.all(
-        SECTIONS.map(async (section) => {
-          const controlsResponse = await fetch(
-            `/api/assessments/${id}/sections/${section.id}/controls`,
-            { headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` } }
-          );
-          const controls = await controlsResponse.json();
-
-          return {
-            ...section,
-            controls,
-            score: data[`section_${section.id}_score`] || 0,
-            status: data[`section_${section.id}_status`] || 'not_started'
-          };
-        })
-      );
-
-      setSections(sectionsData);
-    } catch (error) {
-      console.error('Error fetching assessment:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [id]);
 
   const handleEvidenceUpload = async (controlId) => {
-    navigate(`/assessments/${id}/controls/${controlId}/evidence`);
+    try {
+      await fetch(`/api/assessments/${id}/controls/${controlId}/evidence`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          file_name: `evidence-${controlId}.txt`,
+          file_type: 'text/plain',
+          storage_location: '',
+          tenant_id: 'public'
+        })
+      });
+      const refresh = await fetch(`/api/assessments/${id}/sections/${expandedSection || 1}/controls`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      const refreshedControls = await refresh.json();
+      setSections(prev => prev.map(s => s.id === (expandedSection || 1) ? { ...s, controls: refreshedControls } : s));
+    } catch {}
+  };
+
+  const saveSectionScore = async (section) => {
+    try {
+      await fetch(`/api/assessments/${id}/sections/${section.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ score: section.score, status: section.status })
+      });
+    } catch {}
   };
 
   const filteredSections = sections.map(section => ({
@@ -103,6 +130,63 @@ const AssessmentPage = () => {
       return matchesStatus && matchesSearch;
     })
   }));
+
+  const onFileSelected = async (sectionId, controlId, e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const signRes = await fetch(`/api/assessments/${id}/controls/${controlId}/evidence/sign?filename=${encodeURIComponent(file.name)}&contentType=${encodeURIComponent(file.type)}`, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+      });
+      if (signRes.ok) {
+        const { url, key } = await signRes.json();
+        const putRes = await fetch(url, {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type },
+          body: file
+        });
+        if (putRes.ok) {
+          await fetch(`/api/assessments/${id}/controls/${controlId}/evidence/confirm`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ key, file_name: file.name, file_type: file.type })
+          });
+        } else {
+          const form = new FormData();
+          form.append('file', file);
+          await fetch(`/api/assessments/${id}/controls/${controlId}/evidence/upload`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+            body: form
+          });
+        }
+      } else {
+        const form = new FormData();
+        form.append('file', file);
+        await fetch(`/api/assessments/${id}/controls/${controlId}/evidence/upload`, {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+          body: form
+        });
+      }
+    } catch {
+      const form = new FormData();
+      form.append('file', file);
+      await fetch(`/api/assessments/${id}/controls/${controlId}/evidence/upload`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+        body: form
+      });
+    }
+    const refresh = await fetch(`/api/assessments/${id}/sections/${sectionId}/controls`, {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+    const refreshedControls = await refresh.json();
+    setSections(prev => prev.map(s => s.id === sectionId ? { ...s, controls: refreshedControls } : s));
+  };
 
   if (loading) {
     return (
@@ -258,21 +342,27 @@ const AssessmentPage = () => {
 
                   <div className="text-center">
                     <p className="text-sm text-gray-600">Score</p>
-                    <p className={`text-lg font-bold ${section.score >= 60 ? 'text-green-600' : 'text-red-600'}`}>
-                      {section.score.toFixed(0)}%
-                    </p>
+                    <input
+                      type="number"
+                      value={section.score}
+                      onChange={(e)=>setSections(prev=>prev.map(s=>s.id===section.id?{...s,score:parseFloat(e.target.value)||0}:s))}
+                      className="w-20 text-center border rounded"
+                    />
                   </div>
 
                   <div className="text-center">
                     <p className="text-sm text-gray-600 mb-1">Status</p>
-                    <span className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                      section.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      section.status === 'in_progress' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {section.status.replace('_', ' ')}
-                    </span>
+                    <select
+                      value={section.status}
+                      onChange={(e)=>setSections(prev=>prev.map(s=>s.id===section.id?{...s,status:e.target.value}:s))}
+                      className="px-2 py-1 border rounded"
+                    >
+                      <option value="not_started">Not Started</option>
+                      <option value="in_progress">In Progress</option>
+                      <option value="completed">Completed</option>
+                    </select>
                   </div>
+                  <button className="px-3 py-2 border rounded" onClick={()=>saveSectionScore(section)}>Save</button>
                 </div>
               </button>
 
@@ -281,19 +371,24 @@ const AssessmentPage = () => {
                 <div className="border-t border-gray-200 p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {section.controls.map(control => (
-                      <ControlCard
-                        key={control.id}
-                        control={{
-                          controlId: control.controlId,
-                          title: control.title,
-                          titleAr: control.titleAr,
-                          maturityLevel: control.maturityLevel || 0,
-                          evidenceCount: control.evidenceCount || 0,
-                          score: control.score || 0,
-                          isMandatory: control.isMandatory || false
-                        }}
-                        onClick={() => handleEvidenceUpload(control.id)}
-                      />
+                      <div key={control.id}>
+                        <ControlCard
+                          control={{
+                            controlId: control.controlId,
+                            title: control.title,
+                            titleAr: control.titleAr,
+                            maturityLevel: control.maturityLevel || 0,
+                            evidenceCount: control.evidenceCount || 0,
+                            score: control.score || 0,
+                            isMandatory: control.isMandatory || false
+                          }}
+                          onClick={() => handleEvidenceUpload(control.id)}
+                        />
+                        <div className="mt-2 flex items-center gap-2">
+                          <label className="text-sm">Upload Evidence</label>
+                          <input type="file" onChange={(e)=>onFileSelected(section.id, control.id, e)} />
+                        </div>
+                      </div>
                     ))}
                   </div>
 

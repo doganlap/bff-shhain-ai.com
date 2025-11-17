@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import apiService from '../../services/apiEndpoints';
+import { apiServices } from '../../services/api';
 import { toast } from 'sonner';
 import { CulturalLoadingSpinner } from '../../components/Animation/InteractiveAnimationToolkit';
 
@@ -13,7 +13,7 @@ const OrganizationDetails = () => {
   const fetchOrganizationDetails = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await apiService.organizations.getById(id);
+      const response = await apiServices.organizations.getById(id);
       if (response?.data?.success && response.data.data) {
         setOrganization(response.data.data);
       } else {

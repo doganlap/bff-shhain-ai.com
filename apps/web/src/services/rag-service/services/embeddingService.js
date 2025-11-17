@@ -28,39 +28,28 @@ class EmbeddingService {
         }
 
         try {
-            // Mock embedding generation for development
-            // In production, this would call actual embedding API
-            const mockEmbedding = this.generateMockEmbedding(text);
-            return mockEmbedding;
+            // Forward to BFF for real embedding generation
+            const response = await fetch('http://localhost:3000/api/rag/embeddings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ text })
+            });
+
+            if (!response.ok) {
+                throw new Error(`BFF embedding request failed: ${response.status}`);
+            }
+
+            const data = await response.json();
+            return data.embedding;
         } catch (error) {
             console.error('[RAG Service] Error generating embedding:', error.message);
             return null;
         }
     }
 
-    generateMockEmbedding(text) {
-        // Generate a simple mock embedding based on text characteristics
-        const dimension = 1536; // OpenAI ada-002 dimension
-        const embedding = new Array(dimension);
-        
-        // Simple hash-based mock embedding
-        let hash = 0;
-        for (let i = 0; i < text.length; i++) {
-            const char = text.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash; // Convert to 32-bit integer
-        }
-
-        // Generate pseudo-random values based on hash
-        for (let i = 0; i < dimension; i++) {
-            const seed = hash + i;
-            embedding[i] = (Math.sin(seed) * 10000) % 1;
-        }
-
-        // Normalize the vector
-        const norm = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
-        return embedding.map(val => val / norm);
-    }
+    // Removed mock embedding generation - now forwards to BFF
 
     async generateBatchEmbeddings(texts) {
         if (!this.initialized) {
@@ -85,7 +74,7 @@ class EmbeddingService {
             model: this.model,
             dimension: 1536,
             initialized: this.initialized,
-            type: 'mock' // In production: 'openai', 'huggingface', etc.
+            type: 'bff-proxy' // Now forwards to BFF for real embeddings
         };
     }
 }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, X, Trash2 } from 'lucide-react';
 import ArabicTextEngine from '../Arabic/ArabicTextEngine';
+import { apiServices } from '../../services/api';
 
 const NotificationCenter = ({ isOpen, onClose }) => {
   const [notifications, setNotifications] = useState([]);
@@ -12,16 +13,10 @@ const NotificationCenter = ({ isOpen, onClose }) => {
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
-        // TODO: Replace with actual API call
-        // const response = await apiServices.notifications.getAll();
-        // if (response.success) {
-        //   setNotifications(response.data || []);
-        //   setUnreadCount((response.data || []).filter(n => !n.read).length);
-        // }
-
-        // For now, set empty array to avoid mock data
-        setNotifications([]);
-        setUnreadCount(0);
+        const response = await apiServices.notifications.getAll();
+        const notificationsData = response.data || response || [];
+        setNotifications(notificationsData);
+        setUnreadCount(notificationsData.filter(n => !n.read).length);
       } catch (error) {
         console.error('Error fetching notifications:', error);
         setNotifications([]);
@@ -29,8 +24,10 @@ const NotificationCenter = ({ isOpen, onClose }) => {
       }
     };
 
-    fetchNotifications();
-  }, []);
+    if (isOpen) {
+      fetchNotifications();
+    }
+  }, [isOpen]);
 
   // Filter notifications
   const filteredNotifications = notifications.filter(notification => {
@@ -41,31 +38,46 @@ const NotificationCenter = ({ isOpen, onClose }) => {
   });
 
   // Mark notification as read
-  const markAsRead = (id) => {
-    setNotifications(prev =>
-      prev.map(notification =>
-        notification.id === id
-          ? { ...notification, read: true }
-          : notification
-      )
-    );
-    setUnreadCount(prev => prev > 0 ? prev - 1 : 0);
+  const markAsRead = async (id) => {
+    try {
+      await apiServices.notifications.markAsRead(id);
+      setNotifications(prev =>
+        prev.map(notification =>
+          notification.id === id
+            ? { ...notification, read: true }
+            : notification
+        )
+      );
+      setUnreadCount(prev => prev > 0 ? prev - 1 : 0);
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+    }
   };
 
   // Mark all as read
-  const markAllAsRead = () => {
-    setNotifications(prev =>
-      prev.map(notification => ({ ...notification, read: true }))
-    );
-    setUnreadCount(0);
+  const markAllAsRead = async () => {
+    try {
+      await apiServices.notifications.markAllAsRead();
+      setNotifications(prev =>
+        prev.map(notification => ({ ...notification, read: true }))
+      );
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+    }
   };
 
   // Delete notification
-  const deleteNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
-    const notification = notifications.find(n => n.id === id);
-    if (notification && !notification.read) {
-      setUnreadCount(prev => prev > 0 ? prev - 1 : 0);
+  const deleteNotification = async (id) => {
+    try {
+      await apiServices.notifications.delete(id);
+      const notification = notifications.find(n => n.id === id);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      if (notification && !notification.read) {
+        setUnreadCount(prev => prev > 0 ? prev - 1 : 0);
+      }
+    } catch (error) {
+      console.error('Error deleting notification:', error);
     }
   };
 

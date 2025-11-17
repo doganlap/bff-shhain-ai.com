@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useApp } from '../../context/AppContext';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Shield, Mail, Lock, Globe, Loader2, AlertCircle, Crown, Key, Unlock } from 'lucide-react';
 
 const SimpleLoginPage = () => {
   const navigate = useNavigate();
-  const { actions } = useApp();
+  const [searchParams] = useSearchParams();
+  const [inviteInfo, setInviteInfo] = useState(null);
   const [formData, setFormData] = useState({
     email: 'admin@shahin-ai.com',
     password: 'SuperAdmin2025'
@@ -18,62 +18,36 @@ const SimpleLoginPage = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
-    // Super Admin Access - Direct Entry
     try {
-      // Set admin user data
-      const adminUser = {
-        id: 'admin-001',
-        email: formData.email,
-        name: 'Super Administrator',
-        role: 'SUPER_ADMIN',
-        permissions: ['*'], // All permissions
-        tenant: 'MASTER_TENANT',
-        isVerified: true,
-        lastLogin: new Date().toISOString()
-      };
-
-      // Store in localStorage
-      localStorage.setItem('app_user', JSON.stringify(adminUser));
-      localStorage.setItem('app_token', 'SUPER_ADMIN_TOKEN_' + Date.now());
-      localStorage.setItem('app_role', 'SUPER_ADMIN');
-      localStorage.setItem('app_permissions', JSON.stringify(['*']));
-
-      // Immediate access
-      setTimeout(() => {
-        navigate('/app');
-        window.location.reload(); // Refresh to apply admin context
-      }, 1000);
-
-    } catch (error) {
-      setError('Access configuration error');
-    } finally {
+      const invite = searchParams.get('invite');
+      if (import.meta.env.PROD && !invite) {
+        setError('Invitation required');
+        setLoading(false);
+        return;
+      }
+      const resp = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: formData.email, password: formData.password, invite })
+      });
+      const data = await resp.json();
+      if (!resp.ok || !data.success) {
+        setError(data.error || 'Login failed');
+        setLoading(false);
+        return;
+      }
+      localStorage.setItem('app_user', JSON.stringify(data.user));
+      localStorage.setItem('app_token', data.accessToken);
+      localStorage.setItem('app_role', data.user.role || 'user');
+      navigate('/app');
+      window.location.reload();
+    } catch (err) {
+      setError('Login error');
       setLoading(false);
     }
   };
 
-  const handleDirectAccess = () => {
-    setLoading(true);
-    // Instant Super Admin Access
-    const adminUser = {
-      id: 'admin-direct',
-      email: 'admin@shahin-ai.com',
-      name: 'Direct Access Administrator',
-      role: 'SUPER_ADMIN',
-      permissions: ['*'],
-      tenant: 'MASTER_TENANT',
-      isVerified: true,
-      directAccess: true
-    };
-
-    localStorage.setItem('app_user', JSON.stringify(adminUser));
-    localStorage.setItem('app_token', 'DIRECT_ACCESS_TOKEN_' + Date.now());
-    localStorage.setItem('app_role', 'SUPER_ADMIN');
-    localStorage.setItem('app_permissions', JSON.stringify(['*']));
-
-    navigate('/app');
-    window.location.reload();
-  };
+  const handleDirectAccess = () => {};
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -88,6 +62,23 @@ const SimpleLoginPage = () => {
       document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
     } catch {}
   };
+
+  useEffect(() => {
+    const invite = searchParams.get('invite');
+    if (import.meta.env.PROD && !invite) {
+      navigate('/');
+      return;
+    }
+    if (invite) {
+      fetch(`/api/invitations/validate?token=${encodeURIComponent(invite)}`)
+        .then(r => r.json())
+        .then(d => {
+          if (d.success) setInviteInfo(d.data);
+          else setError(d.error || 'Invalid invitation');
+        })
+        .catch(() => setError('Invitation validation failed'));
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 flex items-center justify-center">
@@ -112,6 +103,7 @@ const SimpleLoginPage = () => {
               value={language}
               onChange={onLanguageChange}
               className="bg-black/50 border border-white/30 text-white rounded-md px-3 py-2 text-sm backdrop-blur"
+              aria-label="Select language"
             >
               <option value="en">English</option>
               <option value="ar">العربية</option>
@@ -123,25 +115,12 @@ const SimpleLoginPage = () => {
           <div className="text-3xl font-bold bg-gradient-to-r from-yellow-300 to-orange-400 bg-clip-text text-transparent">
             Master Access
           </div>
-          <div className="text-white/80 mt-2">Unrestricted GRC Platform Entry</div>
+          <div className="text-white/80 mt-2">Invite-only Access</div>
         </div>
 
         {/* Direct Access Button */}
         <div className="mb-6">
-          <button
-            onClick={handleDirectAccess}
-            disabled={loading}
-            className="w-full py-4 px-6 bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold rounded-xl hover:from-yellow-400 hover:to-orange-400 transition-all duration-300 flex items-center justify-center gap-3 shadow-lg"
-          >
-            {loading ? (
-              <Loader2 className="w-6 h-6 animate-spin" />
-            ) : (
-              <>
-                <Unlock className="w-6 h-6" />
-                INSTANT ACCESS
-              </>
-            )}
-          </button>
+          <div className="text-white/60 text-sm">Use your invitation link to sign in</div>
         </div>
 
         <div className="relative mb-6">

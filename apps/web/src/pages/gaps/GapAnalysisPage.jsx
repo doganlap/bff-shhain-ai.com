@@ -65,7 +65,6 @@ const GapAnalysisPage = () => {
 
   useEffect(() => {
     applyFilters();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gaps, searchTerm, filterSeverity, filterType, filterFramework]);
 
   const fetchGaps = async () => {

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../db/prisma');
-const documentService = require('../src/services/document.service');
+// const documentService = require('../src/services/document.service');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');

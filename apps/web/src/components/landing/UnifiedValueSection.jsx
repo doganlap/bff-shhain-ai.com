@@ -117,7 +117,7 @@ const UnifiedValueSection = () => {
             </p>
             <p className="font-english text-base text-gray-600 leading-relaxed">
               At Shahin, we are committed to delivering real, lasting value to our clients. 
-              Your success is our success, and we're here to support you every step of the way
+              Your success is our success, and we&apos;re here to support you every step of the way
             </p>
           </div>
         </motion.div>

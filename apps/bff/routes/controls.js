@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../db/prisma');
-const controlService = require('../src/services/control.service');
+// const controlService = require('../src/services/control.service');
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {

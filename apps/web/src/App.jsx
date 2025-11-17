@@ -79,14 +79,11 @@ import {
   
 
   // Demo, Partner, POC Access Paths
-  DemoLanding,
-  DemoRegister,
-  DemoAppLayout,
   PartnerLanding,
   PartnerAppLayout,
-  PocLanding,
-  PocRequest,
-  PocAppLayout,
+  // PocLanding,
+  // PocRequest,
+  // PocAppLayout,
 
   // Special Pages
   KSAGRCPage,
@@ -106,8 +103,6 @@ import GapAnalysisPage from './pages/gaps/GapAnalysisPage';
 import RemediationPlanPage from './pages/remediation/RemediationPlanPage';
 // Public subpages linked from Landing
 import PathSelection from './pages/public/PathSelection';
-import DemoAccessForm from './pages/public/DemoAccessForm';
-import DemoKit from './pages/public/DemoKit';
 
 // Layouts
 import AppLayout from './components/layout/AppLayout';
@@ -119,7 +114,8 @@ import AdvancedGRCDashboard from './components/AdvancedGRCDashboard';
 import MissionControlPage from './pages/system/MissionControlPage.jsx';
 import AdvancedAssessmentManager from './components/AdvancedAssessmentManager';
 import AdvancedFrameworkManager from './components/AdvancedFrameworkManager';
-import AutoRoutes from './components/dev/AutoRoutes.jsx';
+import InvitationsAdmin from './pages/users/InvitationsAdmin.jsx';
+import ReactLazy from 'react';
 
 const isProd = import.meta.env.PROD;
 
@@ -171,33 +167,11 @@ const AppContent = () => {
         {/* Public Routes */}
         <Route path="/" element={<Navigate to="/app" replace />} />
         <Route path="/welcome" element={<Navigate to="/" replace />} />
-        <Route path="/paths" element={<PathSelection />} />
-        <Route path="/demo-access" element={<DemoAccessForm />} />
-        <Route path="/demo-kit" element={<DemoKit />} />
-        <Route path="/dev/auto/*" element={<AutoRoutes base="/dev/auto" />} />
-        <Route path="/pages/*" element={<AutoRoutes base="/pages" />} />
-        <Route path="/pages/app" element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }>
-          <Route path="*" element={<AutoRoutes base="/pages/app" />} />
-        </Route>
+        <Route path="/paths" element={<Navigate to="/app" replace />} />
+        
+        {/* Dev-only auto routing removed from production build */}
 
-        {/* ==================================================================
-            DEMO ACCESS PATH - /demo
-            ================================================================== */}
-        <Route path="/demo" element={<DemoLanding />} />
-        <Route path="/demo/register" element={<DemoRegister />} />
-        <Route path="/demo/app" element={<DemoAppLayout />}>
-          <Route index element={<EnhancedDashboard />} />
-          <Route path="dashboard" element={<EnhancedDashboard />} />
-          <Route path="assessments" element={<AssessmentsModuleEnhanced />} />
-          <Route path="frameworks" element={<FrameworksModuleEnhanced />} />
-          <Route path="controls" element={<ControlsModuleEnhanced />} />
-          <Route path="risks" element={<RiskManagementModuleEnhanced />} />
-          <Route path="compliance" element={<ComplianceTrackingModuleEnhanced />} />
-        </Route>
+        
 
         {/* ==================================================================
             PARTNER ACCESS PATH - /partner
@@ -209,9 +183,9 @@ const AppContent = () => {
         {/* ==================================================================
             POC ACCESS PATH - /poc
             ================================================================== */}
-        <Route path="/poc" element={<PocLanding />} />
+        {/* <Route path="/poc" element={<PocLanding />} />
         <Route path="/poc/request" element={<PocRequest />} />
-        <Route path="/poc/app/*" element={<PocAppLayout />} />
+        <Route path="/poc/app/*" element={<PocAppLayout />} /> */}
 
         {/* Authentication Routes */}
         <Route path="/login" element={<LoginPage />} />
@@ -320,6 +294,7 @@ const AppContent = () => {
               <Route path="users/new" element={<UserManagementPage />} />
               <Route path="users/:id" element={<UserManagementPage />} />
               <Route path="users/:id/edit" element={<UserManagementPage />} />
+              <Route path="users/invitations" element={<InvitationsAdmin />} />
 
               {/* Reports & Analytics */}
               <Route path="reports" element={<ReportsPage />} />
@@ -410,57 +385,57 @@ const AppContent = () => {
               <Route path="status" element={<PerformanceMonitorPage />} />
             </Route>
 
-            {/* Public API Documentation */}
-            <Route path="/api" element={<APIManagementPage publicView={true} />} />
-            <Route path="/api/docs" element={<APIManagementPage publicView={true} />} />
-            <Route path="/api/status" element={<PerformanceMonitorPage publicView={true} />} />
+            {/* Public API Documentation disabled */}
+            <Route path="/api" element={<Navigate to="/app" replace />} />
+            <Route path="/api/docs" element={<Navigate to="/app" replace />} />
+            <Route path="/api/status" element={<Navigate to="/app" replace />} />
 
-            {/* Public Integration Endpoints */}
-            <Route path="/integrations" element={<PartnerManagementPage publicView={true} />} />
-            <Route path="/integrations/webhook" element={<NotificationManagementPage publicView={true} />} />
-            <Route path="/integrations/sso" element={<Navigate to="/" replace />} />
+            {/* Public Integration Endpoints disabled */}
+            <Route path="/integrations" element={<Navigate to="/app" replace />} />
+            <Route path="/integrations/webhook" element={<Navigate to="/app" replace />} />
+            <Route path="/integrations/sso" element={<Navigate to="/app" replace />} />
 
-            {/* Public Regulatory Intelligence */}
-            <Route path="/regulatory" element={<RegulatoryIntelligencePage publicView={true} />} />
-            <Route path="/regulatory/ksa" element={<KSAGRCPage publicView={true} />} />
-            <Route path="/regulatory/sectors" element={<SectorIntelligence publicView={true} />} />
+            {/* Public Regulatory Intelligence disabled */}
+            <Route path="/regulatory" element={<Navigate to="/app" replace />} />
+            <Route path="/regulatory/ksa" element={<Navigate to="/app" replace />} />
+            <Route path="/regulatory/sectors" element={<Navigate to="/app" replace />} />
 
-            {/* Public Reports & Analytics */}
-            <Route path="/reports" element={<ReportsPage publicView={true} />} />
-            <Route path="/reports/compliance" element={<ComplianceTrackingModuleEnhanced publicView={true} />} />
-            <Route path="/reports/risk" element={<RiskManagementModuleEnhanced publicView={true} />} />
+            {/* Public Reports & Analytics disabled */}
+            <Route path="/reports" element={<Navigate to="/app" replace />} />
+            <Route path="/reports/compliance" element={<Navigate to="/app" replace />} />
+            <Route path="/reports/risk" element={<Navigate to="/app" replace />} />
 
-            {/* Bridge & Transfer Endpoints */}
-            <Route path="/bridge" element={<WorkflowManagementPage bridgeMode={true} />} />
-            <Route path="/bridge/status" element={<PerformanceMonitorPage bridgeMode={true} />} />
-            <Route path="/bridge/approval" element={<UserManagementPage approvalMode={true} />} />
+            {/* Bridge & Transfer Endpoints disabled */}
+            <Route path="/bridge" element={<Navigate to="/app" replace />} />
+            <Route path="/bridge/status" element={<Navigate to="/app" replace />} />
+            <Route path="/bridge/approval" element={<Navigate to="/app" replace />} />
 
-            {/* External Web App Integration Points */}
-            <Route path="/external" element={<Navigate to="/external/dashboard" replace />} />
-            <Route path="/external/dashboard" element={<EnhancedDashboard externalMode={true} />} />
-            <Route path="/external/assessments" element={<AssessmentsModuleEnhanced externalMode={true} />} />
-            <Route path="/external/compliance" element={<ComplianceTrackingModuleEnhanced externalMode={true} />} />
-            <Route path="/external/frameworks" element={<FrameworksModuleEnhanced externalMode={true} />} />
-            <Route path="/external/controls" element={<ControlsModuleEnhanced externalMode={true} />} />
-            <Route path="/external/risks" element={<RiskManagementModuleEnhanced externalMode={true} />} />
-            <Route path="/external/reports" element={<ReportsPage externalMode={true} />} />
-            <Route path="/external/organizations" element={<OrganizationsPage externalMode={true} />} />
+            {/* External Web App Integration Points disabled */}
+            <Route path="/external" element={<Navigate to="/app" replace />} />
+            <Route path="/external/dashboard" element={<Navigate to="/app" replace />} />
+            <Route path="/external/assessments" element={<Navigate to="/app" replace />} />
+            <Route path="/external/compliance" element={<Navigate to="/app" replace />} />
+            <Route path="/external/frameworks" element={<Navigate to="/app" replace />} />
+            <Route path="/external/controls" element={<Navigate to="/app" replace />} />
+            <Route path="/external/risks" element={<Navigate to="/app" replace />} />
+            <Route path="/external/reports" element={<Navigate to="/app" replace />} />
+            <Route path="/external/organizations" element={<Navigate to="/app" replace />} />
 
-            {/* Microservices Public Endpoints */}
-            <Route path="/services" element={<APIManagementPage servicesView={true} />} />
-            <Route path="/services/license" element={<LicensesManagementPage serviceMode={true} />} />
-            <Route path="/services/tenant" element={<OrganizationsPage serviceMode={true} />} />
-            <Route path="/services/analytics" element={<UsageDashboardPage serviceMode={true} />} />
-            <Route path="/services/notification" element={<NotificationManagementPage serviceMode={true} />} />
-            <Route path="/services/billing" element={<SettingsPage billingServiceMode={true} />} />
-            <Route path="/services/auth" element={<Navigate to="/" replace />} />
-            <Route path="/services/reporting" element={<ReportsPage serviceMode={true} />} />
-            <Route path="/services/workflow" element={<WorkflowManagementPage serviceMode={true} />} />
+            {/* Microservices Public Endpoints disabled */}
+            <Route path="/services" element={<Navigate to="/app" replace />} />
+            <Route path="/services/license" element={<Navigate to="/app" replace />} />
+            <Route path="/services/tenant" element={<Navigate to="/app" replace />} />
+            <Route path="/services/analytics" element={<Navigate to="/app" replace />} />
+            <Route path="/services/notification" element={<Navigate to="/app" replace />} />
+            <Route path="/services/billing" element={<Navigate to="/app" replace />} />
+            <Route path="/services/auth" element={<Navigate to="/app" replace />} />
+            <Route path="/services/reporting" element={<Navigate to="/app" replace />} />
+            <Route path="/services/workflow" element={<Navigate to="/app" replace />} />
 
-            {/* Public Health & Monitoring */}
-            <Route path="/health" element={<PerformanceMonitorPage publicView={true} />} />
-            <Route path="/status" element={<PerformanceMonitorPage statusOnly={true} />} />
-            <Route path="/metrics" element={<UsageDashboardPage metricsOnly={true} />} />
+            {/* Public Health & Monitoring disabled */}
+            <Route path="/health" element={<Navigate to="/app" replace />} />
+            <Route path="/status" element={<Navigate to="/app" replace />} />
+            <Route path="/metrics" element={<Navigate to="/app" replace />} />
 
             {/* ========================================== */}
             {/* AUTHENTICATED ROUTES                      */}

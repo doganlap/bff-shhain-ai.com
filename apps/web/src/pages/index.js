@@ -144,16 +144,8 @@ export { default as StoryDrivenRegistration } from './auth/StoryDrivenRegistrati
 export { default as LandingPage } from './public/LandingPage.jsx';
 export { default as SimpleLandingPage } from './public/SimpleLandingPage.jsx';
 export { default as NotFoundPage } from './public/NotFoundPage.jsx';
-export { default as ComponentsDemo } from './public/ComponentsDemo.jsx';
-export { default as ModernComponentsDemo } from './public/ModernComponentsDemo.jsx';
 
-// ============================================================================
-// 🎯 DEMO ACCESS PATH
-// ============================================================================
-
-export { default as DemoLanding } from './demo/DemoLanding.jsx';
-export { default as DemoRegister } from './demo/DemoRegister.jsx';
-export { default as DemoAppLayout } from './demo/DemoAppLayout.jsx';
+// Demo exports removed
 
 // ============================================================================
 // 🤝 PARTNER ACCESS PATH
@@ -167,6 +159,6 @@ export { default as PartnerAppLayout } from './partner/PartnerAppLayout.jsx';
 // 🏢 POC ACCESS PATH
 // ============================================================================
 
-export { default as PocLanding } from './poc/PocLanding.jsx';
-export { default as PocRequest } from './poc/PocRequest.jsx';
-export { default as PocAppLayout } from './poc/PocAppLayout.jsx';
+// export { default as PocLanding } from './poc/PocLanding.jsx';
+// export { default as PocRequest } from './poc/PocRequest.jsx';
+// export { default as PocAppLayout } from './poc/PocAppLayout.jsx';

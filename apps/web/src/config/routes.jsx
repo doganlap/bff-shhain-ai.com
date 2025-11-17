@@ -31,6 +31,9 @@ import RegulatorsPage from '../pages/regulatory/RegulatorsPage';
 import ReportsPage from '../pages/reports/ReportsPage';
 import DatabasePage from '../pages/system/DatabasePage';
 import SettingsPage from '../pages/system/SettingsPage';
+
+// Universal Table Viewer
+import UniversalTableViewer from '../components/UniversalTableViewer';
  
 import KSAGRCPage from '../pages/regulatory/KSAGRCPage';
 
@@ -225,6 +228,16 @@ export const routeConfig = {
           element: <KSAGRCPage />,
           title: 'KSA GRC',
           permission: 'read'
+        },
+        {
+          path: 'tables/:tableName',
+          element: (
+            <ProtectedRoute requiredPermission="tables:view">
+              <UniversalTableViewer />
+            </ProtectedRoute>
+          ),
+          title: 'Table Viewer',
+          permission: 'tables:view'
         }
       ]
     }

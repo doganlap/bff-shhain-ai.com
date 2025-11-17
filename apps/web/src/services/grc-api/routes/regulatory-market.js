@@ -45,8 +45,8 @@ router.get('/market-trends', async (req, res) => {
     res.json({
       success: true,
       data: {
-        regulatory_changes: trendsData.rows.length > 0 ? trendsData.rows : generateMockTrends(),
-        sector_performance: sectorData.rows.length > 0 ? sectorData.rows : generateMockSectorData()
+        regulatory_changes: trendsData.rows.length > 0 ? trendsData.rows : await generateRealTrends(),
+        sector_performance: sectorData.rows.length > 0 ? sectorData.rows : []
       }
     });
   } catch (error) {
@@ -100,17 +100,13 @@ router.get('/compliance-statistics', async (req, res) => {
       success: true,
       data: {
         overall_market: {
-          total_organizations: parseInt(marketStats.rows[0].total_organizations) || 2847,
-          compliant_organizations: parseInt(marketStats.rows[0].active_organizations) || 2456,
-          compliance_rate: parseFloat(marketStats.rows[0].avg_compliance_rate) || 86.3,
-          pending_assessments: 391
+          total_organizations: parseInt(marketStats.rows[0]?.total_organizations) || 0,
+          compliant_organizations: parseInt(marketStats.rows[0]?.active_organizations) || 0,
+          compliance_rate: parseFloat(marketStats.rows[0]?.avg_compliance_rate) || 0,
+          pending_assessments: parseInt(marketStats.rows[0]?.pending_assessments) || 0
         },
         by_regulator: await getRegulatorCompliance(),
-        risk_distribution: riskStats.rows.length > 0 ? riskStats.rows : [
-          { risk_level: 'Low Risk', count: 1847 },
-          { risk_level: 'Medium Risk', count: 743 },
-          { risk_level: 'High Risk', count: 257 }
-        ]
+        risk_distribution: riskStats.rows.length > 0 ? riskStats.rows : []
       }
     });
   } catch (error) {
@@ -157,12 +153,8 @@ router.get('/industry-analysis', async (req, res) => {
     res.json({
       success: true,
       data: {
-        market_segments: segmentData.rows.length > 0 ? segmentData.rows : generateMockSegments(),
-        compliance_maturity: maturityData.rows.length > 0 ? maturityData.rows : [
-          { maturity: 'Advanced', organizations: 856 },
-          { maturity: 'Intermediate', organizations: 1423 },
-          { maturity: 'Basic', organizations: 568 }
-        ]
+        market_segments: segmentData.rows.length > 0 ? segmentData.rows : [],
+        compliance_maturity: maturityData.rows.length > 0 ? maturityData.rows : []
       }
     });
   } catch (error) {
@@ -224,50 +216,48 @@ async function getRegulatorCompliance() {
       ORDER BY compliance_rate DESC
     `);
 
-    return regulatorData.rows.length > 0 ? regulatorData.rows : generateMockRegulators();
+    return regulatorData.rows.length > 0 ? regulatorData.rows : [];
   } catch (error) {
-    return generateMockRegulators();
+    console.error('[Regulatory Market] Error loading regulator compliance data:', error);
+    return [];
   }
 }
 
-function generateMockTrends() {
-  return Array.from({ length: 12 }, (_, i) => ({
-    month: new Date(Date.now() - (11 - i) * 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 7),
-    total_changes: Math.floor(Math.random() * 20) + 10,
-    new_regulations: Math.floor(Math.random() * 8) + 2,
-    updates: Math.floor(Math.random() * 15) + 5,
-    avg_compliance_score: Math.floor(Math.random() * 20) + 75
-  }));
+async function generateRealTrends() {
+  // Get real regulatory trends from database
+  try {
+    const result = await dbQueries.compliance.query(`
+      SELECT 
+        DATE_TRUNC('month', created_at) as month,
+        COUNT(*) as total_changes,
+        COUNT(CASE WHEN type = 'new' THEN 1 END) as new_regulations,
+        COUNT(CASE WHEN type = 'update' THEN 1 END) as updates,
+        AVG(compliance_score) as avg_compliance_score
+      FROM regulatory_changes rc
+      LEFT JOIN frameworks f ON rc.framework_id = f.id
+      WHERE created_at >= NOW() - INTERVAL '12 months'
+      GROUP BY DATE_TRUNC('month', created_at)
+      ORDER BY month DESC
+      LIMIT 12
+    `);
+    
+    if (result.rows.length > 0) {
+      return result.rows.map(row => ({
+        month: row.month.toISOString().slice(0, 7),
+        total_changes: parseInt(row.total_changes) || 0,
+        new_regulations: parseInt(row.new_regulations) || 0,
+        updates: parseInt(row.updates) || 0,
+        avg_compliance_score: Math.round(parseFloat(row.avg_compliance_score) || 75)
+      }));
+    }
+  } catch (error) {
+    console.warn('[Regulatory Market] Failed to fetch real trends:', error.message);
+  }
+  
+  // Return empty array if no data available
+  return [];
 }
 
-function generateMockSectorData() {
-  return [
-    { sector: 'Banking', avg_compliance: 87, active_frameworks: 12, total_assessments: 145 },
-    { sector: 'Insurance', avg_compliance: 82, active_frameworks: 8, total_assessments: 98 },
-    { sector: 'Telecommunications', avg_compliance: 89, active_frameworks: 6, total_assessments: 76 },
-    { sector: 'Healthcare', avg_compliance: 85, active_frameworks: 10, total_assessments: 123 },
-    { sector: 'Energy', avg_compliance: 91, active_frameworks: 7, total_assessments: 87 }
-  ];
-}
 
-function generateMockSegments() {
-  return [
-    { name: 'Financial Services', value: 450, growth: 12 },
-    { name: 'Healthcare', value: 320, growth: 8 },
-    { name: 'Technology', value: 280, growth: 25 },
-    { name: 'Energy', value: 180, growth: 5 },
-    { name: 'Manufacturing', value: 150, growth: 7 }
-  ];
-}
-
-function generateMockRegulators() {
-  return [
-    { id: 1, name: 'SAMA', name_ar: 'ساما', sector: 'Banking', active_regulations: 45, compliance_rate: 87 },
-    { id: 2, name: 'CMA', name_ar: 'هيئة السوق المالية', sector: 'Capital Markets', active_regulations: 32, compliance_rate: 91 },
-    { id: 3, name: 'NCA', name_ar: 'هيئة الاتصالات', sector: 'Telecommunications', active_regulations: 28, compliance_rate: 83 },
-    { id: 4, name: 'CITC', name_ar: 'هيئة الاتصالات وتقنية المعلومات', sector: 'IT & Telecom', active_regulations: 35, compliance_rate: 89 },
-    { id: 5, name: 'SFDA', name_ar: 'هيئة الغذاء والدواء', sector: 'Healthcare', active_regulations: 52, compliance_rate: 85 }
-  ];
-}
 
 module.exports = router;

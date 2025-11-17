@@ -4,7 +4,7 @@
  */
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { AlertTriangle, X, RefreshCw, Wifi, WifiOff } from 'lucide-react';
+import { AlertTriangle, X, RefreshCw, WifiOff } from 'lucide-react';
 
 // Error Context
 const ErrorContext = createContext();
@@ -46,7 +46,7 @@ export const ErrorProvider = ({ children }) => {
     }
 
     return errorId;
-  }, []);
+  }, [removeError]);
 
   // Remove specific error
   const removeError = useCallback((errorId) => {

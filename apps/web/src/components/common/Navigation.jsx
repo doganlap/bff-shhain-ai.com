@@ -4,7 +4,7 @@ import { BarChart3, Shield, AlertTriangle, FileText, Languages, Bot } from 'luci
 import { useApp } from '../../context/AppContext';  
   
 const Navigation = () => {  
-  const { state } = useApp();
+  useApp();
   const language = 'en'; // Default to English
   const isRTL = false;
   const toggleLanguage = () => {}; // Placeholder function  
@@ -69,4 +69,4 @@ const Navigation = () => {
   );  
 };  
   
-export default Navigation; 
+export default Navigation;

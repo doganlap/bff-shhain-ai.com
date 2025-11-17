@@ -6,7 +6,7 @@
 const express = require('express');
 const router = express.Router();
 const prisma = require('../db/prisma');
-const schedulerService = require('../src/services/scheduler.service');
+// const schedulerService = require('../src/services/scheduler.service');
 
 // Middleware for consistent error handling
 const handleError = (res, error, message) => {
@@ -31,7 +31,7 @@ function shouldIgnoreJob(job, entries) {
       try {
         const re = new RegExp(e.pattern);
         if (re.test(job?.name || '') || re.test(job?.type || '')) return true;
-      } catch {}
+      } catch (e) { void e; }
     } else {
       if (e.value && (e.value === name || e.value === type)) return true;
     }
@@ -78,52 +78,12 @@ router.get('/jobs', async (req, res) => {
     });
   } catch (error) {
     console.error('Database error fetching scheduler jobs:', error.message);
-    // Return mock data when database is unavailable
-    const mockJobs = [
-      {
-        id: 1,
-        name: 'Daily Compliance Report',
-        description: 'Generate daily compliance status report',
-        type: 'report_generation',
-        schedule_expression: '0 8 * * *',
-        timezone: 'UTC',
-        task_parameters: { report_type: 'compliance', recipients: ['admin@company.com'] },
-        ai_optimization_enabled: true,
-        is_active: true,
-        priority: 5,
-        status: 'active',
-        next_execution: new Date(Date.now() + 3600000).toISOString(),
-        last_execution: new Date(Date.now() - 86400000).toISOString(),
-        created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
-        updated_at: new Date(Date.now() - 86400000).toISOString(),
-        automation_rules: [],
-        task_executions: []
-      },
-      {
-        id: 2,
-        name: 'Weekly Risk Assessment',
-        description: 'Run weekly risk analysis and scoring',
-        type: 'assessment',
-        schedule_expression: '0 9 * * 1',
-        timezone: 'UTC',
-        task_parameters: { assessment_type: 'risk', scope: 'all_frameworks' },
-        ai_optimization_enabled: false,
-        is_active: true,
-        priority: 3,
-        status: 'active',
-        next_execution: new Date(Date.now() + 86400000 * 3).toISOString(),
-        last_execution: new Date(Date.now() - 86400000 * 4).toISOString(),
-        created_at: new Date(Date.now() - 86400000 * 14).toISOString(),
-        updated_at: new Date(Date.now() - 86400000 * 4).toISOString(),
-        automation_rules: [],
-        task_executions: []
-      }
-    ];
+    // Return empty data when database is unavailable
     res.json({
       success: true,
-      data: mockJobs,
+      data: [],
       pagination: {
-        total: 2,
+        total: 0,
         limit: parseInt(limit, 10),
         offset: parseInt(offset, 10),
         hasMore: false
@@ -154,27 +114,7 @@ router.get('/jobs/:id', async (req, res) => {
     res.json({ success: true, data: job });
   } catch (error) {
     console.error('Database error fetching scheduler job:', error.message);
-    // Return mock data when database is unavailable
-    const mockJob = {
-      id: parseInt(id, 10),
-      name: 'Daily Compliance Report',
-      description: 'Generate daily compliance status report',
-      type: 'report_generation',
-      schedule_expression: '0 8 * * *',
-      timezone: 'UTC',
-      task_parameters: { report_type: 'compliance', recipients: ['admin@company.com'] },
-      ai_optimization_enabled: true,
-      is_active: true,
-      priority: 5,
-      status: 'active',
-      next_execution: new Date(Date.now() + 3600000).toISOString(),
-      last_execution: new Date(Date.now() - 86400000).toISOString(),
-      created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
-      updated_at: new Date(Date.now() - 86400000).toISOString(),
-      automation_rules: [],
-      task_executions: []
-    };
-    res.json({ success: true, data: mockJob });
+    res.status(500).json({ error: 'Scheduler job not found' });
   }
 });
 
@@ -227,27 +167,7 @@ router.post('/jobs', async (req, res) => {
     res.status(201).json({ success: true, data: job });
   } catch (error) {
     console.error('Database error creating scheduler job:', error.message);
-    // Return mock created job when database is unavailable
-    const mockJob = {
-      id: Math.floor(Math.random() * 1000),
-      name: req.body.name || 'New Scheduled Task',
-      description: req.body.description || 'New scheduler task',
-      type: req.body.type || 'report_generation',
-      schedule_expression: req.body.schedule_expression || '0 9 * * *',
-      timezone: 'UTC',
-      task_parameters: req.body.task_parameters || {},
-      ai_optimization_enabled: false,
-      is_active: true,
-      priority: req.body.priority || 5,
-      status: 'active',
-      next_execution: new Date(Date.now() + 3600000).toISOString(),
-      last_execution: null,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      automation_rules: [],
-      task_executions: []
-    };
-    res.status(201).json({ success: true, data: mockJob });
+    res.status(500).json({ error: 'Failed to create scheduler job' });
   }
 });
 
@@ -292,27 +212,7 @@ router.put('/jobs/:id', async (req, res) => {
       return res.status(404).json({ error: 'Scheduler job not found' });
     }
     console.error('Database error updating scheduler job:', error.message);
-    // Return mock updated job when database is unavailable
-    const mockJob = {
-      id: parseInt(id, 10),
-      name: req.body.name || 'Updated Scheduled Task',
-      description: req.body.description || 'Updated scheduler task',
-      type: req.body.type || 'report_generation',
-      schedule_expression: req.body.schedule_expression || '0 9 * * *',
-      timezone: 'UTC',
-      task_parameters: req.body.task_parameters || {},
-      ai_optimization_enabled: false,
-      is_active: req.body.is_active !== undefined ? req.body.is_active : true,
-      priority: req.body.priority || 5,
-      status: 'active',
-      next_execution: new Date(Date.now() + 3600000).toISOString(),
-      last_execution: new Date(Date.now() - 86400000).toISOString(),
-      created_at: new Date(Date.now() - 86400000 * 7).toISOString(),
-      updated_at: new Date().toISOString(),
-      automation_rules: [],
-      task_executions: []
-    };
-    res.json({ success: true, data: mockJob });
+    res.status(500).json({ error: 'Failed to update scheduler job' });
   }
 });
 
@@ -353,8 +253,7 @@ router.delete('/jobs/:id', async (req, res) => {
       return res.status(404).json({ error: 'Scheduler job not found' });
     }
     console.error('Database error deleting scheduler job:', error.message);
-    // Return success even if database is unavailable (mock delete)
-    res.json({ success: true, message: 'Scheduler job deleted successfully' });
+    res.status(500).json({ error: 'Failed to delete scheduler job' });
   }
 });
 
@@ -410,16 +309,7 @@ router.post('/jobs/:id/execute', async (req, res) => {
     });
   } catch (error) {
     console.error('Database error executing scheduler job:', error.message);
-    // Return mock execution when database is unavailable
-    res.json({
-      success: true,
-      data: {
-        jobId: parseInt(id, 10),
-        runId: `mock_${Date.now()}`,
-        status: 'running',
-        message: 'Job execution started (mock)'
-      }
-    });
+    res.status(500).json({ error: 'Failed to execute scheduler job' });
   }
 });
 
@@ -456,52 +346,13 @@ router.get('/runs', async (req, res) => {
     });
   } catch (error) {
     console.error('Database error fetching scheduler runs:', error.message);
-    // Return mock data when database is unavailable
-    const mockRuns = [
-      {
-        id: 'mock_1',
-        task_id: 1,
-        execution_id: 'exec_123456',
-        status: 'completed',
-        started_at: new Date(Date.now() - 3600000).toISOString(),
-        completed_at: new Date(Date.now() - 3000000).toISOString(),
-        duration: 600,
-        trigger_type: 'scheduled',
-        output_data: { result: 'Report generated successfully' },
-        performance_score: 0.95,
-        created_at: new Date(Date.now() - 3600000).toISOString(),
-        updated_at: new Date(Date.now() - 3000000).toISOString(),
-        scheduled_tasks: {
-          id: 1,
-          name: 'Daily Compliance Report'
-        }
-      },
-      {
-        id: 'mock_2',
-        task_id: 2,
-        execution_id: 'exec_123457',
-        status: 'failed',
-        started_at: new Date(Date.now() - 7200000).toISOString(),
-        completed_at: new Date(Date.now() - 6600000).toISOString(),
-        duration: 600,
-        trigger_type: 'scheduled',
-        error_details: 'Database connection timeout',
-        performance_score: 0.1,
-        created_at: new Date(Date.now() - 7200000).toISOString(),
-        updated_at: new Date(Date.now() - 6600000).toISOString(),
-        scheduled_tasks: {
-          id: 2,
-          name: 'Weekly Risk Assessment'
-        }
-      }
-    ];
     res.json({
       success: true,
-      data: mockRuns,
+      data: [],
       pagination: {
-        total: 2,
-        limit: parseInt(limit, 10),
-        offset: parseInt(offset, 10),
+        total: 0,
+        limit: 50,
+        offset: 0,
         hasMore: false
       }
     });
@@ -526,27 +377,7 @@ router.get('/runs/:id', async (req, res) => {
     res.json({ success: true, data: run });
   } catch (error) {
     console.error('Database error fetching scheduler run:', error.message);
-    // Return mock data when database is unavailable
-    const mockRun = {
-      id: parseInt(id, 10),
-      task_id: 1,
-      execution_id: `exec_${Date.now()}`,
-      status: 'completed',
-      started_at: new Date(Date.now() - 3600000).toISOString(),
-      completed_at: new Date(Date.now() - 3000000).toISOString(),
-      duration: 600,
-      trigger_type: 'manual',
-      input_data: { task: 'test execution' },
-      output_data: { result: 'Task completed successfully' },
-      performance_score: 0.95,
-      created_at: new Date(Date.now() - 3600000).toISOString(),
-      updated_at: new Date(Date.now() - 3000000).toISOString(),
-      scheduled_tasks: {
-        id: 1,
-        name: 'Daily Compliance Report'
-      }
-    };
-    res.json({ success: true, data: mockRun });
+    res.status(500).json({ error: 'Scheduler run not found' });
   }
 });
 
@@ -597,27 +428,7 @@ router.put('/runs/:id', async (req, res) => {
       return res.status(404).json({ error: 'Scheduler run not found' });
     }
     console.error('Database error updating scheduler run:', error.message);
-    // Return mock updated run when database is unavailable
-    const mockRun = {
-      id: parseInt(id, 10),
-      task_id: 1,
-      execution_id: `exec_${Date.now()}`,
-      status: req.body.status || 'completed',
-      started_at: new Date(Date.now() - 3600000).toISOString(),
-      completed_at: new Date().toISOString(),
-      duration: 600,
-      trigger_type: 'manual',
-      input_data: { task: 'test execution' },
-      output_data: req.body.output_data || { result: 'Task completed successfully' },
-      performance_score: 0.95,
-      created_at: new Date(Date.now() - 3600000).toISOString(),
-      updated_at: new Date().toISOString(),
-      scheduled_tasks: {
-        id: 1,
-        name: 'Daily Compliance Report'
-      }
-    };
-    res.json({ success: true, data: mockRun });
+    res.status(500).json({ error: 'Failed to update scheduler run' });
   }
 });
 
@@ -650,24 +461,7 @@ router.post('/triggers', async (req, res) => {
     res.status(201).json({ success: true, data: trigger });
   } catch (error) {
     console.error('Database error creating scheduler trigger:', error.message);
-    // Return mock trigger when database is unavailable
-    const mockTrigger = {
-      id: Math.floor(Math.random() * 1000),
-      organization_id: parseInt(req.body.jobId || '1', 10),
-      rule_type: req.body.type || 'condition',
-      conditions: req.body.configuration || {},
-      actions: { action: 'trigger_task', task_id: parseInt(req.body.jobId || '1', 10) },
-      is_active: true,
-      name: `Auto-trigger for job ${req.body.jobId || '1'}`,
-      description: `Automatically triggered rule for task ${req.body.jobId || '1'}`,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      scheduled_tasks: {
-        id: parseInt(req.body.jobId || '1', 10),
-        name: 'Sample Scheduled Task'
-      }
-    };
-    res.status(201).json({ success: true, data: mockTrigger });
+    res.status(500).json({ error: 'Failed to create scheduler trigger' });
   }
 });
 
@@ -696,18 +490,19 @@ router.get('/stats', async (req, res) => {
     res.json({ success: true, data: stats });
   } catch (error) {
     console.error('Database error fetching scheduler statistics:', error.message);
-    // Return mock stats when database is unavailable
-    const mockStats = {
-      totalJobs: 5,
-      activeJobs: 4,
-      runningJobs: 1,
-      inactiveJobs: 1,
-      totalRuns: 25,
-      successfulRuns: 22,
-      failedRuns: 3,
-      successRate: 88
-    };
-    res.json({ success: true, data: mockStats });
+    res.json({ 
+      success: true, 
+      data: {
+        totalJobs: 0,
+        activeJobs: 0,
+        runningJobs: 0,
+        inactiveJobs: 0,
+        totalRuns: 0,
+        successfulRuns: 0,
+        failedRuns: 0,
+        successRate: 0
+      }
+    });
   }
 });
 

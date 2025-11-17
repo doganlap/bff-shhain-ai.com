@@ -6,7 +6,7 @@
 import axios from 'axios';
 import { translationAPI } from './translationApi';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3005'; // Use BFF port
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3006'; // Use BFF port
 
 // Create axios instance with default config
 const api = axios.create({
@@ -125,31 +125,31 @@ export const regulatorsApi = {
 
   // Get regulatory intelligence feed
   getRegulatoryFeed: async (params = {}) => {
-    const response = await api.get('/api/regulatory-intelligence/feed', { params });
+    const response = await api.get('/api/regulators/regulatory-intelligence/feed', { params });
     return response.data;
   },
 
   // Get compliance calendar events
   getComplianceCalendar: async (params = {}) => {
-    const response = await api.get('/api/regulatory-intelligence/calendar', { params });
+    const response = await api.get('/api/regulators/regulatory-intelligence/calendar', { params });
     return response.data;
   },
 
   // Get impact assessment for regulatory change
   getImpactAssessment: async (changeId) => {
-    const response = await api.get(`/api/regulatory-intelligence/impact/${changeId}`);
+    const response = await api.get(`/api/regulators/regulatory-intelligence/impact/${changeId}`);
     return response.data;
   },
 
   // Subscribe to regulatory updates
   subscribeToUpdates: async (subscriptionData) => {
-    const response = await api.post('/api/regulatory-intelligence/subscribe', subscriptionData);
+    const response = await api.post('/api/regulators/regulatory-intelligence/subscribe', subscriptionData);
     return response.data;
   },
 
   // Get regulatory statistics with real-time data
   getRegulatoryStats: async () => {
-    const response = await api.get('/api/regulatory-intelligence/stats');
+    const response = await api.get('/api/regulators/regulatory-intelligence/stats');
     return response.data;
   }
 };

@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 import { apiServices } from '../../services/api';
 
 const OrganizationForm = () => {
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     name: '',
     sector: '',
@@ -11,20 +13,57 @@ const OrganizationForm = () => {
     phone: ''
   });
 
+  useEffect(() => {
+    let isMounted = true;
+    const loadOrg = async () => {
+      if (!id) return;
+      try {
+        const res = await apiServices.organizations.getById(id);
+        const org = res.data?.data || res.data || {};
+        if (isMounted) {
+          setFormData({
+            name: org.name || '',
+            sector: org.sector || '',
+            country: org.country || '',
+            email: org.email || '',
+            phone: org.phone || ''
+          });
+        }
+      } catch {}
+    };
+    loadOrg();
+    return () => { isMounted = false; };
+  }, [id]);
+
   const createMutation = useMutation({
     mutationFn: apiServices.organizations.create,
     onSuccess: () => {
       alert('Organization created successfully!');
-      window.location.href = '/organizations';
+      window.location.href = '/app/organizations';
     },
     onError: (error) => {
       alert('Error creating organization: ' + error.message);
     }
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ orgId, data }) => apiServices.organizations.update(orgId, data),
+    onSuccess: () => {
+      alert('Organization updated successfully!');
+      window.location.href = '/app/organizations';
+    },
+    onError: (error) => {
+      alert('Error updating organization: ' + error.message);
+    }
+  });
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    createMutation.mutate(formData);
+    if (id) {
+      updateMutation.mutate({ orgId: id, data: formData });
+    } else {
+      createMutation.mutate(formData);
+    }
   };
 
   const handleChange = (e) => {
@@ -36,7 +75,7 @@ const OrganizationForm = () => {
 
   return (
     <div className="px-4 py-6 sm:px-0">
-      <h1 className="text-xl font-semibold text-gray-900 mb-6">Create Organization</h1>
+      <h1 className="text-xl font-semibold text-gray-900 mb-6">{id ? 'Edit Organization' : 'Create Organization'}</h1>
       
       <form onSubmit={handleSubmit} className="space-y-6 max-w-lg">
         <div>
@@ -103,17 +142,17 @@ const OrganizationForm = () => {
 
         <div className="flex justify-end space-x-3">
           <a
-            href="/organizations"
+            href="/app/organizations"
             className="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             Cancel
           </a>
           <button
             type="submit"
-            disabled={createMutation.isLoading}
+            disabled={createMutation.isLoading || updateMutation.isLoading}
             className="bg-indigo-600 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
           >
-            {createMutation.isLoading ? 'Creating...' : 'Create Organization'}
+            {id ? (updateMutation.isLoading ? 'Updating...' : 'Update Organization') : (createMutation.isLoading ? 'Creating...' : 'Create Organization')}
           </button>
         </div>
       </form>

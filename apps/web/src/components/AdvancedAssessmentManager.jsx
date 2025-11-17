@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Plus, Search, Filter, Download, Upload, Eye, Edit, Trash2,
+  Plus, Search, Download, Eye, Edit, Trash2,
   CheckCircle, XCircle, Clock, AlertTriangle, FileText,
-  Users, Building2, Shield, Target, BarChart3, Settings, PackageX
+  Users, Building2, Shield, Target, PackageX
 } from 'lucide-react';
 import apiService from '../services/apiEndpoints';
 import { toast } from 'sonner';
@@ -65,7 +65,6 @@ const AdvancedAssessmentManager = () => {
         fetchData();
       }
     } catch (error) {
-      console.error('Error creating assessment:', error);
       toast.error('Failed to create assessment');
     }
   };
@@ -82,7 +81,6 @@ const AdvancedAssessmentManager = () => {
         fetchData();
       }
     } catch (error) {
-      console.error('Error updating assessment:', error);
       toast.error('Failed to update assessment');
     }
   };
@@ -97,7 +95,6 @@ const AdvancedAssessmentManager = () => {
         fetchData();
       }
     } catch (error) {
-      console.error('Error deleting assessment:', error);
       toast.error('Failed to delete assessment');
     }
   };
@@ -139,7 +136,7 @@ const AdvancedAssessmentManager = () => {
       setOrganizations(organizationsRes.data?.data || []);
 
     } catch (error) {
-      console.error('Error fetching data:', error);
+      toast.error('Failed to fetch data');
     } finally {
       setLoading(false);
     }
@@ -150,7 +147,7 @@ const AdvancedAssessmentManager = () => {
       const response = await apiService.frameworks.getControls(frameworkId);
       setControls(response.data?.data || []);
     } catch (error) {
-      console.error('Error fetching controls:', error);
+      toast.error('Failed to fetch controls');
     }
   };
 

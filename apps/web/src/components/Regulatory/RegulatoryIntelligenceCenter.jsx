@@ -3,18 +3,19 @@
  * Provides real-time regulatory monitoring and compliance calendar
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Bell, AlertCircle, Calendar, Filter, RefreshCw, 
-  TrendingUp, Building2, FileText, Download, Languages, Globe 
+  TrendingUp, FileText, Languages, Globe 
 } from 'lucide-react';
 import RegulatoryFeedWidget from './RegulatoryFeedWidget';
 import ComplianceCalendarWidget from './ComplianceCalendarWidget';
 import ImpactAssessmentModal from './ImpactAssessmentModal';
 import { regulatorsApi } from '../../services/regulatorsApi';
-import apiService from '../../services/apiEndpoints';
-import { translationAPI, translationUtils } from '../../services/translationApi';
+import { translationAPI } from '../../services/translationApi';
 import { useI18n } from '../../hooks/useI18n';
+
+// Removed mock data functions - using real API data only
 
 const RegulatoryIntelligenceCenter = () => {
   const { t, isRTL, language, changeLanguage } = useI18n();
@@ -39,20 +40,10 @@ const RegulatoryIntelligenceCenter = () => {
     { id: 'CMA', name: 'CMA', nameAr: 'هيئة السوق المالية' }
   ];
 
-  useEffect(() => {
-    loadData();
-  }, [selectedRegulator, language]);
-
-  useEffect(() => {
-    // Load calendar events separately
-    loadCalendarEvents();
-  }, [language]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // Load regulatory changes from real API
       const changesResponse = await regulatorsApi.getRegulatoryChanges(
         selectedRegulator === 'all' ? null : selectedRegulator,
         { 
@@ -61,10 +52,7 @@ const RegulatoryIntelligenceCenter = () => {
           limit: 50
         }
       );
-      
       let regulatoryChanges = changesResponse.data || changesResponse || [];
-      
-      // Apply translations if needed
       if (language !== 'ar' && regulatoryChanges.length > 0) {
         setTranslationLoading(true);
         try {
@@ -82,10 +70,7 @@ const RegulatoryIntelligenceCenter = () => {
           setTranslationLoading(false);
         }
       }
-      
       setChanges(regulatoryChanges);
-
-      // Load statistics from real API
       const statsResponse = await regulatorsApi.getRegulatoryStats();
       setStats(statsResponse.data || statsResponse || {
         total_changes: regulatoryChanges.length,
@@ -101,32 +86,27 @@ const RegulatoryIntelligenceCenter = () => {
           return changeDate > monthAgo;
         }).length
       });
-      
     } catch (error) {
       console.error('Error loading regulatory data:', error);
       setError(error.message || 'Failed to load regulatory data');
-      const mockChanges = generateMockRegulatoryChanges();
-      setChanges(mockChanges);
+      // Show empty state instead of mock data
+      setChanges([]);
       setStats({
-        total_changes: mockChanges.length,
-        critical_changes: mockChanges.filter(c => c.urgency_level === 'critical').length,
-        changes_last_week: mockChanges.filter(c => {
-          const changeDate = new Date(c.published_date || c.created_at);
-          const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
-          return changeDate > weekAgo;
-        }).length,
-        changes_last_month: mockChanges.filter(c => {
-          const changeDate = new Date(c.published_date || c.created_at);
-          const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
-          return changeDate > monthAgo;
-        }).length
+        total_changes: 0,
+        critical_changes: 0,
+        changes_last_week: 0,
+        changes_last_month: 0
       });
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedRegulator, language]);
 
-  const loadCalendarEvents = async () => {
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const loadCalendarEvents = useCallback(async () => {
     try {
       const eventsResponse = await regulatorsApi.getComplianceCalendar({
         language: language,
@@ -136,9 +116,15 @@ const RegulatoryIntelligenceCenter = () => {
       setCalendarEvents(eventsResponse.data || eventsResponse || []);
     } catch (error) {
       console.error('Error loading calendar events:', error);
-      setCalendarEvents(generateMockCalendarEvents());
+      setCalendarEvents([]); // Show empty state instead of mock data
     }
-  };
+  }, [language]);
+
+  useEffect(() => {
+    loadCalendarEvents();
+  }, [loadCalendarEvents]);
+
+
 
   const handleRefresh = () => {
     loadData();
@@ -167,7 +153,7 @@ const RegulatoryIntelligenceCenter = () => {
     changeLanguage(newLanguage);
   };
 
-  const handleSubscribeToUpdates = async (regulatorId) => {
+  const _handleSubscribeToUpdates = async (regulatorId) => {
     try {
       await regulatorsApi.subscribeToUpdates({
         regulator_id: regulatorId,
@@ -196,36 +182,7 @@ const RegulatoryIntelligenceCenter = () => {
   };
 
   // Mock data generators for fallback
-  const generateMockRegulatoryChanges = () => [
-    {
-      id: '1',
-      title: language === 'ar' ? 'تحديث لوائح البنك المركزي السعودي' : 'SAMA Banking Regulations Update',
-      description: language === 'ar' ? 'تحديثات جديدة على لوائح الخدمات المصرفية' : 'New updates to banking services regulations',
-      regulator: 'SAMA',
-      urgency_level: 'high',
-      published_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      status: 'active'
-    },
-    {
-      id: '2', 
-      title: language === 'ar' ? 'إرشادات الأمن السيبراني الجديدة' : 'New Cybersecurity Guidelines',
-      description: language === 'ar' ? 'إرشادات محدثة للأمن السيبراني من الهيئة الوطنية' : 'Updated cybersecurity guidelines from NCA',
-      regulator: 'NCA',
-      urgency_level: 'critical',
-      published_date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      status: 'active'
-    }
-  ];
-
-  const generateMockCalendarEvents = () => [
-    {
-      id: '1',
-      title: language === 'ar' ? 'موعد تقديم التقرير السنوي' : 'Annual Report Submission',
-      date: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
-      regulator: 'SAMA',
-      type: 'deadline'
-    }
-  ];
+  
 
   if (error && !changes.length) {
     return (

@@ -8,9 +8,7 @@ import AdvancedStats from '../../components/landing/AdvancedStats';
 import CompetitiveAdvantage from '../../components/landing/CompetitiveAdvantage';
 import TargetSectors from '../../components/landing/TargetSectors';
 import SaudiFrameworks from '../../components/landing/SaudiFrameworks';
-import PlatformDemo from '../../components/landing/PlatformDemo';
 import DashboardPreview from '../../components/landing/DashboardPreview';
-import DemoBooking from '../../components/landing/DemoBooking';
 import FAQ from '../../components/landing/FAQ';
 import FinalCTA from '../../components/landing/FinalCTA';
 import Footer from '../../components/landing/Footer';
@@ -21,12 +19,10 @@ import SmallIconSidebar from '../../components/landing/SmallIconSidebar';
 // import FloatingGlassCard from '../../components/landing/FloatingGlassCard'; // Removed - too annoying
 // import AutoScroll from '../../components/landing/AutoScroll'; // Removed - too fast and annoying
 import LoginModal from '../../components/landing/LoginModal';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '../../components/theme/ThemeProvider';
 
 // Import new pages
-import PathSelection from './PathSelection';
-import DemoAccessForm from './DemoAccessForm';
-import DemoKit from './DemoKit';
+ 
 
 const LandingPage = () => {
   const { theme } = useTheme();
@@ -57,9 +53,7 @@ const LandingPage = () => {
       <CompetitiveAdvantage />
       <TargetSectors />
       <SaudiFrameworks />
-      <PlatformDemo />
       <DashboardPreview />
-      <DemoBooking />
       <FAQ />
       <FinalCTA onLoginClick={handleGetStarted} />
       <Footer />

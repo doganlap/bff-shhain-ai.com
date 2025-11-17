@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronUp, ChevronDown } from 'lucide-react'
 import { useScrollSpy } from '../../hooks/useScrollSpy'
 
 const QuickSectionNav = () => {
-  const sections = [
+  const sections = useMemo(() => ([
     'hero',
     'trust',
     'vision',
@@ -18,8 +18,8 @@ const QuickSectionNav = () => {
     'parallax',
     'pricing',
     'faq'
-  ]
-
+  ]), [])
+  
   const activeSection = useScrollSpy(sections, 150)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
@@ -38,7 +38,7 @@ const QuickSectionNav = () => {
     }
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [activeSection])
+  }, [activeSection, sections])
 
   const scrollToSection = (index) => {
     if (index >= 0 && index < sections.length) {

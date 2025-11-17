@@ -141,8 +141,8 @@ const WorkflowManagementPage = () => {
       const workflowsData = response.data || response || [];
       
       // Process workflows data with safe defaults
-      const processedWorkflows = workflowsData.map(workflow => ({
-        id: workflow.id || Math.random().toString(36).substr(2, 9),
+      const processedWorkflows = workflowsData.map((workflow, index) => ({
+        id: workflow.id || `workflow-fallback-${index}-${Date.now()}`,
         name: workflow.name || 'Unnamed Workflow',
         nameAr: workflow.nameAr || 'سير عمل غير مسمى',
         description: workflow.description || 'No description available',

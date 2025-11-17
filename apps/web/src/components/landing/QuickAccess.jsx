@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ChevronDown, ChevronUp, Sparkles, Star, Shield, Users, DollarSign, Mail, BarChart3, Award } from 'lucide-react'
+import { ChevronDown, ChevronUp, Sparkles, Star, Shield, DollarSign, Mail, BarChart3, Award } from 'lucide-react'
 
 const QuickAccess = () => {
   const [isExpanded, setIsExpanded] = useState(false)

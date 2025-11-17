@@ -51,6 +51,11 @@ CREATE TABLE IF NOT EXISTS scheduled_tasks (
     status VARCHAR(50) DEFAULT 'active', -- 'active', 'paused', 'disabled', 'archived'
     next_execution TIMESTAMP WITH TIME ZONE,
     last_execution TIMESTAMP WITH TIME ZONE,
+    last_execution_status VARCHAR(50),
+    last_execution_duration INTEGER,
+    total_executions INTEGER DEFAULT 0,
+    successful_executions INTEGER DEFAULT 0,
+    failed_executions INTEGER DEFAULT 0,
 
     -- Audit fields
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -577,8 +582,9 @@ CREATE INDEX IF NOT EXISTS idx_scheduled_tasks_organization
 CREATE INDEX IF NOT EXISTS idx_scheduled_tasks_status
     ON scheduled_tasks (status);
 
-CREATE INDEX IF NOT EXISTS idx_scheduled_tasks_next_execution
-    ON scheduled_tasks (next_execution_at) WHERE status = 'active';
+-- DEPRECATED: next_execution_at, use next_execution
+-- CREATE INDEX IF NOT EXISTS idx_scheduled_tasks_next_execution
+--     ON scheduled_tasks (next_execution_at) WHERE status = 'active';
 
 CREATE INDEX IF NOT EXISTS idx_scheduled_tasks_type
     ON scheduled_tasks (type);
@@ -666,16 +672,16 @@ RETURNS TRIGGER AS $$
 BEGIN
     UPDATE scheduled_tasks
     SET
-        last_execution_at = NEW.completed_at,
+        last_execution = NEW.completed_at,
         last_execution_status = NEW.status,
-        last_execution_duration = NEW.duration,
-        total_executions = total_executions + 1,
-        successful_executions = CASE WHEN NEW.status = 'success'
-            THEN successful_executions + 1
-            ELSE successful_executions END,
+        last_execution_duration = COALESCE(NEW.duration, last_execution_duration),
+        total_executions = COALESCE(total_executions, 0) + 1,
+        successful_executions = CASE WHEN NEW.status IN ('completed', 'success')
+            THEN COALESCE(successful_executions, 0) + 1
+            ELSE COALESCE(successful_executions, 0) END,
         failed_executions = CASE WHEN NEW.status IN ('failed', 'timeout')
-            THEN failed_executions + 1
-            ELSE failed_executions END,
+            THEN COALESCE(failed_executions, 0) + 1
+            ELSE COALESCE(failed_executions, 0) END,
         updated_at = NOW()
     WHERE id = NEW.task_id;
 
@@ -700,9 +706,7 @@ COMMENT ON TABLE automation_rules IS 'Rules for automated task management and op
 COMMENT ON TABLE ai_suggestions IS 'AI-generated suggestions for task optimization';
 COMMENT ON TABLE task_dependencies IS 'Task dependency relationships and conditions';
 
-COMMENT ON COLUMN scheduled_tasks.schedule IS 'Schedule configuration: cron, interval, or trigger-based';
-COMMENT ON COLUMN scheduled_tasks.task_config IS 'Task-specific parameters and settings';
-COMMENT ON COLUMN scheduled_tasks.ai_suggestions IS 'AI-generated optimization suggestions';
+COMMENT ON COLUMN scheduled_tasks.schedule_expression IS 'Schedule configuration: cron, interval, or trigger-based';
 COMMENT ON COLUMN task_executions.ai_analysis IS 'AI insights about execution performance';
 COMMENT ON COLUMN automation_rules.conditions IS 'Conditions that trigger the automation rule';
 COMMENT ON COLUMN automation_rules.actions IS 'Actions to take when rule conditions are met';

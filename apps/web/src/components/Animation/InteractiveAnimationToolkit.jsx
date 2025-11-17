@@ -156,22 +156,11 @@ export const AnimatedCard = ({
   const handleMouseMove = (event) => {
     // Disabled 3D effects for enterprise clean look
     return;
-
-    if (!hover3D) return;
-
-    const rect = ref.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    x.set(event.clientX - centerX);
-    y.set(event.clientY - centerY);
   };
 
   const handleMouseLeave = () => {
     // Disabled 3D effects for enterprise clean look
     return;
-
-    x.set(0);
-    y.set(0);
   };
 
   return (

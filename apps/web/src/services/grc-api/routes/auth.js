@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const { authenticateToken } = require('../middleware/auth');
 const router = express.Router();
 
-// Login a user
+// Login a user (sets HTTP-only cookie)
 router.post('/login', async (req, res) => {
   const origin = req.headers.origin;
   const allowed = 'https://www.shahin-ai.com';
@@ -39,7 +39,17 @@ router.post('/login', async (req, res) => {
     // Remove password from user object before sending
     delete user.password;
 
-    res.status(200).json({ success: true, data: { user, token } });
+    const secure = process.env.NODE_ENV === 'production';
+    const sameSite = secure ? 'Lax' : 'Lax';
+    res.cookie('accessToken', token, {
+      httpOnly: true,
+      secure,
+      sameSite,
+      maxAge: 60 * 60 * 1000,
+      path: '/',
+    });
+
+    res.status(200).json({ success: true, data: { user } });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ success: false, message: 'Server error during login.' });

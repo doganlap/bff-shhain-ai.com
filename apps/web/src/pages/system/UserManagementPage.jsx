@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Users, UserPlus, Edit, Trash2, Shield, Mail, Building, UserCheck, UserX, RefreshCw, Grid, List, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Users, UserPlus, Edit, Trash2, Shield, Mail, Building, UserCheck, UserX, RefreshCw, Grid, List, Search, Table } from 'lucide-react';
 import EnterprisePageLayout from '../../components/layout/EnterprisePageLayout';
 import apiService from '../../services/apiEndpoints';
 import { toast } from 'sonner';
 
 
 const UserManagementPage = () => {
+  const navigate = useNavigate();
   // State
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -199,6 +201,13 @@ const UserManagementPage = () => {
       actions={
         <div className="flex gap-2">
           <button
+            onClick={() => navigate('/app/tables/users')}
+            className="px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors flex items-center gap-2"
+          >
+            <Table className="h-4 w-4" />
+            Table View
+          </button>
+          <button
             onClick={() => setViewMode(viewMode === 'grid' ? 'table' : 'grid')}
             className="px-3 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
           >
@@ -216,6 +225,13 @@ const UserManagementPage = () => {
           >
             <UserPlus className="h-4 w-4" />
             Add User
+          </button>
+          <button
+            onClick={() => navigate('/app/users/invitations')}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2"
+          >
+            <Mail className="h-4 w-4" />
+            Invitations
           </button>
         </div>
       }

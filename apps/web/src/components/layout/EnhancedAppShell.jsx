@@ -6,12 +6,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import {
-  Home, Shield, Target, FileText, Building2, Users, BarChart3, Database, Settings,
-  Menu, X, Search, Bell, MessageSquare, HelpCircle, ChevronLeft, ChevronRight,
-  Bot, Eye, AlertTriangle, UserCheck, Archive, Activity, CheckCircle, Workflow,
-  ShieldCheck, Sun, Moon, Globe, Palette, Info
-} from 'lucide-react';
+import { Shield, Settings, Menu, X, Search, Bell, HelpCircle, ChevronLeft, ChevronRight, UserCheck, Globe } from 'lucide-react';
 
 // Import our new components
 import ErrorBoundary from '../common/ErrorBoundary';
@@ -20,8 +15,9 @@ import { useApp } from '../../context/AppContext';
 import { useI18n } from '../../hooks/useI18n.jsx';
 import { useTheme } from '../theme/ThemeProvider';
 import { Tooltip, InfoTooltip, WarningTooltip } from '../ui/Tooltip';
-import { Modal, Dropdown, Select, Alert, LoadingSpinner } from '../ui/InteractiveComponents';
+import { Modal, Dropdown, Select, Alert } from '../ui/InteractiveComponents';
 import { getNavigationForRole, TenantSelector, RoleBadge } from './MultiTenantNavigation';
+import { apiServices } from '../../services/api';
 
 const EnhancedAppShell = () => {
   const navigate = useNavigate();
@@ -29,13 +25,14 @@ const EnhancedAppShell = () => {
   const { state } = useApp();
   const { user } = state;
   const { t, language, changeLanguage, isRTL } = useI18n();
-  const { currentTheme, toggleTheme, isDark } = useTheme();
+  const { isDark } = useTheme();
 
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [notificationsLoading, setNotificationsLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
 
   // Multi-tenant navigation
   const userRole = user?.role || 'team_member'; // platform_admin, tenant_admin, team_member
@@ -67,12 +64,33 @@ const EnhancedAppShell = () => {
     { value: 'ar', label: 'العربية' }
   ];
 
-  // Mock notifications
-  const notifications = [
-    { id: 1, title: 'New Assessment Due', message: 'ISO 27001 assessment requires attention', type: 'warning', time: '5 min ago' },
-    { id: 2, title: 'Compliance Update', message: 'SAMA regulations updated', type: 'info', time: '1 hour ago' },
-    { id: 3, title: 'Risk Alert', message: 'High risk control identified', type: 'error', time: '2 hours ago' },
-  ];
+  // Load real notifications
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        setNotificationsLoading(true);
+        const response = await apiServices.notifications.getAll({ 
+          limit: 10, 
+          unread_only: true,
+          user_id: user?.id 
+        });
+        const notificationsData = response.data || response || [];
+        setNotifications(notificationsData);
+      } catch (error) {
+        console.error('Failed to load notifications:', error);
+        setNotifications([]);
+      } finally {
+        setNotificationsLoading(false);
+      }
+    };
+
+    if (user?.id) {
+      loadNotifications();
+      // Refresh notifications every 30 seconds
+      const interval = setInterval(loadNotifications, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [user?.id]);
 
   return (
     <ErrorBoundary>
@@ -86,7 +104,7 @@ const EnhancedAppShell = () => {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className={`fixed top-4 ${isRTL() ? 'right-4' : 'left-4'} z-50 p-2 rounded-lg shadow-lg hover:shadow-xl transition-all ${
-                isDark() ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'
+                isDark ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'
               }`}
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -135,8 +153,8 @@ const EnhancedAppShell = () => {
                       <Tooltip content={sidebarCollapsed ? t('action.open') : t('action.close')} position="right">
                         <button
                           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                          className={`p-1 rounded-lg transition-colors ${
-                            isDark() ? 'hover:bg-gray-700' : 'hover:bg-slate-100'
+                            className={`p-1 rounded-lg transition-colors ${
+                            isDark ? 'hover:bg-gray-700' : 'hover:bg-slate-100'
                           }`}
                         >
                           {sidebarCollapsed ?
@@ -322,7 +340,7 @@ const EnhancedAppShell = () => {
             isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-slate-200'
           }`}>
             <div className="flex items-center space-x-4">
-              <h2 className={`text-xl font-semibold ${isDark() ? 'text-white' : 'text-slate-900'}`}>
+              <h2 className={`text-xl font-semibold ${isDark ? 'text-white' : 'text-slate-900'}`}>
                 {navigationItems.find(item => currentPath === item.path || currentPath.startsWith(item.path + '/'))?.name || t('nav.dashboard')}
               </h2>
             </div>
@@ -344,7 +362,9 @@ const EnhancedAppShell = () => {
                     isDark ? 'hover:bg-gray-700 text-gray-300' : 'hover:bg-slate-100 text-slate-600'
                   }`}>
                     <Bell className="h-4 w-4" />
-                    <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+                    {notifications.length > 0 && (
+                      <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
+                    )}
                   </button>
                 }
                 position="bottom-end"
@@ -352,19 +372,33 @@ const EnhancedAppShell = () => {
               >
                 <div className="p-4">
                   <h3 className="font-semibold text-gray-900 mb-3">Notifications</h3>
-                  <div className="space-y-3">
-                    {notifications.map((notification) => (
-                      <Alert
-                        key={notification.id}
-                        type={notification.type}
-                        title={notification.title}
-                        className="text-sm"
-                      >
-                        <p>{notification.message}</p>
-                        <p className="text-xs opacity-70 mt-1">{notification.time}</p>
-                      </Alert>
-                    ))}
-                  </div>
+                  {notificationsLoading ? (
+                    <div className="text-center py-4">
+                      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto"></div>
+                      <p className="text-sm text-gray-500 mt-2">Loading notifications...</p>
+                    </div>
+                  ) : notifications.length === 0 ? (
+                    <div className="text-center py-4">
+                      <Bell className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">No new notifications</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {notifications.map((notification) => (
+                        <Alert
+                          key={notification.id}
+                          type={notification.type || 'info'}
+                          title={notification.title}
+                          className="text-sm"
+                        >
+                          <p>{notification.message}</p>
+                          <p className="text-xs opacity-70 mt-1">
+                            {notification.created_at ? new Date(notification.created_at).toLocaleTimeString() : notification.time}
+                          </p>
+                        </Alert>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </Dropdown>
 

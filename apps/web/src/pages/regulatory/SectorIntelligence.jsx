@@ -4,7 +4,7 @@ import {
   Building2, Shield, FileText, TrendingUp,
   AlertCircle, RefreshCw
 } from 'lucide-react';
-import apiService from '../../services/apiEndpoints';
+import { apiServices } from '../../services/api';
 import { useApiData } from '../../hooks/useApiData';
  
 import ErrorFallback from '../../components/common/ErrorFallback';
@@ -34,6 +34,7 @@ const SectorIntelligence = () => {
   const [selectedFramework, setSelectedFramework] = useState('all');
   const [selectedRegulator, setSelectedRegulator] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [initialized, setInitialized] = useState(false);
 
   // Fetch sector controls data
   const { 
@@ -46,19 +47,13 @@ const SectorIntelligence = () => {
     framework: selectedFramework !== 'all' ? selectedFramework : undefined,
     regulator: selectedRegulator !== 'all' ? selectedRegulator : undefined,
     search: searchQuery || undefined
-  }, {
-    fallbackData: { data: [], pagination: { total: 0 } }
   });
 
   // Fetch frameworks for filtering
-  const { data: frameworksData } = useApiData('frameworks.getAll', {}, {
-    fallbackData: { data: [] }
-  });
+  const { data: frameworksData } = useApiData('frameworks.getAll', {});
 
   // Fetch regulators for filtering
-  const { data: regulatorsData } = useApiData('regulators.getAll', {}, {
-    fallbackData: { data: [] }
-  });
+  const { data: regulatorsData } = useApiData('regulators.getAll', {});
 
   // Available sectors (hardcoded for now, could come from API)
   const sectors = [
@@ -75,9 +70,18 @@ const SectorIntelligence = () => {
     { value: 'technology', label: 'Technology' }
   ];
 
+  const seededControls = useMemo(() => ([]), []); // REMOVED MOCK DATA
+
+  const effectiveControls = useMemo(() => {
+    const apiControls = sectorControlsData?.data || [];
+    return apiControls; // ONLY REAL DATA, NO FALLBACK
+  }, [sectorControlsData]);
+
+  // REMOVED MOCK DATA SEEDING LOGIC
+
   // Calculate statistics
   const statistics = useMemo(() => {
-    const controls = sectorControlsData?.data || [];
+    const controls = effectiveControls;
     const frameworks = frameworksData?.data || [];
     const regulators = regulatorsData?.data || [];
 
@@ -132,11 +136,11 @@ const SectorIntelligence = () => {
       };
 
       // This would need to be implemented in the backend
-      await apiService.sectorControls.getAll(params);
+      await apiServices.sectorControls.getAll(params);
       
       // For now, create a simple CSV export
       if (format === 'csv') {
-        const csvContent = convertToCSV(sectorControlsData?.data || []);
+        const csvContent = convertToCSV(effectiveControls || []);
         downloadFile(csvContent, `sector-intelligence-${new Date().toISOString().split('T')[0]}.csv`, 'text/csv');
       }
     } catch (error) {
@@ -185,6 +189,19 @@ const SectorIntelligence = () => {
           </p>
         </div>
         <div className="flex gap-2">
+          <button
+            onClick={async () => {
+              try {
+                await apiServices.sectorControls.seed(selectedSector === 'all' ? 'banking' : selectedSector);
+                await refetchControls();
+                setInitialized(true);
+              } catch {}
+            }}
+            className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50"
+            title="Initialize demo data locally"
+          >
+            Initialize Data
+          </button>
           <button
             onClick={() => refetchControls()}
             className="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 flex items-center gap-2"
@@ -339,9 +356,9 @@ const SectorIntelligence = () => {
           <div className="p-12 text-center">
             <LoadingSpinner message="Loading sector controls..." />
           </div>
-        ) : sectorControlsData?.data && sectorControlsData.data.length > 0 ? (
+        ) : effectiveControls && effectiveControls.length > 0 ? (
           <DataGrid
-            data={sectorControlsData.data.map((row, idx) => ({ id: row.control_id || idx, ...row }))}
+            data={effectiveControls.map((row, idx) => ({ id: row.control_id || idx, ...row }))}
             columns={[
               { key: 'control_id', label: 'Control ID', sortable: true },
               { key: 'title', label: 'Control Title', sortable: true },

@@ -72,7 +72,12 @@ const webSocketReducer = (state, action) => {
 // WebSocket Provider Component
 export const WebSocketProvider = ({ children }) => {
   const [state, dispatch] = useReducer(webSocketReducer, initialWebSocketState);
-  const { state: { token, isAuthenticated } } = useApp();
+  let appState = { token: null, isAuthenticated: false };
+  try {
+    const app = useApp();
+    appState = app?.state || appState;
+  } catch {}
+  const { token, isAuthenticated } = appState;
 
   // Initialize WebSocket connection when user is authenticated
   useEffect(() => {

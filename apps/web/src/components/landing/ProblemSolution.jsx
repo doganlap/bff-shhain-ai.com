@@ -143,7 +143,7 @@ const ProblemSolution = () => {
               حان الوقت للتغيير
             </h3>
             <p className="font-english text-xl mb-8 opacity-90">
-              It's Time for Change
+              It&apos;s Time for Change
             </p>
             <p className="font-arabic text-lg max-w-3xl mx-auto mb-8">
               انضم إلى مئات المنظمات التي حولت تحدياتها إلى نجاحات مع شاهين

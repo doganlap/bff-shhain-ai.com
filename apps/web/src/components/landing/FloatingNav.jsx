@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Home, Sparkles, Star, Shield, DollarSign, Mail, ArrowUp, Monitor, MessageSquare, Link2 } from 'lucide-react'
+import { Home, Sparkles, Star, Shield, DollarSign, Mail, ArrowUp, Monitor, Link2 } from 'lucide-react'
 import { useScrollSpy } from '../../hooks/useScrollSpy'
 
 const FloatingNav = () => {

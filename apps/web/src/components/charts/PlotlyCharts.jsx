@@ -1,5 +1,10 @@
 import React, { Suspense } from 'react';
-const LazyPlot = React.lazy(() => import('react-plotly.js'));
+const LazyPlot = React.lazy(() =>
+  Promise.all([
+    import('react-plotly.js'),
+    import('plotly.js/dist/plotly.css')
+  ]).then(([mod]) => mod)
+);
 const Plot = (props) => (
   <Suspense fallback={<div />}> 
     <LazyPlot {...props} />

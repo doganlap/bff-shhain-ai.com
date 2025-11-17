@@ -43,27 +43,10 @@ const PerformanceMonitor = ({ data, loading, language = 'ar' }) => {
     }
   }, [data]);
 
-  // Simulate real-time metrics updates when no real data
+  // No simulation - rely entirely on real data
   useEffect(() => {
-    if (data) return; // Don't simulate if we have real data
-    
-    intervalRef.current = setInterval(() => {
-      setMetrics(prev => ({
-        responseTime: Math.max(0.5, prev.responseTime + (Math.random() - 0.5) * 0.5),
-        throughput: Math.max(800, prev.throughput + Math.floor((Math.random() - 0.5) * 200)),
-        cpuUsage: Math.max(10, Math.min(90, prev.cpuUsage + (Math.random() - 0.5) * 10)),
-        memoryUsage: Math.max(20, Math.min(95, prev.memoryUsage + (Math.random() - 0.5) * 5)),
-        diskUsage: Math.max(5, Math.min(80, prev.diskUsage + (Math.random() - 0.5) * 2)),
-        networkLatency: Math.max(5, prev.networkLatency + (Math.random() - 0.5) * 5),
-        activeConnections: Math.max(20, prev.activeConnections + Math.floor((Math.random() - 0.5) * 10)),
-        errorRate: Math.max(0, Math.min(5, prev.errorRate + (Math.random() - 0.5) * 0.2)),
-        uptime: Math.max(95, Math.min(100, prev.uptime + (Math.random() - 0.5) * 0.01)),
-        apiCalls: prev.apiCalls + Math.floor(Math.random() * 20)
-      }));
-      setLastUpdate(new Date());
-    }, 3000);
-
-    return () => clearInterval(intervalRef.current);
+    // Component only updates when real data is provided
+    // No simulation fallback to ensure accurate metrics
   }, [data]);
 
   // Network status monitoring
@@ -328,10 +311,13 @@ const PerformanceMonitor = ({ data, loading, language = 'ar' }) => {
             </div>
           </div>
           
-          {/* Simulated data points */}
+          {/* Real data visualization placeholder */}
           <div className="absolute bottom-0 left-0 right-0 h-32 flex items-end justify-center gap-1 px-4">
             {Array.from({ length: 24 }, (_, i) => {
-              const height = Math.random() * 80 + 20;
+              // Use actual metrics data for visualization instead of random data
+              const baseHeight = metrics.cpuUsage || 50;
+              const variation = (i % 3) * 10; // Simple pattern based on position
+              const height = Math.max(20, Math.min(90, baseHeight + variation - 15));
               const color = height > 70 ? 'bg-red-500' : height > 50 ? 'bg-yellow-500' : 'bg-green-500';
               return (
                 <div

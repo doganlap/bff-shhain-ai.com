@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import {
-  ChevronUp, ChevronDown, Search, Filter,
-  MoreVertical, Eye, Edit, Trash2
+  ChevronUp, ChevronDown, Search
 } from 'lucide-react';
 import { useBulkOperations } from '../../hooks/useBulkOperations';
 import { CRUDActions } from './ActionButtons';
 import BulkOperationsBar from './BulkOperationsBar';
-import { Tooltip } from '../ui/Tooltip';
 import { AnimatedCard } from '../Animation/InteractiveAnimationToolkit';
 
 /**
@@ -36,7 +34,6 @@ const DataTable = ({
 
   // Bulk operations hook
   const {
-    selectedItems,
     selectedCount,
     selectItem,
     selectAll,

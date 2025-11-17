@@ -117,17 +117,7 @@ Partner Login Uses /api/partner/auth/login
     ${data}=       Set Variable    ${resp.json()}
     Dictionary Should Contain Key    ${data}    accessToken
 
-Demo Registration Uses /api/public/demo/request
-    [Tags]    public    demo
-    ${payload}=    Create Dictionary
-    ...            fullName=${DEMO_FULL_NAME}
-    ...            email=${USER_EMAIL}
-    ...            companyName=${DEMO_COMPANY}
-    ${resp}=       POST On Session    bff    /api/public/demo/request    json=${payload}
-    Should Be Equal As Integers    ${resp.status_code}    200
-    ${data}=       To Json    ${resp.content}
-    Dictionary Should Contain Key    ${data}    requestId
-    Dictionary Should Contain Key    ${data}    status
+
 
 POC Request Uses /api/public/poc/request
     [Tags]    public    poc

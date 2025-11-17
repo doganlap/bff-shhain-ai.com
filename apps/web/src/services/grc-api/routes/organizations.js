@@ -1,5 +1,5 @@
 const express = require('express');
-const { dbQueries } = require('../config/database');
+const { dbQueries, query } = require('../config/database');
 const { v4: uuidv4 } = require('uuid');
 const router = express.Router();
 
@@ -90,7 +90,7 @@ router.get('/', async (req, res) => {
     });
 
   } catch (error) {
-    res.json({ success: true, data: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasNext: false, hasPrev: false } });
+    res.status(500).json({ success: false, error: 'Failed to fetch organizations' });
   }
 });
 
@@ -346,3 +346,38 @@ router.delete('/:id', async (req, res) => {
 });
 
 module.exports = router;
+
+/**
+ * POST /api/organizations/seed
+ * Seed demo organizations for the current tenant
+ */
+router.post('/seed', async (req, res) => {
+  try {
+    const tenantId = req.headers['x-tenant-id'];
+    if (!tenantId) {
+      return res.status(400).json({ success: false, error: 'Tenant ID required' });
+    }
+
+    const orgs = [
+      { name: 'Alpha Bank KSA', sector: 'banking', industry: 'financial_services', country: 'SA', city: 'Riyadh' },
+      { name: 'Nexus Tech', sector: 'technology', industry: 'software', country: 'SA', city: 'Jeddah' },
+      { name: 'Telecom United', sector: 'telecommunications', industry: 'telecom', country: 'SA', city: 'Dammam' },
+    ];
+
+    for (const o of orgs) {
+      const existing = await query('SELECT id FROM organizations WHERE name = $1 AND tenant_id = $2', [o.name, tenantId]);
+      if (existing.rows.length === 0) {
+        await query(
+          `INSERT INTO organizations (id, tenant_id, name, sector, industry, country, city, is_active, created_at, updated_at)
+           VALUES (gen_random_uuid(), $1, $2, $3, $4, $5, $6, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+          [tenantId, o.name, o.sector, o.industry, o.country, o.city]
+        );
+      }
+    }
+
+    res.json({ success: true, message: 'Organizations seed completed' });
+  } catch (error) {
+    console.error('❌ Error seeding organizations:', error);
+    res.status(500).json({ success: false, error: 'Seed failed', message: error.message });
+  }
+});

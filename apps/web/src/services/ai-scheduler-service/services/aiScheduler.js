@@ -58,71 +58,68 @@ class AIScheduler {
     try {
       console.log('📊 Loading historical data for AI scheduler...');
       
-      // Use mock data by default since database tables may not exist
-      this.historicalAssessments = [
-        {
-          id: 1,
-          name: 'Mock Assessment 1',
-          status: 'completed',
-          priority: 'high',
-          created_at: new Date(Date.now() - 86400000), // 1 day ago
-          updated_at: new Date(),
-          completed_at: new Date(),
-          organization_id: 1,
-          sector: 'finance',
-          size_category: 'medium',
-          response_count: 25,
-          evidence_count: 10,
-          completion_hours: 24
-        },
-        {
-          id: 2,
-          name: 'Mock Assessment 2',
-          status: 'completed',
-          priority: 'medium',
-          created_at: new Date(Date.now() - 172800000), // 2 days ago
-          updated_at: new Date(),
-          completed_at: new Date(),
-          organization_id: 2,
-          sector: 'healthcare',
-          size_category: 'large',
-          response_count: 50,
-          evidence_count: 20,
-          completion_hours: 48
-        }
-      ];
+      // Load real historical data from database
+      const assessmentsData = await this.db.query(`
+        SELECT 
+          a.id,
+          a.name,
+          a.status,
+          a.priority,
+          a.created_at,
+          a.updated_at,
+          a.completed_at,
+          a.organization_id,
+          o.sector,
+          o.size_category,
+          COUNT(DISTINCT ar.id) as response_count,
+          COUNT(DISTINCT ae.id) as evidence_count,
+          EXTRACT(EPOCH FROM (a.completed_at - a.created_at))/3600 as completion_hours
+        FROM assessments a
+        JOIN organizations o ON a.organization_id = o.id
+        LEFT JOIN assessment_responses ar ON a.id = ar.assessment_id
+        LEFT JOIN assessment_evidence ae ON a.id = ae.assessment_id
+        WHERE a.status = 'completed' 
+          AND a.completed_at IS NOT NULL
+          AND a.created_at >= NOW() - INTERVAL '6 months'
+        GROUP BY a.id, a.name, a.status, a.priority, a.created_at, a.updated_at, 
+                 a.completed_at, a.organization_id, o.sector, o.size_category
+        ORDER BY a.created_at DESC
+        LIMIT 1000
+      `);
       
-      this.historicalWorkflows = [
-        {
-          id: 1,
-          workflow_type: 'assessment_review',
-          priority: 'high',
-          assigned_to: 1,
-          assigned_at: new Date(Date.now() - 43200000), // 12 hours ago
-          completed_at: new Date(),
-          status: 'completed',
-          role: 'compliance_officer',
-          experience_level: 'senior',
-          completion_hours: 12
-        },
-        {
-          id: 2,
-          workflow_type: 'evidence_review',
-          priority: 'medium',
-          assigned_to: 2,
-          assigned_at: new Date(Date.now() - 86400000), // 1 day ago
-          completed_at: new Date(),
-          status: 'completed',
-          role: 'analyst',
-          experience_level: 'mid',
-          completion_hours: 24
-        }
-      ];
+      const workflowsData = await this.db.query(`
+        SELECT 
+          w.id,
+          w.workflow_type,
+          w.priority,
+          w.status,
+          w.created_at,
+          w.updated_at,
+          w.completed_at,
+          w.organization_id,
+          o.sector,
+          o.size_category,
+          COUNT(DISTINCT wt.id) as task_count,
+          EXTRACT(EPOCH FROM (w.completed_at - w.created_at))/3600 as completion_hours
+        FROM workflows w
+        JOIN organizations o ON w.organization_id = o.id
+        LEFT JOIN workflow_tasks wt ON w.id = wt.workflow_id
+        WHERE w.status = 'completed'
+          AND w.completed_at IS NOT NULL
+          AND w.created_at >= NOW() - INTERVAL '6 months'
+        GROUP BY w.id, w.workflow_type, w.priority, w.status, w.created_at, 
+                 w.updated_at, w.completed_at, w.organization_id, o.sector, o.size_category
+        ORDER BY w.created_at DESC
+        LIMIT 1000
+      `);
       
-      console.log(`📊 Loaded ${this.historicalAssessments.length} assessments and ${this.historicalWorkflows.length} workflows (mock data)`);
+      this.historicalAssessments = assessmentsData.rows || [];
+      this.historicalWorkflows = workflowsData.rows || [];
+      
+      console.log(`📊 Loaded ${this.historicalAssessments.length} assessments and ${this.historicalWorkflows.length} workflows from database`);
     } catch (error) {
       console.error('❌ Error loading historical data:', error);
-      // Use minimal mock data as fallback
+      // Use empty arrays as fallback - no mock data
       this.historicalAssessments = [];
       this.historicalWorkflows = [];
     }

@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { 
-  BarChart3, TrendingUp, Shield, AlertTriangle, CheckCircle, Clock,
+  BarChart3, Shield, AlertTriangle, CheckCircle, Clock,
   Bot, Brain, Cpu, MessageCircle, Activity, Users, Edit, Code, Settings,
-  Menu, X
+  TrendingUp, X
 } from 'lucide-react'
 
 const DashboardPreview = () => {
@@ -117,7 +117,7 @@ const DashboardPreview = () => {
           <div className="flex gap-4">
             {/* Main Dashboard */}
             <div className="flex-1 bg-white rounded-2xl shadow-2xl overflow-hidden border border-gray-200">
-              {/* Mock Dashboard Header */}
+              {/* Dashboard Header */}
               <div className="bg-gradient-to-r from-brand-primary to-brand-secondary text-white px-6 py-4 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Shield className="w-6 h-6" />
@@ -237,7 +237,7 @@ const DashboardPreview = () => {
         {/* Mobile Info */}
         <div className="text-center mt-6">
           <p className="font-arabic text-gray-600 text-sm">
-            💡 على شاشات صغيرة، انقر زر "فريق الذكاء الاصطناعي" لإظهار/إخفاء اللوحة
+            💡 على شاشات صغيرة، انقر زر &quot;فريق الذكاء الاصطناعي&quot; لإظهار/إخفاء اللوحة
           </p>
         </div>
       </div>

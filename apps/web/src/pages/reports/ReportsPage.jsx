@@ -12,6 +12,7 @@ const ReportsPage = () => {
   // State
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [serviceError, setServiceError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBy, setFilterBy] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
@@ -50,6 +51,16 @@ const ReportsPage = () => {
     fetchReports();
     fetchStats();
   }, [fetchReports, fetchStats]);
+
+  useEffect(() => {
+    const onServiceError = (e) => {
+      if (e.detail?.module === 'reports') {
+        setServiceError('Reports service unavailable');
+      }
+    };
+    window.addEventListener('service-error', onServiceError);
+    return () => window.removeEventListener('service-error', onServiceError);
+  }, []);
 
   // Calculate statistics
   const statsCards = [
@@ -194,6 +205,15 @@ const ReportsPage = () => {
         </div>
       }
     >
+      {serviceError && (
+        <div className="mb-4 rounded-lg p-4 bg-red-50 border border-red-200 flex items-center justify-between">
+          <p className="text-sm text-red-800">{serviceError}</p>
+          <div className="flex gap-3">
+            <button onClick={() => { setServiceError(null); fetchReports(); fetchStats(); }} className="text-red-700 underline">Retry</button>
+            <button onClick={() => setServiceError(null)} className="text-red-700 underline">Dismiss</button>
+          </div>
+        </div>
+      )}
       <div className="space-y-6">
         {/* Statistics Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

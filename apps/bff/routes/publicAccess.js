@@ -17,7 +17,7 @@ const JWT_EXPIRY = process.env.JWT_EXPIRY || '7d';
 const emailCache = new Map();
 const EMAIL_CACHE_TTL = 5 * 60 * 1000;
 
-function getCachedEmail(email) {
+function _getCachedEmail(email) {
   const cached = emailCache.get(email.toLowerCase());
   if (cached && Date.now() - cached.timestamp < EMAIL_CACHE_TTL) {
     return cached.data;
@@ -25,7 +25,7 @@ function getCachedEmail(email) {
   return null;
 }
 
-function setCachedEmail(email, data) {
+function _setCachedEmail(email, data) {
   emailCache.set(email.toLowerCase(), { data, timestamp: Date.now() });
   if (emailCache.size > 1000) {
     const oldestKey = emailCache.keys().next().value;
@@ -36,7 +36,7 @@ function setCachedEmail(email, data) {
 /**
  * Helper: Generate slug from name
  */
-function generateSlug(name, type) {
+function _generateSlug(name, type) {
   const baseSlug = name
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
@@ -45,230 +45,9 @@ function generateSlug(name, type) {
   return `${baseSlug}-${type}-${timestamp}`;
 }
 
-/**
- * Helper: Generate JWT token with enhanced security
- */
-function generateToken(user, tenant) {
-  const now = Math.floor(Date.now() / 1000);
-  return jwt.sign(
-    {
-      sub: user.id,
-      email: user.email,
-      tenantId: tenant.id,
-      tenantType: tenant.type,
-      tenantSlug: tenant.slug,
-      role: user.role,
-      iat: now,
-      jti: `${user.id}-${tenant.id}-${now}`, // JWT ID for token tracking
-      iss: 'grc-bff', // Issuer
-      aud: 'grc-platform' // Audience
-    },
-    JWT_SECRET,
-    {
-      expiresIn: JWT_EXPIRY,
-      algorithm: 'HS256'
-    }
-  );
-}
 
-/**
- * POST /api/public/demo/request
- * Create demo tenant + user + return JWT instantly
- */
-router.post('/public/demo/request', async (req, res) => {
-  const requestId = uuidv4();
 
-  try {
-    const {
-      fullName,
-      email,
-      companyName,
-      sector,
-      orgSize,
-      useCases = [],
-      notes
-    } = req.body;
 
-    // Validation
-    if (!fullName || !email) {
-      return res.status(400).json({
-        error: 'VALIDATION_ERROR',
-        message: 'Full name and email are required'
-      });
-    }
-
-    logger.info('Demo request received', { requestId, email, companyName });
-
-    // Check if email already has active demo
-    const existingDemoRequest = await prisma.demo_requests.findFirst({
-      where: {
-        email: email.toLowerCase(),
-        status: { in: ['approved_auto', 'approved_manual'] }
-      },
-      include: {
-        tenants: true
-      }
-    });
-
-    if (existingDemoRequest && existingDemoRequest.tenants) {
-      logger.info('Returning existing demo tenant', { requestId, tenantId: existingDemoRequest.tenants.id });
-
-      // Return existing tenant
-      const existingUser = await prisma.users.findFirst({
-        where: {
-          tenant_id: existingDemoRequest.tenants.id,
-          email: email.toLowerCase()
-        }
-      });
-
-      const token = generateToken(existingUser, existingDemoRequest.tenants);
-      
-      // Add ID field for enhancedAuth compatibility
-      const decoded = jwt.decode(token);
-      decoded.id = decoded.sub; // Copy sub to id for enhancedAuth compatibility
-      
-      // Re-sign the token with the additional field
-      const enhancedToken = jwt.sign(decoded, JWT_SECRET, {
-        expiresIn: JWT_EXPIRY,
-        algorithm: 'HS256'
-      });
-
-      return res.status(200).json({
-        requestId: existingDemoRequest.id,
-        status: 'approved_auto',
-        tenant: {
-          id: existingDemoRequest.tenants.id,
-          slug: existingDemoRequest.tenants.slug,
-          type: existingDemoRequest.tenants.type
-        },
-        user: {
-          id: existingUser.id,
-          email: existingUser.email,
-          fullName: existingUser.full_name,
-          role: existingUser.role
-        },
-        token: enhancedToken,
-        expiresAt: existingDemoRequest.tenants.expires_at
-      });
-    }
-
-    // Create new demo environment
-    const tenantSlug = generateSlug(companyName || fullName, 'demo');
-    const demoExpiresAt = new Date();
-    demoExpiresAt.setDate(demoExpiresAt.getDate() + 30); // 30 days demo
-
-    // Use transaction to ensure atomicity
-    const result = await prisma.$transaction(async (tx) => {
-      // 1. Create demo request
-      const demoRequest = await tx.demo_requests.create({
-        data: {
-          id: requestId,
-          email: email.toLowerCase(),
-          full_name: fullName,
-          company_name: companyName,
-          sector,
-          org_size: orgSize,
-          use_cases: useCases,
-          notes,
-          status: 'approved_auto',
-          reviewed_at: new Date()
-        }
-      });
-
-      // 2. Create tenant
-      const tenant = await tx.tenants.create({
-        data: {
-          id: uuidv4(),
-          slug: tenantSlug,
-          display_name: companyName || `${fullName}'s Demo`,
-          type: 'demo',
-          status: 'active',
-          sector,
-          expires_at: demoExpiresAt,
-          updated_at: new Date(),
-          metadata: {
-            orgSize,
-            useCases,
-            demoRequestId: requestId,
-            source: 'self-service'
-          }
-        }
-      });
-
-      // 3. Create user
-      const user = await tx.users.create({
-        data: {
-          id: uuidv4(),
-          tenant_id: tenant.id,
-          email: email.toLowerCase(),
-          full_name: fullName,
-          role: 'demo-admin',
-          updated_at: new Date(),
-          metadata: {
-            demoUser: true,
-            source: 'demo-registration'
-          }
-        }
-      });
-
-      // 4. Update demo request with tenant and user IDs
-      await tx.demo_requests.update({
-        where: { id: requestId },
-        data: {
-          tenant_id: tenant.id,
-          user_id: user.id
-        }
-      });
-
-      return { demoRequest, tenant, user };
-    });
-
-    // Generate JWT token
-    const token = generateToken(result.user, result.tenant);
-    
-    // Add ID field for enhancedAuth compatibility
-    const decoded = jwt.decode(token);
-    decoded.id = decoded.sub; // Copy sub to id for enhancedAuth compatibility
-    
-    // Re-sign the token with the additional field
-    const enhancedToken = jwt.sign(decoded, JWT_SECRET, {
-      expiresIn: JWT_EXPIRY,
-      algorithm: 'HS256'
-    });
-
-    logger.info('Demo environment created successfully', {
-      requestId,
-      tenantId: result.tenant.id,
-      userId: result.user.id
-    });
-
-    res.status(201).json({
-      requestId,
-      status: 'approved_auto',
-      tenant: {
-        id: result.tenant.id,
-        slug: result.tenant.slug,
-        type: result.tenant.type
-      },
-      user: {
-        id: result.user.id,
-        email: result.user.email,
-        fullName: result.user.full_name,
-        role: result.user.role
-      },
-      token: enhancedToken,
-      expiresAt: result.tenant.expires_at
-    });
-
-  } catch (error) {
-    logger.error('Demo request failed', { requestId, error: error.message, stack: error.stack });
-    res.status(500).json({
-      error: 'INTERNAL_ERROR',
-      message: 'Failed to create demo environment',
-      requestId
-    });
-  }
-});
 
 /**
  * POST /api/public/poc/request
@@ -372,7 +151,7 @@ router.post('/partner/auth/login', async (req, res) => {
         is_partner: true
       },
       include: {
-        tenant: true
+        tenants: true
       }
     });
 
@@ -467,3 +246,12 @@ router.post('/partner/auth/login', async (req, res) => {
 });
 
 module.exports = router;
+function generateToken(user, tenant) {
+  const payload = {
+    sub: user.id,
+    email: user.email,
+    tenantId: tenant.id,
+    role: user.role,
+  };
+  return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRY, algorithm: 'HS256' });
+}

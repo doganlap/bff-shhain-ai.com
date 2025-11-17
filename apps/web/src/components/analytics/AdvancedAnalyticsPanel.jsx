@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from 'recharts';
-import { TrendingUp, BarChart3, PieChart as PieChartIcon, Activity, Target, Filter } from 'lucide-react';
+import { TrendingUp, PieChart as PieChartIcon, Target, Filter } from 'lucide-react';
 import { useI18n } from '../../hooks/useI18n';
 import { useTheme } from '../theme/ThemeProvider';
 
 const AdvancedAnalyticsPanel = ({ data, filters, loading = false }) => {
-  const { t, language, isRTL } = useI18n();
+  const { t, isRTL } = useI18n();
   const { isDark } = useTheme();
   const [activeTab, setActiveTab] = useState('trends');
 

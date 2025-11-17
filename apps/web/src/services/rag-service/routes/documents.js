@@ -8,18 +8,27 @@ const router = express.Router();
 // Get documents
 router.get('/', async (req, res) => {
     try {
-        res.json({
-            success: true,
-            documents: [],
-            total: 0,
-            metadata: {
-                retrievedAt: new Date().toISOString()
+        // Forward to BFF for real document data
+        const response = await fetch('http://localhost:3000/api/rag/documents', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': req.headers.authorization || ''
             }
         });
+
+        if (!response.ok) {
+            throw new Error(`BFF request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        res.json(data);
     } catch (error) {
+        console.error('Documents fetch error:', error);
         res.status(500).json({
             success: false,
-            error: error.message
+            error: 'Documents service unavailable',
+            details: error.message
         });
     }
 });
@@ -36,21 +45,28 @@ router.post('/', async (req, res) => {
             });
         }
 
-        // Mock document creation
-        res.json({
-            success: true,
-            document: {
-                id: Date.now().toString(),
-                title,
-                content,
-                type: type || 'text',
-                createdAt: new Date().toISOString()
-            }
+        // Forward to BFF for real document creation
+        const response = await fetch('http://localhost:3000/api/rag/documents', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': req.headers.authorization || ''
+            },
+            body: JSON.stringify({ title, content, type })
         });
+
+        if (!response.ok) {
+            throw new Error(`BFF request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        res.json(data);
     } catch (error) {
+        console.error('Document creation error:', error);
         res.status(500).json({
             success: false,
-            error: error.message
+            error: 'Document creation failed',
+            details: error.message
         });
     }
 });

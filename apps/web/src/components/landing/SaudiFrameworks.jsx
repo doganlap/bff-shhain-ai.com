@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Shield, Building, Users, TrendingUp, CheckCircle, FileText } from 'lucide-react'
+import { Shield, Building, Users, CheckCircle, FileText } from 'lucide-react'
 
 const SaudiFrameworks = () => {
   const frameworkCategories = [

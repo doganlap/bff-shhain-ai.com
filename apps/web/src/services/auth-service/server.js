@@ -228,6 +228,10 @@ app.get('/api/info', (req, res) => {
   });
 });
 
+app.get('/', (req, res) => {
+  res.redirect('/api/info');
+});
+
 // Authentication routes
 app.use('/api/auth', authRoutes);
 

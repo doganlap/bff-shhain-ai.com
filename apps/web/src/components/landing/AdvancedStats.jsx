@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { TrendingUp, Users, CheckCircle, Zap, Award, Globe, Shield, BarChart3 } from 'lucide-react'
+import { TrendingUp, Users, CheckCircle, Zap, Award, Shield, BarChart3 } from 'lucide-react'
 
 const AdvancedStats = () => {
   const mainStats = [

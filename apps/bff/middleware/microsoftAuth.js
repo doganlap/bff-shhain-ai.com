@@ -187,7 +187,7 @@ function generateState() {
  */
 async function authenticateWithMicrosoft(req, res) {
   try {
-    const { code, state } = req.query;
+    const { code } = req.query;
 
     if (!code) {
       return res.status(400).json({
@@ -201,7 +201,7 @@ async function authenticateWithMicrosoft(req, res) {
     const tokens = await getMicrosoftAccessToken(code);
 
     // Verify ID token
-    const idTokenPayload = verifyMicrosoftIdToken(tokens.id_token);
+    verifyMicrosoftIdToken(tokens.id_token);
 
     // Get user profile
     const profile = await getMicrosoftUserProfile(tokens.access_token);

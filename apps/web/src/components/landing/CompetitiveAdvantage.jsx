@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Shield, Zap, Globe, Award, TrendingUp, Target, Brain, Cpu } from 'lucide-react'
+import { Shield, Zap, Globe, Award, TrendingUp, Cpu, Target } from 'lucide-react'
 
 const CompetitiveAdvantage = () => {
   const advantages = [

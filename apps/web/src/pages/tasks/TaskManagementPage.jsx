@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   CheckSquare, Square, User, Filter,
@@ -77,10 +77,42 @@ const TaskManagementPage = () => {
     fetchTasks();
   }, []);
 
+  const applyFilters = useCallback(() => {
+    let filtered = [...tasks];
+
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      filtered = filtered.filter(task =>
+        task.summary.toLowerCase().includes(term) ||
+        task.descriptionEn?.toLowerCase().includes(term) ||
+        task.descriptionAr?.includes(term) ||
+        task.controlId?.toLowerCase().includes(term) ||
+        task.section?.toLowerCase().includes(term)
+      );
+    }
+
+    if (filterFramework !== 'all') {
+      filtered = filtered.filter(task => task.labels?.includes(filterFramework));
+    }
+
+    if (filterPriority !== 'all') {
+      filtered = filtered.filter(task => task.priority === filterPriority);
+    }
+
+    if (filterAssignee !== 'all') {
+      filtered = filtered.filter(task => task.assignee === filterAssignee);
+    }
+
+    if (filterStatus !== 'all') {
+      filtered = filtered.filter(task => task.status === filterStatus);
+    }
+
+    setFilteredTasks(filtered);
+  }, [tasks, searchTerm, filterFramework, filterPriority, filterAssignee, filterStatus]);
+
   useEffect(() => {
     applyFilters();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tasks, searchTerm, filterFramework, filterPriority, filterAssignee, filterStatus]);
+  }, [applyFilters]);
 
   const fetchTasks = async () => {
     try {
@@ -113,43 +145,7 @@ const TaskManagementPage = () => {
     }
   };
 
-  const applyFilters = () => {
-    let filtered = [...tasks];
-
-    // Search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(task =>
-        task.summary.toLowerCase().includes(term) ||
-        task.descriptionEn?.toLowerCase().includes(term) ||
-        task.descriptionAr?.includes(term) ||
-        task.controlId?.toLowerCase().includes(term) ||
-        task.section?.toLowerCase().includes(term)
-      );
-    }
-
-    // Framework filter
-    if (filterFramework !== 'all') {
-      filtered = filtered.filter(task => task.labels?.includes(filterFramework));
-    }
-
-    // Priority filter
-    if (filterPriority !== 'all') {
-      filtered = filtered.filter(task => task.priority === filterPriority);
-    }
-
-    // Assignee filter
-    if (filterAssignee !== 'all') {
-      filtered = filtered.filter(task => task.assignee === filterAssignee);
-    }
-
-    // Status filter
-    if (filterStatus !== 'all') {
-      filtered = filtered.filter(task => task.status === filterStatus);
-    }
-
-    setFilteredTasks(filtered);
-  };
+  
 
   const updateTaskStatus = async (taskId, newStatus) => {
     try {

@@ -3,7 +3,7 @@
  * Displays upcoming compliance deadlines
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { regulatoryAPI } from '@/services/api';
 
@@ -12,11 +12,7 @@ const ComplianceCalendarWidget = () => {
   const [loading, setLoading] = useState(true);
   const [daysFilter, setDaysFilter] = useState(30);
 
-  useEffect(() => {
-    loadDeadlines();
-  }, [daysFilter]);
-
-  const loadDeadlines = async () => {
+  const loadDeadlines = useCallback(async () => {
     setLoading(true);
     try {
       // Get user's organization ID from context/auth
@@ -25,12 +21,15 @@ const ComplianceCalendarWidget = () => {
       const response = await regulatoryAPI.getCalendar(organizationId, daysFilter);
       setDeadlines(response.data || []);
     } catch (error) {
-      console.error('Error loading calendar:', error);
       setDeadlines([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [daysFilter]);
+
+  useEffect(() => {
+    loadDeadlines();
+  }, [daysFilter, loadDeadlines]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -153,7 +152,6 @@ const ComplianceCalendarWidget = () => {
                         await regulatoryAPI.markDeadlineComplete(deadline.id);
                         loadDeadlines();
                       } catch (error) {
-                        console.error('Error marking complete:', error);
                       }
                     }}
                     className="mt-3 w-full px-3 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition text-sm font-medium"
