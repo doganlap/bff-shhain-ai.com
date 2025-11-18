@@ -1,0 +1,72 @@
+===========================================
+QUICK ENVIRONMENT VARIABLES SETUP
+===========================================
+
+FRONTEND PROJECT: app-shahin-ai
+URL: https://vercel.com/donganksa/app-shahin-ai/settings/environment-variables
+
+Variable 1:
+Key: NODE_ENV
+Value: production
+Environments: Production, Preview, Development
+Encrypted: No
+
+Variable 2:
+Key: VITE_BFF_URL
+Value: https://bff-shahin-ai.vercel.app
+Environments: Production, Preview, Development
+Encrypted: No
+
+===========================================
+
+BFF PROJECT: bff-shahin-ai
+URL: https://vercel.com/donganksa/bff-shahin-ai/settings/environment-variables
+
+Variable 1:
+Key: NODE_ENV
+Value: production
+Environments: Production, Preview, Development
+Encrypted: No
+
+Variable 2:
+Key: DATABASE_URL
+Value: postgres://38452a313303a24baeddfbfe8046678d396610943c9b34e65432968f33793f7f:sk_ziZoE_g62VBpHvM3Nv6C7@db.prisma.io:5432/postgres?sslmode=require
+Environments: Production only
+Encrypted: YES ⚠️
+
+Variable 3:
+Key: JWT_SECRET
+Value: 208d15bb78bd8a7a17402c09b3a40f44d35df6f352e05fd9f5c0328b513dfa7a
+Environments: Production, Preview, Development
+Encrypted: YES ⚠️
+
+Variable 4:
+Key: SESSION_SECRET
+Value: 201a910fda3dcb149ec9a29cf4545c162000a96fbc3dc7ac5d344213d0e4f65f
+Environments: Production, Preview, Development
+Encrypted: YES ⚠️
+
+Variable 5:
+Key: FRONTEND_ORIGINS
+Value: https://app-shahin-ai.vercel.app,https://app.shahin-ai.com,https://www.shahin-ai.com,https://shahin-ai.com
+Environments: Production, Preview, Development
+Encrypted: No
+
+Variable 6 (Optional):
+Key: SERVICE_TOKEN
+Value: eae1e5b539d37adcf4dbe41947e8ed280504199e92150fa6ae377794734736d1
+Environments: Production
+Encrypted: YES ⚠️
+
+===========================================
+INSTRUCTIONS:
+===========================================
+1. Open the Vercel Dashboard URLs above
+2. Click "Add New" for each variable
+3. Copy-paste the Key and Value
+4. Select the Environments
+5. Check "Encrypted" if marked YES ⚠️
+6. Click "Save"
+7. Repeat for all variables
+8. Redeploy both projects after setting all variables
+

@@ -1,37 +1,38 @@
 {
-  "version": 2,
-  "builds": [
+  "buildCommand": "cd apps/web && pnpm install && pnpm build",
+  "outputDirectory": "apps/web/dist",
+  "installCommand": "pnpm install",
+  "rewrites": [
     {
-      "src": "apps/bff/index.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "apps/web/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
-  "routes": [
+  "headers": [
     {
-      "src": "/api/(.*)",
-      "dest": "/apps/bff/index.js"
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
+        { "key": "Pragma", "value": "no-cache" },
+        { "key": "Expires", "value": "0" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://vercel.live data: blob:; script-src-elem 'self' 'unsafe-inline' https://vercel.live data: blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; frame-src 'self'; frame-ancestors 'none'; connect-src 'self' https: wss:;" },
+        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" }
+      ]
     },
     {
-      "src": "/bff/(.*)",
-      "dest": "/apps/bff/index.js"
+      "source": "/assets/(.*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
     },
     {
-      "src": "/health",
-      "dest": "/apps/bff/index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/apps/web/$1"
+      "source": "/(.*).svg",
+      "headers": [
+        { "key": "Content-Type", "value": "image/svg+xml; charset=utf-8" },
+        { "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }
+      ]
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }

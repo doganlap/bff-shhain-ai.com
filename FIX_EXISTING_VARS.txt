@@ -1,0 +1,58 @@
+===========================================
+HOW TO FIX "Variable Already Exists" ERROR
+===========================================
+
+PROBLEM:
+NODE_ENV already exists for Development and Preview,
+but you're trying to add it for Production.
+
+SOLUTION:
+Update the existing variable instead of creating new one.
+
+===========================================
+STEP-BY-STEP:
+===========================================
+
+1. Go to Environment Variables page
+2. Find "NODE_ENV" in the list
+3. Click on "NODE_ENV" (or click Edit icon)
+4. You'll see:
+   - Current value
+   - Current environments (Dev, Preview)
+   
+5. Check the "Production" checkbox
+6. Make sure value is "production"
+7. Click "Save"
+
+That's it! You've updated the existing variable.
+
+===========================================
+FOR OTHER VARIABLES:
+===========================================
+
+If variable DOESN'T exist:
+→ Click "Add New" and add it normally
+
+If variable EXISTS:
+→ Click on it to edit
+→ Update value/environments
+→ Save
+
+===========================================
+QUICK CHECKLIST:
+===========================================
+
+Frontend (app-shahin-ai):
+□ NODE_ENV - UPDATE (add Production)
+□ VITE_BFF_URL - ADD NEW
+
+BFF (bff-shahin-ai):
+□ NODE_ENV - UPDATE (add Production)
+□ DATABASE_URL - ADD NEW
+□ JWT_SECRET - ADD NEW
+□ SESSION_SECRET - ADD NEW
+□ FRONTEND_ORIGINS - ADD NEW
+□ SERVICE_TOKEN - ADD NEW (optional)
+
+===========================================
+
